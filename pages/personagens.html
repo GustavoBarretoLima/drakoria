@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escolha seu Herói - Drakoria</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="../css/personagens.css" />
+  </head>
+  <body>
+    <section id="selecao">
+      <h1>Escolha seu Herói</h1>
+      <p>Selecione a classe que guiará seu destino em Drakoria.</p>
+
+      <!-- Campo para nome do herói -->
+      <div class="opcoes-nome">
+        <label for="nomeHeroi">Digite o nome do seu herói:</label>
+        <input
+          type="text"
+          id="nomeHeroi"
+          placeholder="Ex: Arthan, Lyra, Kael..."
+          required
+        />
+      </div>
+
+      <!-- Escolha de gênero -->
+      <div class="opcoes-genero">
+        <button onclick="selecionarGenero('Masculino')">Masculino</button>
+        <button onclick="selecionarGenero('Feminino')">Feminino</button>
+      </div>
+
+      <!-- Cards lado a lado -->
+      <div class="cards">
+        <!-- Guerreiro -->
+        <div class="card">
+          <img
+            id="imgGuerreiro"
+            src="../img/personagens/guerreiro.png"
+            alt="Guerreiro"
+          />
+          <h2 id="nomeGuerreiro">Guerreiro</h2>
+          <p>Força e coragem indomáveis.</p>
+          <button onclick="selecionarPersonagem('Guerreiro')">
+            Selecionar
+          </button>
+        </div>
+
+        <!-- Mago -->
+        <div class="card">
+          <img id="imgMago" src="../img/personagens/mago.png" alt="Mago" />
+          <h2 id="nomeMago">Mago</h2>
+          <p>
+            Domina os elementos e conjura feitiços poderosos contra seus
+            inimigos.
+          </p>
+          <button onclick="selecionarPersonagem('Mago')">Selecionar</button>
+        </div>
+
+        <!-- Arqueiro -->
+        <div class="card">
+          <img
+            id="imgArqueiro"
+            src="../img/personagens/arqueiro.png"
+            alt="Arqueiro"
+          />
+          <h2 id="nomeArqueiro">Arqueiro</h2>
+          <p>Ágil e preciso, ataca de longe com flechas certeiras.</p>
+          <button onclick="selecionarPersonagem('Arqueiro')">Selecionar</button>
+        </div>
+      </div>
+    </section>
+
+    <script src="../js/personagens.js" defer></script>
+  </body>
+</html>

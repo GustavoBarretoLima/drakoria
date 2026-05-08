@@ -1,0 +1,102 @@
+body {
+  background: url("../img/stages/dracit.png") no-repeat center center fixed;
+  background-size: cover;
+  font-family: "Cinzel", serif;
+  color: #fff;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+#introTexto {
+  background: rgba(0, 0, 0, 0.7);
+  margin: 50px auto;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 800px;
+  box-shadow: 0 0 20px #ffd700;
+  font-size: 1.2em;
+  line-height: 1.6;
+  min-height: 200px; /* espaço reservado para o texto */
+  white-space: pre-line; /* mantém quebras de linha */
+}
+
+/* Botão continuar */
+button {
+  margin-top: 20px;
+  padding: 12px 25px;
+  background: #8b0000;
+  color: #fff;
+  border: 2px solid #ffd700;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1em;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: #b22222;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px #ffd700;
+}
+
+/* Animação suave de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.nome-destaque {
+  color: #ffd700;
+  font-weight: bold;
+  text-shadow:
+    0 0 10px #ff8c00,
+    0 0 20px #ffd700;
+  animation: brilhoHeroi 2s infinite alternate;
+}
+
+@keyframes brilhoHeroi {
+  from {
+    text-shadow: 0 0 5px #ffd700;
+  }
+  to {
+    text-shadow:
+      0 0 20px #ff8c00,
+      0 0 30px #ffd700;
+  }
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  #introTexto {
+    max-width: 90%;
+    font-size: 1.1em;
+    padding: 25px;
+  }
+
+  button {
+    font-size: 0.95em;
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  #introTexto {
+    margin: 30px auto;
+    font-size: 1em;
+    line-height: 1.4;
+    padding: 20px;
+  }
+
+  button {
+    width: 80%;
+    font-size: 0.9em;
+    padding: 10px;
+  }
+}

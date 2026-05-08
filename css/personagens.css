@@ -1,0 +1,243 @@
+body {
+  background: url("../img/stages/dracit.png") no-repeat center center fixed;
+  background-size: cover;
+  font-family: "Cinzel", serif;
+  color: #fff;
+  text-align: center;
+}
+
+#selecao {
+  background: rgba(0, 0, 0, 0.6);
+  margin: 50px auto;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 1000px;
+  box-shadow: 0 0 20px #ffd700;
+}
+
+.cards {
+  display: flex;
+  justify-content: center; /* centraliza os cards */
+  gap: 20px; /* espaçamento entre eles */
+  margin-top: 30px;
+}
+
+.card {
+  background: rgba(30, 30, 30, 0.8);
+  border: 2px solid #ffd700;
+  border-radius: 10px;
+  flex: 1 1 280px; /* largura mínima de 280px */
+  max-width: 300px;
+  padding: 20px;
+  box-shadow: 0 0 15px #ff4500;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.card h2 {
+  color: #ffd700;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 0.9em;
+  margin-bottom: 15px;
+}
+
+.card button {
+  padding: 10px 20px;
+  background: #8b0000;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.card button:hover {
+  background-color: #b22222;
+}
+
+.card img,
+.card h2 {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+.fade-in {
+  opacity: 1;
+}
+
+.opcoes-genero {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.opcoes-genero button {
+  padding: 10px 20px;
+  background: #444;
+  color: #fff;
+  border: 2px solid #ffd700;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.opcoes-genero button:hover {
+  background: #666;
+}
+
+.opcoes-genero button.ativo {
+  background: #ffd700;
+  color: #000;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px #ffd700;
+}
+/* Animações */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInCenter {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Efeito de brilho dourado */
+@keyframes goldenGlow {
+  0% {
+    box-shadow: 0 0 5px #ffd700;
+  }
+  50% {
+    box-shadow:
+      0 0 20px #ffd700,
+      0 0 40px #ff8c00;
+  }
+  100% {
+    box-shadow: 0 0 5px #ffd700;
+  }
+}
+
+/* Aplica brilho na entrada */
+.card {
+  background: rgba(30, 30, 30, 0.8);
+  border: 2px solid #ffd700;
+  border-radius: 10px;
+  flex: 1;
+  max-width: 300px;
+  min-width: 250px;
+  padding: 20px;
+  box-shadow: 0 0 15px #ff4500;
+  transition: transform 0.3s ease;
+  opacity: 0; /* começa invisível */
+}
+
+/* Animações de entrada com brilho */
+.card:nth-child(1) {
+  animation:
+    slideInLeft 0.8s ease-out forwards,
+    goldenGlow 2s ease-in-out 0.2s;
+}
+
+.card:nth-child(2) {
+  animation:
+    slideInCenter 0.8s ease-out forwards 0.6s,
+    goldenGlow 2s ease-in-out 0.6s;
+}
+
+.card:nth-child(3) {
+  animation:
+    slideInRight 0.8s ease-out forwards 1s,
+    goldenGlow 2s ease-in-out 1s;
+}
+.opcoes-nome {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.opcoes-nome label {
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.opcoes-nome input {
+  padding: 10px;
+  width: 250px;
+  border: 2px solid #ffd700;
+  border-radius: 6px;
+  background: rgba(30, 30, 30, 0.8);
+  color: #fff;
+  font-size: 1em;
+  text-align: center;
+}
+.opcoes-nome input:invalid {
+  border: 2px solid red;
+  box-shadow: 0 0 10px red;
+}
+
+.opcoes-nome input:valid {
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 10px #ffd700;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card {
+    width: 90%; /* ocupa quase toda a largura da tela */
+  }
+}
+
+@media (max-width: 600px) {
+  .opcoes-nome input {
+    width: 80%;
+    font-size: 0.9em;
+  }
+}

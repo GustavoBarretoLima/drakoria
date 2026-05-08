@@ -1,0 +1,83 @@
+body {
+  background-image: url("../img/stages/drakoria.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: "Cinzel", serif;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+#login {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 40px 50px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px #ffd700;
+  text-align: center;
+  width: 90%;
+  max-width: 400px;
+  animation: fadeIn 1.5s ease forwards;
+}
+
+#login h1 {
+  color: #ffd700;
+  margin-bottom: 10px;
+}
+
+#login p {
+  margin-bottom: 20px;
+  font-size: 1.1em;
+}
+
+#login input {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 12px;
+  border: 2px solid #ffd700;
+  border-radius: 6px;
+  background: #333;
+  color: #fff;
+}
+
+#login button {
+  margin-top: 15px;
+  padding: 12px 24px;
+  background: #8b0000;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 0 15px #ff4500;
+  transition: background-color 0.3s ease;
+}
+
+#login button:hover {
+  background-color: #b22222;
+}
+
+.voltar a {
+  color: #ffd700;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.voltar a:hover {
+  text-decoration: underline;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

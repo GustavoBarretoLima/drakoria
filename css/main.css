@@ -1,0 +1,110 @@
+/* ======== Fundo ======== */
+body {
+  background-image: url("/img/drakoria.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+  font-family: "Cinzel", serif;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ======== Container da lore ======== */
+#lore {
+  width: 80%;
+  max-width: 800px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+  opacity: 0;
+  animation: fadeIn 2s ease forwards;
+}
+
+/* ======== Título e texto ======== */
+#lore h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #ffd700;
+  text-shadow: 0 0 15px #000;
+}
+
+#lore p {
+  font-size: 1.2em;
+  line-height: 1.6;
+  color: #f0f0f0;
+  margin-bottom: 25px;
+}
+
+/* ======== Botão ======== */
+#lore button {
+  padding: 15px 40px;
+  font-size: 1.3em;
+  background-color: #8b0000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 15px #ff4500;
+  transition: background-color 0.3s ease;
+  animation: pulseGlow 2s infinite;
+}
+
+#lore button:hover {
+  background-color: #b22222;
+}
+
+/* ======== Animações ======== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 10px #ff4500;
+  }
+  50% {
+    box-shadow:
+      0 0 25px #ff6347,
+      0 0 50px #ff4500;
+  }
+  100% {
+    box-shadow: 0 0 10px #ff4500;
+  }
+}
+
+/* ======== Responsividade ======== */
+@media (max-width: 768px) {
+  #lore {
+    width: 95%;
+    padding: 20px;
+  }
+
+  #lore h1 {
+    font-size: 2em;
+  }
+
+  #lore p {
+    font-size: 1em;
+    line-height: 1.4;
+  }
+
+  #lore button {
+    width: 100%;
+    font-size: 1.1em;
+    padding: 12px;
+  }
+}
