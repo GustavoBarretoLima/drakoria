@@ -1,0 +1,215 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Trebuchet MS", sans-serif;
+  background: linear-gradient(to bottom, #1a1a1a, #000);
+  color: #fff;
+}
+
+#batalha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 20px;
+}
+
+/* STATUS */
+.status {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #444;
+  border-radius: 10px;
+  padding: 10px 20px;
+  margin: 10px;
+  text-align: center;
+}
+
+.status h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #ffcc00;
+}
+
+/* CAMPO DE BATALHA */
+.campo {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 100px;
+  position: relative;
+  margin-top: 40px;
+}
+/*fundo animado*/
+#batalha::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.2) 2px,
+    transparent 2px
+  );
+  background-size: 40px 40px;
+  animation: moverParticulas 10s linear infinite;
+  z-index: -1;
+}
+
+@keyframes moverParticulas {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100px 100px;
+  }
+}
+
+/* Contêineres do herói e inimigo */
+.heroi,
+.inimigo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Imagens */
+.heroi-img,
+.inimigo-img {
+  width: 260px;
+  height: 360px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
+}
+
+/* Destaque do herói */
+.heroi-img {
+  border: 3px solid #ffcc00;
+  animation: brilhoHeroi 2s infinite alternate;
+}
+
+@keyframes brilhoHeroi {
+  from {
+    box-shadow: 0 0 10px #ffcc00;
+  }
+  to {
+    box-shadow: 0 0 25px #ffcc00;
+  }
+}
+
+/* Status abaixo das imagens */
+.heroi-status,
+.inimigo-status {
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #444;
+  border-radius: 10px;
+  padding: 10px 20px;
+  width: 220px;
+  text-align: center;
+}
+
+/* Títulos */
+.heroi-status h2,
+.inimigo-status h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #ffcc00;
+}
+
+/* Barras */
+.barra {
+  width: 180px;
+  height: 18px;
+  background: #333;
+  border: 2px solid #555;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 5px auto;
+}
+
+.hp {
+  height: 100%;
+  background: linear-gradient(to right, #ff0000, #aa0000);
+  transition: width 0.3s ease;
+}
+
+.mana {
+  height: 100%;
+  background: linear-gradient(to right, #0066ff, #0033aa);
+  transition: width 0.3s ease;
+}
+
+/* EFEITOS DE DANO E MAGIA */
+.inimigo.dano {
+  filter: brightness(2) saturate(2);
+  animation: flash 0.4s ease;
+}
+
+@keyframes flash {
+  0% {
+    transform: scale(1.05);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.heroi.magia {
+  box-shadow:
+    0 0 20px #00f inset,
+    0 0 40px #0ff;
+  animation: glow 0.6s ease;
+}
+
+@keyframes glow {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+/* BOTÕES DE AÇÃO */
+.acoes {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.acoes button {
+  background: #ff4444;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    background 0.3s;
+}
+
+.acoes button:hover {
+  transform: scale(1.1);
+  background: #ff6600;
+}
+
+/* MENSAGENS */
+#mensagens {
+  margin-top: 20px;
+  font-size: 1.2rem;
+  font-style: italic;
+  text-shadow: 2px 2px 4px #000;
+}

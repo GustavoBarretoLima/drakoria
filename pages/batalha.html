@@ -1,6 +1,62 @@
-<body>
-  <h1>Campo de Batalha</h1>
-  <p id="infoPersonagem"></p>
-  <!-- Aqui você pode adicionar inimigos, HUD, etc -->
-</body>
-<script src="../js/batalha.js" defer></script>
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Batalha - Drakoria</title>
+    <link rel="stylesheet" href="../css/batalha.css" />
+  </head>
+  <body>
+    <section id="batalha" style="position: relative;"></section>
+      <!-- Campo de batalha -->
+      <div class="campo">
+        <!-- Herói -->
+        <div class="heroi">
+          <img
+            src="../img/personagens/guerreiro.png"
+            alt="Herói"
+            class="heroi-img"
+          />
+          <div class="status heroi-status">
+            <h2 id="nomeHeroi"></h2>
+            <p>Classe: <span id="classeHeroi"></span></p>
+            <div class="barra">
+              <div id="hpHeroiBar" class="hp" style="width: 100%"></div>
+            </div>
+            <div class="barra">
+              <div id="manaHeroiBar" class="mana" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inimigo -->
+        <div class="inimigo">
+          <img
+            src="../img/monstros/goblin.png"
+            alt="Goblin Anime"
+            class="inimigo-img"
+          />
+          <div class="status inimigo-status">
+            <h2>Goblin</h2>
+            <div class="barra">
+              <div id="hpInimigoBar" class="hp" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="acoes">
+        <button onclick="atacar()">Atacar</button>
+        <button onclick="defender()">Defender</button>
+        <button onclick="magia()">Magia</button>
+        <button onclick="fugir()">Fugir</button>
+      </div>
+
+      <!-- Mensagens -->
+      <div id="mensagens"></div>
+    </section>
+
+    <script src="../js/batalhas.js"></script>
+  </body>
+</html>

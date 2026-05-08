@@ -10,18 +10,32 @@ window.onload = function () {
     Um Goblin faminto bloqueia sua passagem!
   `;
 
-  digitarTexto(introTexto, "introTexto");
+  digitarTexto(introTexto, "introTexto", () => {
+    const goblinCena = document.getElementById("goblinCena");
+    const somGoblin = document.getElementById("somGoblin");
+
+    goblinCena.style.display = "block";
+    somGoblin.play(); // toca o som junto com o tremor
+
+    setTimeout(() => {
+      document.getElementById("falaGoblin").innerHTML =
+        "“Haaaaaaa! Carne fresca! Você não passará, herói!”";
+      document.getElementById("continuar").style.display = "inline-block";
+    }, 1200);
+  });
 };
 
-function digitarTexto(texto, elementoId) {
+function digitarTexto(texto, elementoId, callback) {
   const elemento = document.getElementById(elementoId);
   let i = 0;
 
   function escrever() {
     if (i < texto.length) {
-      elemento.innerHTML = texto.substring(0, i + 1); // usa innerHTML para renderizar tags
+      elemento.innerHTML = texto.substring(0, i + 1);
       i++;
       setTimeout(escrever, 40);
+    } else {
+      if (callback) callback();
     }
   }
 
