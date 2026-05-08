@@ -1,6 +1,6 @@
 /* ======== Fundo ======== */
 body {
-  background-image: url("/img/drakoria.png");
+  background-image: url("../img/drakoria.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
