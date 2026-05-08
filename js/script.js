@@ -2,7 +2,7 @@
 
 function entrarNoJogo() {
   // Exemplo: redirecionar para login.html
-  window.location.href = "../pages/login.html";
+  window.location.href = "pages/login.html";
 }
 
 // Se estiver usando type="module", precisa expor manualmente:
