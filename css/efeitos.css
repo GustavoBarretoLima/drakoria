@@ -11,6 +11,32 @@
   position: absolute;
 }
 
+.dano-numero {
+  position: absolute;
+  top: 40%; /* ponto inicial */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 40px;
+  font-weight: bold;
+  color: #ff3333;
+  text-shadow: 0 0 10px #000;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.dano-critico {
+  position: absolute;
+  top: 35%; /* ponto inicial */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 52px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 15px #ff0;
+  pointer-events: none;
+  z-index: 120;
+}
+
 /* ⚔️ Corte básico com brilho */
 .corte-amplo {
   position: absolute;

@@ -113,7 +113,7 @@ export async function efeitoMagiaCritica(heroi, inimigo) {
   }).finished;
 }
 
-// 🔴 Dano normal
+// 🔴 Dano normal – sobe e desaparece
 export function efeitoDano(inimigo, valor) {
   const dano = document.createElement("div");
   dano.classList.add("dano-numero");
@@ -122,15 +122,15 @@ export function efeitoDano(inimigo, valor) {
 
   anime({
     targets: dano,
-    translateY: [-20, -60],
-    opacity: [1, 0],
+    translateY: [0, -60], // sobe 60px
+    opacity: [1, 0], // desaparece
     duration: 1000,
-    easing: "easeOutCubic",
+    easing: "easeOutQuad",
     complete: () => dano.remove(),
   });
 }
 
-// ✨ Dano crítico
+// ✨ Dano crítico – sobe mais alto e com pulso
 export function efeitoDanoCritico(inimigo, valor) {
   const critico = document.createElement("div");
   critico.classList.add("dano-critico");
@@ -139,9 +139,9 @@ export function efeitoDanoCritico(inimigo, valor) {
 
   anime({
     targets: critico,
-    translateY: [-30, -80],
-    opacity: [1, 0],
-    scale: [1, 1.3],
+    translateY: [0, -100], // sobe 100px
+    scale: [1, 1.3], // dá um pulso
+    opacity: [1, 0], // desaparece
     duration: 1200,
     easing: "easeOutBack",
     complete: () => critico.remove(),
