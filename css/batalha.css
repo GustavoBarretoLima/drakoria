@@ -1,3 +1,4 @@
+/* Layout base */
 body {
   margin: 0;
   padding: 0;
@@ -10,39 +11,475 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  height: 100vh;
-  padding: 20px;
-}
-
-/* STATUS */
-.status {
-  background: rgba(0, 0, 0, 0.6);
-  border: 2px solid #444;
-  border-radius: 10px;
-  padding: 10px 20px;
-  margin: 10px;
-  text-align: center;
-}
-
-.status h2 {
-  margin: 0;
-  font-size: 1.4rem;
-  color: #ffcc00;
-}
-
-/* CAMPO DE BATALHA */
-.campo {
-  flex: 1;
-  display: flex;
-  align-items: flex-end;
   justify-content: center;
-  gap: 100px;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
   position: relative;
-  margin-top: 40px;
+  overflow: hidden;
 }
-/*fundo animado*/
+
+/* --- Efeitos de dano e magia --- */
+.inimigo-img.dano {
+  animation: piscarVermelho 0.4s;
+}
+@keyframes piscarVermelho {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(2) saturate(2) hue-rotate(-20deg);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.heroi-img.magia {
+  animation: brilhoMagico 0.6s ease-in-out;
+}
+@keyframes brilhoMagico {
+  0% {
+    filter: drop-shadow(0 0 0px #00f);
+  }
+  50% {
+    filter: drop-shadow(0 0 15px #00f);
+  }
+  100% {
+    filter: drop-shadow(0 0 0px #00f);
+  }
+}
+
+/* Container do inimigo */
+.inimigo {
+  position: relative;
+  display: inline-block;
+}
+
+/* Cortes centralizados no inimigo */
+.corte-amplo,
+.corte-c,
+.corte-pesado,
+.corte-critico-c {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* centraliza dentro do card */
+}
+.heroi {
+  position: relative;
+  display: inline-block;
+}
+/*guerreiro/guerreira*/
+@keyframes corteAmplo {
+  0% {
+    transform: translate(-50%, -50%) scaleX(0.2);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scaleX(1.5);
+    opacity: 0;
+  }
+}
+.corte-amplo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+  animation: corteAmplo 1s ease-out forwards;
+  z-index: 20;
+}
+
+@keyframes corteC {
+  0% {
+    transform: rotate(0deg) scale(0.5);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(180deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(240deg) scale(1.2);
+    opacity: 0;
+  }
+}
+.corte-c {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 140px;
+  height: 140px;
+  border: 6px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  animation: corteC 1.2s ease-out forwards;
+  z-index: 25;
+}
+
+@keyframes cortePesado {
+  0% {
+    transform: translate(-50%, -50%) scaleY(0.2);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scaleY(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scaleY(1.4);
+    opacity: 0;
+  }
+}
+.corte-pesado {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, #fff, transparent);
+  animation: cortePesado 1s ease-out forwards;
+  z-index: 20;
+}
+/* Explosão mágica (Mago) */
+@keyframes explosaoMagica {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+    filter: drop-shadow(0 0 20px #00f);
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+.explosao-magica {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #00f, #004);
+  animation: explosaoMagica 0.8s ease-out forwards;
+  z-index: 60;
+}
+
+/* Barreira mágica (Mago) */
+@keyframes barreiraMagica {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    filter: drop-shadow(0 0 15px #0ff);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+.barreira-magica {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #0ff;
+  animation: barreiraMagica 1s ease-out forwards;
+  z-index: 60;
+}
+
+/* Raio mágico crítico (Mago) */
+@keyframes raioMagico {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  50% {
+    height: 100px;
+    opacity: 1;
+    filter: drop-shadow(0 0 10px #f0f);
+  }
+  100% {
+    height: 0;
+    opacity: 0;
+  }
+}
+.raio-magico {
+  position: absolute;
+  width: 6px;
+  height: 100px;
+  background: linear-gradient(to bottom, #f0f, #800080);
+  animation: raioMagico 0.6s ease-out forwards;
+  z-index: 60;
+}
+
+/* Escudo do Guerreiro */
+@keyframes escudoAnimacao {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    filter: drop-shadow(0 0 15px #ffd700);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+.escudo {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #ffd700;
+  animation: escudoAnimacao 1s ease-out forwards;
+  z-index: 60;
+}
+
+/* Flecha normal (Arqueiro) */
+@keyframes flechaAnimacao {
+  0% {
+    transform: translateX(-200px) translateY(-20px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(200px) translateY(20px);
+    opacity: 0;
+  }
+}
+.flecha {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 60px;
+  height: 6px;
+  background: linear-gradient(90deg, #ccc, #999);
+  border-radius: 3px;
+  animation: flechaAnimacao 0.8s linear forwards;
+  z-index: 60;
+}
+
+/* Flecha crítica (Arqueiro) */
+@keyframes flechaCriticaAnimacao {
+  0% {
+    transform: translateX(-250px) translateY(-30px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(250px) translateY(30px);
+    opacity: 0;
+  }
+}
+.flecha-critica {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 80px;
+  height: 8px;
+  background: linear-gradient(90deg, #ff0, #f00);
+  border-radius: 4px;
+  animation: flechaCriticaAnimacao 0.8s linear forwards;
+  z-index: 60;
+}
+
+/* Esquiva rápida (Arqueiro) */
+@keyframes esquivaRapida {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-40px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.heroi-img.esquiva {
+  animation: esquivaRapida 0.6s ease-out;
+}
+
+/* --- Corte crítico especial --- */
+@keyframes corteExplosivo {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+    opacity: 1;
+    box-shadow: 0 0 10px #ff0000;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2) rotate(180deg);
+    opacity: 1;
+    box-shadow: 0 0 25px #ffcc00;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5) rotate(360deg);
+    opacity: 0;
+    box-shadow: 0 0 40px #fff;
+  }
+}
+
+.corte-critico {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  border: 6px solid rgba(255, 0, 0, 0.9);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: corteExplosivo 1.2s ease-out forwards;
+  z-index: 50;
+}
+
+/* --- Números de dano --- */
+@keyframes danoFlutuante {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    color: #ff2222;
+  }
+  50% {
+    transform: translateY(-30px) scale(1.2);
+    opacity: 0.9;
+    color: #ffcc00;
+  }
+  100% {
+    transform: translateY(-60px) scale(1.3);
+    opacity: 0;
+    color: #fff;
+  }
+}
+.dano-numero {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 36px;
+  font-weight: bold;
+  animation: danoFlutuante 1.2s ease-out forwards;
+  pointer-events: none;
+  z-index: 30;
+}
+
+@keyframes danoCritico {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    color: #ff0000;
+  }
+  30% {
+    transform: translateY(-20px) scale(1.5);
+    opacity: 1;
+    color: #ffcc00;
+  }
+  70% {
+    transform: translateY(-40px) scale(1.8);
+    opacity: 0.9;
+    color: #fff;
+  }
+  100% {
+    transform: translateY(-70px) scale(2);
+    opacity: 0;
+  }
+}
+.dano-critico {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 52px;
+  font-weight: bold;
+  animation: danoCritico 1.5s ease-out forwards;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Escudo do Guerreiro */
+@keyframes escudoAnimacao {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    filter: drop-shadow(0 0 15px #ffd700);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+.escudo {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #ffd700;
+  animation: escudoAnimacao 1s ease-out forwards;
+  z-index: 25;
+}
+
+/* Flecha crítica do Arqueiro */
+@keyframes flechaCriticaAnimacao {
+  0% {
+    transform: translateX(-250px) translateY(-30px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(250px) translateY(30px);
+    opacity: 0;
+  }
+}
+.flecha-critica {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 80px;
+  height: 8px;
+  background: linear-gradient(90deg, #ff0, #f00);
+  border-radius: 4px;
+  animation: flechaCriticaAnimacao 0.8s linear forwards;
+  z-index: 40;
+}
+
+/* --- Campo de batalha --- */
+.campo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+/* Fundo com chamas e brasas */
 #batalha::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("../img/stages/arena-fogo.png");
+  background-size: cover;
+  background-position: center;
+  z-index: -2;
+}
+#batalha::after {
   content: "";
   position: absolute;
   top: 0;
@@ -51,79 +488,65 @@ body {
   height: 100%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.2) 2px,
+    rgba(255, 100, 0, 0.3) 2px,
     transparent 2px
   );
-  background-size: 40px 40px;
-  animation: moverParticulas 10s linear infinite;
+  background-size: 60px 60px;
+  animation: brasasFlutuando 12s linear infinite;
   z-index: -1;
 }
-
-@keyframes moverParticulas {
+@keyframes brasasFlutuando {
   from {
     background-position: 0 0;
   }
   to {
-    background-position: 100px 100px;
+    background-position: 120px 240px;
   }
-}
-
-/* Contêineres do herói e inimigo */
-.heroi,
-.inimigo {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
 }
 
 /* Imagens */
 .heroi-img,
 .inimigo-img {
   width: 260px;
-  height: 360px;
+  max-width: 100%;
+  height: auto;
   border-radius: 12px;
   object-fit: cover;
   box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
 }
 
-/* Destaque do herói */
-.heroi-img {
-  border: 3px solid #ffcc00;
-  animation: brilhoHeroi 2s infinite alternate;
+/* Status */
+.heroi-status h2 {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow: 2px 2px 4px #000;
+  margin-bottom: 5px;
 }
-
-@keyframes brilhoHeroi {
-  from {
-    box-shadow: 0 0 10px #ffcc00;
-  }
-  to {
-    box-shadow: 0 0 25px #ffcc00;
-  }
+.inimigo-status h2 {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #ff4444;
+  text-shadow: 2px 2px 4px #000;
+  margin-bottom: 5px;
 }
-
-/* Status abaixo das imagens */
-.heroi-status,
-.inimigo-status {
+/* Status */
+.status {
   background: rgba(0, 0, 0, 0.6);
   border: 2px solid #444;
   border-radius: 10px;
   padding: 10px 20px;
-  width: 220px;
+  margin: 10px;
   text-align: center;
+  width: 220px;
+  max-width: 90%;
 }
 
-/* Títulos */
-.heroi-status h2,
-.inimigo-status h2 {
-  margin: 0;
-  font-size: 1.3rem;
-  color: #ffcc00;
-}
-
-/* Barras */
+/* Barras de HP e Mana */
 .barra {
-  width: 180px;
+  position: relative;
+  width: 100%;
+  max-width: 180px;
   height: 18px;
   background: #333;
   border: 2px solid #555;
@@ -131,85 +554,97 @@ body {
   overflow: hidden;
   margin: 5px auto;
 }
-
 .hp {
+  background: #ff3333; /* vermelho para HP */
   height: 100%;
-  background: linear-gradient(to right, #ff0000, #aa0000);
   transition: width 0.3s ease;
+  border-radius: 3px;
 }
-
 .mana {
+  background: #3399ff; /* azul para Mana */
   height: 100%;
-  background: linear-gradient(to right, #0066ff, #0033aa);
   transition: width 0.3s ease;
+  border-radius: 3px;
 }
 
-/* EFEITOS DE DANO E MAGIA */
-.inimigo.dano {
-  filter: brightness(2) saturate(2);
-  animation: flash 0.4s ease;
-}
-
-@keyframes flash {
-  0% {
-    transform: scale(1.05);
-  }
-  50% {
-    transform: scale(0.95);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.heroi.magia {
-  box-shadow:
-    0 0 20px #00f inset,
-    0 0 40px #0ff;
-  animation: glow 0.6s ease;
-}
-
-@keyframes glow {
-  0% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.7;
-  }
-}
-
-/* BOTÕES DE AÇÃO */
+/* Botões de ação */
 .acoes {
   display: flex;
-  gap: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 20px;
+  justify-content: center;
 }
-
 .acoes button {
   background: #ff4444;
   border: none;
   border-radius: 8px;
-  padding: 10px 20px;
+  padding: 10px 15px;
   color: #fff;
   font-weight: bold;
   cursor: pointer;
   transition:
     transform 0.2s,
     background 0.3s;
+  flex: 1 1 120px;
 }
-
 .acoes button:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
   background: #ff6600;
 }
+.acoes button:disabled {
+  background: #555;
+  color: #aaa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.acoes button.ativo {
+  animation: brilho 0.6s ease;
+}
+@keyframes brilho {
+  0% {
+    box-shadow: 0 0 0px #ffd700;
+  }
+  50% {
+    box-shadow: 0 0 12px #ffd700;
+  }
+  100% {
+    box-shadow: 0 0 0px #ffd700;
+  }
+}
 
-/* MENSAGENS */
+/* Mensagens e indicador de turno */
 #mensagens {
   margin-top: 20px;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-style: italic;
   text-shadow: 2px 2px 4px #000;
+  text-align: center;
+}
+.indicador-turno {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow: 2px 2px 4px #000;
+  margin-top: 10px;
+  text-align: center;
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+.indicador-turno.inimigo {
+  color: #ff4444;
+  transform: scale(1.1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .campo {
+    flex-direction: column;
+    gap: 30px;
+  }
+  .heroi-img,
+  .inimigo-img {
+    width: 200px;
+  }
 }

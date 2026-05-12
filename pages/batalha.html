@@ -7,8 +7,7 @@
     <link rel="stylesheet" href="../css/batalha.css" />
   </head>
   <body>
-    <section id="batalha" style="position: relative;"></section>
-      <!-- Campo de batalha -->
+    <section id="batalha" style="position: relative">
       <div class="campo">
         <!-- Herói -->
         <div class="heroi">
@@ -18,13 +17,17 @@
             class="heroi-img"
           />
           <div class="status heroi-status">
-            <h2 id="nomeHeroi"></h2>
-            <p>Classe: <span id="classeHeroi"></span></p>
+            <h2 id="nomeHeroi">Herói</h2>
+            <p>Classe: <span id="classeHeroi">Guerreiro</span></p>
             <div class="barra">
-              <div id="hpHeroiBar" class="hp" style="width: 100%"></div>
+              <div id="hpHeroiBar" class="hp" style="width: 100%">
+                <span id="hpHeroiTexto">100/100</span>
+              </div>
             </div>
             <div class="barra">
-              <div id="manaHeroiBar" class="mana" style="width: 100%"></div>
+              <div id="manaHeroiBar" class="mana" style="width: 100%">
+                <span id="manaHeroiTexto">50/50</span>
+              </div>
             </div>
           </div>
         </div>
@@ -37,9 +40,11 @@
             class="inimigo-img"
           />
           <div class="status inimigo-status">
-            <h2>Goblin</h2>
+            <h2 id="nomeInimigo">Goblin</h2>
             <div class="barra">
-              <div id="hpInimigoBar" class="hp" style="width: 100%"></div>
+              <div id="hpInimigoBar" class="hp" style="width: 100%">
+                <span id="hpInimigoTexto">60/60</span>
+              </div>
             </div>
           </div>
         </div>
@@ -55,6 +60,7 @@
 
       <!-- Mensagens -->
       <div id="mensagens"></div>
+      <div id="indicadorTurno" class="indicador-turno">Seu turno</div>
     </section>
 
     <script src="../js/batalhas.js"></script>
