@@ -1,5 +1,3 @@
-import { animate } from "animejs";
-
 // ⚔️ Guerreiro/Guerreira – corte básico
 export function efeitoCorteBasico(inimigo) {
   const corte = document.createElement("div");
@@ -57,7 +55,8 @@ export function efeitoFlechaBasica(inimigo) {
     complete: () => flecha.remove(),
   });
 }
-// 🏹 Flecha crítica – maior, dourada e mais brilhante
+
+// 🏹 Flecha crítica – dourada e maior
 export function efeitoFlechaCritica(inimigo) {
   const flecha = document.createElement("div");
   flecha.classList.add("flecha-critica");
@@ -114,7 +113,7 @@ export async function efeitoMagiaCritica(heroi, inimigo) {
   }).finished;
 }
 
-// 🔴 Dano normal – número vermelho que sobe
+// 🔴 Dano normal
 export function efeitoDano(inimigo, valor) {
   const dano = document.createElement("div");
   dano.classList.add("dano-numero");
@@ -131,7 +130,7 @@ export function efeitoDano(inimigo, valor) {
   });
 }
 
-// ✨ Dano crítico – número dourado maior
+// ✨ Dano crítico
 export function efeitoDanoCritico(inimigo, valor) {
   const critico = document.createElement("div");
   critico.classList.add("dano-critico");
