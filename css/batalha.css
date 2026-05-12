@@ -191,6 +191,13 @@ body {
 }
 
 /* ---------------- RESPONSIVIDADE ---------------- */
+/* Layout padrão */
+.campo {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
 
 /* Tablets */
 @media (max-width: 1024px) {
@@ -203,28 +210,7 @@ body {
   }
 }
 
-/* Celulares */
-@media (max-width: 768px) {
-  .campo {
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-  }
-
-  .heroi,
-  .inimigo {
-    flex: 1 1 100%;
-  }
-
-  .heroi-img,
-  .inimigo-img {
-    width: 180px;
-  }
-
-  .status {
-    width: 80%;
-  }
-}
+/* Responsividade para telas pequenas */
 @media (max-width: 600px) {
   .campo {
     flex-direction: row; /* lado a lado */
@@ -235,7 +221,8 @@ body {
   .heroi,
   .inimigo {
     flex: 1;
-    max-width: 45%; /* cada card ocupa metade da tela */
+    max-width: 48%; /* cada card ocupa metade da tela */
+    margin: 0 2px;
   }
 
   .heroi img,
@@ -243,19 +230,36 @@ body {
     width: 100%; /* imagem se ajusta ao card */
     height: auto;
   }
-}
 
-/* Celulares muito pequenos */
-@media (max-width: 480px) {
-  .heroi-img,
-  .inimigo-img {
-    width: 140px;
-  }
   .status {
-    font-size: 0.85em;
+    font-size: 14px; /* texto menor para caber */
+  }
+
+  .barra {
+    height: 14px; /* barras mais finas */
+  }
+
+  .acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .acoes button {
+    flex: 1 1 45%; /* botões ocupam metade da largura */
+    font-size: 14px;
     padding: 8px;
   }
+
   #mensagens {
-    font-size: 0.9em;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  #indicadorTurno {
+    font-size: 14px;
+    margin-top: 8px;
   }
 }
