@@ -9,9 +9,13 @@ import {
   efeitoCorteBasico,
   efeitoMagiaBasica,
   efeitoFlechaBasica,
+  efeitoFlechaCritica,
   efeitoCorteCritico,
   efeitoMagiaCritica,
+  efeitoDano,
+  efeitoDanoCritico,
 } from "./efeitos.js";
+
 import { atualizarStatus, carregarHeroi } from "./status.js";
 
 // ---------------- VARIÁVEIS ----------------
@@ -81,7 +85,7 @@ function atacar() {
     // efeitos críticos
     if (classeHeroi.includes("guer")) efeitoCorteCritico(inimigo);
     if (classeHeroi.includes("mag")) efeitoMagiaCritica(heroi, inimigo);
-    if (classeHeroi.includes("arq")) efeitoFlechaBasica(inimigo); // pode criar efeito flecha crítica
+    if (classeHeroi.includes("arq")) efeitoFlechaCritica(inimigo);
   } else {
     mostrarDano(dano);
     mensagem(`Você atacou e causou ${dano} de dano!`);
