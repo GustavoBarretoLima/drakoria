@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Batalha - Drakoria</title>
     <link rel="stylesheet" href="../css/batalha.css" />
+    <link rel="stylesheet" href="../css/efeitos.css" />
   </head>
   <body>
     <section id="batalha" style="position: relative">
@@ -52,10 +53,10 @@
 
       <!-- Ações -->
       <div class="acoes">
-        <button onclick="atacar()">Atacar</button>
-        <button onclick="defender()">Defender</button>
-        <button onclick="magia()">Magia</button>
-        <button onclick="fugir()">Fugir</button>
+        <button id="btnAtacar">Atacar</button>
+        <button id="btnDefender">Defender</button>
+        <button id="btnMagia">Magia</button>
+        <button id="btnFugir">Fugir</button>
       </div>
 
       <!-- Mensagens -->
@@ -63,6 +64,9 @@
       <div id="indicadorTurno" class="indicador-turno">Seu turno</div>
     </section>
 
-    <script src="../js/batalhas.js"></script>
+    <!-- Importando como módulo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <script type="module" src="../js/batalha.js"></script>
   </body>
 </html>

@@ -4,17 +4,17 @@ function selecionarGenero(genero) {
   generoSelecionado = genero;
   atualizarImagens();
 
-  // Remove destaque de todos os botões
   document.querySelectorAll(".opcoes-genero button").forEach((btn) => {
     btn.classList.remove("ativo");
   });
 
-  // Adiciona destaque ao botão clicado
   const botaoSelecionado =
     genero === "Masculino"
       ? document.querySelector(".opcoes-genero button:nth-child(1)")
       : document.querySelector(".opcoes-genero button:nth-child(2)");
   botaoSelecionado.classList.add("ativo");
+
+  localStorage.setItem("generoHeroi", generoSelecionado);
 }
 
 function atualizarImagens() {
@@ -50,18 +50,14 @@ function selecionarPersonagem(classe) {
   }
 
   const nomeHeroi = document.getElementById("nomeHeroi").value.trim();
-
-  // Validação: impede continuar sem nome
   if (!nomeHeroi) {
     alert("Por favor, digite o nome do seu herói antes de continuar!");
     return;
   }
 
-  // Salva no localStorage
-  localStorage.setItem("classeEscolhida", nomeClasse);
-  localStorage.setItem("generoEscolhido", generoSelecionado);
+  localStorage.setItem("classeHeroi", nomeClasse);
+  localStorage.setItem("generoHeroi", generoSelecionado);
   localStorage.setItem("nomeHeroi", nomeHeroi);
 
-  // Vai para a intro
   window.location.href = "intro.html";
 }
