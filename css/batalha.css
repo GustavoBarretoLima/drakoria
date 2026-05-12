@@ -53,7 +53,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 40px;
   max-width: 1000px;
   margin: 0 auto;
@@ -223,6 +223,25 @@ body {
 
   .status {
     width: 80%;
+  }
+}
+@media (max-width: 600px) {
+  .campo {
+    flex-direction: row; /* lado a lado */
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .heroi,
+  .inimigo {
+    flex: 1;
+    max-width: 45%; /* cada card ocupa metade da tela */
+  }
+
+  .heroi img,
+  .inimigo img {
+    width: 100%; /* imagem se ajusta ao card */
+    height: auto;
   }
 }
 
