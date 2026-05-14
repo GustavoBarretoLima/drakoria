@@ -1,0 +1,41 @@
+/* Estilo geral para portão e entrada */
+.drakoria-portao,
+.entrada-drakoria {
+  text-align: center;
+  color: #f5e6c8;
+  font-family: "Cinzel", serif;
+}
+
+/* Imagem do portão */
+.portao-img,
+.portao-drakoria {
+  width: 80%;
+  margin: 20px auto;
+  border-radius: 12px;
+}
+
+/* Caixa de diálogo */
+.dialogo {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+/* Botão continuar */
+.btn-continuar {
+  margin-top: 30px;
+  padding: 10px 20px;
+  font-size: 1.1em;
+  background-color: #d4a017;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-continuar:hover {
+  background-color: #ffcc00;
+}

@@ -6,6 +6,23 @@ export function mensagem(texto) {
   setTimeout(() => mensagens.classList.remove("ativo"), 800);
 }
 
+// 🔹 Torna a função disponível globalmente
+window.mensagem = mensagem;
+
+// ---------------- Efeito dos números de dano ----------------
+import { efeitoDano, efeitoDanoCritico } from "./efeitos.js";
+
+export function mostrarDano(valor, inimigo) {
+  efeitoDano(inimigo, valor);
+}
+export function mostrarDanoCritico(valor, inimigo) {
+  efeitoDanoCritico(inimigo, valor);
+}
+
+// 🔹 Exposição global
+window.mostrarDano = mostrarDano;
+window.mostrarDanoCritico = mostrarDanoCritico;
+
 // ---------------- INDICADOR DE TURNO ----------------
 export function atualizarIndicadorTurno(turnoHeroi = true) {
   const indicador = document.getElementById("indicadorTurno");
@@ -23,41 +40,26 @@ export function atualizarIndicadorTurno(turnoHeroi = true) {
 
 // ---------------- BOTÕES ----------------
 export function atualizarBotoes(turnoHeroi) {
+  const classeHeroi = (
+    localStorage.getItem("classeHeroi") || "Guerreiro"
+  ).toLowerCase();
+
   document.querySelectorAll(".acoes button").forEach((botao) => {
     botao.disabled = !turnoHeroi;
+
+    if (botao.id === "btnMagia") {
+      if (classeHeroi.includes("mag")) {
+        botao.disabled = !turnoHeroi;
+        botao.style.opacity = "1";
+      } else {
+        botao.disabled = true;
+        botao.style.opacity = "0.5";
+      }
+    }
+
     if (turnoHeroi) {
       botao.classList.add("ativo");
       setTimeout(() => botao.classList.remove("ativo"), 600);
     }
   });
-}
-
-// ---------------- NÚMEROS DE DANO ----------------
-export function mostrarDano(valor) {
-  const inimigo = document.querySelector(".inimigo");
-  const numero = document.createElement("div");
-  numero.classList.add("dano-numero");
-  numero.textContent = `-${valor}`;
-  inimigo.appendChild(numero);
-
-  // animação simples de subida
-  numero.style.position = "absolute";
-  numero.style.top = "0";
-  numero.style.left = "50%";
-  numero.style.transform = "translateX(-50%)";
-  setTimeout(() => numero.remove(), 1000);
-}
-
-export function mostrarDanoCritico(valor) {
-  const inimigo = document.querySelector(".inimigo");
-  const numero = document.createElement("div");
-  numero.classList.add("dano-critico");
-  numero.textContent = `CRIT! -${valor}`;
-  inimigo.appendChild(numero);
-
-  numero.style.position = "absolute";
-  numero.style.top = "0";
-  numero.style.left = "50%";
-  numero.style.transform = "translateX(-50%)";
-  setTimeout(() => numero.remove(), 1500);
 }

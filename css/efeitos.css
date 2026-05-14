@@ -11,30 +11,68 @@
   position: absolute;
 }
 
-.dano-numero {
+/* 🔴 Guerreiro/Guerreira */
+.dano-guerreiro {
   position: absolute;
-  top: 40%; /* ponto inicial */
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 40px;
+  font-size: 22px;
   font-weight: bold;
-  color: #ff3333;
-  text-shadow: 0 0 10px #000;
+  color: #ff3333; /* vermelho forte */
+  text-shadow: 1px 1px 2px black;
   pointer-events: none;
-  z-index: 100;
+  z-index: 999;
 }
 
-.dano-critico {
+/* 🔵 Mago/Maga */
+.dano-mago {
   position: absolute;
-  top: 35%; /* ponto inicial */
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 52px;
+  font-size: 22px;
   font-weight: bold;
-  color: #ffd700;
-  text-shadow: 0 0 15px #ff0;
+  color: #3399ff; /* azul mágico */
+  text-shadow: 1px 1px 2px black;
   pointer-events: none;
-  z-index: 120;
+  z-index: 999;
+}
+
+/* 🟡 Arqueiro/Arqueira */
+.dano-arqueiro {
+  position: absolute;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ffd700; /* dourado */
+  text-shadow: 1px 1px 2px black;
+  pointer-events: none;
+  z-index: 999;
+}
+/* 🔴 Dano normal estilo anime */
+.dano-numero {
+  color: #ff3030; /* vermelho intenso */
+  font-size: 28px; /* maior para impacto */
+  font-weight: 900; /* bem grosso */
+  font-family: "Impact", "Arial Black", sans-serif; /* estilo forte */
+  text-shadow:
+    2px 2px 0 #fff,
+    /* borda branca */ -2px -2px 0 #fff,
+    3px 3px 6px #000; /* sombra preta para contraste */
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  transform: scale(1.2); /* levemente maior */
+}
+
+/* ✨ Dano crítico estilo anime */
+.dano-critico {
+  color: #ffd700; /* dourado brilhante */
+  font-size: 32px;
+  font-weight: 500;
+  font-family: "Impact", "Arial Black", sans-serif;
+  text-shadow:
+    2px 2px 0 #ff0000,
+    /* borda vermelha */ -2px -2px 0 #ff0000,
+    4px 4px 8px #000; /* sombra preta mais forte */
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  transform: scale(1.4); /* crítico aparece maior */
 }
 
 /* ⚔️ Corte básico com brilho */
@@ -50,37 +88,6 @@
   z-index: 10;
   box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
   border-radius: 4px;
-}
-
-/* ✨ Explosão mágica com aura */
-.explosao-magica {
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 150, 255, 0.9), rgba(0, 0, 0, 0));
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 10;
-  box-shadow:
-    0 0 25px rgba(0, 150, 255, 0.9),
-    0 0 50px rgba(0, 150, 255, 0.6);
-}
-
-/* 🏹 Flecha com ponta dourada */
-.flecha {
-  position: absolute;
-  width: 70px;
-  height: 6px;
-  background: linear-gradient(to right, brown, gold);
-  border-radius: 3px;
-  top: 50%;
-  left: 0;
-  pointer-events: none;
-  z-index: 10;
-  box-shadow: 0 0 10px gold;
 }
 
 /* 💥 Corte crítico com energia pulsante */
@@ -110,5 +117,297 @@
       0 0 25px red,
       0 0 40px yellow;
     transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+/*mago*/
+
+.rajada-arcana {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #9c27b0 0%,
+    #4a148c 70%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 10px #ba68c8,
+    0 0 20px #7b1fa2;
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.efeito-magia {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #4fc3f7 0%,
+    #0288d1 70%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 20px #00bfff,
+    0 0 40px #00bfff;
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ✨ Explosão mágica com aura */
+.explosao-magica {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 150, 255, 0.9), rgba(0, 0, 0, 0));
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+  box-shadow:
+    0 0 25px rgba(0, 150, 255, 0.9),
+    0 0 50px rgba(0, 150, 255, 0.6);
+}
+
+/* 🏹 Flecha com ponta dourada */
+.flecha {
+  position: absolute;
+  width: 70px;
+  height: 6px;
+  background: linear-gradient(to right, brown, gold);
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 0 10px gold;
+}
+
+.flecha-trilha {
+  position: absolute;
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(to right, rgba(255, 255, 0, 0.8), transparent);
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 9;
+  opacity: 0.7;
+}
+
+.flecha-critica {
+  position: absolute;
+  width: 80px;
+  height: 7px;
+  background: linear-gradient(to right, gold, orange, yellow);
+  border-radius: 3px;
+  box-shadow: 0 0 15px gold;
+  pointer-events: none;
+  z-index: 12;
+}
+/*efeitos de defesa*/
+.escudo-defesa {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #b0bec5 0%, #455a64 70%);
+  box-shadow:
+    0 0 15px #90a4ae,
+    0 0 30px #607d8b;
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.barreira-magica {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #4fc3f7 0%,
+    #0288d1 70%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 20px #00bfff,
+    0 0 40px #00bfff;
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+}
+.dano-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 0, 0, 0.5);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 10;
+}
+.heroi-img {
+  position: relative; /* necessário para overlay */
+}
+
+.heroi-dano-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 0, 0, 0.5);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.heroi-dano-overlay-critico {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 0, 0, 0.8);
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.particula-critico {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: red;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* ---------------- RESPONSIVIDADE ---------------- */
+
+/* 📱 Telas pequenas (celulares até 600px) */
+@media (max-width: 600px) {
+  .dano-guerreiro,
+  .dano-mago,
+  .dano-arqueiro {
+    font-size: 16px;
+  }
+  .dano-critico {
+    font-size: 20px;
+  }
+
+  .corte-amplo {
+    width: 100px;
+    height: 18px;
+  }
+
+  .corte-critico {
+    width: 80px;
+    height: 80px;
+  }
+
+  .explosao-magica {
+    width: 70px;
+    height: 70px;
+  }
+
+  .flecha {
+    width: 50px;
+    height: 5px;
+  }
+
+  .flecha-trilha {
+    width: 70px;
+  }
+
+  .flecha-critica {
+    width: 60px;
+    height: 6px;
+  }
+}
+
+/* 📲 Tablets (entre 601px e 1024px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .dano-guerreiro,
+  .dano-mago,
+  .dano-arqueiro {
+    font-size: 18px;
+  }
+  .dano-critico {
+    font-size: 24px;
+  }
+
+  .corte-amplo {
+    width: 120px;
+    height: 20px;
+  }
+
+  .corte-critico {
+    width: 100px;
+    height: 100px;
+  }
+
+  .explosao-magica {
+    width: 85px;
+    height: 85px;
+  }
+
+  .flecha {
+    width: 60px;
+    height: 5px;
+  }
+
+  .flecha-trilha {
+    width: 85px;
+  }
+
+  .flecha-critica {
+    width: 70px;
+    height: 6px;
+  }
+}
+
+/* 💻 Telas grandes (PC acima de 1025px) */
+@media (min-width: 1025px) {
+  .dano-guerreiro,
+  .dano-mago,
+  .dano-arqueiro {
+    font-size: 22px;
+  }
+  .dano-critico {
+    font-size: 28px;
+  }
+
+  .corte-amplo {
+    width: 140px;
+    height: 25px;
+  }
+
+  .corte-critico {
+    width: 120px;
+    height: 120px;
+  }
+
+  .explosao-magica {
+    width: 100px;
+    height: 100px;
+  }
+
+  .flecha {
+    width: 70px;
+    height: 6px;
+  }
+
+  .flecha-trilha {
+    width: 100px;
+  }
+
+  .flecha-critica {
+    width: 80px;
+    height: 7px;
   }
 }

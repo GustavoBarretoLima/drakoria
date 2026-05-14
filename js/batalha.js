@@ -4,8 +4,10 @@ import {
   atualizarIndicadorTurno,
   mostrarDano,
   mostrarDanoCritico,
+  atualizarBotoes,
 } from "./ui.js";
 import {
+  efeitoReceberDano,
   efeitoCorteBasico,
   efeitoMagiaBasica,
   efeitoFlechaBasica,
@@ -14,6 +16,9 @@ import {
   efeitoMagiaCritica,
   efeitoDano,
   efeitoDanoCritico,
+  efeitoAtaqueBasicoMago,
+  efeitoReceberDanoHeroi,
+  efeitoReceberDanoHeroiCritico,
 } from "./efeitos.js";
 
 import { atualizarStatus, carregarHeroi } from "./status.js";
@@ -53,6 +58,16 @@ function iniciarBatalha() {
 
   atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
   atualizarIndicadorTurno(true);
+
+  // 🔹 Desabilita botão Magia para classes que não usam magia
+  const btnMagia = document.getElementById("btnMagia");
+  if (classeHeroi.includes("guerre") || classeHeroi.includes("arque")) {
+    btnMagia.disabled = true;
+    btnMagia.style.opacity = "0.5"; // opcional: visual de desativado
+  } else {
+    btnMagia.disabled = false;
+    btnMagia.style.opacity = "1";
+  }
 }
 
 // ---------------- CONTROLE DE TURNO ----------------
@@ -79,25 +94,48 @@ function atacar() {
 
   if (critico) {
     dano *= 2;
-    mostrarDanoCritico(dano);
+    mostrarDanoCritico(dano, inimigo);
+    efeitoReceberDano(inimigo);
     mensagem(`💥 CRÍTICO! Você causou ${dano} de dano!`);
 
-    // efeitos críticos
-    if (classeHeroi.includes("guer")) efeitoCorteCritico(inimigo);
-    if (classeHeroi.includes("mag")) efeitoMagiaCritica(heroi, inimigo);
-    if (classeHeroi.includes("arq")) efeitoFlechaCritica(inimigo);
+    if (classeHeroi === "guerreiro" || classeHeroi === "guerreira") {
+      efeitoCorteCritico(inimigo);
+    }
+    if (classeHeroi === "mago" || classeHeroi === "maga") {
+      efeitoMagiaCritica(heroi, inimigo);
+    }
+    if (classeHeroi === "arqueiro" || classeHeroi === "arqueira") {
+      efeitoFlechaCritica(inimigo);
+    }
   } else {
-    mostrarDano(dano);
+    mostrarDano(dano, inimigo);
+    efeitoReceberDano(inimigo);
     mensagem(`Você atacou e causou ${dano} de dano!`);
 
-    // efeitos básicos
-    if (classeHeroi.includes("guer")) efeitoCorteBasico(inimigo);
-    if (classeHeroi.includes("mag")) efeitoMagiaBasica(heroi, inimigo);
-    if (classeHeroi.includes("arq")) efeitoFlechaBasica(inimigo);
+    if (classeHeroi === "guerreiro" || classeHeroi === "guerreira") {
+      efeitoCorteBasico(inimigo);
+    }
+    if (classeHeroi === "mago" || classeHeroi === "maga") {
+      efeitoAtaqueBasicoMago(inimigo);
+    }
+    if (classeHeroi === "arqueiro" || classeHeroi === "arqueira") {
+      efeitoFlechaBasica(inimigo);
+    }
   }
 
+  // 🔹 Atualiza vida do inimigo
   hpInimigo -= dano;
   atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
+
+  // 🔹 Verifica se o Goblin morreu
+  if (hpInimigo <= 0) {
+    hpInimigo = 0;
+    atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
+    cenaVitoriaGoblin(); // chama transição para Drakoria
+    return; // interrompe o turno inimigo
+  }
+
+  // Se ainda está vivo, passa o turno para o inimigo
   setTimeout(() => turnoInimigo(), 1500);
 }
 
@@ -109,15 +147,15 @@ function defender() {
     localStorage.getItem("classeHeroi") || "Guerreiro"
   ).toLowerCase();
 
-  if (classeHeroi.includes("guer")) {
+  if (classeHeroi === "guerreiro" || classeHeroi === "guerreira") {
     mensagem("🛡️ Você ergueu seu escudo!");
-    // aqui você pode criar efeito escudo
-  } else if (classeHeroi.includes("mag")) {
+    efeitoDefesaGuerreiro();
+  } else if (classeHeroi === "mago" || classeHeroi === "maga") {
     mensagem("✨ Você conjurou uma barreira mágica!");
-    // aqui você pode criar efeito barreira
-  } else if (classeHeroi.includes("arq")) {
+    efeitoDefesaMago();
+  } else if (classeHeroi === "arqueiro" || classeHeroi === "arqueira") {
     mensagem("🏹 Você se esquivou rapidamente!");
-    // pode criar efeito de esquiva
+    efeitoDefesaArqueiro();
   } else {
     mensagem("Você se defendeu, reduzindo o próximo dano!");
   }
@@ -141,15 +179,30 @@ function magia() {
     let dano = Math.floor(Math.random() * 25) + 10;
     hpInimigo -= dano;
     mensagem(`✨ Você lançou uma magia e causou ${dano} de dano!`);
-    mostrarDano(dano);
 
-    // efeito visual de magia
-    if (classeHeroi.includes("mag")) efeitoMagiaBasica(heroi, inimigo);
+    // número de dano continua aparecendo
+    mostrarDano(dano, inimigo);
+
+    // efeito visual exclusivo para magia
+    if (classeHeroi === "mago" || classeHeroi === "maga") {
+      efeitoMagiaBasica(heroi, inimigo);
+    }
+
+    // atualiza status
+    atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
+
+    // 🔹 Verifica se o Goblin morreu
+    if (hpInimigo <= 0) {
+      hpInimigo = 0;
+      atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
+      cenaVitoriaGoblin(); // chama transição para Drakoria
+      return; // interrompe o turno inimigo
+    }
   } else {
     mensagem("Mana insuficiente!");
   }
 
-  atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
+  // se ainda está vivo, passa o turno para o inimigo
   setTimeout(() => turnoInimigo(), 1500);
 }
 
@@ -172,14 +225,88 @@ function fugir() {
   }
 }
 
+/*efeitos de defesa*/
+// 🛡️ Guerreiro/Guerreira – escudo metálico
+export function efeitoDefesaGuerreiro(inimigo) {
+  const escudo = document.createElement("div");
+  escudo.classList.add("escudo-defesa");
+  document.body.appendChild(escudo);
+
+  const heroi = document.querySelector(".heroi-img");
+  const rectHeroi = heroi.getBoundingClientRect();
+
+  escudo.style.left = `${rectHeroi.left + rectHeroi.width / 2}px`;
+  escudo.style.top = `${rectHeroi.top + rectHeroi.height / 2}px`;
+  escudo.style.position = "absolute";
+
+  anime({
+    targets: escudo,
+    scale: [0.5, 1.2],
+    opacity: [1, 0],
+    duration: 800,
+    easing: "easeOutBack",
+    complete: () => escudo.remove(),
+  });
+}
+
+// ✨ Mago/Maga – barreira mágica
+export function efeitoDefesaMago() {
+  const barreira = document.createElement("div");
+  barreira.classList.add("barreira-magica");
+  document.body.appendChild(barreira);
+
+  const heroi = document.querySelector(".heroi-img");
+  const rectHeroi = heroi.getBoundingClientRect();
+
+  barreira.style.left = `${rectHeroi.left + rectHeroi.width / 2}px`;
+  barreira.style.top = `${rectHeroi.top + rectHeroi.height / 2}px`;
+  barreira.style.position = "absolute";
+
+  anime({
+    targets: barreira,
+    scale: [0.5, 1.5],
+    opacity: [0.8, 0],
+    duration: 1000,
+    easing: "easeOutCubic",
+    complete: () => barreira.remove(),
+  });
+}
+
+// 🏹 Arqueiro/Arqueira – esquiva rápida
+export function efeitoDefesaArqueiro() {
+  const arqueiro = document.querySelector(".heroi-img");
+
+  anime({
+    targets: arqueiro,
+    translateX: [-20, 0],
+    duration: 500,
+    easing: "easeInOutQuad",
+  });
+}
+
 // ---------------- TURNO DO INIMIGO ----------------
 function turnoInimigo(defesa = false) {
   if (hpInimigo > 0) {
     let dano = Math.floor(Math.random() * 12) + 3;
     if (defesa) dano = Math.floor(dano / 2);
 
+    const critico = Math.random() < 0.2; // 20% chance de crítico
+    if (critico) dano *= 2;
+
     hpHeroi -= dano;
-    mensagem(`👹 O Goblin atacou e causou ${dano} de dano!`);
+
+    const heroi = document.querySelector(".heroi-img");
+
+    if (critico) {
+      mensagem(`💥 CRÍTICO! O Goblin causou ${dano} de dano!`);
+      mostrarDanoCritico(dano, heroi);
+      efeitoReceberDanoHeroiCritico(heroi);
+    } else {
+      mensagem(`👹 O Goblin atacou e causou ${dano} de dano!`);
+      mostrarDano(dano, heroi);
+      efeitoReceberDanoHeroi(heroi);
+    }
+
     atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
   } else {
     mensagem("🏆 Você derrotou o Goblin!");

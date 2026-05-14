@@ -1,5 +1,5 @@
 window.onload = function () {
-  const classe = localStorage.getItem("classeEscolhida");
+  const classe = localStorage.getItem("classeHeroi");
   const genero = localStorage.getItem("generoEscolhido");
   const nomeHeroi = localStorage.getItem("nomeHeroi");
 
