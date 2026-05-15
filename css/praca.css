@@ -1,0 +1,196 @@
+.drakoria-praca {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url("../img/stages/drakoria-praca.png") no-repeat center center;
+  background-size: cover;
+}
+
+/* Hotspots invisíveis */
+.hotspot {
+  position: absolute;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: transparent; /* invisível sem esconder o conteúdo */
+}
+
+/* Destaque ao passar o mouse */
+.hotspot:hover {
+  opacity: 1;
+  background: rgba(255, 165, 0, 0.3);
+  box-shadow: 0 0 15px #ffaa33;
+}
+
+/* Brilho permanente + reflexo automático */
+.hotspot::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background: rgba(255, 200, 100, 0.15);
+  box-shadow: 0 0 14px rgba(255, 190, 80, 0.6);
+  opacity: 0.2;
+  pointer-events: none;
+  animation:
+    portaGlow 3s infinite alternate,
+    reflexoPorta 10s infinite;
+}
+
+.hotspot:hover::before {
+  box-shadow: 0 0 22px rgba(255, 220, 150, 0.9);
+  opacity: 1;
+}
+
+/* Emojis pulsando de vez em quando */
+
+.hotspot .icon {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2em;
+  text-shadow: 0 0 8px rgba(255, 200, 100, 0.8);
+  animation:
+    flutuar 3s infinite alternate,
+    pulsarIcon 4s infinite;
+  pointer-events: none;
+}
+
+/* Animação de flutuação */
+@keyframes flutuar {
+  from {
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    transform: translateX(-50%) translateY(-6px);
+  }
+}
+
+/* Animação de pulsar/brilhar */
+@keyframes pulsarIcon {
+  0% {
+    text-shadow: 0 0 6px rgba(255, 200, 100, 0.6);
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    text-shadow: 0 0 16px rgba(255, 220, 150, 1);
+    transform: translateX(-50%) scale(1.1);
+  }
+  100% {
+    text-shadow: 0 0 6px rgba(255, 200, 100, 0.6);
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* Brilho pulsante */
+@keyframes portaGlow {
+  from {
+    box-shadow: 0 0 10px rgba(255, 200, 100, 0.5);
+  }
+  to {
+    box-shadow: 0 0 18px rgba(255, 220, 150, 0.8);
+  }
+}
+
+/* Reflexo recorrente */
+@keyframes reflexoPorta {
+  0% {
+    background: linear-gradient(
+      90deg,
+      transparent 40%,
+      rgba(255, 255, 200, 0.4) 50%,
+      transparent 60%
+    );
+    background-size: 200% 100%;
+    background-position: -100% 0;
+  }
+  40% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Tooltips mágicos */
+.hotspot::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.95em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+  box-shadow: 0 0 12px rgba(255, 170, 51, 0.6);
+}
+
+.hotspot:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  animation: pulsarTooltip 1.5s infinite alternate;
+}
+
+@keyframes pulsarTooltip {
+  from {
+    box-shadow: 0 0 8px rgba(255, 170, 51, 0.6);
+  }
+  to {
+    box-shadow: 0 0 18px rgba(255, 200, 100, 0.9);
+  }
+}
+
+/* Coordenadas responsivas */
+.taberna {
+  top: 58vh;
+  left: 9vw;
+  width: 13vw;
+  height: 15vh;
+}
+
+.ferreiro {
+  top: 60vh;
+  left: 39vw;
+  width: 13vw;
+  height: 15vh;
+}
+
+.guilda {
+  top: 57vh;
+  left: 69vw;
+  width: 15vw;
+  height: 17vh;
+}
+
+@media (max-width: 768px) {
+  .hotspot {
+    width: 20vw;
+    height: 20vh;
+  }
+  .taberna {
+    top: 60vh;
+    left: 8vw;
+  }
+  .ferreiro {
+    top: 62vh;
+    left: 38vw;
+  }
+  .guilda {
+    top: 59vh;
+    left: 68vw;
+  }
+}

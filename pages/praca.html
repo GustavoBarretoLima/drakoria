@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Praça de Drakoria</title>
+    <link rel="stylesheet" href="../css/praca.css" />
+    <script src="../js/caminho-drakoria.js"></script>
+  </head>
+  <body>
+    <div id="praca" class="drakoria-praca">
+      <!-- Botões de entrada sempre visíveis -->
+ <div class="hotspot taberna" onclick="entrarTaberna()" data-tooltip="🍺 Entrar na Taberna">
+  <span class="icon">🍺</span>
+</div>
+
+<div class="hotspot ferreiro" onclick="entrarFerreiro()" data-tooltip="⚒️ Ir ao Ferreiro">
+  <span class="icon">⚒️</span>
+</div>
+
+<div class="hotspot guilda" onclick="entrarGuilda()" data-tooltip="🛡️ Guilda dos Aventureiros">
+  <span class="icon">🛡️</span>
+</div>
+    <script>
+      // inicia a cena principal da praça
+      cenaPrincipalDrakoria();
+    </script>
+  </body>
+</html>

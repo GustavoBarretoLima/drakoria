@@ -2,6 +2,7 @@
 body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
   font-family: "Trebuchet MS", sans-serif;
   background: linear-gradient(to bottom, #1a1a1a, #000);
   color: #fff;
@@ -206,6 +207,362 @@ body {
 .indicador-turno.inimigo {
   color: #ff4444;
   transform: scale(1.1);
+}
+.goblin-derrotado {
+  position: relative;
+  text-align: center;
+}
+
+.goblin-dead {
+  display: block;
+  margin: 0 auto;
+  max-width: 50%; /* imagem mais compacta */
+  height: auto;
+  animation: zoomInDead 1.2s ease forwards;
+}
+
+@keyframes zoomInDead {
+  from {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.texto-final {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: 1.4em;
+  text-align: center;
+  text-shadow:
+    0 0 8px #ff0000,
+    2px 2px 4px #000;
+  animation: pulsarBrilho 1.5s infinite alternate;
+}
+
+@keyframes pulsarBrilho {
+  from {
+    text-shadow:
+      0 0 6px #ff0000,
+      2px 2px 4px #000;
+  }
+  to {
+    text-shadow:
+      0 0 14px #ff4444,
+      2px 2px 6px #000;
+  }
+}
+.drakoria-cena {
+  position: absolute;
+  width: 100%;
+  height: 100vh;
+  background: url("../img/stages/portao-drakoria.png") no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.drakoria-cena::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 140, 0, 0.3) 0%,
+    transparent 70%
+  );
+  animation: fogoParticulas 6s infinite linear;
+  pointer-events: none;
+}
+
+@keyframes fogoParticulas {
+  0% {
+    background-position: 0 0;
+    opacity: 0.6;
+  }
+  50% {
+    background-position: 100px 200px;
+    opacity: 0.9;
+  }
+  100% {
+    background-position: 0 400px;
+    opacity: 0.6;
+  }
+}
+
+.texto-cena {
+  position: absolute;
+  top: 38%; /* acima dos olhos do dragão */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  text-align: center;
+  color: #fff;
+  font-size: 1.3em;
+  line-height: 1.6em;
+  text-shadow:
+    0 0 10px #ff6600,
+    2px 2px 6px #000;
+  animation: pulsarBrilho 1.5s infinite alternate;
+}
+@keyframes pulsarBrilho {
+  from {
+    text-shadow:
+      0 0 8px #ff6600,
+      2px 2px 4px #000;
+  }
+  to {
+    text-shadow:
+      0 0 16px #ffaa33,
+      2px 2px 6px #000;
+  }
+}
+
+.fala {
+  color: #fff;
+  font-size: 1.2em;
+  margin: 1rem 0;
+  text-shadow:
+    0 0 8px #00bfff,
+    2px 2px 4px #000;
+  animation: pulsarDialogo 1.5s infinite alternate;
+}
+
+@keyframes pulsarDialogo {
+  from {
+    text-shadow:
+      0 0 6px #00bfff,
+      2px 2px 4px #000;
+  }
+  to {
+    text-shadow:
+      0 0 14px #66d9ff,
+      2px 2px 6px #000;
+  }
+}
+.btn-continuar {
+  margin-top: 1.5rem; /* espaçamento abaixo da frase */
+  background: linear-gradient(90deg, #ff6600, #ffaa33);
+  border: none;
+  color: #fff;
+  font-size: 1.2em;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #ff6600;
+  animation: pulsarBotao 1.5s infinite alternate;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+@keyframes pulsarBrilho {
+  from {
+    text-shadow:
+      0 0 8px #ff6600,
+      2px 2px 4px #000;
+  }
+  to {
+    text-shadow:
+      0 0 16px #ffaa33,
+      2px 2px 6px #000;
+  }
+}
+
+@keyframes pulsarBotao {
+  from {
+    box-shadow: 0 0 8px #ff6600;
+  }
+  to {
+    box-shadow: 0 0 20px #ffaa33;
+  }
+}
+
+.btn-continuar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #ffcc66;
+}
+
+.entrada-drakoria {
+  position: absolute; /* garante que ocupe a tela inteira */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+
+  background: url("../img/stages/guardas.png") no-repeat center center;
+  background-size: cover; /* cobre toda a tela */
+  z-index: -1; /* mantém a imagem atrás do diálogo */
+}
+
+.dialogo-guardas {
+  position: absolute;
+  bottom: 15%; /* posiciona acima do rodapé */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  text-align: center;
+  color: #fff;
+  font-size: 1.2em;
+  line-height: 1.6em;
+  text-shadow:
+    0 0 8px #ff6600,
+    2px 2px 4px #000;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  border-radius: 10px;
+}
+.btn-continuar {
+  margin-top: 1.5rem;
+  background: linear-gradient(90deg, #ff6600, #ffaa33);
+  border: none;
+  color: #fff;
+  font-size: 1.2em;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #ff6600;
+  animation: pulsarBotao 1.5s infinite alternate;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+@keyframes pulsarBotao {
+  from {
+    box-shadow: 0 0 8px #ff6600;
+  }
+  to {
+    box-shadow: 0 0 20px #ffaa33;
+  }
+}
+
+.btn-continuar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #ffcc66;
+}
+.drakoria-cidade {
+  position: fixed; /* ocupa toda a tela e ignora margens externas */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("../img/stages/drakoria-cidade.png") no-repeat center center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centraliza verticalmente */
+  align-items: center; /* centraliza horizontalmente */
+  text-align: center; /* centraliza o texto */
+  color: #fff;
+  padding: 0; /* remove espaçamento lateral */
+  margin: 0; /* remove margens automáticas */
+  box-sizing: border-box;
+}
+
+.drakoria-cidade p {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  margin: 0.5rem 0;
+  font-size: 1.3em;
+  line-height: 1.6em;
+  text-shadow:
+    0 0 8px #ffaa33,
+    2px 2px 4px #000;
+  max-width: 60%;
+}
+
+.texto-drakoria {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1.5rem;
+  border-radius: 10px;
+  width: 80%;
+  font-size: 1.2em;
+  line-height: 1.6em;
+  text-shadow:
+    0 0 8px #ffaa33,
+    2px 2px 4px #000;
+}
+
+.fala-cidade {
+  margin: 1rem 0;
+  animation: fadeInFalaCidade 0.5s ease forwards;
+}
+
+@keyframes fadeInFalaCidade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.drakoria-praca {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url("../img/stages/drakoria-praca.png") no-repeat center center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: #fff;
+  text-align: center;
+  opacity: 0; /* começa invisível para o fade-in */
+}
+
+.menu-drakoria {
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 0 20px #ffaa33;
+  animation: fadeInMenu 1.5s ease forwards;
+}
+
+@keyframes fadeInMenu {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn-local {
+  background: linear-gradient(90deg, #ff6600, #ffaa33);
+  border: none;
+  color: #fff;
+  font-size: 1.2em;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 0.5rem;
+  box-shadow: 0 0 10px #ff6600;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.btn-local:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px #ffcc66;
 }
 
 /* ---------------- RESPONSIVIDADE ---------------- */
