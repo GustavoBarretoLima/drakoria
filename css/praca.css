@@ -50,6 +50,7 @@
 /* Emojis pulsando de vez em quando */
 
 .hotspot .icon {
+  opacity: 1; /* força visibilidade */
   position: absolute;
   top: -40px;
   left: 50%;
@@ -59,7 +60,7 @@
   animation:
     flutuar 3s infinite alternate,
     pulsarIcon 4s infinite;
-  pointer-events: none;
+  pointer-events: none; /* não atrapalha o clique */
 }
 
 /* Animação de flutuação */
