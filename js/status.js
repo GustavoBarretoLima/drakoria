@@ -1,3 +1,4 @@
+// Atualiza status do herói e inimigo
 export function atualizarStatus(hpHeroi, manaHeroi, hpInimigo) {
   // Recupera classe para saber os máximos
   const classeHeroi = (
@@ -27,11 +28,31 @@ export function atualizarStatus(hpHeroi, manaHeroi, hpInimigo) {
   const porcentagemHPInimigo = Math.max((hpInimigo / inimigoMax) * 100, 0);
 
   // Atualiza barras
-  document.getElementById("hpHeroiBar").style.width = `${porcentagemHPHeroi}%`;
-  document.getElementById("manaHeroiBar").style.width =
-    `${porcentagemManaHeroi}%`;
-  document.getElementById("hpInimigoBar").style.width =
-    `${porcentagemHPInimigo}%`;
+  const hpBar = document.getElementById("hpHeroiBar");
+  const manaBar = document.getElementById("manaHeroiBar");
+  const inimigoBar = document.getElementById("hpInimigoBar");
+
+  hpBar.style.width = `${porcentagemHPHeroi}%`;
+  manaBar.style.width = `${porcentagemManaHeroi}%`;
+  inimigoBar.style.width = `${porcentagemHPInimigo}%`;
+
+  // 🔹 Cor dinâmica da barra de HP
+  if (porcentagemHPHeroi > 60) {
+    hpBar.style.backgroundColor = "#4caf50"; // verde
+  } else if (porcentagemHPHeroi > 30) {
+    hpBar.style.backgroundColor = "#ff9800"; // laranja
+  } else {
+    hpBar.style.backgroundColor = "#f44336"; // vermelho
+  }
+
+  // 🔹 Cor dinâmica da barra de Mana
+  if (porcentagemManaHeroi > 60) {
+    manaBar.style.backgroundColor = "#2196f3"; // azul forte
+  } else if (porcentagemManaHeroi > 30) {
+    manaBar.style.backgroundColor = "#64b5f6"; // azul médio
+  } else {
+    manaBar.style.backgroundColor = "#bbdefb"; // azul claro
+  }
 
   // Atualiza textos
   document.getElementById("hpHeroiTexto").textContent =
@@ -44,10 +65,16 @@ export function atualizarStatus(hpHeroi, manaHeroi, hpInimigo) {
   // Atualiza nomes
   const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
   document.getElementById("nomeHeroi").textContent = nomeHeroi;
-  document.getElementById("classeHeroi").textContent = classeHeroi;
+
+  // Capitaliza classe para exibição
+  const classeFormatada =
+    classeHeroi.charAt(0).toUpperCase() + classeHeroi.slice(1);
+  document.getElementById("classeHeroi").textContent = classeFormatada;
+
   document.getElementById("nomeInimigo").textContent = "Goblin";
 }
 
+// Carrega imagem do herói conforme classe e gênero
 export function carregarHeroi() {
   const heroiImg = document.querySelector(".heroi-img");
   const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";

@@ -136,7 +136,7 @@ function entrarDrakoria() {
     }, idx * 1500);
   });
 
-  // fade-out e transição para a praça principal
+  // fade-out e redirecionamento para praca.html
   setTimeout(() => {
     anime({
       targets: ".drakoria-cidade",
@@ -144,24 +144,24 @@ function entrarDrakoria() {
       duration: 1500,
       easing: "easeOutQuad",
       complete: () => {
-        cenaPrincipalDrakoria();
-        anime({
-          targets: ".drakoria-praca",
-          opacity: [0, 1],
-          duration: 1500,
-          easing: "easeInQuad",
-        });
+        window.location.href = "praca.html"; // 🔹 redireciona para a praça
       },
     });
-  }, 6000); // tempo total antes da transição
+  }, 6000);
 }
 
 function cenaPrincipalDrakoria() {
   document.querySelector("#praca").innerHTML = `
     <div class="drakoria-praca">
-      <div class="hotspot taberna" onclick="entrarTaberna()" data-tooltip="🍺 Entrar na Taberna"></div>
-      <div class="hotspot ferreiro" onclick="entrarFerreiro()" data-tooltip="⚒️ Ir ao Ferreiro"></div>
-      <div class="hotspot guilda" onclick="entrarGuilda()" data-tooltip="🛡️ Guilda dos Aventureiros"></div>
+      <div class="hotspot taberna" 
+           onclick="window.location.href='estabelecimentos.html#taberna'" 
+           data-tooltip="🍺 Entrar na Taberna"></div>
+      <div class="hotspot ferreiro" 
+           onclick="window.location.href='estabelecimentos.html#ferreiro'" 
+           data-tooltip="⚒️ Ir ao Ferreiro"></div>
+      <div class="hotspot guilda" 
+           onclick="window.location.href='estabelecimentos.html#guilda'" 
+           data-tooltip="🛡️ Guilda dos Aventureiros"></div>
     </div>
   `;
 }

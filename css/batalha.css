@@ -469,16 +469,31 @@ body {
 }
 
 .drakoria-cidade p {
-  background: rgba(0, 0, 0, 0.5);
   padding: 1rem 2rem;
   border-radius: 10px;
   margin: 0.5rem 0;
   font-size: 1.3em;
   line-height: 1.6em;
-  text-shadow:
-    0 0 8px #ffaa33,
-    2px 2px 4px #000;
-  max-width: 60%;
+  color: #0e0d0d;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(248, 247, 247, 0.8); /* sombra escura para contraste */
+  animation: pulsarTexto 2.5s infinite ease-in-out;
+}
+
+/* Efeito pulsante */
+@keyframes pulsarTexto {
+  0% {
+    color: #ffcc00;
+    text-shadow: 0 0 8px rgba(248, 247, 247, 0.8);
+  }
+  50% {
+    color: #ffd700;
+    text-shadow: 0 0 16px rgba(255, 215, 0, 0.9);
+  }
+  100% {
+    color: #ffcc00;
+    text-shadow: 0 0 8px rgba(248, 247, 247, 0.8);
+  }
 }
 
 .texto-drakoria {

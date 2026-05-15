@@ -2,16 +2,16 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <title>Praça de Drakoria</title>
-    <link rel="stylesheet" href="../css/praca.css" />
-    <script src="../js/caminho-drakoria.js"></script>
+    <title>Drakoria - Estabelecimentos</title>
+    <link rel="stylesheet" href="../css/estabelecimentos.css" />
+    <script src="../js/estabelecimentos.js"></script>
   </head>
   <body>
-    <div id="praca" class="drakoria-praca">
-      <!-- Botões de entrada -->
+    <!-- Praça principal -->
+    <div id="praca" class="drakoria-praca fade">
       <div
         class="hotspot taberna"
-        onclick="window.location.href = 'estabelecimentos.html#taberna'"
+        onclick="carregarTaberna()"
         data-tooltip="🍺 Entrar na Taberna"
       >
         <span class="icon">🍺</span>
@@ -19,7 +19,7 @@
 
       <div
         class="hotspot ferreiro"
-        onclick="window.location.href = 'estabelecimentos.html#ferreiro'"
+        onclick="carregarFerreiro()"
         data-tooltip="⚒️ Ir ao Ferreiro"
       >
         <span class="icon">⚒️</span>
@@ -27,16 +27,16 @@
 
       <div
         class="hotspot guilda"
-        onclick="window.location.href = 'estabelecimentos.html#guilda'"
+        onclick="carregarGuilda()"
         data-tooltip="🛡️ Guilda dos Aventureiros"
       >
         <span class="icon">🛡️</span>
       </div>
     </div>
 
-    <script>
-      // inicia a cena principal da praça
-      cenaPrincipalDrakoria();
-    </script>
+    <!-- Interiores -->
+    <div id="taberna" style="display: none"></div>
+    <div id="ferreiro" style="display: none"></div>
+    <div id="guilda" style="display: none"></div>
   </body>
 </html>
