@@ -1,0 +1,134 @@
+.inventario {
+  position: fixed;
+  top: 50%; /* centraliza verticalmente */
+  left: 50%; /* centraliza horizontalmente */
+  transform: translate(-50%, -50%) scale(0.95); /* combina translate + scale */
+  background: rgba(30, 30, 30, 0.95);
+  border: 2px solid #d4af37;
+  border-radius: 12px;
+  padding: 1rem;
+  width: 600px; /* largura fixa */
+  max-width: 90%; /* não ultrapassa a tela */
+  max-height: 80%; /* limite de altura */
+  overflow-y: auto; /* scroll interno se passar do limite */
+  z-index: 1200;
+  color: #fff;
+  font-family: "Cinzel", serif;
+  opacity: 0;
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+.inventario.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1); /* mantém centralização */
+}
+
+.inventario h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #ffd700;
+}
+
+/* Layout do inventário */
+.inventario-conteudo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+}
+
+/* Imagem do herói centralizada e menor */
+.heroi {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+#heroiImagem {
+  width: 180px; /* controla largura */
+  height: 180px; /* controla altura */
+  object-fit: cover; /* mantém proporção sem distorcer */
+  border: 2px solid #d4af37;
+  border-radius: 50%; /* formato circular */
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+  display: block;
+  margin: 0 auto; /* centraliza */
+}
+
+.heroi img.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Slots */
+.slots {
+  display: grid;
+  grid-template-columns: repeat(5, 70px); /* 5 colunas fixas */
+  grid-auto-rows: 70px; /* altura dos slots */
+  gap: 0.8rem;
+  justify-content: center; /* centraliza a grade */
+}
+
+.slots div {
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+  height: 70px; /* 🔹 menor altura */
+  background: rgba(50, 50, 50, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+}
+
+.slots div.ocupado {
+  background: rgba(100, 100, 100, 0.9);
+  color: #fff;
+}
+
+.slots div.ocupado img {
+  max-width: 60%;
+  max-height: 60%;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .inventario {
+    width: 70%;
+  }
+  .slots {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .inventario {
+    width: 85%;
+    top: 5%;
+  }
+  .slots {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+  }
+  .slots div {
+    height: 65px;
+  }
+}
+
+@media (max-width: 480px) {
+  .inventario {
+    width: 95%;
+    padding: 0.8rem;
+  }
+  .slots {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  .slots div {
+    height: 60px;
+    font-size: 0.85rem;
+  }
+}

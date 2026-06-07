@@ -8,13 +8,90 @@
   background-size: cover;
 }
 
+/* Botão para abrir menu */
+.abrir-menu-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #222;
+  color: #ffd700;
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  z-index: 1100;
+  transition:
+    background 0.3s,
+    transform 0.3s;
+  font-family: "Cinzel", serif;
+}
+
+.abrir-menu-btn:hover {
+  background: #444;
+  transform: scale(1.05);
+}
+
+/* Menu flutuante */
+.menu-flutuante {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(20, 20, 20, 0.9); /* fundo escuro translúcido */
+  border: 2px solid #d4af37; /* dourado medieval */
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  z-index: 1000;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.6); /* brilho dourado */
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* Botões do menu */
+.menu-flutuante button {
+  background: linear-gradient(180deg, #444, #222); /* efeito metálico */
+  color: #fff;
+  font-family: "Cinzel", serif; /* fonte medieval */
+  font-size: 1rem;
+  border: 1px solid #d4af37;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.menu-flutuante button:hover {
+  background: linear-gradient(180deg, #666, #333);
+  color: #ffd700; /* dourado ao passar o mouse */
+  transform: scale(1.05);
+}
+
+/* Estado oculto */
+.hidden {
+  display: none;
+}
+
+/* Animação de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Hotspots invisíveis */
 .hotspot {
   position: absolute;
   cursor: pointer;
   border-radius: 8px;
   transition: all 0.3s ease;
-  background: transparent; /* invisível sem esconder o conteúdo */
+  background: transparent;
 }
 
 /* Destaque ao passar o mouse */
@@ -47,10 +124,9 @@
   opacity: 1;
 }
 
-/* Emojis pulsando de vez em quando */
-
+/* Emojis pulsando */
 .hotspot .icon {
-  opacity: 1; /* força visibilidade */
+  opacity: 1;
   position: absolute;
   top: -40px;
   left: 50%;
@@ -60,10 +136,10 @@
   animation:
     flutuar 3s infinite alternate,
     pulsarIcon 4s infinite;
-  pointer-events: none; /* não atrapalha o clique */
+  pointer-events: none;
 }
 
-/* Animação de flutuação */
+/* Animações */
 @keyframes flutuar {
   from {
     transform: translateX(-50%) translateY(0);
@@ -73,7 +149,6 @@
   }
 }
 
-/* Animação de pulsar/brilhar */
 @keyframes pulsarIcon {
   0% {
     text-shadow: 0 0 6px rgba(255, 200, 100, 0.6);
@@ -89,7 +164,6 @@
   }
 }
 
-/* Brilho pulsante */
 @keyframes portaGlow {
   from {
     box-shadow: 0 0 10px rgba(255, 200, 100, 0.5);
@@ -99,7 +173,6 @@
   }
 }
 
-/* Reflexo recorrente */
 @keyframes reflexoPorta {
   0% {
     background: linear-gradient(
@@ -162,14 +235,12 @@
   width: 13vw;
   height: 15vh;
 }
-
 .ferreiro {
   top: 60vh;
   left: 39vw;
   width: 13vw;
   height: 15vh;
 }
-
 .guilda {
   top: 57vh;
   left: 69vw;

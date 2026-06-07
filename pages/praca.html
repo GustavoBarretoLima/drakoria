@@ -4,11 +4,34 @@
     <meta charset="UTF-8" />
     <title>Praça de Drakoria</title>
     <link rel="stylesheet" href="../css/praca.css" />
-    <script src="../js/caminho-drakoria.js"></script>
+    <link rel="stylesheet" href="../css/inventario.css" />
+    <script src="../js/caminho-drakoria.js" defer></script>
+    <script src="../js/praca.js" defer></script>
+    <script src="../js/inventario.js" defer></script>
   </head>
   <body>
-    <div id="praca" class="drakoria-praca">
-      <!-- Botões de entrada -->
+    <!-- Botão para abrir/fechar menu -->
+    <button id="abrirMenuBtn" class="abrir-menu-btn" type="button">
+      ☰ Menu
+    </button>
+
+    <!-- Menu flutuante -->
+    <nav
+      id="menuPraca"
+      class="menu-flutuante hidden"
+      aria-label="Menu da Praça"
+    >
+      <button type="button" onclick="abrirInventario()">🎒 Inventário</button>
+      <button type="button" onclick="abrirEquipamentos()">
+        🛡️ Equipamentos
+      </button>
+      <button type="button" onclick="abrirStatus()">📊 Status</button>
+      <button type="button" onclick="abrirLoja()">🏪 Loja</button>
+      <button type="button" onclick="abrirMissoes()">📜 Missões</button>
+    </nav>
+
+    <!-- Praça principal -->
+    <main id="praca" class="drakoria-praca">
       <div
         class="hotspot taberna"
         onclick="window.location.href = 'estabelecimentos.html#taberna'"
@@ -32,11 +55,19 @@
       >
         <span class="icon">🛡️</span>
       </div>
-    </div>
 
-    <script>
-      // inicia a cena principal da praça
-      cenaPrincipalDrakoria();
-    </script>
+      <!-- Inventário (janela oculta por padrão) -->
+      <div id="inventario" class="inventario hidden">
+        <h2></h2>
+        <div class="inventario-conteudo">
+          <!-- Imagem do herói -->
+          <div class="heroi">
+            <img id="heroiImagem" src="" alt="Herói de Drakoria" />
+          </div>
+          <!-- Slots do inventário -->
+          <div class="slots"></div>
+        </div>
+      </div>
+    </main>
   </body>
 </html>
