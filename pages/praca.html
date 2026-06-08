@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="../css/inventario.css" />
     <script src="../js/caminho-drakoria.js" defer></script>
     <script src="../js/praca.js" defer></script>
+    <script src="../js/itens.js" defer></script>
+    <script src="../js/personagens.js" defer></script>
+    <script src="../js/equipamentos.js" defer></script>
     <script src="../js/inventario.js" defer></script>
   </head>
   <body>
@@ -22,9 +25,6 @@
       aria-label="Menu da Praça"
     >
       <button type="button" onclick="abrirInventario()">🎒 Inventário</button>
-      <button type="button" onclick="abrirEquipamentos()">
-        🛡️ Equipamentos
-      </button>
       <button type="button" onclick="abrirStatus()">📊 Status</button>
       <button type="button" onclick="abrirLoja()">🏪 Loja</button>
       <button type="button" onclick="abrirMissoes()">📜 Missões</button>
@@ -55,19 +55,40 @@
       >
         <span class="icon">🛡️</span>
       </div>
+      <div id="item-panel" class="item-panel"></div>
 
       <!-- Inventário (janela oculta por padrão) -->
       <div id="inventario" class="inventario hidden">
-        <h2></h2>
+        <h2>Inventário</h2>
         <div class="inventario-conteudo">
-          <!-- Imagem do herói -->
-          <div class="heroi">
-            <img id="heroiImagem" src="" alt="Herói de Drakoria" />
+          <!-- Container geral -->
+          <div class="equipamentos-container">
+            <!-- Personagem central -->
+            <div class="personagem">
+              <img id="heroiImagem" src="" alt="Herói de Drakoria" />
+            </div>
+
+            <!-- Equipamentos em círculo -->
+            <div class="equip-circle">
+              <div class="slot arma">Arma</div>
+              <div class="slot armadura">Armadura</div>
+              <div class="slot escudo">Escudo</div>
+              <div class="slot perna">Perna</div>
+              <div class="slot bota">Bota</div>
+              <div class="slot luva">Luva</div>
+              <div class="slot brinco">Brinco</div>
+              <div class="slot colar">Colar</div>
+              <div class="slot anel">Anel</div>
+            </div>
           </div>
-          <!-- Slots do inventário -->
+
+          <!-- Slots do inventário abaixo -->
           <div class="slots"></div>
         </div>
       </div>
+
+      <!-- Painel lateral de item -->
+      <div id="item-panel" class="item-panel"></div>
     </main>
   </body>
 </html>

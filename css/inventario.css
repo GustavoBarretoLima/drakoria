@@ -7,9 +7,9 @@
   border: 2px solid #d4af37;
   border-radius: 12px;
   padding: 1rem;
-  width: 600px; /* largura fixa */
+  width: 800px; /* largura fixa */
   max-width: 90%; /* não ultrapassa a tela */
-  max-height: 80%; /* limite de altura */
+  max-height: 70%; /* limite de altura */
   overflow-y: auto; /* scroll interno se passar do limite */
   z-index: 1200;
   color: #fff;
@@ -19,7 +19,18 @@
     opacity 0.6s ease,
     transform 0.6s ease;
 }
+.inventario::-webkit-scrollbar {
+  width: 6px; /* 🔹 largura da barra */
+}
 
+.inventario::-webkit-scrollbar-thumb {
+  background-color: #d4af37; /* 🔹 cor da barra (dourado medieval) */
+  border-radius: 3px;
+}
+
+.inventario::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); /* 🔹 fundo da trilha */
+}
 .inventario.show {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1); /* mantém centralização */
@@ -38,6 +49,78 @@
   align-items: center;
   justify-content: flex-start;
   gap: 1rem;
+}
+#inventario-equipamentos {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+#inventario,
+#equipamento {
+  flex: 1;
+  background: rgba(30, 30, 30, 0.95);
+  border: 2px solid #d4af37;
+  border-radius: 12px;
+  padding: 1rem;
+}
+#inventario .slots {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+#inventario .slots div {
+  width: 64px;
+  height: 64px;
+  border: 1px solid #d4af37;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+#inventario .slots div.vazio {
+  opacity: 0.3;
+}
+
+#inventario .slots .quantidade {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.inventario.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+.inventario.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+#equipamento .slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+#equipamento .slot img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  border: 1px solid #d4af37;
+  border-radius: 8px;
+  background: rgba(50, 50, 50, 0.8);
 }
 
 /* Imagem do herói centralizada e menor */
@@ -87,11 +170,268 @@
 .slots div.ocupado {
   background: rgba(100, 100, 100, 0.9);
   color: #fff;
+  position: relative;
+  overflow: visible;
 }
 
 .slots div.ocupado img {
-  max-width: 60%;
-  max-height: 60%;
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+  background: none;
+  display: block;
+  margin: auto;
+  transition: transform 0.2s ease-in-out;
+}
+.slots div.ocupado::after {
+  content: attr(data-descricao);
+  position: absolute;
+  bottom: 100%; /* posiciona acima do slot */
+  left: 50%;
+  transform: translatex(-50%) scale(0); /* inicia invisível e pequeno */
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: normal;
+  width: 180px;
+  text-align: center;
+  pointer-events: none;
+  transition: transform 0.2s ease-in-out;
+  opacity: 0;
+  z-index: 15;
+}
+.slots div.ocupado:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+.slots div.ocupado:hover::after {
+  transform: translatex(-50%) scale(1); /* torna visível e do tamanho normal */
+  opacity: 1;
+}
+.slots div.ocupado img:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+.slots div.ocupado.equipado {
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+}
+.equipamentos-container {
+  position: relative;
+  width: 520px; /* ligeiramente maior para compensar margens */
+  height: 520px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Personagem central */
+.personagem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.personagem img {
+  width: 200px; /* ligeiramente maior para equilíbrio visual */
+  height: 200px;
+  border: 3px solid #d4af37;
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+}
+
+/* Equipamentos em círculo */
+.equip-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 440px;
+  height: 440px;
+  transform: translate(-50%, -50%);
+}
+
+/* Slots */
+.equip-circle .slot {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 2px solid #d4af37;
+  border-radius: 10px;
+  background: rgba(50, 50, 50, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  font-size: 0.9rem;
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+/* Posições ao redor do personagem */
+.slot.arma {
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.slot.armadura {
+  top: 22%;
+  right: 14%;
+  transform: translateY(-50%);
+}
+.slot.escudo {
+  top: 22%;
+  left: 90%;
+  transform: translateY(-50%);
+}
+.slot.perna {
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+.slot.bota {
+  bottom: 22%;
+  right: 14%;
+  transform: translateY(50%);
+}
+.slot.luva {
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.slot.brinco {
+  bottom: 22%;
+  left: 14%;
+  transform: translateY(50%);
+}
+.slot.colar {
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+.slot.anel {
+  top: 22%;
+  left: 14%;
+  transform: translateY(-50%);
+}
+.equip-circle .slot img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.equip-circle .slot .stats {
+  font-size: 12px;
+  color: #ccc;
+  margin-top: 4px;
+  text-align: center;
+}
+.equipado-item {
+  position: relative;
+  display: inline-block;
+}
+
+.equipado-item .tooltip {
+  visibility: hidden;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  text-align: left;
+  padding: 6px;
+  border-radius: 4px;
+  position: absolute;
+  bottom: 110%; /* aparece acima do ícone */
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 10;
+  font-size: 12px;
+}
+
+.equipado-item:hover .tooltip {
+  visibility: visible;
+}
+.item-panel {
+  position: absolute;
+  right: 20px;
+  top: 100px;
+  width: 200px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  display: none; /* começa oculto */
+}
+
+.item-panel img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
+
+.item-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item-panel li {
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.comparison {
+  display: flex;
+  gap: 12px;
+}
+
+.comparison .item {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.comparison img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  margin-bottom: 6px;
+}
+
+.melhora {
+  color: #4caf50; /* verde */
+  font-weight: bold;
+  margin-left: 6px;
+}
+
+.piora {
+  color: #f44336; /* vermelho */
+  font-weight: bold;
+  margin-left: 6px;
+}
+.ocupado.bloqueado {
+  border: 2px solid red;
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-4px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 /* Responsividade */

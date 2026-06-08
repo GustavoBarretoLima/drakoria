@@ -1,4 +1,10 @@
 let generoSelecionado = "Masculino";
+// Obtém dados do herói do localStorage
+window.personagem = {
+  nome: localStorage.getItem("nomeHeroi") || "Herói",
+  classe: (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase(),
+  genero: (localStorage.getItem("generoHeroi") || "masculino").toLowerCase(),
+};
 
 function selecionarGenero(genero) {
   generoSelecionado = genero;
@@ -41,6 +47,7 @@ function atualizarImagens() {
   }
 }
 
+// personagens.js
 function selecionarPersonagem(classe) {
   let nomeClasse = classe;
   if (generoSelecionado === "Feminino") {
@@ -55,9 +62,17 @@ function selecionarPersonagem(classe) {
     return;
   }
 
-  localStorage.setItem("classeHeroi", nomeClasse);
+  // salva no localStorage
+  localStorage.setItem("classeHeroi", classe); // 🔹 aqui salva SEM gênero, padronizado
   localStorage.setItem("generoHeroi", generoSelecionado);
   localStorage.setItem("nomeHeroi", nomeHeroi);
+
+  // cria objeto global personagem
+  window.personagem = {
+    nome: nomeHeroi,
+    classe: classe.toLowerCase(), // "guerreiro", "mago", "arqueiro"
+    genero: generoSelecionado.toLowerCase(), // "masculino" ou "feminino"
+  };
 
   window.location.href = "intro.html";
 }
