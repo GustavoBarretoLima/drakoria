@@ -97,10 +97,10 @@
 /* Responsividade */
 @media (max-width: 1024px) {
   .inventario {
-    width: 70%;
+    width: 50%;
   }
   .slots {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(1fr, 70px));
   }
 }
 
@@ -110,7 +110,7 @@
     top: 5%;
   }
   .slots {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, minmax(1fr, 70px));
     gap: 0.6rem;
   }
   .slots div {
@@ -124,7 +124,7 @@
     padding: 0.8rem;
   }
   .slots {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(1fr, 70px));
     gap: 0.5rem;
   }
   .slots div {
