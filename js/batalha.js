@@ -31,10 +31,15 @@ let turnoHeroi;
 
 // ---------------- INICIALIZAÇÃO ----------------
 function iniciarBatalha() {
+  const heroiBatalha = document.getElementById("heroiBatalha");
+  const generoHeroi = (
+    localStorage.getItem("generoHeroi") || "masculino"
+  ).toLowerCase();
   const classeHeroi = (
     localStorage.getItem("classeHeroi") || "Guerreiro"
   ).toLowerCase();
 
+  // 🔹 Define HP/Mana por classe
   switch (true) {
     case classeHeroi.includes("guerre"):
       hpHeroi = 120;
@@ -58,6 +63,24 @@ function iniciarBatalha() {
 
   atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
   atualizarIndicadorTurno(true);
+
+  // 🔹 Define imagem do herói em batalha
+  if (classeHeroi.includes("guerre")) {
+    heroiBatalha.src =
+      generoHeroi === "feminino"
+        ? "../img/personagens/guerreira.png"
+        : "../img/personagens/guerreiro.png";
+  } else if (classeHeroi.includes("mag")) {
+    heroiBatalha.src =
+      generoHeroi === "feminino"
+        ? "../img/personagens/maga.png"
+        : "../img/personagens/mago.png";
+  } else if (classeHeroi.includes("arque")) {
+    // Aqui você usa o gif só na batalha
+    heroiBatalha.src = "../img/personagens/arqueira.gif";
+  } else {
+    heroiBatalha.src = "../img/personagens/guerreiro.png";
+  }
 
   // 🔹 Desabilita botão Magia para classes que não usam magia
   const btnMagia = document.getElementById("btnMagia");
@@ -91,7 +114,13 @@ function atacar() {
   const classeHeroi = (
     localStorage.getItem("classeHeroi") || "Guerreiro"
   ).toLowerCase();
-
+  // Ativa gif de ataque do arqueiro
+  if (classeHeroi === "arqueiro" || classeHeroi === "arqueira") {
+    heroi.src = "../img/personagens/arqueira-ataque.gif";
+    setTimeout(() => {
+      heroi.src = "../img/personagens/arqueira.gif";
+    }, 1500); // volta para o gif de idle após 0.5s
+  }
   if (critico) {
     dano *= 2;
     mostrarDanoCritico(dano, inimigo);
@@ -143,17 +172,28 @@ function defender() {
   if (!podeAgir()) return;
   encerrarTurnoHeroi();
 
+  const heroi = document.getElementById("heroiBatalha");
   const classeHeroi = (
     localStorage.getItem("classeHeroi") || "Guerreiro"
   ).toLowerCase();
 
-  if (classeHeroi === "guerreiro" || classeHeroi === "guerreira") {
+  // 🔹 troca para gif de defesa
+  if (classeHeroi.includes("arque")) {
+    heroi.src = "../img/personagens/arqueira-defesa.gif";
+
+    // volta para o gif padrão depois de 1.5s
+    setTimeout(() => {
+      heroi.src = "../img/personagens/arqueira.gif";
+    }, 1500);
+  }
+
+  if (classeHeroi.includes("guerre")) {
     mensagem("🛡️ Você ergueu seu escudo!");
     efeitoDefesaGuerreiro();
-  } else if (classeHeroi === "mago" || classeHeroi === "maga") {
+  } else if (classeHeroi.includes("mag")) {
     mensagem("✨ Você conjurou uma barreira mágica!");
     efeitoDefesaMago();
-  } else if (classeHeroi === "arqueiro" || classeHeroi === "arqueira") {
+  } else if (classeHeroi.includes("arque")) {
     mensagem("🏹 Você se esquivou rapidamente!");
     efeitoDefesaArqueiro();
   } else {

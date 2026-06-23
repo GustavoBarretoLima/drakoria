@@ -27,7 +27,7 @@ const itensBasicos = [
     descricao:
       "Um cajado simples feito de madeira. Ideal para magos iniciantes.",
     consumivel: false,
-    classePermitida: ["mago"], // ✅ precisa ser array e minúsculo
+    classePermitida: ["mago"],
     icone: "/img/itens/cajado_madeira.png",
     stats: { ataque: 8, durabilidade: 60 },
   },
