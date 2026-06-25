@@ -78,7 +78,9 @@ export function atualizarStatus(hpHeroi, manaHeroi, hpInimigo) {
 export function carregarHeroi() {
   const heroiImg = document.querySelector(".heroi-img");
   const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
-  const classeHeroi = localStorage.getItem("classeHeroi") || "Guerreiro";
+  const classeHeroi = (
+    localStorage.getItem("classeHeroi") || "guerreiro"
+  ).toLowerCase();
   const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
 
   const imagensHeroi = {
@@ -96,17 +98,10 @@ export function carregarHeroi() {
     },
   };
 
-  // Normaliza a classe escolhida
-  let classeKey = classeHeroi.toLowerCase();
-
-  // Corrige equivalências femininas
-  if (classeKey === "maga") classeKey = "mago";
-  if (classeKey === "arqueira") classeKey = "arqueiro";
-  if (classeKey === "guerreira") classeKey = "guerreiro";
-
-  if (imagensHeroi[classeKey]) {
+  if (imagensHeroi[classeHeroi]) {
     heroiImg.src =
-      imagensHeroi[classeKey][generoHeroi] || imagensHeroi[classeKey].Masculino;
+      imagensHeroi[classeHeroi][generoHeroi] ||
+      imagensHeroi[classeHeroi].Masculino;
   } else {
     heroiImg.src = "../img/personagens/guerreiro.png"; // fallback
   }

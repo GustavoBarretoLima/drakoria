@@ -1,4 +1,5 @@
 // Importa módulos
+import { gifsHeroi, gifsGoblin } from "./gifs.js";
 import {
   mensagem,
   atualizarIndicadorTurno,
@@ -32,14 +33,14 @@ let turnoHeroi;
 // ---------------- INICIALIZAÇÃO ----------------
 function iniciarBatalha() {
   const heroiBatalha = document.getElementById("heroiBatalha");
-  const generoHeroi = (
-    localStorage.getItem("generoHeroi") || "masculino"
-  ).toLowerCase();
-  const classeHeroi = (
-    localStorage.getItem("classeHeroi") || "Guerreiro"
-  ).toLowerCase();
+  const inimigo = document.querySelector(".inimigo-img");
 
-  // 🔹 Define HP/Mana por classe
+  const classeHeroi = (
+    localStorage.getItem("classeHeroi") || "guerreiro"
+  ).toLowerCase();
+  const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+
+  // 🔹 Define HP/Mana por classe base
   switch (true) {
     case classeHeroi.includes("guerre"):
       hpHeroi = 120;
@@ -64,29 +65,30 @@ function iniciarBatalha() {
   atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
   atualizarIndicadorTurno(true);
 
-  // 🔹 Define imagem do herói em batalha
-  if (classeHeroi.includes("guerre")) {
-    heroiBatalha.src =
-      generoHeroi === "feminino"
-        ? "../img/personagens/guerreira.png"
-        : "../img/personagens/guerreiro.png";
-  } else if (classeHeroi.includes("mag")) {
-    heroiBatalha.src =
-      generoHeroi === "feminino"
-        ? "../img/personagens/maga.png"
-        : "../img/personagens/mago.png";
-  } else if (classeHeroi.includes("arque")) {
-    // Aqui você usa o gif só na batalha
-    heroiBatalha.src = "../img/personagens/arqueira.gif";
-  } else {
-    heroiBatalha.src = "../img/personagens/guerreiro.png";
+  // 🔹 Usa o mapa de gifs com classe base + gênero
+  heroiBatalha.src =
+    gifsHeroi[classeHeroi][generoHeroi]?.padrao ||
+    "../img/personagens/guerreiro.gif";
+  if (gifsGoblin) {
+    inimigo.src = gifsGoblin.padrao;
   }
+  // 🔹 Atualiza o texto da classe conforme o gênero
+  const nomeClasse = {
+    guerreiro: { Masculino: "Guerreiro", Feminino: "Guerreira" },
+    mago: { Masculino: "Mago", Feminino: "Maga" },
+    arqueiro: { Masculino: "Arqueiro", Feminino: "Arqueira" },
+  };
+
+  const classeHeroiTexto =
+    nomeClasse[classeHeroi]?.[generoHeroi] || "Guerreiro";
+
+  document.getElementById("classeHeroi").textContent = classeHeroiTexto;
 
   // 🔹 Desabilita botão Magia para classes que não usam magia
   const btnMagia = document.getElementById("btnMagia");
   if (classeHeroi.includes("guerre") || classeHeroi.includes("arque")) {
     btnMagia.disabled = true;
-    btnMagia.style.opacity = "0.5"; // opcional: visual de desativado
+    btnMagia.style.opacity = "0.5";
   } else {
     btnMagia.disabled = false;
     btnMagia.style.opacity = "1";
@@ -109,47 +111,49 @@ function atacar() {
 
   let dano = Math.floor(Math.random() * 15) + 5;
   let critico = Math.random() < 0.2;
-  const heroi = document.querySelector(".heroi-img");
-  const inimigo = document.querySelector(".inimigo");
+  const heroi = document.getElementById("heroiBatalha");
+  const inimigo = document.querySelector(".inimigo-img");
   const classeHeroi = (
-    localStorage.getItem("classeHeroi") || "Guerreiro"
+    localStorage.getItem("classeHeroi") || "guerreiro"
   ).toLowerCase();
-  // Ativa gif de ataque do arqueiro
-  if (classeHeroi === "arqueiro" || classeHeroi === "arqueira") {
-    heroi.src = "../img/personagens/arqueira-ataque.gif";
+  const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+
+  // 🔹 Gif de ataque do herói
+  if (gifsHeroi[classeHeroi] && gifsHeroi[classeHeroi][generoHeroi]) {
+    heroi.src = gifsHeroi[classeHeroi][generoHeroi].atk;
     setTimeout(() => {
-      heroi.src = "../img/personagens/arqueira.gif";
-    }, 1500); // volta para o gif de idle após 0.5s
+      heroi.src = gifsHeroi[classeHeroi][generoHeroi].padrao;
+    }, 1500);
   }
+
+  // Gif de dano do goblin
+  if (gifsGoblin) {
+    inimigo.classList.add("dano"); // aplica inversão primeiro
+    inimigo.src = gifsGoblin.damage;
+
+    setTimeout(() => {
+      inimigo.src = gifsGoblin.padrao;
+      inimigo.classList.remove("dano"); // remove depois
+    }, 1000);
+  }
+
   if (critico) {
     dano *= 2;
     mostrarDanoCritico(dano, inimigo);
     efeitoReceberDano(inimigo);
     mensagem(`💥 CRÍTICO! Você causou ${dano} de dano!`);
 
-    if (classeHeroi === "guerreiro" || classeHeroi === "guerreira") {
-      efeitoCorteCritico(inimigo);
-    }
-    if (classeHeroi === "mago" || classeHeroi === "maga") {
-      efeitoMagiaCritica(heroi, inimigo);
-    }
-    if (classeHeroi === "arqueiro" || classeHeroi === "arqueira") {
-      efeitoFlechaCritica(inimigo);
-    }
+    if (classeHeroi.includes("guerre")) efeitoCorteCritico(inimigo);
+    if (classeHeroi.includes("mag")) efeitoMagiaCritica(heroi, inimigo);
+    if (classeHeroi.includes("arque")) efeitoFlechaCritica(inimigo);
   } else {
     mostrarDano(dano, inimigo);
     efeitoReceberDano(inimigo);
     mensagem(`Você atacou e causou ${dano} de dano!`);
 
-    if (classeHeroi === "guerreiro" || classeHeroi === "guerreira") {
-      efeitoCorteBasico(inimigo);
-    }
-    if (classeHeroi === "mago" || classeHeroi === "maga") {
-      efeitoAtaqueBasicoMago(inimigo);
-    }
-    if (classeHeroi === "arqueiro" || classeHeroi === "arqueira") {
-      efeitoFlechaBasica(inimigo);
-    }
+    if (classeHeroi.includes("guerre")) efeitoCorteBasico(inimigo);
+    if (classeHeroi.includes("mag")) efeitoAtaqueBasicoMago(inimigo);
+    if (classeHeroi.includes("arque")) efeitoFlechaBasica(inimigo);
   }
 
   // 🔹 Atualiza vida do inimigo
@@ -160,8 +164,14 @@ function atacar() {
   if (hpInimigo <= 0) {
     hpInimigo = 0;
     atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
-    cenaVitoriaGoblin(); // chama transição para Drakoria
-    return; // interrompe o turno inimigo
+
+    // Gif de morte do goblin
+    if (gifsGoblin) {
+      inimigo.src = gifsGoblin.morte;
+    }
+
+    cenaVitoriaGoblin();
+    return;
   }
 
   // Se ainda está vivo, passa o turno para o inimigo
@@ -174,16 +184,15 @@ function defender() {
 
   const heroi = document.getElementById("heroiBatalha");
   const classeHeroi = (
-    localStorage.getItem("classeHeroi") || "Guerreiro"
+    localStorage.getItem("classeHeroi") || "guerreiro"
   ).toLowerCase();
+  const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
 
-  // 🔹 troca para gif de defesa
-  if (classeHeroi.includes("arque")) {
-    heroi.src = "../img/personagens/arqueira-defesa.gif";
-
-    // volta para o gif padrão depois de 1.5s
+  // 🔹 Usa o mapa de gifs para defesa com classe base + gênero
+  if (gifsHeroi[classeHeroi] && gifsHeroi[classeHeroi][generoHeroi]) {
+    heroi.src = gifsHeroi[classeHeroi][generoHeroi].defesa;
     setTimeout(() => {
-      heroi.src = "../img/personagens/arqueira.gif";
+      heroi.src = gifsHeroi[classeHeroi][generoHeroi].padrao;
     }, 1500);
   }
 
@@ -209,7 +218,7 @@ function magia() {
   encerrarTurnoHeroi();
 
   const heroi = document.querySelector(".heroi-img");
-  const inimigo = document.querySelector(".inimigo");
+  const inimigo = document.querySelector(".inimigo-img");
   const classeHeroi = (
     localStorage.getItem("classeHeroi") || "Mago"
   ).toLowerCase();
@@ -336,6 +345,30 @@ function turnoInimigo(defesa = false) {
     hpHeroi -= dano;
 
     const heroi = document.querySelector(".heroi-img");
+    const goblin = document.querySelector(".inimigo-img"); // pega a imagem do goblin
+
+    // 🔹 Mostra gif de ataque do goblin
+    if (gifsGoblin) {
+      goblin.src = gifsGoblin.atk;
+      goblin.classList.add("atacando"); // aplica classe para inverter
+      setTimeout(() => {
+        goblin.src = gifsGoblin.padrao;
+        goblin.classList.remove("atacando"); // remove classe
+      }, 1000);
+    }
+
+    const classeHeroi = (
+      localStorage.getItem("classeHeroi") || "guerreiro"
+    ).toLowerCase();
+    const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+
+    // 🔹 Mostra gif de dano do herói
+    if (gifsHeroi[classeHeroi] && gifsHeroi[classeHeroi][generoHeroi]) {
+      heroi.src = gifsHeroi[classeHeroi][generoHeroi].damage;
+      setTimeout(() => {
+        heroi.src = gifsHeroi[classeHeroi][generoHeroi].padrao;
+      }, 1000);
+    }
 
     if (critico) {
       mensagem(`💥 CRÍTICO! O Goblin causou ${dano} de dano!`);
