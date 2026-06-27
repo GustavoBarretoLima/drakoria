@@ -604,6 +604,18 @@ body {
 
 /* Smartphones */
 @media (max-width: 600px) {
+  body {
+    overflow-y: auto; /* ativa rolagem vertical */
+    overflow-x: hidden; /* evita rolagem lateral */
+  }
+
+  #batalha {
+    min-height: auto; /* libera altura dinâmica */
+    padding-bottom: 40px; /* espaço extra para rolagem */
+  }
+}
+
+@media (max-width: 600px) {
   .campo {
     flex-direction: row; /* lado a lado */
     justify-content: space-between;
