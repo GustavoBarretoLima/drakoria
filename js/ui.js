@@ -48,7 +48,7 @@ export function atualizarBotoes(turnoHeroi) {
     botao.disabled = !turnoHeroi;
 
     if (botao.id === "btnMagia") {
-      if (classeHeroi.includes("mag")) {
+      if (classeHeroi.includes("mag") || classeHeroi.includes("guerre")) {
         botao.disabled = !turnoHeroi;
         botao.style.opacity = "1";
       } else {

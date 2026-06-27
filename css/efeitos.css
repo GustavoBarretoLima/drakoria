@@ -287,8 +287,36 @@
   z-index: 30;
 }
 
-/* ---------------- RESPONSIVIDADE ---------------- */
+.slash-efeito {
+  pointer-events: none; /* não interfere nos cliques */
+  z-index: 9999; /* fica acima dos outros elementos */
+  filter: drop-shadow(0 0 10px #00f) brightness(1.2); /* brilho azul */
+  animation: slashGlow 0.8s ease-in-out infinite alternate;
+}
 
+/* animação de brilho pulsante */
+@keyframes slashGlow {
+  from {
+    filter: drop-shadow(0 0 5px #00f) brightness(1.1);
+    transform: scale(1);
+  }
+  to {
+    filter: drop-shadow(0 0 20px #0ff) brightness(1.3);
+    transform: scale(1.1);
+  }
+}
+
+/* ---------------- RESPONSIVIDADE ---------------- */
+@keyframes slashGlow {
+  from {
+    filter: drop-shadow(0 0 5px #00f) brightness(1.1);
+    transform: scale(1);
+  }
+  to {
+    filter: drop-shadow(0 0 20px #0ff) brightness(1.3);
+    transform: scale(1.1);
+  }
+}
 /* 📱 Telas pequenas (celulares até 600px) */
 @media (max-width: 600px) {
   .dano-guerreiro,

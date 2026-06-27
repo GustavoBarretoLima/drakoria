@@ -86,7 +86,8 @@ function iniciarBatalha() {
 
   // 🔹 Desabilita botão Magia para classes que não usam magia
   const btnMagia = document.getElementById("btnMagia");
-  if (classeHeroi.includes("guerre") || classeHeroi.includes("arque")) {
+  if (classeHeroi.includes("arque")) {
+    // só arqueiro não usa magia
     btnMagia.disabled = true;
     btnMagia.style.opacity = "0.5";
   } else {
@@ -126,34 +127,55 @@ function atacar() {
     }, 1500);
   }
 
-  // Gif de dano do goblin
-  if (gifsGoblin) {
-    inimigo.classList.add("dano"); // aplica inversão primeiro
-    inimigo.src = gifsGoblin.damage;
+  // 🔹 Se for arqueiro, dispara flecha após o gif terminar
+  if (classeHeroi.includes("arque")) {
+    setTimeout(() => {
+      const flecha = document.createElement("img");
+      flecha.src = "../img/skills/Flecha.gif";
+      flecha.classList.add("flecha-efeito");
+      document.body.appendChild(flecha);
 
+      const rectHeroi = heroi.getBoundingClientRect();
+      flecha.style.position = "absolute";
+      flecha.style.left = `${rectHeroi.left + rectHeroi.width / 2}px`;
+      flecha.style.top = `${rectHeroi.top + rectHeroi.height / 2}px`;
+      flecha.style.width = "80px";
+
+      const rectInimigo = inimigo.getBoundingClientRect();
+
+      anime({
+        targets: flecha,
+        left: `${rectInimigo.left + rectInimigo.width / 2}px`,
+        top: `${rectInimigo.top + rectInimigo.height / 2}px`,
+        duration: 700,
+        easing: "easeOutQuad",
+        complete: () => {
+          flecha.remove();
+        },
+      });
+    }, 500); // espera o tempo do gif antes de lançar a flecha
+  }
+
+  // 🔹 Gif de dano do goblin
+  if (gifsGoblin) {
+    inimigo.classList.add("dano");
+    inimigo.src = gifsGoblin.damage;
     setTimeout(() => {
       inimigo.src = gifsGoblin.padrao;
-      inimigo.classList.remove("dano"); // remove depois
+      inimigo.classList.remove("dano");
     }, 1000);
   }
 
+  // 🔹 Cálculo de dano e mensagens
   if (critico) {
     dano *= 2;
     mostrarDanoCritico(dano, inimigo);
     efeitoReceberDano(inimigo);
     mensagem(`💥 CRÍTICO! Você causou ${dano} de dano!`);
-
-    if (classeHeroi.includes("guerre")) efeitoCorteCritico(inimigo);
-    if (classeHeroi.includes("mag")) efeitoMagiaCritica(heroi, inimigo);
-    if (classeHeroi.includes("arque")) efeitoFlechaCritica(inimigo);
   } else {
     mostrarDano(dano, inimigo);
     efeitoReceberDano(inimigo);
     mensagem(`Você atacou e causou ${dano} de dano!`);
-
-    if (classeHeroi.includes("guerre")) efeitoCorteBasico(inimigo);
-    if (classeHeroi.includes("mag")) efeitoAtaqueBasicoMago(inimigo);
-    if (classeHeroi.includes("arque")) efeitoFlechaBasica(inimigo);
   }
 
   // 🔹 Atualiza vida do inimigo
@@ -165,7 +187,6 @@ function atacar() {
     hpInimigo = 0;
     atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
 
-    // Gif de morte do goblin
     if (gifsGoblin) {
       inimigo.src = gifsGoblin.morte;
     }
@@ -193,7 +214,7 @@ function defender() {
     heroi.src = gifsHeroi[classeHeroi][generoHeroi].defesa;
     setTimeout(() => {
       heroi.src = gifsHeroi[classeHeroi][generoHeroi].padrao;
-    }, 1500);
+    }, 2000);
   }
 
   if (classeHeroi.includes("guerre")) {
@@ -210,51 +231,82 @@ function defender() {
   }
 
   atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
-  setTimeout(() => turnoInimigo(true), 1500);
+  setTimeout(() => turnoInimigo(true), 500);
 }
 
 function magia() {
   if (!podeAgir()) return;
   encerrarTurnoHeroi();
 
-  const heroi = document.querySelector(".heroi-img");
+  const heroi = document.getElementById("heroiBatalha");
   const inimigo = document.querySelector(".inimigo-img");
   const classeHeroi = (
-    localStorage.getItem("classeHeroi") || "Mago"
+    localStorage.getItem("classeHeroi") || "guerreiro"
   ).toLowerCase();
+  const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
 
   if (manaHeroi >= 10) {
     manaHeroi -= 10;
     let dano = Math.floor(Math.random() * 25) + 10;
-    hpInimigo -= dano;
-    mensagem(`✨ Você lançou uma magia e causou ${dano} de dano!`);
 
-    // número de dano continua aparecendo
-    mostrarDano(dano, inimigo);
-
-    // efeito visual exclusivo para magia
-    if (classeHeroi === "mago" || classeHeroi === "maga") {
-      efeitoMagiaBasica(heroi, inimigo);
+    // 1️⃣ Assim que aperta magia, goblin já mostra dano
+    if (gifsGoblin) {
+      inimigo.src = gifsGoblin.damage;
+      inimigo.classList.add("dano");
+      setTimeout(() => {
+        inimigo.src = gifsGoblin.padrao;
+        inimigo.classList.remove("dano");
+      }, 600); // tempo menor para resposta rápida
     }
 
-    // atualiza status
+    // 2️⃣ Guerreiro faz animação de ataque
+    heroi.src = gifsHeroi[classeHeroi][generoHeroi].atk;
+    setTimeout(() => {
+      heroi.src = gifsHeroi[classeHeroi][generoHeroi].padrao;
+    }, 1000);
+
+    // 3️⃣ Criar Slash.gif como efeito separado
+    const slash = document.createElement("img");
+    slash.src = "../img/skills/Slash.gif";
+    slash.classList.add("slash-efeito");
+    document.body.appendChild(slash);
+
+    const rectHeroi = heroi.getBoundingClientRect();
+    slash.style.position = "absolute";
+    slash.style.left = `${rectHeroi.left + rectHeroi.width / 2}px`;
+    slash.style.top = `${rectHeroi.top + rectHeroi.height / 2}px`;
+    slash.style.width = "120px";
+
+    const rectInimigo = inimigo.getBoundingClientRect();
+
+    anime({
+      targets: slash,
+      left: `${rectInimigo.left + rectInimigo.width / 2}px`,
+      top: `${rectInimigo.top + rectInimigo.height / 2}px`,
+      duration: 800,
+      easing: "easeOutQuad",
+      complete: () => {
+        slash.remove();
+      },
+    });
+
+    // 4️⃣ Aplicar dano
+    hpInimigo -= dano;
+    mensagem(`⚔️ Você usou Slash e causou ${dano} de dano!`);
+    mostrarDano(dano, inimigo);
     atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
 
-    // 🔹 Verifica se o Goblin morreu
     if (hpInimigo <= 0) {
       hpInimigo = 0;
       atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
-      cenaVitoriaGoblin(); // chama transição para Drakoria
-      return; // interrompe o turno inimigo
+      cenaVitoriaGoblin();
+      return;
     }
   } else {
     mensagem("Mana insuficiente!");
   }
-
-  // se ainda está vivo, passa o turno para o inimigo
-  setTimeout(() => turnoInimigo(), 1500);
+  setTimeout(() => turnoInimigo(), 200);
 }
-
 function fugir() {
   if (!podeAgir()) return;
   encerrarTurnoHeroi();
@@ -342,52 +394,76 @@ function turnoInimigo(defesa = false) {
     const critico = Math.random() < 0.2; // 20% chance de crítico
     if (critico) dano *= 2;
 
-    hpHeroi -= dano;
+    const heroi = document.getElementById("heroiBatalha");
+    const goblin = document.querySelector(".inimigo-img");
 
-    const heroi = document.querySelector(".heroi-img");
-    const goblin = document.querySelector(".inimigo-img"); // pega a imagem do goblin
+    // Goblin desliza até o herói antes de atacar
+    const rectHeroi = heroi.getBoundingClientRect();
+    const rectGoblin = goblin.getBoundingClientRect();
 
-    // 🔹 Mostra gif de ataque do goblin
-    if (gifsGoblin) {
-      goblin.src = gifsGoblin.atk;
-      goblin.classList.add("atacando"); // aplica classe para inverter
-      setTimeout(() => {
-        goblin.src = gifsGoblin.padrao;
-        goblin.classList.remove("atacando"); // remove classe
-      }, 1000);
-    }
+    const deslocX = rectHeroi.left - rectGoblin.left;
+    const deslocY = rectHeroi.top - rectGoblin.top;
 
-    const classeHeroi = (
-      localStorage.getItem("classeHeroi") || "guerreiro"
-    ).toLowerCase();
-    const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+    anime({
+      targets: goblin,
+      translateX: deslocX,
+      translateY: deslocY,
+      duration: 600,
+      easing: "easeOutQuad",
+      complete: () => {
+        // aplica o dano ao herói
+        hpHeroi -= dano;
 
-    // 🔹 Mostra gif de dano do herói
-    if (gifsHeroi[classeHeroi] && gifsHeroi[classeHeroi][generoHeroi]) {
-      heroi.src = gifsHeroi[classeHeroi][generoHeroi].damage;
-      setTimeout(() => {
-        heroi.src = gifsHeroi[classeHeroi][generoHeroi].padrao;
-      }, 1000);
-    }
+        if (gifsGoblin) {
+          goblin.src = gifsGoblin.atk;
+          goblin.classList.add("atacando");
+        }
 
-    if (critico) {
-      mensagem(`💥 CRÍTICO! O Goblin causou ${dano} de dano!`);
-      mostrarDanoCritico(dano, heroi);
-      efeitoReceberDanoHeroiCritico(heroi);
-    } else {
-      mensagem(`👹 O Goblin atacou e causou ${dano} de dano!`);
-      mostrarDano(dano, heroi);
-      efeitoReceberDanoHeroi(heroi);
-    }
+        // Gif de dano do herói
+        const classeHeroi = (
+          localStorage.getItem("classeHeroi") || "guerreiro"
+        ).toLowerCase();
+        const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
 
-    atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
+        if (gifsHeroi[classeHeroi] && gifsHeroi[classeHeroi][generoHeroi]) {
+          heroi.src = gifsHeroi[classeHeroi][generoHeroi].damage;
+          setTimeout(() => {
+            heroi.src = gifsHeroi[classeHeroi][generoHeroi].padrao;
+          }, 1000);
+        }
+
+        if (critico) {
+          mensagem(`💥 CRÍTICO! O Goblin causou ${dano} de dano!`);
+          mostrarDanoCritico(dano, heroi);
+          efeitoReceberDanoHeroiCritico(heroi);
+        } else {
+          mensagem(`👹 O Goblin atacou e causou ${dano} de dano!`);
+          mostrarDano(dano, heroi);
+          efeitoReceberDanoHeroi(heroi);
+        }
+
+        atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
+
+        // volta o goblin para posição original
+        anime({
+          targets: goblin,
+          translateX: 0,
+          translateY: 0,
+          duration: 600,
+          easing: "easeOutQuad",
+          complete: () => {
+            goblin.src = gifsGoblin.padrao;
+            goblin.classList.remove("atacando");
+            turnoHeroi = true;
+            atualizarIndicadorTurno(true);
+          },
+        });
+      },
+    });
   } else {
     mensagem("🏆 Você derrotou o Goblin!");
     return;
   }
-
-  turnoHeroi = true;
-  atualizarIndicadorTurno(true);
 }
 
 // ---------------- INÍCIO ----------------

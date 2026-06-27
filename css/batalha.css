@@ -62,10 +62,12 @@ body {
 /* Cards do herói e inimigo */
 .heroi,
 .inimigo {
-  flex: 1 1 250px; /* 🔹 reduz largura base */
-  max-width: 280px; /* 🔹 limite máximo menor */
+  flex: 1 1 250px;
+  max-width: 280px;
   text-align: center;
-  overflow: hidden;
+  overflow: visible; /* ✅ permite que o guerreiro deslize fora do card */
+  position: relative; /* garante que o z-index funcione */
+  z-index: 10; /* mantém o guerreiro acima dos outros elementos */
 }
 
 .heroi img,
@@ -75,6 +77,8 @@ body {
   max-height: 300px; /* 🔹 reduz altura máxima */
   border-radius: 10px;
   object-fit: contain; /* mantém proporção */
+  position: relative; /* permite que translate funcione corretamente */
+  z-index: 10; /* garante que fique acima dos cards */
 }
 
 /* 🧱 Status geral */

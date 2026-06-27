@@ -5,12 +5,14 @@ export const gifsHeroi = {
       atk: "../img/personagens/guerreiro-ataque.gif",
       defesa: "../img/personagens/guerreiro-defesa.gif",
       damage: "../img/personagens/guerreiro-dano.gif",
+      magia: "../img/skills/Slash.gif",
     },
     Feminino: {
       padrao: "../img/personagens/guerreira.gif",
       atk: "../img/personagens/guerreira-ataque.gif",
       defesa: "../img/personagens/guerreira-defesa.gif",
       damage: "../img/personagens/guerreira-dano.gif",
+      magia: "../img/skills/Slash.gif",
     },
   },
   mago: {
