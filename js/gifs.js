@@ -35,6 +35,7 @@ export const gifsHeroi = {
       atk: "../img/personagens/arqueiro-ataque.gif",
       defesa: "../img/personagens/arqueiro-defesa.gif",
       damage: "../img/personagens/arqueiro-dano.gif",
+      magia: "../img/skills/Arrow.gif",
     },
     Feminino: {
       padrao: "../img/personagens/arqueira.gif",
