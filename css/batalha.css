@@ -589,20 +589,27 @@ body {
 /* Tablets */
 @media (max-width: 1024px) {
   .campo {
-    gap: 40px;
+    gap: 80px; /* reduz espaço entre herói e inimigo */
+    margin-top: 60px; /* menos margem superior */
   }
-  .heroi-img,
-  .inimigo-img {
-    width: 220px;
+  .heroi img,
+  .inimigo img {
+    width: 180px; /* imagens menores */
+    max-height: 220px;
+  }
+  .status {
+    width: 160px; /* status mais compacto */
   }
 }
 
-/* Responsividade para telas pequenas */
+/* Smartphones */
 @media (max-width: 600px) {
   .campo {
     flex-direction: row; /* lado a lado */
     justify-content: space-between;
     align-items: center;
+    gap: 20px; /* espaço menor */
+    margin-top: 40px;
   }
 
   .heroi,
@@ -614,16 +621,18 @@ body {
 
   .heroi img,
   .inimigo img {
-    width: 100%; /* imagem se ajusta ao card */
-    height: auto;
+    width: 100%;
+    max-height: 180px; /* altura menor */
   }
 
   .status {
-    font-size: 14px; /* texto menor para caber */
+    font-size: 12px;
+    width: 140px; /* status mais compacto */
   }
 
   .barra {
-    height: 14px; /* barras mais finas */
+    height: 12px;
+    max-width: 120px;
   }
 
   .acoes {
@@ -635,18 +644,43 @@ body {
   }
 
   .acoes button {
-    flex: 1 1 45%; /* botões ocupam metade da largura */
-    font-size: 14px;
-    padding: 8px;
+    flex: 1 1 45%;
+    font-size: 12px;
+    padding: 6px;
   }
 
   #mensagens {
-    font-size: 14px;
-    margin-top: 10px;
+    font-size: 13px;
+    margin-top: 8px;
   }
 
   #indicadorTurno {
-    font-size: 14px;
-    margin-top: 8px;
+    font-size: 13px;
+    margin-top: 6px;
+  }
+}
+
+/* Telas muito pequenas (até 400px) */
+@media (max-width: 400px) {
+  .campo {
+    flex-direction: column; /* herói e inimigo em cima/baixo */
+    gap: 30px;
+    margin-top: 20px;
+  }
+
+  .heroi,
+  .inimigo {
+    max-width: 90%;
+  }
+
+  .heroi img,
+  .inimigo img {
+    max-height: 160px;
+  }
+
+  .acoes button {
+    flex: 1 1 100%; /* botões ocupam largura total */
+    font-size: 12px;
+    padding: 8px;
   }
 }

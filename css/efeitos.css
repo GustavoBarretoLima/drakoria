@@ -294,6 +294,11 @@
   animation: slashGlow 0.8s ease-in-out infinite alternate;
 }
 
+.flecha-efeito {
+  pointer-events: none;
+  z-index: 20; /* garante que fique acima dos cards */
+}
+
 /* animação de brilho pulsante */
 @keyframes slashGlow {
   from {
