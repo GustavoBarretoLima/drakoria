@@ -1,5 +1,12 @@
 # 🏰 Drakoria  
 
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](ca://s?q=Status_do_build_Drakoria)  
+[![Vite](https://img.shields.io/badge/vite-5.0-blue)](ca://s?q=Versão_do_Vite)  
+[![TypeScript](https://img.shields.io/badge/typescript-5.0-blue)](ca://s?q=Versão_do_TypeScript)  
+![Language](https://img.shields.io/github/languages/top/GustavoBarretoLima/drakoria)  
+![Node](https://img.shields.io/badge/node-20-green)  
+![NPM](https://img.shields.io/badge/npm-10-red)  
+
 **Drakoria** é um projeto de RPG interativo desenvolvido em **HTML**, **CSS**, **TypeScript** e **Vite**, com foco em narrativa, ambientação e efeitos visuais.  
 O jogador assume o papel de um herói que inicia sua jornada em um mundo devastado por guerras antigas.
 
@@ -25,6 +32,15 @@ O jogador assume o papel de um herói que inicia sua jornada em um mundo devasta
 
 ---
 
+🎮 Funcionalidades Principais
+- Introdução com efeito typewriter e botão de fade-in
+
+- Sistema de personagens e classes armazenado em localStorage
+
+- Áudio e efeitos visuais integrados
+
+- Estrutura modular para futuras expansões (batalhas, inventário, mapa)
+
 ## 🚀 Como Executar Localmente
 ```bash
 # Clone o repositório
@@ -38,3 +54,18 @@ npm install
 
 # Execute o projeto em modo de desenvolvimento
 npm run dev
+```
+💡 Próximos Passos
+- Adicionar trilha sonora dinâmica
+
+- Implementar sistema de status
+
+- Criar itens/equipamentos
+
+- Adicionar dungeons
+
+- Criar banco de dados
+
+🧙 Autor
+Desenvolvido por Gustavo Barreto Lima  
+📧 Contato: gustavobarretolima@gmail.com
