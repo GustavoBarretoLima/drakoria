@@ -38,9 +38,11 @@ function iniciarBatalha() {
   const classeHeroi = (
     localStorage.getItem("classeHeroi") || "guerreiro"
   ).toLowerCase();
-  const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+  const generoHeroi = (
+    localStorage.getItem("generoHeroi") || "masculino"
+  ).toLowerCase();
 
-  // 🔹 Define HP/Mana por classe base
+  // HP/Mana por classe
   switch (true) {
     case classeHeroi.includes("guerre"):
       hpHeroi = 120;
@@ -65,29 +67,29 @@ function iniciarBatalha() {
   atualizarStatus(hpHeroi, manaHeroi, hpInimigo);
   atualizarIndicadorTurno(true);
 
-  // 🔹 Usa o mapa de gifs com classe base + gênero
+  // Usa o mapa de gifs com classe base + gênero em minúsculo
   heroiBatalha.src =
     gifsHeroi[classeHeroi][generoHeroi]?.padrao ||
     "../img/personagens/guerreiro.gif";
+
   if (gifsGoblin) {
     inimigo.src = gifsGoblin.padrao;
   }
-  // 🔹 Atualiza o texto da classe conforme o gênero
+
+  // Texto da classe conforme gênero
   const nomeClasse = {
-    guerreiro: { Masculino: "Guerreiro", Feminino: "Guerreira" },
-    mago: { Masculino: "Mago", Feminino: "Maga" },
-    arqueiro: { Masculino: "Arqueiro", Feminino: "Arqueira" },
+    guerreiro: { masculino: "Guerreiro", feminino: "Guerreira" },
+    mago: { masculino: "Mago", feminino: "Maga" },
+    arqueiro: { masculino: "Arqueiro", feminino: "Arqueira" },
   };
 
   const classeHeroiTexto =
     nomeClasse[classeHeroi]?.[generoHeroi] || "Guerreiro";
-
   document.getElementById("classeHeroi").textContent = classeHeroiTexto;
 
-  // 🔹 Desabilita botão Magia para classes que não usam magia
+  // Desabilita magia para arqueiro
   const btnMagia = document.getElementById("btnMagia");
   if (classeHeroi.includes("arque")) {
-    // só arqueiro não usa magia
     btnMagia.disabled = true;
     btnMagia.style.opacity = "0.5";
   } else {
@@ -117,7 +119,7 @@ function atacar() {
   const classeHeroi = (
     localStorage.getItem("classeHeroi") || "guerreiro"
   ).toLowerCase();
-  const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+  const generoHeroi = localStorage.getItem("generoHeroi") || "masculino";
 
   // 🔹 Gif de ataque do herói
   if (gifsHeroi[classeHeroi] && gifsHeroi[classeHeroi][generoHeroi]) {
@@ -207,7 +209,7 @@ function defender() {
   const classeHeroi = (
     localStorage.getItem("classeHeroi") || "guerreiro"
   ).toLowerCase();
-  const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+  const generoHeroi = localStorage.getItem("generoHeroi") || "masculino";
 
   // 🔹 Usa o mapa de gifs para defesa com classe base + gênero
   if (gifsHeroi[classeHeroi] && gifsHeroi[classeHeroi][generoHeroi]) {
@@ -243,7 +245,7 @@ function magia() {
   const classeHeroi = (
     localStorage.getItem("classeHeroi") || "guerreiro"
   ).toLowerCase();
-  const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+  const generoHeroi = localStorage.getItem("generoHeroi") || "masculino";
 
   if (manaHeroi >= 10) {
     manaHeroi -= 10;
@@ -423,7 +425,7 @@ function turnoInimigo(defesa = false) {
         const classeHeroi = (
           localStorage.getItem("classeHeroi") || "guerreiro"
         ).toLowerCase();
-        const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+        const generoHeroi = localStorage.getItem("generoHeroi") || "masculino";
 
         if (gifsHeroi[classeHeroi] && gifsHeroi[classeHeroi][generoHeroi]) {
           heroi.src = gifsHeroi[classeHeroi][generoHeroi].damage;

@@ -228,6 +228,83 @@
   }
 }
 
+.painel-praca {
+  position: absolute;
+  left: 50%;
+  bottom: 48px;
+  transform: translateX(-50%);
+  width: min(560px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid rgba(255, 180, 80, 0.55);
+  border-radius: 16px;
+  background: rgba(18, 10, 8, 0.9);
+  color: #f8e8c0;
+  box-shadow:
+    0 0 24px rgba(255, 100, 0, 0.35),
+    inset 0 0 16px rgba(255, 180, 80, 0.08);
+  z-index: 20;
+}
+
+.painel-praca h2 {
+  margin: 0 0 12px;
+  color: #ffd36a;
+  text-align: center;
+}
+
+.painel-praca p {
+  margin: 0 0 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.painel-acoes {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.painel-acoes button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff3d6;
+  background: linear-gradient(135deg, #ff7a18, #d9480f);
+  box-shadow: 0 0 14px rgba(255, 100, 0, 0.45);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.painel-acoes button:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.hidden {
+  display: none;
+}
+.missao-card {
+  margin: 14px 0;
+  padding: 14px;
+  border: 1px solid rgba(255, 180, 80, 0.35);
+  border-radius: 12px;
+  background: rgba(255, 180, 80, 0.08);
+}
+
+.missao-card h3 {
+  margin: 0 0 8px;
+  color: #ffd36a;
+}
+
+.missao-card p {
+  margin: 0 0 10px;
+  text-align: left;
+}
+.hidden {
+  display: none !important;
+}
+
 /* Coordenadas responsivas */
 .taberna {
   top: 58vh;

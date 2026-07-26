@@ -2,7 +2,7 @@
 export function atualizarStatus(hpHeroi, manaHeroi, hpInimigo) {
   // Recupera classe para saber os máximos
   const classeHeroi = (
-    localStorage.getItem("classeHeroi") || "Guerreiro"
+    localStorage.getItem("classeHeroi") || "guerreiro"
   ).toLowerCase();
 
   let hpMax, manaMax;
@@ -77,31 +77,32 @@ export function atualizarStatus(hpHeroi, manaHeroi, hpInimigo) {
 // Carrega imagem do herói conforme classe e gênero
 export function carregarHeroi() {
   const heroiImg = document.querySelector(".heroi-img");
-  const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
   const classeHeroi = (
     localStorage.getItem("classeHeroi") || "guerreiro"
   ).toLowerCase();
-  const generoHeroi = localStorage.getItem("generoHeroi") || "Masculino";
+  const generoHeroi = (
+    localStorage.getItem("generoHeroi") || "masculino"
+  ).toLowerCase();
 
   const imagensHeroi = {
     guerreiro: {
-      Masculino: "../img/personagens/guerreiro.png",
-      Feminino: "../img/personagens/guerreira.png",
+      masculino: "../img/personagens/guerreiro.png",
+      feminino: "../img/personagens/guerreira.png",
     },
     mago: {
-      Masculino: "../img/personagens/mago.png",
-      Feminino: "../img/personagens/maga.png",
+      masculino: "../img/personagens/mago.png",
+      feminino: "../img/personagens/maga.png",
     },
     arqueiro: {
-      Masculino: "../img/personagens/arqueiro.png",
-      Feminino: "../img/personagens/arqueira.png",
+      masculino: "../img/personagens/arqueiro.png",
+      feminino: "../img/personagens/arqueira.png",
     },
   };
 
   if (imagensHeroi[classeHeroi]) {
     heroiImg.src =
       imagensHeroi[classeHeroi][generoHeroi] ||
-      imagensHeroi[classeHeroi].Masculino;
+      imagensHeroi[classeHeroi].masculino;
   } else {
     heroiImg.src = "../img/personagens/guerreiro.png"; // fallback
   }

@@ -2,15 +2,22 @@
   "name": "drakoria",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "devDependencies": {
+    "@types/node": "^26.0.1",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
     "vite": "^6.4.2"
   },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "tsx server/src/index.ts"
   },
   "dependencies": {
-    "animejs": "^4.4.1"
+    "animejs": "^4.4.1",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
   }
 }

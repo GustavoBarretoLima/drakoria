@@ -1,11 +1,18 @@
-let generoSelecionado = "Masculino";
-// Obtém dados do herói do localStorage
-window.personagem = {
-  nome: localStorage.getItem("nomeHeroi") || "Herói",
-  classe: (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase(),
-  genero: (localStorage.getItem("generoHeroi") || "masculino").toLowerCase(),
-};
+let generoSelecionado = "masculino";
 
+// Normaliza classe e retorna nome correto por gênero
+function formatarClassePorGenero(classe, genero) {
+  const classeNormalizada = classe.toLowerCase();
+  const nomes = {
+    guerreiro: { masculino: "Guerreiro", feminino: "Guerreira" },
+    mago: { masculino: "Mago", feminino: "Maga" },
+    arqueiro: { masculino: "Arqueiro", feminino: "Arqueira" },
+  };
+
+  return nomes[classeNormalizada]?.[genero.toLowerCase()] || classe;
+}
+
+// Seleciona gênero e atualiza interface
 function selecionarGenero(genero) {
   generoSelecionado = genero;
   atualizarImagens();
@@ -14,58 +21,94 @@ function selecionarGenero(genero) {
     btn.classList.remove("ativo");
   });
 
-  const botaoSelecionado =
-    genero === "Masculino"
-      ? document.querySelector(".opcoes-genero button:nth-child(1)")
-      : document.querySelector(".opcoes-genero button:nth-child(2)");
-  botaoSelecionado.classList.add("ativo");
+  const botaoSelecionado = document.querySelector(`[data-genero="${genero}"]`);
+  botaoSelecionado?.classList.add("ativo");
 
-  localStorage.setItem("generoHeroi", generoSelecionado);
+  localStorage.setItem("generoHeroi", generoSelecionado.toLowerCase());
 }
 
+// Atualiza imagens e textos conforme gênero
 function atualizarImagens() {
-  if (generoSelecionado === "Feminino") {
-    document.getElementById("imgGuerreiro").src =
-      "../img/personagens/guerreira.png";
-    document.getElementById("imgMago").src = "../img/personagens/maga.png";
-    document.getElementById("imgArqueiro").src =
-      "../img/personagens/arqueira.png";
+  const isFeminino = generoSelecionado.toLowerCase() === "feminino";
 
-    document.getElementById("nomeGuerreiro").textContent = "Guerreira";
-    document.getElementById("nomeMago").textContent = "Maga";
-    document.getElementById("nomeArqueiro").textContent = "Arqueira";
-  } else {
-    document.getElementById("imgGuerreiro").src =
-      "../img/personagens/guerreiro.png";
-    document.getElementById("imgMago").src = "../img/personagens/mago.png";
-    document.getElementById("imgArqueiro").src =
-      "../img/personagens/arqueiro.png";
+  const imagens = {
+    guerreiro: isFeminino ? "guerreira.png" : "guerreiro.png",
+    mago: isFeminino ? "maga.png" : "mago.png",
+    arqueiro: isFeminino ? "arqueira.png" : "arqueiro.png",
+  };
 
-    document.getElementById("nomeGuerreiro").textContent = "Guerreiro";
-    document.getElementById("nomeMago").textContent = "Mago";
-    document.getElementById("nomeArqueiro").textContent = "Arqueiro";
-  }
+  const nomes = {
+    guerreiro: isFeminino ? "Guerreira" : "Guerreiro",
+    mago: isFeminino ? "Maga" : "Mago",
+    arqueiro: isFeminino ? "Arqueira" : "Arqueiro",
+  };
+
+  Object.keys(imagens).forEach((classe) => {
+    const imgEl = document.getElementById(
+      `img${classe.charAt(0).toUpperCase() + classe.slice(1)}`,
+    );
+    const nomeEl = document.getElementById(
+      `nome${classe.charAt(0).toUpperCase() + classe.slice(1)}`,
+    );
+
+    if (imgEl) imgEl.src = `../img/personagens/${imagens[classe]}`;
+    if (nomeEl) nomeEl.textContent = nomes[classe];
+  });
 }
 
-// personagens.js
+// Seleciona personagem e salva dados
 function selecionarPersonagem(classe) {
-  const nomeHeroi = document.getElementById("nomeHeroi").value.trim();
-  if (!nomeHeroi) {
-    alert("Por favor, digite o nome do seu herói antes de continuar!");
+  const inputNome = document.getElementById("nomeHeroi");
+  const erroNome = document.getElementById("erroNome");
+
+  if (!inputNome) {
+    console.error("Campo de nome do herói não encontrado.");
     return;
   }
 
-  // 🔹 salva sempre a classe base
-  localStorage.setItem("classeHeroi", classe); // "Arqueiro", "Guerreiro" ou "Mago"
-  localStorage.setItem("generoHeroi", generoSelecionado); // "Masculino" ou "Feminino"
-  localStorage.setItem("nomeHeroi", nomeHeroi);
+  const nomeHeroi = inputNome.value.trim();
+  if (!nomeHeroi) {
+    erroNome.textContent = "⚠️ Digite o nome do seu herói antes de continuar!";
+    erroNome.style.display = "block";
+    inputNome.classList.add("shake");
+    setTimeout(() => inputNome.classList.remove("shake"), 300);
+    inputNome.focus();
+    return;
+  } else {
+    erroNome.style.display = "none";
+  }
 
-  // cria objeto global personagem
+  const classeBase = classe.toLowerCase();
+  const classeExibicao = formatarClassePorGenero(classeBase, generoSelecionado);
+
+  // Definir imagem/gif correto conforme gênero
+  const isFeminino = generoSelecionado.toLowerCase() === "feminino";
+  const imagens = {
+    guerreiro: isFeminino ? "guerreira.gif" : "guerreiro.gif",
+    mago: isFeminino ? "maga.gif" : "mago.gif",
+    arqueiro: isFeminino ? "arqueira.gif" : "arqueiro.gif",
+  };
+
+  const imagemHeroi = imagens[classeBase];
+
+  // Salvar no localStorage
+  localStorage.setItem("classeHeroi", classeBase);
+  localStorage.setItem("classeHeroiTexto", classeExibicao);
+  localStorage.setItem("generoHeroi", generoSelecionado.toLowerCase());
+  localStorage.setItem("nomeHeroi", nomeHeroi);
+  localStorage.setItem("imagemHeroi", imagemHeroi); // <-- novo
+
   window.personagem = {
     nome: nomeHeroi,
-    classe: classe.toLowerCase(), // "arqueiro", "guerreiro", "mago"
-    genero: generoSelecionado.toLowerCase(), // "masculino" ou "feminino"
+    classe: classeBase,
+    classeTexto: classeExibicao,
+    genero: generoSelecionado.toLowerCase(),
+    imagem: imagemHeroi, // <-- novo
   };
 
   window.location.href = "intro.html";
 }
+
+// Expondo funções globalmente
+window.selecionarGenero = selecionarGenero;
+window.selecionarPersonagem = selecionarPersonagem;

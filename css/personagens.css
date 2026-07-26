@@ -14,6 +14,18 @@ body {
   max-width: 1000px;
   box-shadow: 0 0 20px #ffd700;
 }
+#nomeHeroi {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.opcoes-personagem,
+.selecao-personagem,
+.form-nome {
+  position: relative;
+  z-index: 5;
+}
 
 .cards {
   display: flex;
@@ -221,6 +233,38 @@ body {
 .opcoes-nome input:valid {
   border: 2px solid #ffd700;
   box-shadow: 0 0 10px #ffd700;
+}
+.opcoes-genero button:focus {
+  outline: 2px solid #ffd700;
+  outline-offset: 2px;
+}
+.mensagem-erro {
+  color: #ff4444;
+  font-weight: bold;
+  margin-top: 5px;
+  display: none; /* começa invisível */
+}
+
+input.shake {
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 /* Responsividade */

@@ -21,12 +21,18 @@
           placeholder="Ex: Arthan, Lyra, Kael..."
           required
         />
+        <!-- Mensagem de erro inline -->
+        <p id="erroNome" class="mensagem-erro"></p>
       </div>
 
       <!-- Escolha de gênero -->
       <div class="opcoes-genero">
-        <button onclick="selecionarGenero('Masculino')">Masculino</button>
-        <button onclick="selecionarGenero('Feminino')">Feminino</button>
+        <button data-genero="masculino" onclick="selecionarGenero('masculino')">
+          Masculino
+        </button>
+        <button data-genero="feminino" onclick="selecionarGenero('feminino')">
+          Feminino
+        </button>
       </div>
 
       <!-- Cards lado a lado -->
@@ -40,7 +46,10 @@
           />
           <h2 id="nomeGuerreiro">Guerreiro</h2>
           <p>Força e coragem indomáveis.</p>
-          <button onclick="selecionarPersonagem('Guerreiro')">
+          <button
+            id="btnSelecionarGuerreiro"
+            onclick="selecionarPersonagem('Guerreiro')"
+          >
             Selecionar
           </button>
         </div>
@@ -53,7 +62,9 @@
             Domina os elementos e conjura feitiços poderosos contra seus
             inimigos.
           </p>
-          <button onclick="selecionarPersonagem('Mago')">Selecionar</button>
+          <button id="btnSelecionarMago" onclick="selecionarPersonagem('Mago')">
+            Selecionar
+          </button>
         </div>
 
         <!-- Arqueiro -->
@@ -65,7 +76,12 @@
           />
           <h2 id="nomeArqueiro">Arqueiro</h2>
           <p>Ágil e preciso, ataca de longe com flechas certeiras.</p>
-          <button onclick="selecionarPersonagem('Arqueiro')">Selecionar</button>
+          <button
+            id="btnSelecionarArqueiro"
+            onclick="selecionarPersonagem('Arqueiro')"
+          >
+            Selecionar
+          </button>
         </div>
       </div>
     </section>

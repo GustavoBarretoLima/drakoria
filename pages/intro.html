@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="../css/intro.css" />
   </head>
   <body>
+    <!-- Texto de introdução -->
     <div id="introTexto"></div>
-
+    <!-- Cena do goblin -->
     <div id="goblinCena" style="display: none">
       <img
         src="../img/monstros/goblin.png"
@@ -18,14 +19,57 @@
       <div id="falaGoblin" class="fala-goblin"></div>
     </div>
 
+    <!-- Botão continuar -->
     <button id="continuar" onclick="iniciarBatalha()" style="display: none">
       Continuar
     </button>
+
+    <!-- Som do goblin -->
     <audio
       id="somGoblin"
       src="../audio/goblin-risada.mp3"
       preload="auto"
     ></audio>
+
+    <script>
+      const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
+      const classeHeroiTexto =
+        localStorage.getItem("classeHeroiTexto") || "Classe";
+
+      const textoIntro = `Em um mundo devastado por guerras antigas, surge um novo herói. 
+          ${nomeHeroi}, o(a) ${classeHeroiTexto}, caminha em direção à cidade de Drakoria...`;
+
+      function typeWriter(elemento, texto, velocidade = 80, callback) {
+        let i = 0;
+        elemento.textContent = "";
+        function escrever() {
+          if (i < texto.length) {
+            elemento.textContent += texto.charAt(i);
+            i++;
+            setTimeout(escrever, velocidade);
+          } else if (callback) {
+            callback();
+          }
+        }
+        escrever();
+      }
+
+      const introEl = document.getElementById("introTexto");
+      const btnContinuar = document.getElementById("continuar");
+
+      // Garante que o botão comece invisível
+      btnContinuar.style.display = "none";
+      btnContinuar.style.opacity = "0";
+
+      // Executa o efeito de digitação
+      typeWriter(introEl, textoIntro, 80, () => {
+        // Mostra o botão com fade-in suave
+        btnContinuar.style.display = "block";
+        btnContinuar.style.transition = "opacity 1.5s ease";
+        setTimeout(() => (btnContinuar.style.opacity = "1"), 100);
+      });
+    </script>
+
     <script src="../js/intro.js"></script>
   </body>
 </html>
