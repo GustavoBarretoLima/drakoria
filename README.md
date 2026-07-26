@@ -1,40 +1,82 @@
-# 🐉 Drakoria - RPG de Navegador
+🏰 Drakoria
+  
+  
+  
+  
+  
+GitHub Pages (gustavobarretolima.github.io in Bing) (bing.com in Bing)  
+ca://s?q=Licença_MIT
 
-Bem-vindo(a) ao **Drakoria**, um jogo de RPG simples feito em HTML, CSS e JavaScript.  
-Aqui você pode escolher seu herói, enfrentar inimigos e viver aventuras épicas diretamente no navegador.
+Drakoria é um projeto de RPG interativo desenvolvido em HTML, CSS, TypeScript e Vite, com foco em narrativa, ambientação e efeitos visuais.
+O jogador assume o papel de um herói que inicia sua jornada em um mundo devastado por guerras antigas.
 
----
-
-## 📂 Estrutura do projeto
-
-drakoria/
-├── index.html        # Página inicial
-├── selecao.html      # Tela de seleção do herói
-├── batalha.html      # Primeira batalha contra o Goblin
-├── login.html        # Tela de login (em construção)
-├── css/              # Estilos
-├── js/               # Scripts
-└── img/              # Imagens dos personagens e cenários
+⚙️ Estrutura do Projeto
+Pasta	Descrição
+audio	Arquivos de som e efeitos (ex: goblin-risada.mp3).
+client/src	Código-fonte principal do jogo, incluindo assets, lógica de batalha, rede, páginas e interface.
+css	Folhas de estilo separadas por contexto (batalha, login, inventário, etc.).
+dist	Versão compilada pronta para produção, gerada pelo Vite.
+shared	Arquivos de configuração e metadados do projeto (package.json, vite.config.js, tsconfig.json).
 
 
----
+🧩 Tecnologias Utilizadas
+TypeScript – lógica e tipagem segura.
 
-## ✨ Tecnologias usadas
-- **HTML5** para estrutura das páginas
-- **CSS3** para estilos e animações
-- **JavaScript** para lógica do jogo
-- **GitHub Pages** para publicação online
+Vite – build rápido e otimizado.
 
----
+HTML5 / CSS3 – estrutura e estilo das páginas.
 
-## 📌 Próximos passos
-- Criar sistema de batalha completo (vida, ataque e defesa).
-- Adicionar música e efeitos sonoros.
-- Expandir a história com novos inimigos e cenários.
-- Implementar sistema de login e progresso salvo.
+JavaScript – interatividade e animações.
 
----
+Node.js – ambiente de execução para desenvolvimento e build.
 
-## 👨‍💻 Autor
-Projeto desenvolvido por **Gustavo Barreto Lima**.  
-Feedbacks e sugestões são bem-vindos!
+🚀 Como Executar Localmente
+bash
+# Clone o repositório
+git clone https://github.com/GustavoBarretoLima/drakoria.git
+
+# Acesse a pasta
+cd drakoria
+
+# Instale as dependências
+npm install
+
+# Execute o projeto em modo de desenvolvimento
+npm run dev
+🏗️ Build para Produção
+bash
+npm run build
+Os arquivos compilados serão gerados na pasta dist/.
+Essa pasta deve ser publicada no GitHub Pages ou outro serviço de hospedagem.
+
+🎮 Funcionalidades Principais
+Introdução com efeito typewriter e botão de fade-in.
+
+Sistema de personagens e classes armazenado em localStorage.
+
+Áudio e efeitos visuais integrados.
+
+Estrutura modular para futuras expansões (batalhas, inventário, mapa).
+
+📦 Deploy no GitHub Pages
+Gere o build (npm run build).
+
+Configure o Pages para servir a pasta dist.
+
+Acesse o jogo em:
+👉 Drakoria no GitHub Pages (gustavobarretolima.github.io in Bing) (bing.com in Bing)
+
+💡 Próximos Passos
+Adicionar trilha sonora dinâmica.
+
+Implementar sistema de status
+
+Criar itens/equipamentos
+
+Adicionar dungeons
+
+Criar Banco de dados
+
+🧙 Autor
+Desenvolvido por Gustavo Barreto Lima  
+📧 Contato: gustavobarretolima@gmail.com
