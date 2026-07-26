@@ -262,28 +262,6 @@ body {
       2px 2px 6px #000;
   }
 }
-.drakoria-cena {
-  position: absolute;
-  width: 100%;
-  height: 100vh;
-  background: url("../img/stages/portao-drakoria.png") no-repeat center center;
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.drakoria-cena::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle,
-    rgba(255, 140, 0, 0.3) 0%,
-    transparent 70%
-  );
-  animation: fogoParticulas 6s infinite linear;
-  pointer-events: none;
-}
 
 @keyframes fogoParticulas {
   0% {
@@ -393,66 +371,6 @@ body {
   box-shadow: 0 0 25px #ffcc66;
 }
 
-.entrada-drakoria {
-  position: absolute; /* garante que ocupe a tela inteira */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
-
-  background: url("../img/stages/guardas.png") no-repeat center center;
-  background-size: cover; /* cobre toda a tela */
-  z-index: -1; /* mantém a imagem atrás do diálogo */
-}
-
-.dialogo-guardas {
-  position: absolute;
-  bottom: 15%; /* posiciona acima do rodapé */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  text-align: center;
-  color: #fff;
-  font-size: 1.2em;
-  line-height: 1.6em;
-  text-shadow:
-    0 0 8px #ff6600,
-    2px 2px 4px #000;
-  background: rgba(0, 0, 0, 0.5);
-  padding: 1rem;
-  border-radius: 10px;
-}
-.btn-continuar {
-  margin-top: 1.5rem;
-  background: linear-gradient(90deg, #ff6600, #ffaa33);
-  border: none;
-  color: #fff;
-  font-size: 1.2em;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 0 10px #ff6600;
-  animation: pulsarBotao 1.5s infinite alternate;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-@keyframes pulsarBotao {
-  from {
-    box-shadow: 0 0 8px #ff6600;
-  }
-  to {
-    box-shadow: 0 0 20px #ffaa33;
-  }
-}
-
-.btn-continuar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px #ffcc66;
-}
 .drakoria-cidade {
   position: fixed; /* ocupa toda a tela e ignora margens externas */
   top: 0;
@@ -582,6 +500,147 @@ body {
 .btn-local:hover {
   transform: scale(1.1);
   box-shadow: 0 0 25px #ffcc66;
+}
+
+#batalha {
+  overflow: hidden;
+}
+
+.fire-overlay,
+.heat-overlay,
+.embers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.fire-overlay {
+  z-index: 1;
+  background:
+    radial-gradient(circle at 8% 20%, rgba(255, 130, 0, 0.22), transparent 10%),
+    radial-gradient(circle at 16% 45%, rgba(255, 80, 0, 0.18), transparent 12%),
+    radial-gradient(circle at 35% 83%, rgba(255, 120, 0, 0.2), transparent 14%),
+    radial-gradient(circle at 63% 45%, rgba(255, 95, 0, 0.18), transparent 10%),
+    radial-gradient(
+      circle at 82% 24%,
+      rgba(255, 140, 0, 0.22),
+      transparent 12%
+    ),
+    radial-gradient(circle at 91% 61%, rgba(255, 70, 0, 0.2), transparent 13%);
+  mix-blend-mode: screen;
+  opacity: 0.95;
+  animation: fireFlicker 1.8s infinite alternate ease-in-out;
+}
+
+.heat-overlay {
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 180, 80, 0.04),
+    transparent
+  );
+  opacity: 0.35;
+  filter: blur(8px);
+  animation: heatWave 3.5s infinite linear;
+}
+
+.embers {
+  z-index: 3;
+}
+
+.embers span {
+  position: absolute;
+  bottom: -20px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ffb347;
+  box-shadow:
+    0 0 8px #ff7a00,
+    0 0 16px rgba(255, 60, 0, 0.8);
+  opacity: 0;
+  animation: emberRise 4.5s infinite ease-out;
+}
+
+.embers span:nth-child(2n) {
+  width: 3px;
+  height: 3px;
+  animation-duration: 5.5s;
+}
+
+.embers span:nth-child(3n) {
+  width: 5px;
+  height: 5px;
+  animation-duration: 3.8s;
+}
+
+@keyframes fireFlicker {
+  0% {
+    opacity: 0.45;
+    transform: scale(1) translateY(0);
+    filter: brightness(1);
+  }
+
+  35% {
+    opacity: 0.75;
+    transform: scale(1.02) translateY(-4px);
+    filter: brightness(1.25);
+  }
+
+  70% {
+    opacity: 0.55;
+    transform: scale(0.99) translateY(2px);
+    filter: brightness(0.95);
+  }
+
+  100% {
+    opacity: 0.85;
+    transform: scale(1.03) translateY(-6px);
+    filter: brightness(2);
+  }
+}
+
+@keyframes heatWave {
+  0% {
+    transform: translateX(-8%) skewX(-4deg);
+  }
+
+  50% {
+    transform: translateX(8%) skewX(4deg);
+  }
+
+  100% {
+    transform: translateX(-8%) skewX(-4deg);
+  }
+}
+
+@keyframes emberRise {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.4);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  60% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translateY(-110vh) translateX(40px) scale(1);
+    opacity: 0;
+  }
+}
+.campo,
+.acoes,
+#mensagens,
+#indicadorTurno,
+.status {
+  position: relative;
+  z-index: 5;
 }
 
 /* ---------------- RESPONSIVIDADE ---------------- */

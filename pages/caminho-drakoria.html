@@ -1,36 +1,47 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Caminho para Drakoria</title>
-  <link rel="stylesheet" href="../css/caminho-drakoria.css" />
-</head>
-<body>
-  <section class="dialogo">
-    <p class="fala-guarda">
-      <strong>Guarda 1:</strong> Pare aí, viajante! Poucos ousam atravessar este
-      portão sem permissão.
-    </p>
-    <p class="fala-heroi">
-      <strong>Herói:</strong> O caminho estava bloqueado por um Goblin. Ele não
-      é mais ameaça.
-    </p>
-    <p class="fala-guarda">
-      <strong>Guarda 2:</strong> Impressionante… poucos derrotariam aquela
-      criatura sozinhos.
-    </p>
-    <p class="fala-guarda">
-      <strong>Guarda 1:</strong> Se veio em paz, seja bem-vindo a Drakoria. Mas
-      saiba: dentro destas muralhas, desafios maiores o aguardam.
-    </p>
-    <p class="fala-heroi">
-      <strong>Herói:</strong> Estou pronto. Meu destino está além destas
-      muralhas.
-    </p>
-  </section>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Caminho para Drakoria</title>
+    <link rel="stylesheet" href="../css/caminho-drakoria.css" />
+    <script src="../js/progresso.js" defer></script>
+    <script src="../js/caminho-drakoria.js" defer></script>
+    <script src="../js/caminho-drakoria.js" defer></script>
+  </head>
 
-  <button class="btn-continuar" onclick="entrarDrakoria()">
-    Entrar no Reino <span class="icon">⮞</span>
-  </button>
-</div>
+  <body>
+    <main class="caminho-page">
+      <section class="dialogo">
+        <p
+          class="fala"
+          data-texto="Guarda 1: Pare aí, viajante! Poucos ousam atravessar este portão sem permissão."
+        ></p>
+
+        <p
+          class="fala"
+          data-texto="Herói: O caminho estava bloqueado por um Goblin. Ele não é mais ameaça."
+        ></p>
+
+        <p
+          class="fala"
+          data-texto="Guarda 2: Impressionante... poucos derrotariam aquela criatura sozinhos."
+        ></p>
+
+        <p
+          class="fala"
+          data-texto="Guarda 1: Se veio em paz, seja bem-vindo a Drakoria. Mas saiba: dentro destas muralhas, desafios maiores o aguardam."
+        ></p>
+
+        <p
+          class="fala"
+          data-texto="Herói: Estou pronto. Meu destino está além destas muralhas."
+        ></p>
+      </section>
+
+      <button id="btnEntrarReino" class="btn-continuar" type="button" disabled>
+        Entrar no Reino <span class="icon">⮞</span>
+      </button>
+    </main>
+  </body>
+</html>
