@@ -39,7 +39,7 @@
       const textoIntro = `Em um mundo devastado por guerras antigas, surge um novo herói. 
           ${nomeHeroi}, o(a) ${classeHeroiTexto}, caminha em direção à cidade de Drakoria...`;
 
-      function typeWriter(elemento, texto, velocidade = 80, callback) {
+      function typeWriter(elemento, texto, velocidade = 90, callback) {
         let i = 0;
         elemento.textContent = "";
         function escrever() {
@@ -62,7 +62,7 @@
       btnContinuar.style.opacity = "0";
 
       // Executa o efeito de digitação
-      typeWriter(introEl, textoIntro, 80, () => {
+      typeWriter(introEl, textoIntro, 90, () => {
         // Mostra o botão com fade-in suave
         btnContinuar.style.display = "block";
         btnContinuar.style.transition = "opacity 1.5s ease";
