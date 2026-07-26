@@ -1,8 +1,5 @@
 🏰 Drakoria
 
-  
-GitHub Pages (gustavobarretolima.github.io)
-ca://s?q=Licença_MIT
 
 Drakoria é um projeto de RPG interativo desenvolvido em HTML, CSS, TypeScript e Vite, com foco em narrativa, ambientação e efeitos visuais.
 O jogador assume o papel de um herói que inicia sua jornada em um mundo devastado por guerras antigas.
