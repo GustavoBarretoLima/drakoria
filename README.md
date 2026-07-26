@@ -5,15 +5,6 @@ Aqui você pode escolher seu herói, enfrentar inimigos e viver aventuras épica
 
 ---
 
-## 🚀 Como jogar
-1. Acesse o jogo publicado no GitHub Pages:  
-   👉 [Drakoria no GitHub Pages](https://gustavobarretolima.github.io/drakoria/)
-2. Escolha o nome do seu herói.
-3. Selecione o gênero e a classe (Guerreiro, Mago ou Arqueiro).
-4. Avance pela história e enfrente batalhas!
-
----
-
 ## 📂 Estrutura do projeto
 
 drakoria/
