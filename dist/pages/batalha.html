@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Batalha - Drakoria</title>
+    <script type="module" crossorigin src="/assets/batalha-B9JWgc6K.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="stylesheet" crossorigin href="/assets/batalha-csCH2DMe.css">
+  </head>
+  <body>
+    <section id="batalha" style="position: relative">
+      <div class="fire-overlay"></div>
+      <div class="heat-overlay"></div>
+      <div class="embers">
+        <span style="left: 8%; animation-delay: 0s"></span>
+        <span style="left: 16%; animation-delay: 1.5s"></span>
+        <span style="left: 28%; animation-delay: 0.8s"></span>
+        <span style="left: 41%; animation-delay: 2.2s"></span>
+        <span style="left: 55%; animation-delay: 1.1s"></span>
+        <span style="left: 68%; animation-delay: 0.4s"></span>
+        <span style="left: 78%; animation-delay: 2.6s"></span>
+        <span style="left: 89%; animation-delay: 1.8s"></span>
+      </div>
+
+      <div class="campo">
+        <!-- Herói -->
+        <div class="heroi">
+          <img id="heroiBatalha" src="" alt="Herói" class="heroi-img" />
+          <div class="status heroi-status">
+            <h2 id="nomeHeroi">Herói</h2>
+            <p>Classe: <span id="classeHeroi">Classe</span></p>
+            <div class="barra">
+              <div id="hpHeroiBar" class="hp" style="width: 100%">
+                <span id="hpHeroiTexto">100/100</span>
+              </div>
+            </div>
+            <div class="barra">
+              <div id="manaHeroiBar" class="mana" style="width: 100%">
+                <span id="manaHeroiTexto">50/50</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inimigo -->
+        <div class="inimigo">
+          <img
+            id="inimigoBatalha"
+            src="/assets/goblin-C6an_ATQ.png"
+            alt="Goblin Anime"
+            class="inimigo-img"
+          />
+          <div class="status inimigo-status">
+            <h2 id="nomeInimigo">Goblin</h2>
+            <div class="barra">
+              <div id="hpInimigoBar" class="hp" style="width: 100%">
+                <span id="hpInimigoTexto">60/60</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações -->
+      <div class="acoes">
+        <button id="btnAtacar">Atacar</button>
+        <button id="btnDefender">Defender</button>
+        <button id="btnMagia">Magia</button>
+        <button id="btnFugir">Fugir</button>
+      </div>
+
+      <div id="mensagens"></div>
+      <div id="indicadorTurno" class="indicador-turno">Seu turno</div>
+    </section>
+
+    <div id="praca"></div>
+
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+    <!-- Script para carregar dados do herói -->
+    <script>
+      // Recupera dados do personagem do localStorage
+      const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
+      const classeHeroiTexto =
+        localStorage.getItem("classeHeroiTexto") || "Classe";
+      const imagemHeroi = localStorage.getItem("imagemHeroi");
+
+      // Atualiza elementos da batalha
+      if (imagemHeroi) {
+        document.getElementById("heroiBatalha").src = imagemHeroi;
+      }
+      document.getElementById("nomeHeroi").textContent = nomeHeroi;
+      document.getElementById("classeHeroi").textContent = classeHeroiTexto;
+    </script>
+
+    <!-- Seu script principal -->
+  </body>
+</html>

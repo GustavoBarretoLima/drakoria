@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Intro - Drakoria</title>
+    <link rel="stylesheet" crossorigin href="/assets/intro-BnMOSGmG.css">
+  </head>
+  <body>
+    <!-- Texto de introdução -->
+    <div id="introTexto"></div>
+    <!-- Cena do goblin -->
+    <div id="goblinCena" style="display: none">
+      <img
+        src="/assets/goblin-C6an_ATQ.png"
+        alt="Goblin Anime"
+        class="aparecer-goblin"
+      />
+      <div id="falaGoblin" class="fala-goblin"></div>
+    </div>
+
+    <!-- Botão continuar -->
+    <button id="continuar" onclick="iniciarBatalha()" style="display: none">
+      Continuar
+    </button>
+
+    <!-- Som do goblin -->
+    <audio
+      id="somGoblin"
+      src="/assets/goblin-risada-ptvc5cBL.mp3"
+      preload="auto"
+    ></audio>
+
+    <script>
+      const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
+      const classeHeroiTexto =
+        localStorage.getItem("classeHeroiTexto") || "Classe";
+
+      const textoIntro = `Em um mundo devastado por guerras antigas, surge um novo herói. 
+          ${nomeHeroi}, o(a) ${classeHeroiTexto}, caminha em direção à cidade de Drakoria...`;
+
+      function typeWriter(elemento, texto, velocidade = 90, callback) {
+        let i = 0;
+        elemento.textContent = "";
+        function escrever() {
+          if (i < texto.length) {
+            elemento.textContent += texto.charAt(i);
+            i++;
+            setTimeout(escrever, velocidade);
+          } else if (callback) {
+            callback();
+          }
+        }
+        escrever();
+      }
+
+      const introEl = document.getElementById("introTexto");
+      const btnContinuar = document.getElementById("continuar");
+
+      // Garante que o botão comece invisível
+      btnContinuar.style.display = "none";
+      btnContinuar.style.opacity = "0";
+
+      // Executa o efeito de digitação
+      typeWriter(introEl, textoIntro, 90, () => {
+        // Mostra o botão com fade-in suave
+        btnContinuar.style.display = "block";
+        btnContinuar.style.transition = "opacity 1.5s ease";
+        setTimeout(() => (btnContinuar.style.opacity = "1"), 100);
+      });
+    </script>
+
+    <script src="../js/intro.js"></script>
+  </body>
+</html>
