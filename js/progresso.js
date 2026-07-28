@@ -6,6 +6,8 @@ const progressoPadrao = {
   dungeonsLiberadas: ["goblin"],
   missoesConcluidas: [],
   nivel: 1,
+  xp: 0,
+  xpParaProximoNivel: 100,
   ouro: 0,
 };
 
@@ -32,8 +34,27 @@ function salvarProgresso(progresso) {
   localStorage.setItem(PROGRESSO_KEY, JSON.stringify(progresso));
 }
 
+function adicionarRecompensa({ ouro = 0, xp = 0 }) {
+  const progresso = carregarProgresso();
+
+  progresso.ouro += ouro;
+  progresso.xp += xp;
+
+  while (progresso.xp >= progresso.xpParaProximoNivel) {
+    progresso.xp -= progresso.xpParaProximoNivel;
+    progresso.nivel += 1;
+    progresso.xpParaProximoNivel = Math.floor(
+      progresso.xpParaProximoNivel * 1.25,
+    );
+  }
+
+  salvarProgresso(progresso);
+  return progresso;
+}
+
 function marcarGoblinInicialDerrotado() {
   const progresso = carregarProgresso();
+
   const jaConcluiu = progresso.missoesConcluidas.includes(
     "derrotar-goblin-inicial",
   );
@@ -43,29 +64,24 @@ function marcarGoblinInicialDerrotado() {
   if (!jaConcluiu) {
     progresso.missoesConcluidas.push("derrotar-goblin-inicial");
     progresso.ouro += 25;
+    progresso.xp += 30;
+  }
+
+  while (progresso.xp >= progresso.xpParaProximoNivel) {
+    progresso.xp -= progresso.xpParaProximoNivel;
+    progresso.nivel += 1;
+    progresso.xpParaProximoNivel = Math.floor(
+      progresso.xpParaProximoNivel * 1.25,
+    );
   }
 
   salvarProgresso(progresso);
+  return progresso;
 }
 
 function marcarEntradaDrakoria() {
   const progresso = carregarProgresso();
-
   progresso.entrouEmDrakoria = true;
-  salvarProgresso(progresso);
-}
-
-function adicionarOuro(valor) {
-  const progresso = carregarProgresso();
-
-  progresso.ouro += valor;
-  salvarProgresso(progresso);
-}
-
-function subirNivel() {
-  const progresso = carregarProgresso();
-
-  progresso.nivel += 1;
   salvarProgresso(progresso);
 }
 
@@ -76,9 +92,8 @@ function resetarProgresso() {
 window.progressoDrakoria = {
   carregarProgresso,
   salvarProgresso,
+  adicionarRecompensa,
   marcarGoblinInicialDerrotado,
   marcarEntradaDrakoria,
-  adicionarOuro,
-  subirNivel,
   resetarProgresso,
 };

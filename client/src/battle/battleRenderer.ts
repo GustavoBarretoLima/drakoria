@@ -471,7 +471,17 @@ function handleBattleEndRedirect(state: BattleState) {
 
   victoryRedirectScheduled = true;
 
+  const tipoBatalha =
+    localStorage.getItem("tipoBatalhaAtual") || "historia-goblin-inicial";
+
   setTimeout(() => {
+    if (tipoBatalha === "dungeon-goblin") {
+      localStorage.removeItem("tipoBatalhaAtual");
+      window.location.href = "/pages/praca.html";
+      return;
+    }
+
+    localStorage.removeItem("tipoBatalhaAtual");
     window.location.href = "/pages/caminho-drakoria.html";
   }, 2500);
 }

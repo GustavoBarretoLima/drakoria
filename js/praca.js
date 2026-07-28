@@ -66,24 +66,21 @@ function abrirDungeon() {
 }
 
 function entrarDungeonGoblin() {
+  localStorage.setItem("tipoBatalhaAtual", "historia-goblin-inicial");
   window.location.href = "batalha.html";
 }
 
 function abrirStatus() {
   const painel = getPainelPraca();
 
-  if (!painel) {
-    console.error("Painel da praça não encontrado: #painelPraca");
-    return;
-  }
+  if (!painel) return;
 
   const nome = localStorage.getItem("nomeHeroi") || "Herói";
   const classe =
     localStorage.getItem("classeHeroiTexto") ||
     localStorage.getItem("classeHeroi") ||
     "guerreiro";
-
-  const genero = localStorage.getItem("generoHeroi") || "masculino";
+  const genero = localStorage.getItem("generoHeroi") || "Masculino";
   const progresso = window.progressoDrakoria?.carregarProgresso?.();
 
   painel.classList.remove("hidden");
@@ -94,6 +91,7 @@ function abrirStatus() {
     <p><strong>Classe:</strong> ${classe}</p>
     <p><strong>Gênero:</strong> ${genero}</p>
     <p><strong>Nível:</strong> ${progresso?.nivel ?? 1}</p>
+    <p><strong>XP:</strong> ${progresso?.xp ?? 0}/${progresso?.xpParaProximoNivel ?? 100}</p>
     <p><strong>Ouro:</strong> ${progresso?.ouro ?? 0}</p>
     <p><strong>Goblin inicial:</strong> ${
       progresso?.goblinInicialDerrotado ? "Derrotado" : "Pendente"

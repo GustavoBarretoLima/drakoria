@@ -54,6 +54,7 @@ window.entrarDrakoria = entrarDrakoria;
 
 window.addEventListener("DOMContentLoaded", () => {
   window.progressoDrakoria?.marcarGoblinInicialDerrotado();
+
   const botao = document.getElementById("btnEntrarReino");
 
   botao?.addEventListener("click", () => {
