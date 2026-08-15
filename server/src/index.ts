@@ -6,6 +6,10 @@ import {
   calculateDamageTaken,
 } from "./modules/combat/combatEngine.js";
 import type { BattleAction } from "../../shared/src/combat/actions.js";
+import {
+  getEquipmentById,
+  listEquipments,
+} from "./modules/equipment/equipmentService.js";
 
 const httpServer = createServer();
 
@@ -57,6 +61,15 @@ function processEnemyTurn() {
 }
 
 io.on("connection", (socket) => {
+  socket.on("request:equipmentList", (filters, callback) => {
+    const items = listEquipments(filters ?? {});
+    callback(items);
+  });
+
+  socket.on("equipments:get", (id, callback) => {
+    const item = getEquipmentById(id);
+    callback?.(item ?? null);
+  });
   console.log(`Jogador conectado: ${socket.id}`);
 
   socket.emit("battle:update", battleState);
