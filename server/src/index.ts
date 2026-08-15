@@ -10,6 +10,11 @@ import {
   getEquipmentById,
   listEquipments,
 } from "./modules/equipment/equipmentService.js";
+import {
+  getMonsterById,
+  getRandomMonster,
+  listMonsters,
+} from "./modules/monsters/monsterService.js";
 
 const httpServer = createServer();
 
@@ -61,6 +66,21 @@ function processEnemyTurn() {
 }
 
 io.on("connection", (socket) => {
+  socket.on("monsters:list", (filters, callback) => {
+    const monsters = listMonsters(filters ?? {});
+    callback?.(monsters);
+  });
+
+  socket.on("monsters:get", (monsterId, callback) => {
+    const monster = getMonsterById(monsterId);
+    callback?.(monster ?? null);
+  });
+
+  socket.on("monsters:random", (filters, callback) => {
+    const monster = getRandomMonster(filters ?? {});
+    callback?.(monster ?? null);
+  });
+
   socket.on("request:equipmentList", (filters, callback) => {
     const items = listEquipments(filters ?? {});
     callback(items);
