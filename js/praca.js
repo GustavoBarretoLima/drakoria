@@ -64,9 +64,14 @@ function abrirDungeon() {
     </div>
   `;
 }
-
 function entrarDungeonGoblin() {
-  localStorage.setItem("tipoBatalhaAtual", "historia-goblin-inicial");
+  localStorage.setItem("tipoBatalhaAtual", "dungeon-goblin");
+  localStorage.setItem("monsterIdAtual", "goblin-normal-lvl-1");
+  window.location.href = "batalha.html";
+}
+function entrarDungeonOrc() {
+  localStorage.setItem("tipoBatalhaAtual", "dungeon-orc");
+  localStorage.setItem("monsterIdAtual", "orc-normal-lvl-10");
   window.location.href = "batalha.html";
 }
 

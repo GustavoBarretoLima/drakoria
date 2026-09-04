@@ -12,6 +12,7 @@ socket.on("connect", () => {
 
   socket.emit("player:setup", {
     className: classeHeroi,
+    monsterId: localStorage.getItem("monsterIdAtual") || "goblin-normal-lvl-1",
   });
 });
 

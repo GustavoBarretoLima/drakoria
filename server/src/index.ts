@@ -30,7 +30,7 @@ function processEnemyTurn() {
   if (battleState.finished) return;
   if (battleState.turnOwnerId !== battleState.enemy.id) return;
 
-  const baseDamage = 8;
+  const baseDamage = battleState.enemy.stats.attack;
 
   const hero = {
     ...battleState.hero,
@@ -96,13 +96,18 @@ io.on("connection", (socket) => {
 
   socket.on(
     "player:setup",
-    (payload: { className?: "guerreiro" | "mago" | "arqueiro" }) => {
+    (payload: {
+      className?: "guerreiro" | "mago" | "arqueiro";
+      monsterId?: string;
+    }) => {
       const className =
         payload.className === "mago" || payload.className === "arqueiro"
           ? payload.className
           : "guerreiro";
 
-      battleState = createInitialBattleState(className);
+      const monsterId = payload.monsterId || "goblin-normal-lvl-1";
+
+      battleState = createInitialBattleState(className, monsterId);
       io.emit("battle:update", battleState);
     },
   );
