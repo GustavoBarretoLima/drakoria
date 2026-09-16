@@ -1,0 +1,21 @@
+{
+  "name": "drakoria-sprite-generator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "bin": {
+    "drakoria-sprite-generator": "./sprite-generator.js"
+  },
+  "scripts": {
+    "start": "node sprite-generator.js",
+    "build:exe": "pkg sprite-generator.js --targets node18-win-x64 --output dist/drakoria-sprite-generator.exe"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "gif-encoder-2": "^1.0.5",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  }
+}
