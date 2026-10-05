@@ -1,72 +1,127 @@
-# 🏰 Drakoria  
+# 🏰 Drakoria
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](ca://s?q=Status_do_build_Drakoria)  
-[![Vite](https://img.shields.io/badge/vite-5.0-blue)](ca://s?q=Versão_do_Vite)  
-[![TypeScript](https://img.shields.io/badge/typescript-5.0-blue)](ca://s?q=Versão_do_TypeScript)  
-![Language](https://img.shields.io/github/languages/top/GustavoBarretoLima/drakoria)  
-![Node](https://img.shields.io/badge/node-20-green)  
-![NPM](https://img.shields.io/badge/npm-10-red)  
+[![Jogar agora](https://img.shields.io/badge/%F0%9F%8E%AE_Jogar_agora-GitHub_Pages-2ea44f?style=for-the-badge)](https://gustavobarretolima.github.io/drakoria/)
+[![GitHub Pages](https://img.shields.io/badge/deploy-GitHub%20Pages-blue?logo=github)](https://gustavobarretolima.github.io/drakoria/)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.x-3178c6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6.x-646cff?logo=vite&logoColor=white)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-4.x-010101?logo=socketdotio&logoColor=white)
+![Language](https://img.shields.io/github/languages/top/GustavoBarretoLima/drakoria)
 
-**Drakoria** é um projeto de RPG interativo desenvolvido em **HTML**, **CSS**, **TypeScript** e **Vite**, com foco em narrativa, ambientação e efeitos visuais.  
-O jogador assume o papel de um herói que inicia sua jornada em um mundo devastado por guerras antigas.
+**Drakoria** é um RPG online para navegador em desenvolvimento, com combate inspirado em sistemas de turno/ATB, classes distintas, monstros, equipamentos e progressão.
 
----
+> ⚠️ O frontend já pode ser acessado pelo GitHub Pages. O combate online ainda depende do backend Socket.IO, que atualmente precisa ser executado separadamente.
 
-## ⚙️ Estrutura do Projeto
-| Pasta        | Descrição                                                                 |
-|--------------|----------------------------------------------------------------------------|
-| **audio**    | Arquivos de som e efeitos (ex: `goblin-risada.mp3`).                      |
-| **client/src** | Código-fonte principal do jogo, incluindo assets, lógica de batalha, rede, páginas e interface. |
-| **css**      | Folhas de estilo separadas por contexto (batalha, login, inventário, etc.).|
-| **dist**     | Versão compilada pronta para produção, gerada pelo Vite.                  |
-| **shared**   | Arquivos de configuração e metadados do projeto (`package.json`, `vite.config.js`, `tsconfig.json`). |
+## 🎮 Jogar
 
----
+Acesse a versão publicada:
 
-## 🧩 Tecnologias Utilizadas
-- **TypeScript** – lógica e tipagem segura  
-- **Vite** – build rápido e otimizado  
-- **HTML5 / CSS3** – estrutura e estilo das páginas  
-- **JavaScript** – interatividade e animações  
-- **Node.js** – ambiente de execução para desenvolvimento e build  
+**https://gustavobarretolima.github.io/drakoria/**
 
----
+## ⚔️ Estado atual
 
-🎮 Funcionalidades Principais
-- Introdução com efeito typewriter e botão de fade-in
+Já implementado:
 
-- Sistema de personagens e classes armazenado em localStorage
+- 3 classes: Guerreiro, Mago e Arqueiro;
+- batalhas independentes por jogador;
+- ataque, defesa e magia;
+- defesa física e defesa mágica;
+- chance e dano crítico configuráveis;
+- atributo de velocidade preparado para o sistema ATB;
+- catálogo de monstros;
+- catálogo de equipamentos;
+- interface de batalha com HP, mana e atributos defensivos;
+- comunicação cliente/servidor com Socket.IO;
+- deploy automático do frontend no GitHub Pages.
 
-- Áudio e efeitos visuais integrados
+Em evolução:
 
-- Estrutura modular para futuras expansões (batalhas, inventário, mapa)
+- sistema ATB baseado em `speed`;
+- progressão no servidor;
+- integração completa de inventário e equipamentos;
+- persistência em banco de dados;
+- dungeons, quests e conteúdo multiplayer.
 
-## 🚀 Como Executar Localmente
+## 🧱 Estrutura do projeto
+
+| Pasta | Descrição |
+|---|---|
+| `client/src` | Cliente TypeScript: batalha, UI, páginas, rede e assets |
+| `server/src` | Servidor Node.js/Socket.IO e regras autoritativas do jogo |
+| `shared/src` | Tipos, atributos e estruturas compartilhadas entre cliente e servidor |
+| `pages` | Páginas HTML do jogo |
+| `css` | Estilos da interface |
+| `js` | Código legado ainda em migração gradual |
+| `img` | Imagens, sprites e recursos visuais |
+| `audio` | Áudios e efeitos sonoros |
+
+## 🧩 Tecnologias
+
+- TypeScript 6
+- Vite 6
+- Node.js
+- Socket.IO
+- HTML5
+- CSS3
+- JavaScript
+
+## 🚀 Executar localmente
+
 ```bash
 # Clone o repositório
 git clone https://github.com/GustavoBarretoLima/drakoria.git
-
-# Acesse a pasta
 cd drakoria
 
 # Instale as dependências
 npm install
+```
 
-# Execute o projeto em modo de desenvolvimento
+Abra dois terminais.
+
+### Servidor
+
+```bash
+npm run server
+```
+
+O backend fica disponível em `http://localhost:3001`.
+
+### Cliente
+
+```bash
 npm run dev
 ```
-💡 Próximos Passos
 
-- Implementar Battle Rooms por jogador/sala
-- Evoluir o sistema de status e combate
-- Adicionar Speed / ATB
-- Integrar inventário e equipamentos aos atributos
-- Migrar XP, nível e ouro para o servidor
-- Generalizar monstros e sprites
-- Implementar dungeons completas
-- Criar banco de dados
-- Adicionar trilha sonora dinâmica
+Abra o endereço informado pelo Vite, normalmente `http://localhost:5173`.
 
-🧙 Autor
-Desenvolvido por Gustavo Barreto Lima  
-📧 Contato: gustavobarretolima@gmail.com
+## 🌐 Deploy
+
+O frontend é publicado automaticamente no GitHub Pages por GitHub Actions sempre que há atualização na branch `main`.
+
+URL:
+
+**https://gustavobarretolima.github.io/drakoria/**
+
+O GitHub Pages hospeda apenas arquivos estáticos. Para que batalha e multiplayer funcionem fora do ambiente local, o backend em `server/src` precisa ser hospedado em um serviço compatível com Node.js e WebSocket/Socket.IO.
+
+## 🗺️ Roadmap
+
+### Sprint 3 — ATB / Speed
+
+- transformar `speed` em tempo real de carregamento de ação;
+- controlar ordem de turnos pelo servidor;
+- preparar barras ATB na interface.
+
+### Próximas etapas
+
+- progressão de XP, nível e ouro no servidor;
+- integração inventário → equipamento → atributos → combate;
+- persistência e banco de dados;
+- sprites genéricos para diferentes monstros;
+- quests e dungeons;
+- economia e marketplace;
+- multiplayer avançado e PvP.
+
+## 🧙 Autor
+
+Desenvolvido por **Gustavo Barreto Lima**  
+📧 gustavobarretolima@gmail.com
