@@ -56,15 +56,16 @@ npm install
 npm run dev
 ```
 💡 Próximos Passos
-- Adicionar trilha sonora dinâmica
 
-- Implementar sistema de status
-
-- Criar itens/equipamentos
-
-- Adicionar dungeons
-
+- Implementar Battle Rooms por jogador/sala
+- Evoluir o sistema de status e combate
+- Adicionar Speed / ATB
+- Integrar inventário e equipamentos aos atributos
+- Migrar XP, nível e ouro para o servidor
+- Generalizar monstros e sprites
+- Implementar dungeons completas
 - Criar banco de dados
+- Adicionar trilha sonora dinâmica
 
 🧙 Autor
 Desenvolvido por Gustavo Barreto Lima  
