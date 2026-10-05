@@ -3,7 +3,9 @@ import { Server } from "socket.io";
 import { BattleManager } from "./modules/combat/battleManager.js";
 import {
   applyBattleAction,
+  applyCriticalDamage,
   calculateDamageTaken,
+  rollCritical,
 } from "./modules/combat/combatEngine.js";
 import type { BattleAction } from "../../shared/src/combat/actions.js";
 import type { HeroClass } from "../../shared/src/types/combat.js";
@@ -43,18 +45,34 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
   if (battleState.finished) return;
   if (battleState.turnOwnerId !== battleState.enemy.id) return;
 
-  const baseDamage = battleState.enemy.stats.attack;
   const hero = {
     ...battleState.hero,
     stats: { ...battleState.hero.stats },
   };
 
   const wasDefending = hero.defending;
-  const finalDamage = calculateDamageTaken(baseDamage, wasDefending);
+  const critical = rollCritical(battleState.enemy.stats.criticalChance);
+  const mitigatedDamage = calculateDamageTaken(
+    battleState.enemy.stats.attack,
+    hero.stats.defense,
+    wasDefending,
+  );
+  const finalDamage = critical
+    ? applyCriticalDamage(
+        mitigatedDamage,
+        battleState.enemy.stats.criticalDamage,
+      )
+    : mitigatedDamage;
 
   hero.stats.hp = Math.max(0, hero.stats.hp - finalDamage);
   hero.isAlive = hero.stats.hp > 0;
   hero.defending = false;
+
+  const message = critical
+    ? `CRITICO! ${battleState.enemy.name} causou ${finalDamage} de dano em ${hero.name}.`
+    : wasDefending
+      ? `${battleState.enemy.name} atacou, mas ${hero.name} se defendeu e recebeu apenas ${finalDamage} de dano.`
+      : `${battleState.enemy.name} atacou e causou ${finalDamage} de dano.`;
 
   const nextBattleState = {
     ...battleState,
@@ -67,10 +85,8 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
       targetId: battleState.hero.id,
       action: "ATTACK" as const,
       damage: finalDamage,
-      critical: false,
-      message: wasDefending
-        ? `${battleState.enemy.name} atacou, mas ${hero.name} se defendeu e recebeu apenas ${finalDamage} de dano.`
-        : `${battleState.enemy.name} atacou e causou ${finalDamage} de dano.`,
+      critical,
+      message,
     },
   };
 

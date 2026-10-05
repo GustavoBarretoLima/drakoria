@@ -32,6 +32,27 @@ export function renderStatus(state: BattleState) {
     enemyHpText.textContent = `${state.enemy.stats.hp}/${state.enemy.stats.maxHp}`;
   }
 
+  const heroDefense = document.getElementById("defesaHeroi");
+  const heroMagicDefense = document.getElementById("defesaMagicaHeroi");
+  const enemyDefense = document.getElementById("defesaInimigo");
+  const enemyMagicDefense = document.getElementById("defesaMagicaInimigo");
+
+  if (heroDefense) {
+    heroDefense.textContent = String(state.hero.stats.defense);
+  }
+
+  if (heroMagicDefense) {
+    heroMagicDefense.textContent = String(state.hero.stats.magicDefense);
+  }
+
+  if (enemyDefense) {
+    enemyDefense.textContent = String(state.enemy.stats.defense);
+  }
+
+  if (enemyMagicDefense) {
+    enemyMagicDefense.textContent = String(state.enemy.stats.magicDefense);
+  }
+
   const heroName = document.getElementById("nomeHeroi");
   const heroClass = document.getElementById("classeHeroi");
   const enemyName = document.getElementById("nomeInimigo");
