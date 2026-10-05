@@ -50,7 +50,7 @@ export interface MonsterStats {
   maxMana: number;
   attack: number;
   defense: number;
-  magicDefense: number;
+  magicDefense?: number;
   magicPower: number;
   criticalChance: number;
   criticalDamage: number;
