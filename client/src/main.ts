@@ -1,26 +1,73 @@
 import socket from "./network/socket.js";
 import { renderBattle } from "./battle/battleRenderer.js";
 import { setupBattlePage } from "./pages/battlePage.js";
-import type { BattleState } from "../../shared/src/types/combat.js";
+import {
+  isPagesDemoMode,
+  startDemoBattle,
+  subscribeDemoBattle,
+} from "./demo/demoBattle.js";
+import type {
+  BattleState,
+  HeroClass,
+} from "../../shared/src/types/combat.js";
 
-socket.on("connect", () => {
-  console.log("Cliente conectado ao servidor:", socket.id);
+const demoMode = isPagesDemoMode();
+let demoVictoryRedirectScheduled = false;
 
-  const classeHeroi = (
-    localStorage.getItem("classeHeroi") || "guerreiro"
-  ).toLowerCase();
+function normalizeHeroClass(className: string): HeroClass {
+  if (className === "mago" || className === "arqueiro") {
+    return className;
+  }
 
-  socket.emit("player:setup", {
-    className: classeHeroi,
-    monsterId: localStorage.getItem("monsterIdAtual") || "goblin-normal-lvl-1",
-  });
-});
+  return "guerreiro";
+}
 
-socket.on("battle:update", (state: BattleState) => {
+function getSelectedHeroClass(): HeroClass {
+  return normalizeHeroClass(
+    (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase(),
+  );
+}
+
+function renderState(state: BattleState): void {
   console.log("Novo estado da batalha:", state);
   renderBattle(state);
-});
+
+  if (
+    demoMode &&
+    state.finished &&
+    state.winnerId === state.hero.id &&
+    !demoVictoryRedirectScheduled
+  ) {
+    demoVictoryRedirectScheduled = true;
+    window.setTimeout(() => {
+      window.location.href = `${import.meta.env.BASE_URL}pages/caminho-drakoria.html`;
+    }, 2000);
+  }
+}
+
+if (demoMode) {
+  subscribeDemoBattle(renderState);
+} else {
+  socket.on("connect", () => {
+    console.log("Cliente conectado ao servidor:", socket.id);
+
+    socket.emit("player:setup", {
+      className: getSelectedHeroClass(),
+      monsterId:
+        localStorage.getItem("monsterIdAtual") || "goblin-normal-lvl-1",
+    });
+  });
+
+  socket.on("battle:update", renderState);
+}
 
 window.addEventListener("DOMContentLoaded", () => {
   setupBattlePage();
+
+  if (demoMode) {
+    const banner = document.getElementById("demoModeBanner");
+    if (banner) banner.hidden = false;
+
+    startDemoBattle(getSelectedHeroClass());
+  }
 });

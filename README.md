@@ -9,7 +9,7 @@
 
 **Drakoria** é um RPG online para navegador em desenvolvimento, com combate inspirado em sistemas de turno/ATB, classes distintas, monstros, equipamentos e progressão.
 
-> ⚠️ O frontend já pode ser acessado pelo GitHub Pages. O combate online ainda depende do backend Socket.IO, que atualmente precisa ser executado separadamente.
+> 🎮 A versão do GitHub Pages possui um **modo demonstração** da primeira batalha. Essa luta roda localmente no navegador e não salva progresso. O modo online completo continua dependendo do backend Socket.IO.
 
 ## 🎮 Jogar
 
@@ -31,6 +31,7 @@ Já implementado:
 - catálogo de equipamentos;
 - interface de batalha com HP, mana e atributos defensivos;
 - comunicação cliente/servidor com Socket.IO;
+- modo demo da primeira batalha no GitHub Pages;
 - deploy automático do frontend no GitHub Pages.
 
 Em evolução:
@@ -45,7 +46,7 @@ Em evolução:
 
 | Pasta | Descrição |
 |---|---|
-| `client/src` | Cliente TypeScript: batalha, UI, páginas, rede e assets |
+| `client/src` | Cliente TypeScript: batalha, UI, páginas, rede, demo e assets |
 | `server/src` | Servidor Node.js/Socket.IO e regras autoritativas do jogo |
 | `shared/src` | Tipos, atributos e estruturas compartilhadas entre cliente e servidor |
 | `pages` | Páginas HTML do jogo |
@@ -101,7 +102,9 @@ URL:
 
 **https://gustavobarretolima.github.io/drakoria/**
 
-O GitHub Pages hospeda apenas arquivos estáticos. Para que batalha e multiplayer funcionem fora do ambiente local, o backend em `server/src` precisa ser hospedado em um serviço compatível com Node.js e WebSocket/Socket.IO.
+No GitHub Pages, a primeira batalha usa uma engine de demonstração executada no próprio navegador. Ela permite testar ataque, defesa, magia, crítico e turno inimigo, mas o progresso é descartado ao recarregar a página.
+
+O GitHub Pages continua hospedando apenas arquivos estáticos. Para multiplayer, persistência e batalhas autoritativas, o backend em `server/src` precisa ser hospedado em um serviço compatível com Node.js e WebSocket/Socket.IO.
 
 ## 🗺️ Roadmap
 
