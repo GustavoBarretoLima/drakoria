@@ -60,7 +60,7 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
     ...battleState,
     hero,
     finished: !hero.isAlive,
-    winnerId: !hero.isAlive ? battleState.enemy.id : undefined,
+    ...(!hero.isAlive ? { winnerId: battleState.enemy.id } : {}),
     turnOwnerId: !hero.isAlive ? battleState.enemy.id : battleState.hero.id,
     lastEvent: {
       actorId: battleState.enemy.id,
