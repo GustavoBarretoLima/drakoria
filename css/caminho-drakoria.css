@@ -71,19 +71,13 @@ body {
   vertical-align: -2px;
 }
 
-.btn-continuar {
+.btn-continuar,
+.btn-pular-dialogos {
   position: relative;
   z-index: 2;
-  align-self: flex-start;
-  margin-top: 28px;
-  padding: 14px 24px;
   border: 0;
   border-radius: 10px;
   color: #fff3d6;
-  background: linear-gradient(135deg, #ff7a18, #d9480f);
-  box-shadow:
-    0 0 18px rgba(255, 100, 0, 0.6),
-    inset 0 0 10px rgba(255, 220, 120, 0.2);
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
@@ -93,7 +87,28 @@ body {
     filter 0.2s ease;
 }
 
-.btn-continuar:hover {
+.btn-continuar {
+  align-self: flex-start;
+  margin-top: 28px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #ff7a18, #d9480f);
+  box-shadow:
+    0 0 18px rgba(255, 100, 0, 0.6),
+    inset 0 0 10px rgba(255, 220, 120, 0.2);
+}
+
+.btn-pular-dialogos {
+  position: absolute;
+  top: max(18px, env(safe-area-inset-top));
+  right: 22px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 200, 120, 0.45);
+  background: rgba(20, 12, 8, 0.82);
+  box-shadow: 0 0 14px rgba(255, 100, 0, 0.28);
+}
+
+.btn-continuar:hover,
+.btn-pular-dialogos:hover {
   transform: translateY(-2px) scale(1.03);
   filter: brightness(1.15);
 }
@@ -108,6 +123,41 @@ body {
 
 .fade-out {
   animation: fadeOutPage 0.7s forwards ease-in;
+}
+
+@media (max-width: 700px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .caminho-page {
+    min-height: 100dvh;
+    justify-content: flex-start;
+    padding: 78px 16px 24px;
+  }
+
+  .dialogo {
+    width: 100%;
+    padding: 20px 18px;
+  }
+
+  .fala {
+    font-size: 0.98rem;
+    margin-bottom: 14px;
+  }
+
+  .btn-pular-dialogos {
+    top: max(12px, env(safe-area-inset-top));
+    right: 12px;
+    padding: 9px 12px;
+    font-size: 0.9rem;
+  }
+
+  .btn-continuar {
+    align-self: stretch;
+    width: 100%;
+    min-height: 46px;
+  }
 }
 
 @keyframes cursorPisca {
