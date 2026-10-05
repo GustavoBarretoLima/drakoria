@@ -124,12 +124,18 @@ export function applyBattleAction(
 
         const critical = rollCritical(hero.stats.criticalChance);
         const rawDamage = randomInt(10, 25) + hero.stats.attack;
+        const mitigatedDamage = calculateDamageTaken(
+          rawDamage,
+          enemy.stats.magicDefense,
+          enemy.defending,
+        );
         const damage = critical
-          ? applyCriticalDamage(rawDamage, hero.stats.criticalDamage)
-          : rawDamage;
+          ? applyCriticalDamage(mitigatedDamage, hero.stats.criticalDamage)
+          : mitigatedDamage;
 
         enemy.stats.hp = Math.max(0, enemy.stats.hp - damage);
         enemy.isAlive = enemy.stats.hp > 0;
+        enemy.defending = false;
 
         event = createEvent(
           hero.id,
