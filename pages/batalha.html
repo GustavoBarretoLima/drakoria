@@ -30,7 +30,7 @@
           box-shadow: 0 0 10px rgba(0, 0, 0, 0.45);
         "
       >
-        Modo demonstração — esta batalha roda no navegador e o progresso não é salvo.
+        Modo demo — progresso não salvo.
       </div>
 
       <div class="fire-overlay"></div>
@@ -47,7 +47,6 @@
       </div>
 
       <div class="campo">
-        <!-- Herói -->
         <div class="heroi">
           <img id="heroiBatalha" src="" alt="Herói" class="heroi-img" />
           <div class="status heroi-status">
@@ -68,7 +67,6 @@
           </div>
         </div>
 
-        <!-- Inimigo -->
         <div class="inimigo">
           <img
             id="inimigoBatalha"
@@ -89,7 +87,6 @@
         </div>
       </div>
 
-      <!-- Ações -->
       <div class="acoes">
         <button id="btnAtacar">Atacar</button>
         <button id="btnDefender">Defender</button>
@@ -103,18 +100,14 @@
 
     <div id="praca"></div>
 
-    <!-- Anime.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
-    <!-- Script para carregar dados do herói -->
     <script>
-      // Recupera dados do personagem do localStorage
       const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
       const classeHeroiTexto =
         localStorage.getItem("classeHeroiTexto") || "Classe";
       const imagemHeroi = localStorage.getItem("imagemHeroi");
 
-      // Atualiza elementos da batalha
       if (imagemHeroi) {
         document.getElementById("heroiBatalha").src = imagemHeroi;
       }
@@ -122,7 +115,6 @@
       document.getElementById("classeHeroi").textContent = classeHeroiTexto;
     </script>
 
-    <!-- Seu script principal -->
     <script type="module" src="/client/src/main.ts"></script>
   </body>
 </html>
