@@ -1,14 +1,16 @@
 document.getElementById("loginForm").addEventListener("submit", function (e) {
   e.preventDefault();
-  const usuario = document.getElementById("usuario").value;
+
+  const usuario = document.getElementById("usuario").value.trim();
   const senha = document.getElementById("senha").value;
 
-  console.log(`Usuário: ${usuario}, Senha: ${senha}`);
-
-  // Simulação de login bem-sucedido
-  if (usuario && senha) {
-    window.location.href = "personagens.html";
-  } else {
+  if (!usuario || !senha) {
     alert("Por favor, preencha todos os campos!");
+    return;
   }
+
+  const isGitHubPages = window.location.hostname.endsWith("github.io");
+  const basePath = isGitHubPages ? "/drakoria/" : "/";
+
+  window.location.href = `${basePath}pages/personagens.html`;
 });
