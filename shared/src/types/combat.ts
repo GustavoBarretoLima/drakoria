@@ -7,6 +7,9 @@ export interface Stats {
   maxMana: number;
   attack: number;
   defense: number;
+  speed: number;
+  criticalChance: number;
+  criticalDamage: number;
 }
 
 export interface CombatantState {
