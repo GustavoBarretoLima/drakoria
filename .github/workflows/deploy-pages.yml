@@ -34,6 +34,12 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Copy legacy static assets
+        run: |
+          cp -R js dist/js
+          cp -R img dist/img
+          cp -R audio dist/audio
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
