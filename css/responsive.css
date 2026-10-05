@@ -238,6 +238,11 @@ body:has(#batalha) {
     margin-inline: auto;
   }
 
+  #batalha {
+    justify-content: flex-start;
+    padding-top: 8px;
+  }
+
   #batalha .campo {
     gap: clamp(10px, 3vw, 28px);
   }
@@ -269,6 +274,128 @@ body:has(#batalha) {
   }
 }
 
+@media (max-width: 600px) {
+  body:has(#batalha) {
+    background: #120700;
+  }
+
+  #batalha {
+    min-height: 100dvh;
+    padding: 8px 8px calc(92px + env(safe-area-inset-bottom));
+    overflow: visible;
+  }
+
+  #demoModeBanner {
+    position: relative !important;
+    inset: auto !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: min(100%, 420px) !important;
+    max-width: none !important;
+    margin: 0 auto 8px;
+    padding: 6px 10px !important;
+    border-radius: 10px !important;
+    font-size: 0.72rem !important;
+    line-height: 1.25;
+  }
+
+  #batalha .campo {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 0;
+    align-items: end;
+  }
+
+  #batalha .heroi,
+  #batalha .inimigo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    max-width: none;
+  }
+
+  #batalha .heroi img,
+  #batalha .inimigo img {
+    width: min(31vw, 118px);
+    max-height: 132px;
+    margin: 0 auto;
+  }
+
+  #batalha .status {
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 6px 6px 7px;
+    border-radius: 10px;
+    box-shadow: 0 0 6px rgba(255, 204, 0, 0.6);
+  }
+
+  #batalha .status h2 {
+    margin: 1px 0 4px;
+    font-size: clamp(0.95rem, 4.4vw, 1.1rem);
+    line-height: 1.1;
+  }
+
+  #batalha .status p {
+    margin: 3px 0;
+    font-size: clamp(0.68rem, 2.8vw, 0.82rem);
+    line-height: 1.2;
+  }
+
+  #batalha .barra {
+    height: 16px;
+    margin: 4px auto;
+    border-width: 1px;
+  }
+
+  #batalha .hp span,
+  #batalha .mana span {
+    font-size: 0.68rem;
+    line-height: 16px;
+  }
+
+  #mensagens {
+    margin-top: 8px;
+    min-height: 22px;
+    font-size: 0.82rem;
+    line-height: 1.25;
+  }
+
+  #indicadorTurno {
+    margin-top: 4px;
+    font-size: 0.95rem;
+  }
+
+  #batalha .acoes {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    z-index: 1200;
+    width: auto;
+    margin: 0;
+    padding: 7px;
+    gap: 7px;
+    border: 1px solid rgba(255, 204, 0, 0.45);
+    border-radius: 12px;
+    background: rgba(12, 6, 2, 0.88);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.35);
+  }
+
+  #batalha .acoes button {
+    min-height: 42px;
+    padding: 8px 6px;
+    font-size: 0.82rem;
+    border-radius: 8px;
+  }
+}
+
 @media (max-width: 420px) {
   #selecao {
     width: calc(100% - 20px);
@@ -286,49 +413,30 @@ body:has(#batalha) {
     padding-inline: 8px;
   }
 
-  #batalha {
-    padding-inline: 8px;
-  }
-
-  #batalha .campo {
-    margin-top: 92px;
-    gap: 8px;
-  }
-
   #batalha .heroi img,
   #batalha .inimigo img {
-    width: clamp(68px, 24vw, 100px);
+    width: min(29vw, 105px);
+    max-height: 116px;
   }
 
   #batalha .status {
-    padding: 7px 5px;
-    border-width: 1px;
+    padding: 5px 4px 6px;
   }
 
   #batalha .status h2 {
-    font-size: 0.95rem;
-  }
-
-  #batalha .status p {
-    font-size: 0.7rem;
-  }
-
-  #batalha .barra {
-    height: 18px;
-  }
-
-  #batalha .hp span,
-  #batalha .mana span {
-    font-size: 0.72rem;
-    line-height: 18px;
-  }
-
-  #mensagens {
     font-size: 0.9rem;
   }
 
+  #batalha .status p {
+    font-size: 0.66rem;
+  }
+
+  #mensagens {
+    font-size: 0.78rem;
+  }
+
   #indicadorTurno {
-    font-size: 1.05rem;
+    font-size: 0.9rem;
   }
 }
 
@@ -338,16 +446,16 @@ body:has(#batalha) {
   }
 
   #batalha .campo {
-    margin-top: 64px;
+    margin-top: 0;
   }
 
   #batalha .heroi img,
   #batalha .inimigo img {
-    max-height: 120px;
+    max-height: 96px;
   }
 
   #batalha .status p {
-    margin-block: 4px;
+    margin-block: 3px;
   }
 }
 
