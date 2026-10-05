@@ -17,9 +17,10 @@ body {
   box-shadow: 0 0 20px #ffd700;
   font-size: 1.2em;
   line-height: 1.6;
-  min-height: 200px; /* espaço reservado para o texto */
-  white-space: pre-line; /* mantém quebras de linha */
+  min-height: 200px;
+  white-space: pre-line;
 }
+
 .aparecer-goblin {
   width: 250px;
   opacity: 0;
@@ -61,10 +62,10 @@ body {
   margin-top: 15px;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #ffe600; /* amarelo ouro vibrante */
+  color: #ffe600;
   text-shadow:
     2px 2px 6px #000,
-    0 0 10px #ff6600; /* brilho e contraste */
+    0 0 10px #ff6600;
   font-style: italic;
   opacity: 0;
   animation: aparecerFala 1.5s ease forwards;
@@ -77,7 +78,6 @@ body {
   }
 }
 
-/* Botão continuar */
 button {
   margin-top: 20px;
   padding: 12px 25px;
@@ -97,7 +97,26 @@ button:hover {
   box-shadow: 0 0 15px #ffd700;
 }
 
-/* Animação suave de entrada */
+.btn-pular-dialogos {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  z-index: 50;
+  margin: 0;
+  padding: 9px 14px;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 215, 0, 0.85);
+  color: #ffd700;
+  font-size: 0.9rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.btn-pular-dialogos:hover {
+  background: rgba(139, 0, 0, 0.9);
+  transform: none;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -108,6 +127,7 @@ button:hover {
     transform: translateY(0);
   }
 }
+
 .nome-destaque {
   color: #ffd700;
   font-weight: bold;
@@ -128,7 +148,6 @@ button:hover {
   }
 }
 
-/* Responsividade */
 @media (max-width: 1024px) {
   #introTexto {
     max-width: 90%;
@@ -144,7 +163,7 @@ button:hover {
 
 @media (max-width: 600px) {
   #introTexto {
-    margin: 30px auto;
+    margin: 64px auto 30px;
     font-size: 1em;
     line-height: 1.4;
     padding: 20px;
@@ -154,5 +173,12 @@ button:hover {
     width: 80%;
     font-size: 0.9em;
     padding: 10px;
+  }
+
+  .btn-pular-dialogos {
+    width: auto;
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
   }
 }
