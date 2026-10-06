@@ -26,6 +26,11 @@ export interface CombatantState {
   isAlive: boolean;
 }
 
+export interface BattleRewards {
+  xp: number;
+  gold: number;
+}
+
 export interface BattleEvent {
   actorId: string;
   targetId: string;
@@ -39,6 +44,7 @@ export interface BattleState {
   id: string;
   hero: CombatantState;
   enemy: CombatantState;
+  rewards?: BattleRewards;
   turnOwnerId: string | null;
   finished: boolean;
   winnerId?: string;
