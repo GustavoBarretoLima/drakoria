@@ -57,3 +57,13 @@
     width: 100%;
   }
 }
+
+/* O guia expansível mantém texto e lista legíveis em telas pequenas. */
+details.dungeon-tier-card { display: block; }
+details.dungeon-tier-card summary { color: #f7e6bc; cursor: pointer; }
+details.dungeon-tier-card p { margin-top: 10px; }
+
+.dungeon-loot-table { overflow-x: auto; margin-top: 12px; }
+.dungeon-loot-table table { width: 100%; border-collapse: collapse; color: #c7b898; }
+.dungeon-loot-table th, .dungeon-loot-table td { padding: 8px; text-align: left; border-bottom: 1px solid rgba(255, 211, 106, 0.15); }
+.dungeon-loot-table th { color: #f7e6bc; }

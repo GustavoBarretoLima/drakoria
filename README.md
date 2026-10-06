@@ -47,33 +47,41 @@ Já implementado:
 
 ### Dungeons disponíveis
 
-#### Covil Orc I — Nv. 1 a 5
+| Dungeon | Níveis dos monstros | Encontros |
+|---|---|---|
+| Covil dos Goblins e Orcs | 1–10 | Goblin e Orc, 50% cada |
+| Cripta dos Mutantes | 1–10 | Esqueleto Guerreiro e Rato Mutante, 50% cada |
+| Acampamento Hobgoblin | 10–15 | Hobgoblin normal 80%, elite 20% |
+| Trono do Orc Rei | 15–25 | Orc Rei boss, equipamento elite garantido |
 
-- Goblins e Orcs aleatórios;
-- nível dos monstros varia entre 1 e 5;
-- atributos, XP e ouro escalam conforme o nível.
+O Hobgoblin Elite usa os mesmos GIFs, com 1,6× HP/ataque/defesa e 2× XP/ouro (antes do arredondamento). As definições são compartilhadas entre demo e servidor. As faixas indicam o nível dos encontros; não há bloqueio de entrada por nível do jogador.
 
-#### Covil Orc II — Nv. 5 a 15
+### Lista de equipamentos das dungeons
 
-- Goblins e Orcs aleatórios entre os níveis 5 e 15;
-- **15% de chance** de encontro com o Senhor da Guerra Orc;
-- quando o mini-boss aparece, ele é sempre **Nv.15**;
-- possui tabela própria de loot com equipamentos incomuns e armas raras.
+| Slot | Guerreiro | Mago | Arqueiro (elfo) |
+|---|---|---|---|
+| Arma | Espada de Ferro | Cajado Rúnico | Arco Longo |
+| Armadura | Couraça de Placas | Manto de Seda | Gibão de Couro |
+| Mão secundária (shield) | Escudo de Aço | Grimório Arcano | Broquel de Couro |
+| Pernas | Grevas de Placas | Calças de Linho | Calças de Couro |
+| Botas | Botas de Ferro | Botas de Tecido | Botas do Batedor |
+| Luvas | Manoplas de Aço | Luvas de Seda | Luvas do Atirador |
+| Anel | Anel de Vigor | Anel Arcano | Anel da Precisão |
+| Brinco | Brinco de Bravura | Brinco de Safira | Brinco do Falcão |
+| Colar | Medalhão do Guardião | Amuleto da Sabedoria | Pingente do Caçador |
 
-#### Fortaleza do Orc Rei — Nv. 5 a 15
+Cada peça existe por nível (1–25) e qualidade: Recruta (comum), Veterano (incomum), Elite (raro), Soberano (épico). O nível exigido é exatamente o do monstro derrotado. Armadura de placas e arma corpo a corpo são exclusivas do Guerreiro; Mago usa tecido e cajado; Arqueiro usa couro e arco. Joias também possuem versões específicas por classe. Os nove slots e as três classes têm chances iguais por drop, sem favorecer a classe que derrotou o monstro.
 
-- Orcs Nv.5–15 (75%), Senhor da Guerra Nv.15 (15%) e Orc Rei Nv.15 (10%) por encontro;
-- Orc Rei usa seus próprios assets e rank `boss`, com atributos e recompensas superiores ao mini-boss;
-- loot do rei reutiliza os equipamentos da tabela do Senhor da Guerra.
+| Encontro | Chance de equipamento | Raridade após o drop |
+|---|---|---|
+| Goblin/Orc/Esqueleto/Rato | 35% | Comum 70%, incomum 25%, raro 5% |
+| Hobgoblin normal | 45% | Incomum 75%, raro 25% |
+| Hobgoblin elite | 85% | Raro 80%, épico 20% |
+| Orc Rei boss | 100% | Raro 40%, épico 60% |
 
-#### Cripta dos Mutantes — Nv. 5 a 15
+“Elite” descreve o conjunto raro/épico, preservando as raridades atuais da UI. Um encontro concede no máximo um equipamento. A progressão de atributos usa `1 + (nível - 1) × 0,08`, multiplicada por 1/1,2/1,5/1,85 conforme a qualidade. No combate atual, cajados melhoram ataque (também usado no dano mágico) e mana. Equipamentos antigos continuam no inventário; peças incompatíveis não podem ser usadas nem dar bônus. Itens antigos de ferro/placas e a espada do Senhor da Guerra passam a ser exclusivos do Guerreiro.
 
-- Hobgoblin, Esqueleto Guerreiro e Rato Mutante, com chances iguais;
-- atributos, XP e ouro compartilhados entre servidor e demo;
-- loot reutiliza equipamentos existentes: goblin para Hobgoblin/Rato e orc para Esqueleto;
-- animações `idle.gif`, `attack.gif`, `damage.gif` e `death.gif` nas pastas de cada monstro. PNGs e spritesheets permanecem disponíveis, sem conversão.
-
-Verificação da integração: `npx tsx tests/dungeonMonsters.test.ts`.
+Verificação: `npx tsc --noEmit`, `npm run build` e `npx tsx tests/dungeonMonsters.test.ts`.
 
 ## 🧱 Estrutura do projeto
 

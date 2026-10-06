@@ -1,3 +1,4 @@
+import { canEquipItem } from "../../shared/src/equipment/equipmentRules.js";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import { BattleManager } from "./modules/combat/battleManager.js";
@@ -56,11 +57,7 @@ function resolveEquippedItems(
     const item = getEquipmentById(id) ?? STARTER_LOOT_ITEMS[id];
     if (!item || seenSlots.has(item.slot)) continue;
 
-    const canUseClass =
-      item.allowedClasses.includes("universal") ||
-      item.allowedClasses.includes(heroClass);
-    const canUseLevel = heroLevel >= item.level;
-    if (!canUseClass || !canUseLevel) continue;
+    if (!canEquipItem(item, heroClass, heroLevel)) continue;
 
     seenSlots.add(item.slot);
     items.push(item);

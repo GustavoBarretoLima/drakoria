@@ -1,3 +1,4 @@
+import { rollDungeonDrops } from "./dungeonLoot.js";
 import type { EquipmentDrop, EquipmentItem } from "../types/equipment.js";
 
 export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
@@ -8,7 +9,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     slot: "gloves",
     rarity: "common",
     level: 1,
-    allowedClasses: ["universal"],
+    allowedClasses: ["guerreiro", "arqueiro"],
     stats: { defense: 1, criticalChance: 1 },
     icon: "/img/itens/gloves.png",
     sellPrice: 8,
@@ -44,7 +45,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     slot: "weapon",
     rarity: "uncommon",
     level: 1,
-    allowedClasses: ["universal"],
+    allowedClasses: ["guerreiro"],
     stats: { attack: 9 },
     icon: "/img/itens/weapon.png",
     sellPrice: 18,
@@ -56,7 +57,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     slot: "armor",
     rarity: "uncommon",
     level: 1,
-    allowedClasses: ["universal"],
+    allowedClasses: ["guerreiro"],
     stats: { defense: 7, hp: 25 },
     icon: "/img/itens/armor.png",
     sellPrice: 22,
@@ -80,7 +81,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     slot: "weapon",
     rarity: "rare",
     level: 10,
-    allowedClasses: ["guerreiro", "arqueiro"],
+    allowedClasses: ["guerreiro"],
     stats: { attack: 15, criticalChance: 4, criticalDamage: 8 },
     icon: "/img/itens/weapon.png",
     sellPrice: 72,
@@ -116,7 +117,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     slot: "armor",
     rarity: "rare",
     level: 10,
-    allowedClasses: ["guerreiro", "arqueiro"],
+    allowedClasses: ["guerreiro"],
     stats: { defense: 12, hp: 55 },
     icon: "/img/itens/armor.png",
     sellPrice: 70,
@@ -152,7 +153,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     slot: "gloves",
     rarity: "uncommon",
     level: 8,
-    allowedClasses: ["universal"],
+    allowedClasses: ["guerreiro"],
     stats: { defense: 5, attack: 3 },
     icon: "/img/itens/gloves.png",
     sellPrice: 38,
@@ -201,6 +202,8 @@ const LOOT_TABLES: Record<string, MonsterLootTable> = {
 };
 
 export function rollMonsterDrops(monsterId: string): EquipmentDrop[] {
+  const dungeonDrops = rollDungeonDrops(monsterId);
+  if (dungeonDrops !== undefined) return dungeonDrops;
   const family = monsterId.split("-")[0] ?? "";
   const miniBossTable = monsterId.startsWith("orc-warlord-mini-boss-lvl-")
     ? LOOT_TABLES["orc-warlord-mini-boss"]
