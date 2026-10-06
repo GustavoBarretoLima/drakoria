@@ -87,6 +87,8 @@ function applyVictoryRewards(state: BattleState): void {
       name: drop.item.name,
       quantity: drop.quantity,
       rarity: drop.item.rarity,
+      level: drop.item.level,
+      allowedClasses: drop.item.allowedClasses,
     })),
     {
       onNextMonster: () => {

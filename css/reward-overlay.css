@@ -249,3 +249,11 @@
   opacity: 0.6;
   cursor: default;
 }
+
+.reward-drop-requirements {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.4;
+}

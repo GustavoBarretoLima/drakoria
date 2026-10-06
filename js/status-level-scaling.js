@@ -198,7 +198,7 @@ function criarSlotPaperDollStatus(slot, label, inventario) {
   const descricao = escaparHtmlStatus(item.description || "Sem descrição.");
   const nome = escaparHtmlStatus(item.name);
   const requisitoNivel = Math.max(1, Number(item.level || 1));
-  const classes = escaparHtmlStatus(formatarClassesStatus(item.allowedClasses));
+  const classes = escaparHtmlStatus(typeof window.inventoryUxClassesLabel === "function" ? window.inventoryUxClassesLabel(item) : formatarClassesStatus(item.allowedClasses));
 
   return `
     <div class="paper-slot paper-slot-${slot} paper-slot-filled paper-rarity-${rarity}" data-slot="${slot}" tabindex="0">
@@ -216,7 +216,7 @@ function criarSlotPaperDollStatus(slot, label, inventario) {
         </div>
         <div class="paper-tooltip-requirements">
           <span>Nível ${requisitoNivel}</span>
-          <span>${classes}</span>
+          <span>Classe: ${classes}</span>
         </div>
       </div>
     </div>
