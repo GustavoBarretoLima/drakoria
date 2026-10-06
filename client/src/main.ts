@@ -15,7 +15,7 @@ import type {
 } from "../../shared/src/types/combat.js";
 
 const demoMode = isPagesDemoMode();
-let demoVictoryRedirectScheduled = false;
+let victoryRedirectScheduled = false;
 let rewardedBattleId: string | null = null;
 
 function normalizeHeroClass(className: string): HeroClass {
@@ -59,9 +59,9 @@ function applyVictoryRewards(state: BattleState): void {
   renderVictoryRewardOverlay(state.rewards, result);
 }
 
-function scheduleDemoVictoryRedirect(): void {
-  if (demoVictoryRedirectScheduled) return;
-  demoVictoryRedirectScheduled = true;
+function scheduleVictoryRedirect(): void {
+  if (victoryRedirectScheduled) return;
+  victoryRedirectScheduled = true;
 
   const battleType =
     localStorage.getItem("tipoBatalhaAtual") || "historia-goblin-inicial";
@@ -82,8 +82,8 @@ function renderState(state: BattleState): void {
   renderAtbPhase(state);
   applyVictoryRewards(state);
 
-  if (demoMode && state.finished && state.winnerId === state.hero.id) {
-    scheduleDemoVictoryRedirect();
+  if (state.finished && state.winnerId === state.hero.id) {
+    scheduleVictoryRedirect();
   }
 }
 

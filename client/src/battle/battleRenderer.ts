@@ -5,7 +5,6 @@ import { gifsHeroi, gifsGoblin } from "../assets/gifs.js";
 
 let previousEventKey = "";
 let renderedBattleId = "";
-let victoryRedirectScheduled = false;
 
 function getHeroGender(): "Masculino" | "Feminino" {
   const genero = (
@@ -43,7 +42,6 @@ export function renderBattle(state: BattleState) {
   renderButtons(state);
   renderSpritesBase(state);
   playBattleEventEffects(state);
-  handleBattleEndRedirect(state);
 }
 
 function renderTurnIndicator(state: BattleState) {
@@ -496,26 +494,4 @@ function dashAttack(
       easing: "ease-in-out",
     },
   );
-}
-
-function handleBattleEndRedirect(state: BattleState) {
-  if (!state.finished) return;
-  if (state.winnerId !== state.hero.id) return;
-  if (victoryRedirectScheduled) return;
-
-  victoryRedirectScheduled = true;
-
-  const tipoBatalha =
-    localStorage.getItem("tipoBatalhaAtual") || "historia-goblin-inicial";
-
-  setTimeout(() => {
-    if (tipoBatalha === "dungeon-goblin") {
-      localStorage.removeItem("tipoBatalhaAtual");
-      window.location.href = "/pages/praca.html";
-      return;
-    }
-
-    localStorage.removeItem("tipoBatalhaAtual");
-    window.location.href = "/pages/caminho-drakoria.html";
-  }, 2500);
 }
