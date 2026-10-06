@@ -9,20 +9,12 @@
     <script src="../js/praca.js" defer></script>
     <script src="../js/itens.js" defer></script>
     <script src="../js/personagens.js" defer></script>
-    <script src="../js/equipamentos.js" defer></script>
-    <script src="../js/inventario.js" defer></script>
   </head>
 
   <body>
-    <button id="abrirMenuBtn" class="abrir-menu-btn" type="button">
-      ☰ Menu
-    </button>
+    <button id="abrirMenuBtn" class="abrir-menu-btn" type="button">☰ Menu</button>
 
-    <nav
-      id="menuPraca"
-      class="menu-flutuante hidden"
-      aria-label="Menu da Praça"
-    >
+    <nav id="menuPraca" class="menu-flutuante hidden" aria-label="Menu da Praça">
       <button type="button" onclick="abrirInventario()">🎒 Inventário</button>
       <button type="button" onclick="abrirStatus()">📊 Status</button>
       <button type="button" onclick="abrirLoja()">🏪 Loja</button>
@@ -31,59 +23,19 @@
     </nav>
 
     <main id="praca" class="drakoria-praca">
-      <div
-        class="hotspot taberna"
-        onclick="window.location.href = 'estabelecimentos.html#taberna'"
-        data-tooltip="🍺 Entrar na Taberna"
-      >
+      <div class="hotspot taberna" onclick="window.location.href = 'estabelecimentos.html#taberna'" data-tooltip="🍺 Entrar na Taberna">
         <span class="icon">🍺</span>
       </div>
 
-      <div
-        class="hotspot ferreiro"
-        onclick="window.location.href = 'estabelecimentos.html#ferreiro'"
-        data-tooltip="⚒️ Ir ao Ferreiro"
-      >
+      <div class="hotspot ferreiro" onclick="window.location.href = 'estabelecimentos.html#ferreiro'" data-tooltip="⚒️ Ir ao Ferreiro">
         <span class="icon">⚒️</span>
       </div>
 
-      <div
-        class="hotspot guilda"
-        onclick="window.location.href = 'estabelecimentos.html#guilda'"
-        data-tooltip="🛡️ Guilda dos Aventureiros"
-      >
+      <div class="hotspot guilda" onclick="window.location.href = 'estabelecimentos.html#guilda'" data-tooltip="🛡️ Guilda dos Aventureiros">
         <span class="icon">🛡️</span>
       </div>
 
       <section id="painelPraca" class="painel-praca hidden"></section>
-
-      <div id="inventario" class="inventario hidden">
-        <h2>Inventário</h2>
-
-        <div class="inventario-conteudo">
-          <div class="equipamentos-container">
-            <div class="personagem">
-              <img id="heroiImagem" src="" alt="Herói de Drakoria" />
-            </div>
-
-            <div class="equip-circle">
-              <div class="slot arma">Arma</div>
-              <div class="slot armadura">Armadura</div>
-              <div class="slot escudo">Escudo</div>
-              <div class="slot perna">Perna</div>
-              <div class="slot bota">Bota</div>
-              <div class="slot luva">Luva</div>
-              <div class="slot brinco">Brinco</div>
-              <div class="slot colar">Colar</div>
-              <div class="slot anel">Anel</div>
-            </div>
-          </div>
-
-          <div class="slots"></div>
-        </div>
-      </div>
-
-      <div id="item-panel" class="item-panel"></div>
     </main>
   </body>
 </html>
