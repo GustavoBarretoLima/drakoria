@@ -12,7 +12,9 @@ import {
   ATB_TICK_MS,
 } from "../../shared/src/combat/atb.js";
 import type { BattleAction } from "../../shared/src/combat/actions.js";
+import { STARTER_LOOT_ITEMS } from "../../shared/src/loot/lootTables.js";
 import type { HeroClass } from "../../shared/src/types/combat.js";
+import type { EquipmentItem } from "../../shared/src/types/equipment.js";
 import {
   getEquipmentById,
   listEquipments,
@@ -35,11 +37,33 @@ const battleManager = new BattleManager();
 const atbIntervals = new Map<string, NodeJS.Timeout>();
 
 function normalizeHeroClass(className?: string): HeroClass {
-  if (className === "mago" || className === "arqueiro") {
-    return className;
+  if (className === "mago" || className === "arqueiro") return className;
+  return "guerreiro";
+}
+
+function resolveEquippedItems(
+  ids: string[] | undefined,
+  heroClass: HeroClass,
+): EquipmentItem[] {
+  if (!Array.isArray(ids)) return [];
+
+  const seenSlots = new Set<string>();
+  const items: EquipmentItem[] = [];
+
+  for (const id of ids.slice(0, 9)) {
+    const item = getEquipmentById(id) ?? STARTER_LOOT_ITEMS[id];
+    if (!item || seenSlots.has(item.slot)) continue;
+
+    const canUse =
+      item.allowedClasses.includes("universal") ||
+      item.allowedClasses.includes(heroClass);
+    if (!canUse) continue;
+
+    seenSlots.add(item.slot);
+    items.push(item);
   }
 
-  return "guerreiro";
+  return items;
 }
 
 function stopAtbLoop(playerId: string) {
@@ -109,9 +133,7 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
   battleManager.set(playerId, nextBattleState);
   io.to(playerId).emit("battle:update", nextBattleState);
 
-  if (nextBattleState.finished) {
-    stopAtbLoop(playerId);
-  }
+  if (nextBattleState.finished) stopAtbLoop(playerId);
 }
 
 function startAtbLoop(playerId: string, expectedBattleId: string) {
@@ -179,15 +201,21 @@ io.on("connection", (socket) => {
     (payload: {
       className?: string;
       monsterId?: string;
+      equippedItemIds?: string[];
     }) => {
       const className = normalizeHeroClass(payload.className);
       const monsterId = payload.monsterId || "goblin-normal-lvl-1";
+      const equippedItems = resolveEquippedItems(
+        payload.equippedItemIds,
+        className,
+      );
 
       try {
         const battleState = battleManager.create(
           socket.id,
           className,
           monsterId,
+          equippedItems,
         );
 
         socket.emit("battle:update", battleState);
@@ -213,16 +241,12 @@ io.on("connection", (socket) => {
 
     const nextBattleState = applyBattleAction(currentBattle, action);
 
-    if (nextBattleState === currentBattle) {
-      return;
-    }
+    if (nextBattleState === currentBattle) return;
 
     battleManager.set(socket.id, nextBattleState);
     socket.emit("battle:update", nextBattleState);
 
-    if (nextBattleState.finished) {
-      stopAtbLoop(socket.id);
-    }
+    if (nextBattleState.finished) stopAtbLoop(socket.id);
   });
 
   socket.on("disconnect", () => {
