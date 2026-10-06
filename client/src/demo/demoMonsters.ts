@@ -5,6 +5,13 @@ import type {
 
 type DemoMonsterFactory = () => CombatantState;
 
+const ORC_SPRITES = {
+  idle: "/img/monstros/orc-idle.png",
+  attack: "/img/monstros/orc-attack.png",
+  damage: "/img/monstros/orc-damage.png",
+  death: "/img/monstros/orc-death.png",
+};
+
 const DEMO_MONSTERS: Record<string, DemoMonsterFactory> = {
   "goblin-normal-lvl-1": () => ({
     id: "goblin-normal-lvl-1",
@@ -34,12 +41,7 @@ const DEMO_MONSTERS: Record<string, DemoMonsterFactory> = {
   "orc-normal-lvl-1": () => ({
     id: "orc-normal-lvl-1",
     name: "Orc Nv.1",
-    sprites: {
-      idle: "/img/monstros/orc-idle.png",
-      attack: "/img/monstros/orc-attack.png",
-      damage: "/img/monstros/orc-damage.png",
-      death: "/img/monstros/orc-death.png",
-    },
+    sprites: ORC_SPRITES,
     stats: {
       hp: 95,
       maxHp: 95,
@@ -56,11 +58,32 @@ const DEMO_MONSTERS: Record<string, DemoMonsterFactory> = {
     defending: false,
     isAlive: true,
   }),
+  "orc-warlord-mini-boss-lvl-1": () => ({
+    id: "orc-warlord-mini-boss-lvl-1",
+    name: "Senhor da Guerra Orc Nv.1",
+    sprites: ORC_SPRITES,
+    stats: {
+      hp: 155,
+      maxHp: 155,
+      mana: 0,
+      maxMana: 0,
+      attack: 18,
+      defense: 9,
+      magicDefense: 5,
+      speed: 8,
+      criticalChance: 8,
+      criticalDamage: 70,
+    },
+    atb: 0,
+    defending: false,
+    isAlive: true,
+  }),
 };
 
 const DEMO_REWARDS: Record<string, BattleRewards> = {
   "goblin-normal-lvl-1": { xp: 15, gold: 8 },
   "orc-normal-lvl-1": { xp: 15, gold: 8 },
+  "orc-warlord-mini-boss-lvl-1": { xp: 35, gold: 20 },
 };
 
 export function createDemoMonster(monsterId: string): CombatantState {

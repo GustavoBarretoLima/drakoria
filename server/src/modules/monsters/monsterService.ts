@@ -17,6 +17,37 @@ const MONSTER_SPRITE_OVERRIDES: Partial<
   },
 };
 
+const ORC_WARLORD_MINI_BOSS: MonsterDefinition = {
+  id: "orc-warlord-mini-boss-lvl-1",
+  name: "Senhor da Guerra Orc Nv.1",
+  description: "Um comandante orc mais resistente, agressivo e bem equipado.",
+  family: "orc",
+  rank: "elite",
+  element: "physical",
+  level: 1,
+  stats: {
+    hp: 155,
+    maxHp: 155,
+    mana: 0,
+    maxMana: 0,
+    attack: 18,
+    defense: 9,
+    magicDefense: 5,
+    magicPower: 0,
+    criticalChance: 8,
+    criticalDamage: 70,
+  },
+  xpReward: 35,
+  goldReward: 20,
+  sprites: {
+    idle: "/img/monstros/orc-idle.png",
+    attack: "/img/monstros/orc-attack.png",
+    damage: "/img/monstros/orc-damage.png",
+    death: "/img/monstros/orc-death.png",
+  },
+  skills: [],
+};
+
 function applySpriteOverrides(monster: MonsterDefinition): MonsterDefinition {
   const sprites = MONSTER_SPRITE_OVERRIDES[monster.family];
 
@@ -28,7 +59,10 @@ function applySpriteOverrides(monster: MonsterDefinition): MonsterDefinition {
   };
 }
 
-const MONSTER_CATALOG = generateMonsterCatalog().map(applySpriteOverrides);
+const MONSTER_CATALOG = [
+  ...generateMonsterCatalog().map(applySpriteOverrides),
+  ORC_WARLORD_MINI_BOSS,
+];
 
 export interface MonsterFilters {
   level?: number;

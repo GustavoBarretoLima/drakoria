@@ -25,6 +25,18 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     icon: "/img/itens/ring.png",
     sellPrice: 7,
   },
+  "goblin-shadow-ring": {
+    id: "goblin-shadow-ring",
+    name: "Anel Sombrio Goblin",
+    description: "Um anel raro marcado por runas primitivas.",
+    slot: "ring",
+    rarity: "rare",
+    level: 2,
+    allowedClasses: ["mago", "arqueiro"],
+    stats: { mana: 10, criticalChance: 3, magicPower: 3 },
+    icon: "/img/itens/ring.png",
+    sellPrice: 38,
+  },
   "orc-iron-axe": {
     id: "orc-iron-axe",
     name: "Machado de Ferro Orc",
@@ -49,31 +61,92 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     icon: "/img/itens/armor.png",
     sellPrice: 22,
   },
+  "orc-warlord-axe": {
+    id: "orc-warlord-axe",
+    name: "Machado do Senhor da Guerra",
+    description: "Uma arma rara tomada de um líder orc.",
+    slot: "weapon",
+    rarity: "rare",
+    level: 2,
+    allowedClasses: ["guerreiro"],
+    stats: { attack: 14, criticalDamage: 10 },
+    icon: "/img/itens/weapon.png",
+    sellPrice: 55,
+  },
+  "orc-warlord-chest": {
+    id: "orc-warlord-chest",
+    name: "Couraça do Senhor da Guerra",
+    description: "Armadura reforçada usada pela elite orc.",
+    slot: "armor",
+    rarity: "rare",
+    level: 2,
+    allowedClasses: ["guerreiro", "arqueiro"],
+    stats: { defense: 10, hp: 40 },
+    icon: "/img/itens/armor.png",
+    sellPrice: 60,
+  },
 };
 
-const DROP_POOLS: Record<string, string[]> = {
-  goblin: ["goblin-hide-gloves", "goblin-tooth-ring"],
-  orc: ["orc-iron-axe", "orc-iron-chest"],
-};
+interface WeightedLootEntry {
+  itemId: string;
+  weight: number;
+}
 
-const DROP_CHANCE_BY_FAMILY: Record<string, number> = {
-  goblin: 0.18,
-  orc: 0.24,
+interface MonsterLootTable {
+  dropChance: number;
+  entries: WeightedLootEntry[];
+}
+
+const LOOT_TABLES: Record<string, MonsterLootTable> = {
+  goblin: {
+    dropChance: 0.18,
+    entries: [
+      { itemId: "goblin-hide-gloves", weight: 52 },
+      { itemId: "goblin-tooth-ring", weight: 43 },
+      { itemId: "goblin-shadow-ring", weight: 5 },
+    ],
+  },
+  orc: {
+    dropChance: 0.24,
+    entries: [
+      { itemId: "orc-iron-axe", weight: 48 },
+      { itemId: "orc-iron-chest", weight: 47 },
+      { itemId: "orc-warlord-axe", weight: 3 },
+      { itemId: "orc-warlord-chest", weight: 2 },
+    ],
+  },
+  "orc-warlord-mini-boss-lvl-1": {
+    dropChance: 0.65,
+    entries: [
+      { itemId: "orc-iron-axe", weight: 25 },
+      { itemId: "orc-iron-chest", weight: 25 },
+      { itemId: "orc-warlord-axe", weight: 25 },
+      { itemId: "orc-warlord-chest", weight: 25 },
+    ],
+  },
 };
 
 export function rollMonsterDrops(monsterId: string): EquipmentDrop[] {
   const family = monsterId.split("-")[0] ?? "";
-  const pool = DROP_POOLS[family];
-  if (!pool || pool.length === 0) return [];
+  const table = LOOT_TABLES[monsterId] ?? LOOT_TABLES[family];
+  if (!table || table.entries.length === 0) return [];
+  if (Math.random() >= table.dropChance) return [];
 
-  const dropChance = DROP_CHANCE_BY_FAMILY[family] ?? 0.15;
-  if (Math.random() >= dropChance) return [];
-
-  const itemId = pool[Math.floor(Math.random() * pool.length)];
-  if (!itemId) return [];
-
+  const itemId = pickWeightedItem(table.entries);
   const item = STARTER_LOOT_ITEMS[itemId];
   if (!item) return [];
 
   return [{ item: { ...item, stats: { ...item.stats } }, quantity: 1 }];
+}
+
+function pickWeightedItem(entries: WeightedLootEntry[]): string {
+  const totalWeight = entries.reduce((sum, entry) => sum + entry.weight, 0);
+  let roll = Math.random() * totalWeight;
+
+  for (const entry of entries) {
+    roll -= entry.weight;
+    if (roll < 0) return entry.itemId;
+  }
+
+  return entries[entries.length - 1]?.itemId ?? "";
 }
