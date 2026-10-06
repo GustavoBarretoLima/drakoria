@@ -4,12 +4,14 @@ import {
   ATB_TICK_MS,
 } from "../../../shared/src/combat/atb.js";
 import type { BattleAction } from "../../../shared/src/combat/actions.js";
+import { applyEquipmentStats } from "../../../shared/src/equipment/equipmentStats.js";
 import { rollMonsterDrops } from "../../../shared/src/loot/lootTables.js";
 import type {
   BattleEvent,
   BattleState,
   HeroClass,
 } from "../../../shared/src/types/combat.js";
+import { getEquippedItems } from "../inventory/inventoryClient.js";
 import {
   createDemoMonster,
   getDemoMonsterRewards,
@@ -67,6 +69,10 @@ export function startDemoBattle(
 ): void {
   stopAtbLoop();
   const baseRewards = getDemoMonsterRewards(monsterId);
+  const heroStats = applyEquipmentStats(
+    createInitialStats(heroClass),
+    getEquippedItems(),
+  );
 
   battleState = {
     id: `demo-battle-${Date.now()}`,
@@ -74,7 +80,7 @@ export function startDemoBattle(
       id: "demo-player",
       name: localStorage.getItem("nomeHeroi") || "Heroi",
       className: heroClass,
-      stats: createInitialStats(heroClass),
+      stats: heroStats,
       atb: 0,
       defending: false,
       isAlive: true,
@@ -111,7 +117,11 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
     case "ATTACK": {
       const critical = rollCritical(hero.stats.criticalChance);
       const rawDamage = randomInt(5, 15) + hero.stats.attack;
-      const mitigatedDamage = calculateDamageTaken(rawDamage, enemy.stats.defense, enemy.defending);
+      const mitigatedDamage = calculateDamageTaken(
+        rawDamage,
+        enemy.stats.defense,
+        enemy.defending,
+      );
       const damage = critical
         ? applyCriticalDamage(mitigatedDamage, hero.stats.criticalDamage)
         : mitigatedDamage;
@@ -122,7 +132,9 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
         hero.id,
         enemy.id,
         "ATTACK",
-        critical ? `CRITICO! ${hero.name} causou ${damage} de dano.` : `${hero.name} causou ${damage} de dano.`,
+        critical
+          ? `CRITICO! ${hero.name} causou ${damage} de dano.`
+          : `${hero.name} causou ${damage} de dano.`,
         damage,
         critical,
       );
@@ -130,7 +142,12 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
     }
     case "DEFEND": {
       hero.defending = true;
-      event = createEvent(hero.id, hero.id, "DEFEND", `${hero.name} entrou em postura defensiva e reduzira o proximo dano recebido.`);
+      event = createEvent(
+        hero.id,
+        hero.id,
+        "DEFEND",
+        `${hero.name} entrou em postura defensiva e reduzira o proximo dano recebido.`,
+      );
       break;
     }
     case "CAST_MAGIC": {
@@ -138,7 +155,11 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
         hero.stats.mana -= 10;
         const critical = rollCritical(hero.stats.criticalChance);
         const rawDamage = randomInt(10, 25) + hero.stats.attack;
-        const mitigatedDamage = calculateDamageTaken(rawDamage, enemy.stats.magicDefense, enemy.defending);
+        const mitigatedDamage = calculateDamageTaken(
+          rawDamage,
+          enemy.stats.magicDefense,
+          enemy.defending,
+        );
         const damage = critical
           ? applyCriticalDamage(mitigatedDamage, hero.stats.criticalDamage)
           : mitigatedDamage;
@@ -149,12 +170,19 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
           hero.id,
           enemy.id,
           "CAST_MAGIC",
-          critical ? `CRITICO! ${hero.name} lançou magia e causou ${damage} de dano.` : `${hero.name} lançou magia e causou ${damage} de dano.`,
+          critical
+            ? `CRITICO! ${hero.name} lançou magia e causou ${damage} de dano.`
+            : `${hero.name} lançou magia e causou ${damage} de dano.`,
           damage,
           critical,
         );
       } else {
-        event = createEvent(hero.id, hero.id, "CAST_MAGIC", `${hero.name} tentou usar magia sem mana suficiente.`);
+        event = createEvent(
+          hero.id,
+          hero.id,
+          "CAST_MAGIC",
+          `${hero.name} tentou usar magia sem mana suficiente.`,
+        );
       }
       break;
     }
@@ -182,9 +210,17 @@ function processEnemyTurn(expectedBattleId: string): void {
   if (battleState.turnOwnerId !== battleState.enemy.id) return;
 
   const hero = { ...battleState.hero, stats: { ...battleState.hero.stats } };
-  const enemy = { ...battleState.enemy, stats: { ...battleState.enemy.stats }, atb: 0 };
+  const enemy = {
+    ...battleState.enemy,
+    stats: { ...battleState.enemy.stats },
+    atb: 0,
+  };
   const critical = rollCritical(enemy.stats.criticalChance);
-  const mitigatedDamage = calculateDamageTaken(enemy.stats.attack, hero.stats.defense, hero.defending);
+  const mitigatedDamage = calculateDamageTaken(
+    enemy.stats.attack,
+    hero.stats.defense,
+    hero.defending,
+  );
   const damage = critical
     ? applyCriticalDamage(mitigatedDamage, enemy.stats.criticalDamage)
     : mitigatedDamage;
@@ -236,7 +272,11 @@ function applyCriticalDamage(damage: number, criticalDamage: number): number {
   return Math.max(1, Math.floor(damage * (1 + bonus)));
 }
 
-function calculateDamageTaken(baseDamage: number, defense: number, defending: boolean): number {
+function calculateDamageTaken(
+  baseDamage: number,
+  defense: number,
+  defending: boolean,
+): number {
   const safeBaseDamage = Math.max(1, Math.floor(baseDamage));
   const safeDefense = Math.max(0, Math.floor(defense));
   const defenseReduction = Math.floor(safeDefense * 0.5);
