@@ -1,3 +1,4 @@
+import { prepareNextMonster, clearBattleStorage } from "./battle/victoryNavigation.js";
 import socket from "./network/socket.js";
 import { renderBattle } from "./battle/battleRenderer.js";
 import { setEnemyGifs } from "./assets/gifs.js";
@@ -25,7 +26,6 @@ import type {
 } from "../../shared/src/types/combat.js";
 
 const demoMode = isPagesDemoMode();
-let victoryRedirectScheduled = false;
 let defeatRedirectScheduled = false;
 let rewardedBattleId: string | null = null;
 let penalizedBattleId: string | null = null;
@@ -88,6 +88,16 @@ function applyVictoryRewards(state: BattleState): void {
       quantity: drop.quantity,
       rarity: drop.item.rarity,
     })),
+    {
+      onNextMonster: () => {
+        prepareNextMonster(localStorage);
+        window.location.href = `${import.meta.env.BASE_URL}pages/batalha.html`;
+      },
+      onReturnToCity: () => {
+        clearBattleStorage(localStorage);
+        window.location.href = `${import.meta.env.BASE_URL}pages/praca.html`;
+      },
+    },
   );
 }
 
@@ -100,39 +110,14 @@ function applyBattleDefeat(state: BattleState): void {
   renderDefeatOverlay(result);
 }
 
-function scheduleVictoryRedirect(): void {
-  if (victoryRedirectScheduled) return;
-  victoryRedirectScheduled = true;
-
-  const battleType =
-    localStorage.getItem("tipoBatalhaAtual") || "historia-goblin-inicial";
-  const isDungeon = battleType.startsWith("dungeon-");
-  const targetPage = isDungeon ? "praca.html" : "caminho-drakoria.html";
-
-  window.setTimeout(() => {
-    clearBattleStorage();
-    window.location.href = `${import.meta.env.BASE_URL}pages/${targetPage}`;
-  }, 4200);
-}
-
 function scheduleDefeatRedirect(): void {
   if (defeatRedirectScheduled) return;
   defeatRedirectScheduled = true;
 
   window.setTimeout(() => {
-    clearBattleStorage();
+    clearBattleStorage(localStorage);
     window.location.href = `${import.meta.env.BASE_URL}pages/praca.html`;
   }, 4200);
-}
-
-function clearBattleStorage(): void {
-  localStorage.removeItem("tipoBatalhaAtual");
-  localStorage.removeItem("monsterIdAtual");
-  localStorage.removeItem("dungeonAtual");
-  localStorage.removeItem("dungeonNivelMin");
-  localStorage.removeItem("dungeonNivelMax");
-  localStorage.removeItem("dungeonEncontroTipo");
-  localStorage.removeItem("dungeonEncontroNivel");
 }
 
 function renderState(state: BattleState): void {
@@ -143,9 +128,7 @@ function renderState(state: BattleState): void {
   applyVictoryRewards(state);
   applyBattleDefeat(state);
 
-  if (state.finished && state.winnerId === state.hero.id) {
-    scheduleVictoryRedirect();
-  } else if (state.finished) {
+  if (state.finished && state.winnerId !== state.hero.id) {
     scheduleDefeatRedirect();
   }
 }

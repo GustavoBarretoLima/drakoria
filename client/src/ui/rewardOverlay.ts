@@ -20,10 +20,16 @@ const RARITY_LABELS: Record<EquipmentRarity, string> = {
   mythic: "Mítico",
 };
 
+export interface VictoryActions {
+  onNextMonster: () => void;
+  onReturnToCity: () => void;
+}
+
 export function renderVictoryRewardOverlay(
   rewards: BattleRewards,
   result: RewardResult,
   drops: RewardDrop[] = [],
+  actions?: VictoryActions,
 ): void {
   removeBattleResultOverlays();
 
@@ -78,6 +84,41 @@ export function renderVictoryRewardOverlay(
   progress.className = "reward-progress";
   progress.textContent = `Nível ${result.progress.nivel} • XP ${result.progress.xp}/${result.progress.xpParaProximoNivel} • Ouro total ${result.progress.ouro}`;
   panel.appendChild(progress);
+
+  if (actions) {
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    title.id = "battleVictoryTitle";
+    overlay.setAttribute("aria-labelledby", title.id);
+    const buttons = document.createElement("div");
+    buttons.className = "reward-actions";
+    let chosen = false;
+    const createAction = (label: string, action: () => void) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.addEventListener("click", () => {
+        if (chosen) return;
+        chosen = true;
+        nextButton.disabled = true;
+        cityButton.disabled = true;
+        action();
+      });
+      return button;
+    };
+    const nextButton = createAction("Buscar próximo monstro", actions.onNextMonster);
+    const cityButton = createAction("Voltar para a cidade", actions.onReturnToCity);
+    cityButton.className = "reward-action-secondary";
+    buttons.append(nextButton, cityButton);
+    panel.appendChild(buttons);
+    // Mantém a navegação por teclado dentro da escolha de vitória.
+    overlay.addEventListener("keydown", event => {
+      if (event.key !== "Tab") return;
+      event.preventDefault();
+      (document.activeElement === nextButton ? cityButton : nextButton).focus();
+    });
+    requestAnimationFrame(() => nextButton.focus());
+  }
 
   overlay.appendChild(panel);
   showOverlay(overlay);

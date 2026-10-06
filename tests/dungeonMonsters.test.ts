@@ -1,3 +1,4 @@
+import { DUNGEON_CONFIG, pickDungeonEncounter } from "../shared/src/dungeons/dungeonEncounters.js";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 import vm from "node:vm";
@@ -76,8 +77,8 @@ const values = new Map<string, string>();
 const panel = { classList: { remove() {} }, innerHTML: "" };
 let queue: number[] = [];
 const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value) };
-const context = vm.createContext({ Math: Object.assign(Object.create(Math), { random: () => queue.shift() ?? 0 }), localStorage: storage, window: { location: { href: "" } }, document: { getElementById: () => panel } });
-vm.runInContext(readFileSync("js/dungeon-orc-ranges.js", "utf8"), context);
+const context = vm.createContext({ DUNGEON_ORC_CONFIG: DUNGEON_CONFIG, dungeonOrcPickMonster: (config: Parameters<typeof pickDungeonEncounter>[0]) => pickDungeonEncounter(config, () => queue.shift() ?? 0), Math: Object.assign(Object.create(Math), { random: () => queue.shift() ?? 0 }), localStorage: storage, window: { location: { href: "" } }, document: { getElementById: () => panel } });
+vm.runInContext(readFileSync("js/dungeon-orc-ranges.js", "utf8").replace(/^import[^\n]*\n/, ""), context);
 vm.runInContext("window.abrirDungeon()", context);
 for (const label of ["Covil dos Goblins e Orcs", "Cripta dos Mutantes", "Acampamento Hobgoblin", "Trono do Orc Rei"]) assert.ok(panel.innerHTML.includes(label));
 for (const names of Object.values(DUNGEON_EQUIPMENT_NAMES)) for (const name of Object.values(names)) assert.ok(panel.innerHTML.includes(name));
