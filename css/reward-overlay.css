@@ -134,6 +134,44 @@
   line-height: 1.45;
 }
 
+.defeat-overlay {
+  background: rgba(12, 0, 0, 0.72);
+}
+
+.defeat-panel {
+  border-color: rgba(220, 62, 62, 0.92);
+  background:
+    radial-gradient(circle at top, rgba(175, 30, 30, 0.26), transparent 48%),
+    linear-gradient(180deg, rgba(25, 7, 7, 0.98), rgba(5, 5, 5, 0.98));
+  box-shadow:
+    0 0 30px rgba(190, 35, 35, 0.42),
+    0 18px 60px rgba(0, 0, 0, 0.78);
+}
+
+.defeat-heading {
+  color: #ff8a80;
+  text-shadow:
+    0 0 10px rgba(255, 82, 82, 0.92),
+    0 0 24px rgba(183, 28, 28, 0.75);
+}
+
+.defeat-xp .reward-value,
+.defeat-xp .reward-label {
+  color: #ff9e9e;
+}
+
+.defeat-gold .reward-value,
+.defeat-gold .reward-label {
+  color: #ffcc80;
+}
+
+.defeat-explanation {
+  margin: 16px 0 0;
+  color: #e4caca;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
 @keyframes rewardPanelEnter {
   from {
     opacity: 0;
