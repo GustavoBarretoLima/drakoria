@@ -1,5 +1,5 @@
 import type { BattleRewards } from "../../../shared/src/types/combat.js";
-import type { EquipmentRarity } from "../../../shared/src/types/equipment.js";
+import type { EquipmentItem, EquipmentRarity } from "../../../shared/src/types/equipment.js";
 import type {
   DefeatPenaltyResult,
   RewardResult,
@@ -9,6 +9,8 @@ export interface RewardDrop {
   name: string;
   quantity?: number;
   rarity?: EquipmentRarity;
+  level?: number;
+  allowedClasses?: EquipmentItem["allowedClasses"];
 }
 
 const RARITY_LABELS: Record<EquipmentRarity, string> = {
@@ -74,6 +76,16 @@ export function renderVictoryRewardOverlay(
       dropLine.className = `reward-drop-item${drop.rarity ? ` rarity-${drop.rarity}` : ""}`;
       const rarity = drop.rarity ? ` • ${RARITY_LABELS[drop.rarity]}` : "";
       dropLine.textContent = `${drop.name}${drop.quantity && drop.quantity > 1 ? ` x${drop.quantity}` : ""}${rarity}`;
+      if (drop.level !== undefined && drop.allowedClasses) {
+        const labels = { guerreiro: "Guerreiro", mago: "Mago", arqueiro: "Arqueiro", universal: "Todas as classes" };
+        const classes = drop.allowedClasses.includes("universal")
+          ? labels.universal
+          : drop.allowedClasses.map(heroClass => labels[heroClass]).join(", ") || "Não informada";
+        const requirements = document.createElement("small");
+        requirements.className = "reward-drop-requirements";
+        requirements.textContent = `Classe: ${classes} • Nível ${drop.level}`;
+        dropLine.appendChild(requirements);
+      }
       dropsSection.appendChild(dropLine);
     }
 

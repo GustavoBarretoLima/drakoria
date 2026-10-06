@@ -87,6 +87,20 @@ function inventoryUxCanEquip(item) {
   return { allowed: classAllowed && levelAllowed, classAllowed, levelAllowed };
 }
 
+function inventoryUxClassesLabel(item) {
+  const warriorOnly = ["orc-iron-axe", "orc-iron-chest", "orc-warlord-sword", "orc-warlord-chest", "orc-warlord-gloves", "weapon-universal-legendary-natal-lvl-100"].includes(item.id);
+  if (warriorOnly) return "Guerreiro";
+  if (item.id === "goblin-hide-gloves") return "Guerreiro, Arqueiro";
+  const classes = Array.isArray(item.allowedClasses) ? item.allowedClasses : ["universal"];
+  const labels = { guerreiro: "Guerreiro", mago: "Mago", arqueiro: "Arqueiro", universal: "Todas as classes" };
+  if (classes.includes("universal") && ["ring", "earring", "necklace"].includes(item.slot)) return labels.universal;
+  return classes.filter(heroClass => heroClass !== "universal").map(heroClass => labels[heroClass] || heroClass).join(", ") || "Nenhuma classe compatível";
+}
+
+function inventoryUxRequirementsHtml(item) {
+  return `<small class="inventory-slot-description">Classe: ${inventoryUxEscape(inventoryUxClassesLabel(item))} • Nível ${Math.max(1, Number(item.level || 1))}</small>`;
+}
+
 function inventoryUxStatsHtml(stats = {}) {
   const entries = Object.entries(stats).filter(([, value]) => Number(value) !== 0);
   if (!entries.length) {
@@ -132,6 +146,7 @@ function inventoryUxItemSlot(entry, index, inventory) {
       <strong>${inventoryUxEscape(item.name)}</strong>
       ${quantity > 1 ? `<small>x${quantity}</small>` : ""}
       <em>${inventoryUxEscape(INVENTORY_UX_RARITIES[rarity] || rarity)}</em>
+      ${inventoryUxRequirementsHtml(item)}
       ${inventoryUxStatsHtml(item.stats)}
       <small class="inventory-slot-description">${inventoryUxEscape(item.description || "Sem descrição.")}</small>
       ${restriction ? `<small class="inventory-restriction">${inventoryUxEscape(restriction)}</small>` : ""}
@@ -163,6 +178,7 @@ function inventoryUxOpen() {
         <button type="button" class="equipment-slot${current ? ` occupied rarity-${rarity}` : ""}" ${current ? `onclick="desequiparSlotInventario('${slot}')"` : "disabled"}>
           <span>${label}</span>
           <strong>${current ? inventoryUxEscape(current.item.name) : "Vazio"}</strong>
+          ${current ? inventoryUxRequirementsHtml(current.item) : ""}
           ${current ? inventoryUxStatsHtml(current.item.stats) : ""}
           ${current ? "<small>Clique para desequipar</small>" : ""}
         </button>
@@ -336,3 +352,5 @@ window.abrirInventario = inventoryUxOpen;
 window.equiparItemInventario = inventoryUxEquip;
 window.desequiparSlotInventario = inventoryUxUnequip;
 window.venderItemInventario = inventoryUxSell;
+
+window.inventoryUxClassesLabel = inventoryUxClassesLabel;
