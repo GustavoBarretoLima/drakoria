@@ -13,6 +13,28 @@ function getHeroGender(): "Masculino" | "Feminino" {
   return genero === "feminino" ? "Feminino" : "Masculino";
 }
 
+function resolveEnemySprite(path: string | undefined, fallback: string): string {
+  if (!path) return fallback;
+  if (/^https?:\/\//i.test(path)) return path;
+
+  const normalizedPath = path.replace(/^\/+/, "");
+  return `${import.meta.env.BASE_URL}${normalizedPath}`;
+}
+
+function getEnemySprites(state: BattleState) {
+  const sprites = state.enemy.sprites;
+
+  const idle = resolveEnemySprite(sprites?.idle, gifsGoblin.padrao);
+  const attack = resolveEnemySprite(sprites?.attack, gifsGoblin.atk ?? idle);
+  const damage = resolveEnemySprite(sprites?.damage, gifsGoblin.damage ?? idle);
+  const death = resolveEnemySprite(
+    sprites?.death,
+    gifsGoblin.morte ?? gifsGoblin.damage ?? idle,
+  );
+
+  return { idle, attack, damage, death };
+}
+
 export function renderBattle(state: BattleState) {
   renderStatus(state);
   renderBattleMessage(state);
@@ -78,9 +100,8 @@ function renderSpritesBase(state: BattleState) {
   }
 
   if (enemyImg) {
-    enemyImg.src = state.enemy.isAlive
-      ? gifsGoblin.padrao
-      : (gifsGoblin.morte ?? gifsGoblin.damage ?? gifsGoblin.padrao);
+    const enemySprites = getEnemySprites(state);
+    enemyImg.src = state.enemy.isAlive ? enemySprites.idle : enemySprites.death;
   }
 }
 
@@ -118,6 +139,7 @@ function playBattleEventEffects(state: BattleState) {
 
   if (!heroGifs) return;
 
+  const enemySprites = getEnemySprites(state);
   const heroDefaultGif = heroGifs.padrao ?? "";
   const heroAttackGif = heroGifs.atk ?? heroDefaultGif;
   const heroDefenseGif = heroGifs.defesa ?? heroDefaultGif;
@@ -153,12 +175,11 @@ function playBattleEventEffects(state: BattleState) {
           );
 
           if (!state.enemy.isAlive) {
-            enemyImg.src =
-              gifsGoblin.morte ?? gifsGoblin.damage ?? gifsGoblin.padrao;
+            enemyImg.src = enemySprites.death;
           } else {
-            enemyImg.src = gifsGoblin.damage ?? gifsGoblin.padrao;
+            enemyImg.src = enemySprites.damage;
             setTimeout(() => {
-              enemyImg.src = gifsGoblin.padrao;
+              enemyImg.src = enemySprites.idle;
             }, 500);
           }
         },
@@ -195,25 +216,24 @@ function playBattleEventEffects(state: BattleState) {
 
       if (!state.enemy.isAlive) {
         setTimeout(() => {
-          enemyImg.src =
-            gifsGoblin.morte ?? gifsGoblin.damage ?? gifsGoblin.padrao;
+          enemyImg.src = enemySprites.death;
         }, 250);
       } else {
-        enemyImg.src = gifsGoblin.damage ?? gifsGoblin.padrao;
+        enemyImg.src = enemySprites.damage;
         setTimeout(() => {
-          enemyImg.src = gifsGoblin.padrao;
+          enemyImg.src = enemySprites.idle;
         }, 500);
       }
     }
   }
 
   if (lastEvent.actorId === state.enemy.id) {
-    enemyImg.src = gifsGoblin.atk ?? gifsGoblin.padrao;
+    enemyImg.src = enemySprites.attack;
 
     dashAttack(enemyImg, heroImg, 620, false);
 
     setTimeout(() => {
-      enemyImg.src = gifsGoblin.padrao;
+      enemyImg.src = enemySprites.idle;
       heroImg.src = heroDamageGif;
 
       shakeTarget(heroWrapper, lastEvent.critical === true);
@@ -431,6 +451,7 @@ function spawnProjectileEffect(
     projectile.remove();
   };
 }
+
 function dashAttack(
   attackerImg: HTMLImageElement,
   targetImg: HTMLImageElement,
@@ -464,6 +485,7 @@ function dashAttack(
     },
   );
 }
+
 function handleBattleEndRedirect(state: BattleState) {
   if (!state.finished) return;
   if (state.winnerId !== state.hero.id) return;
