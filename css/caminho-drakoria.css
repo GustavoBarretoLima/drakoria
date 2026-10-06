@@ -41,7 +41,8 @@ body {
 .dialogo {
   position: relative;
   z-index: 2;
-  max-width: 920px;
+  width: min(920px, 100%);
+  align-self: center;
   padding: 28px 32px;
   border: 1px solid rgba(255, 180, 80, 0.45);
   border-radius: 14px;
@@ -89,7 +90,7 @@ body {
 
 .btn-continuar {
   align-self: flex-start;
-  margin-top: 28px;
+  margin-top: 18px;
   padding: 14px 24px;
   background: linear-gradient(135deg, #ff7a18, #d9480f);
   box-shadow:
@@ -98,10 +99,9 @@ body {
 }
 
 .btn-pular-dialogos {
-  position: absolute;
-  top: max(18px, env(safe-area-inset-top));
-  right: 22px;
-  padding: 10px 16px;
+  align-self: center;
+  margin-top: 16px;
+  padding: 10px 18px;
   border: 1px solid rgba(255, 200, 120, 0.45);
   background: rgba(20, 12, 8, 0.82);
   box-shadow: 0 0 14px rgba(255, 100, 0, 0.28);
@@ -133,7 +133,7 @@ body {
   .caminho-page {
     min-height: 100dvh;
     justify-content: flex-start;
-    padding: 78px 16px 24px;
+    padding: 24px 16px;
   }
 
   .dialogo {
@@ -147,10 +147,11 @@ body {
   }
 
   .btn-pular-dialogos {
-    top: max(12px, env(safe-area-inset-top));
-    right: 12px;
-    padding: 9px 12px;
-    font-size: 0.9rem;
+    width: min(280px, 82%);
+    min-height: 44px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
   }
 
   .btn-continuar {
