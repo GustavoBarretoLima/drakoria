@@ -1,4 +1,4 @@
-import type { HeroClass, Stats } from "../types/combat";
+import type { HeroClass, Stats } from "../types/combat.js";
 
 type BaseStats = Pick<
   Stats,
