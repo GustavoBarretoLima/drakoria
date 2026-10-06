@@ -9,7 +9,10 @@ import type {
   BattleState,
   HeroClass,
 } from "../../../shared/src/types/combat.js";
-import { createDemoMonster } from "./demoMonsters.js";
+import {
+  createDemoMonster,
+  getDemoMonsterRewards,
+} from "./demoMonsters.js";
 
 type BattleListener = (state: BattleState) => void;
 
@@ -75,6 +78,7 @@ export function startDemoBattle(
       isAlive: true,
     },
     enemy: createDemoMonster(monsterId),
+    rewards: getDemoMonsterRewards(monsterId),
     turnOwnerId: null,
     finished: false,
   };

@@ -7,6 +7,7 @@ import {
   startDemoBattle,
   subscribeDemoBattle,
 } from "./demo/demoBattle.js";
+import { awardBattleRewards } from "./progression/progressionClient.js";
 import type {
   BattleState,
   HeroClass,
@@ -14,6 +15,7 @@ import type {
 
 const demoMode = isPagesDemoMode();
 let demoVictoryRedirectScheduled = false;
+let rewardedBattleId: string | null = null;
 
 function normalizeHeroClass(className: string): HeroClass {
   if (className === "mago" || className === "arqueiro") {
@@ -46,11 +48,40 @@ function renderAtbPhase(state: BattleState): void {
     state.turnOwnerId === state.hero.id ? "Ação pronta!" : "Inimigo agindo...";
 }
 
+function renderRewardMessage(
+  state: BattleState,
+  levelsGained: number,
+  level: number,
+): void {
+  if (!state.rewards) return;
+
+  const messages = document.getElementById("mensagens");
+  if (!messages) return;
+
+  const rewardLine = document.createElement("div");
+  rewardLine.className = "battle-reward-message";
+  rewardLine.textContent = `Recompensas: +${state.rewards.xp} XP, +${state.rewards.gold} ouro${
+    levelsGained > 0 ? ` — nível ${level}!` : ""
+  }`;
+  messages.appendChild(rewardLine);
+}
+
+function applyVictoryRewards(state: BattleState): void {
+  if (!state.finished || state.winnerId !== state.hero.id) return;
+  if (!state.rewards) return;
+  if (rewardedBattleId === state.id) return;
+
+  rewardedBattleId = state.id;
+  const result = awardBattleRewards(state.rewards);
+  renderRewardMessage(state, result.levelsGained, result.progress.nivel);
+}
+
 function scheduleDemoVictoryRedirect(): void {
   if (demoVictoryRedirectScheduled) return;
   demoVictoryRedirectScheduled = true;
 
-  const battleType = localStorage.getItem("tipoBatalhaAtual") || "historia-goblin-inicial";
+  const battleType =
+    localStorage.getItem("tipoBatalhaAtual") || "historia-goblin-inicial";
   const isDungeon = battleType.startsWith("dungeon-");
   const targetPage = isDungeon ? "praca.html" : "caminho-drakoria.html";
 
@@ -58,7 +89,7 @@ function scheduleDemoVictoryRedirect(): void {
     localStorage.removeItem("tipoBatalhaAtual");
     localStorage.removeItem("monsterIdAtual");
     window.location.href = `${import.meta.env.BASE_URL}pages/${targetPage}`;
-  }, 2000);
+  }, 2500);
 }
 
 function renderState(state: BattleState): void {
@@ -66,6 +97,7 @@ function renderState(state: BattleState): void {
   setEnemyGifs(state.enemy.sprites);
   renderBattle(state);
   renderAtbPhase(state);
+  applyVictoryRewards(state);
 
   if (demoMode && state.finished && state.winnerId === state.hero.id) {
     scheduleDemoVictoryRedirect();

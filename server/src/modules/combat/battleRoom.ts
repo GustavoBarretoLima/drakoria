@@ -78,6 +78,10 @@ export function createInitialBattleState(
       defending: false,
       isAlive: true,
     },
+    rewards: {
+      xp: monster.xpReward,
+      gold: monster.goldReward,
+    },
     turnOwnerId: null,
     finished: false,
   };

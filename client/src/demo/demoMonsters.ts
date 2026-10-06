@@ -1,4 +1,7 @@
-import type { CombatantState } from "../../../shared/src/types/combat.js";
+import type {
+  BattleRewards,
+  CombatantState,
+} from "../../../shared/src/types/combat.js";
 
 type DemoMonsterFactory = () => CombatantState;
 
@@ -55,8 +58,17 @@ const DEMO_MONSTERS: Record<string, DemoMonsterFactory> = {
   }),
 };
 
+const DEMO_REWARDS: Record<string, BattleRewards> = {
+  "goblin-normal-lvl-1": { xp: 15, gold: 8 },
+  "orc-normal-lvl-1": { xp: 15, gold: 8 },
+};
+
 export function createDemoMonster(monsterId: string): CombatantState {
   const fallbackFactory = DEMO_MONSTERS["goblin-normal-lvl-1"]!;
   const factory = DEMO_MONSTERS[monsterId] ?? fallbackFactory;
   return factory();
+}
+
+export function getDemoMonsterRewards(monsterId: string): BattleRewards {
+  return DEMO_REWARDS[monsterId] ?? DEMO_REWARDS["goblin-normal-lvl-1"]!;
 }
