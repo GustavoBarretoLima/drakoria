@@ -115,7 +115,7 @@ const LOOT_TABLES: Record<string, MonsterLootTable> = {
       { itemId: "orc-warlord-chest", weight: 2 },
     ],
   },
-  "orc-warlord-mini-boss-lvl-1": {
+  "orc-warlord-mini-boss": {
     dropChance: 0.65,
     entries: [
       { itemId: "orc-iron-axe", weight: 25 },
@@ -128,7 +128,10 @@ const LOOT_TABLES: Record<string, MonsterLootTable> = {
 
 export function rollMonsterDrops(monsterId: string): EquipmentDrop[] {
   const family = monsterId.split("-")[0] ?? "";
-  const table = LOOT_TABLES[monsterId] ?? LOOT_TABLES[family];
+  const miniBossTable = monsterId.startsWith("orc-warlord-mini-boss-lvl-")
+    ? LOOT_TABLES["orc-warlord-mini-boss"]
+    : undefined;
+  const table = miniBossTable ?? LOOT_TABLES[monsterId] ?? LOOT_TABLES[family];
   if (!table || table.entries.length === 0) return [];
   if (Math.random() >= table.dropChance) return [];
 
