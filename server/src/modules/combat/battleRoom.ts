@@ -1,4 +1,5 @@
 import { createInitialStats } from "../../../../shared/src/combat/classStats.js";
+import { rollMonsterDrops } from "../../../../shared/src/loot/lootTables.js";
 import type {
   BattleState,
   HeroClass,
@@ -81,6 +82,7 @@ export function createInitialBattleState(
     rewards: {
       xp: monster.xpReward,
       gold: monster.goldReward,
+      drops: rollMonsterDrops(monster.id),
     },
     turnOwnerId: null,
     finished: false,
