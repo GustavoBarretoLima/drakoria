@@ -11,8 +11,14 @@ import {
   addDropsToInventory,
   getEquippedItems,
 } from "./inventory/inventoryClient.js";
-import { awardBattleRewards } from "./progression/progressionClient.js";
-import { renderVictoryRewardOverlay } from "./ui/rewardOverlay.js";
+import {
+  applyDefeatPenalty,
+  awardBattleRewards,
+} from "./progression/progressionClient.js";
+import {
+  renderDefeatOverlay,
+  renderVictoryRewardOverlay,
+} from "./ui/rewardOverlay.js";
 import type {
   BattleState,
   HeroClass,
@@ -20,7 +26,9 @@ import type {
 
 const demoMode = isPagesDemoMode();
 let victoryRedirectScheduled = false;
+let defeatRedirectScheduled = false;
 let rewardedBattleId: string | null = null;
+let penalizedBattleId: string | null = null;
 
 function normalizeHeroClass(className: string): HeroClass {
   if (className === "mago" || className === "arqueiro") return className;
@@ -83,6 +91,15 @@ function applyVictoryRewards(state: BattleState): void {
   );
 }
 
+function applyBattleDefeat(state: BattleState): void {
+  if (!state.finished || state.winnerId === state.hero.id) return;
+  if (penalizedBattleId === state.id) return;
+
+  penalizedBattleId = state.id;
+  const result = applyDefeatPenalty();
+  renderDefeatOverlay(result);
+}
+
 function scheduleVictoryRedirect(): void {
   if (victoryRedirectScheduled) return;
   victoryRedirectScheduled = true;
@@ -93,10 +110,29 @@ function scheduleVictoryRedirect(): void {
   const targetPage = isDungeon ? "praca.html" : "caminho-drakoria.html";
 
   window.setTimeout(() => {
-    localStorage.removeItem("tipoBatalhaAtual");
-    localStorage.removeItem("monsterIdAtual");
+    clearBattleStorage();
     window.location.href = `${import.meta.env.BASE_URL}pages/${targetPage}`;
   }, 4200);
+}
+
+function scheduleDefeatRedirect(): void {
+  if (defeatRedirectScheduled) return;
+  defeatRedirectScheduled = true;
+
+  window.setTimeout(() => {
+    clearBattleStorage();
+    window.location.href = `${import.meta.env.BASE_URL}pages/praca.html`;
+  }, 4200);
+}
+
+function clearBattleStorage(): void {
+  localStorage.removeItem("tipoBatalhaAtual");
+  localStorage.removeItem("monsterIdAtual");
+  localStorage.removeItem("dungeonAtual");
+  localStorage.removeItem("dungeonNivelMin");
+  localStorage.removeItem("dungeonNivelMax");
+  localStorage.removeItem("dungeonEncontroTipo");
+  localStorage.removeItem("dungeonEncontroNivel");
 }
 
 function renderState(state: BattleState): void {
@@ -105,9 +141,12 @@ function renderState(state: BattleState): void {
   renderBattle(state);
   renderAtbPhase(state);
   applyVictoryRewards(state);
+  applyBattleDefeat(state);
 
   if (state.finished && state.winnerId === state.hero.id) {
     scheduleVictoryRedirect();
+  } else if (state.finished) {
+    scheduleDefeatRedirect();
   }
 }
 
