@@ -56,6 +56,7 @@ const DEMO_MONSTERS: Record<string, DemoMonsterFactory> = {
 };
 
 export function createDemoMonster(monsterId: string): CombatantState {
-  const factory = DEMO_MONSTERS[monsterId] ?? DEMO_MONSTERS["goblin-normal-lvl-1"];
+  const fallbackFactory = DEMO_MONSTERS["goblin-normal-lvl-1"]!;
+  const factory = DEMO_MONSTERS[monsterId] ?? fallbackFactory;
   return factory();
 }
