@@ -205,7 +205,12 @@ export function rollMonsterDrops(monsterId: string): EquipmentDrop[] {
   const miniBossTable = monsterId.startsWith("orc-warlord-mini-boss-lvl-")
     ? LOOT_TABLES["orc-warlord-mini-boss"]
     : undefined;
-  const table = miniBossTable ?? LOOT_TABLES[monsterId] ?? LOOT_TABLES[family];
+  const dungeonTable = monsterId.startsWith("orc-king-boss-lvl-") ? LOOT_TABLES["orc-warlord-mini-boss"]
+    : monsterId.startsWith("hobgoblin-normal-lvl-") ? LOOT_TABLES.goblin
+    : monsterId.startsWith("skeleton-warrior-normal-lvl-") ? LOOT_TABLES.orc
+    : monsterId.startsWith("mutant-rat-normal-lvl-") ? LOOT_TABLES.goblin
+    : undefined;
+  const table = dungeonTable ?? miniBossTable ?? LOOT_TABLES[monsterId] ?? LOOT_TABLES[family];
   if (!table || table.entries.length === 0) return [];
   if (Math.random() >= table.dropChance) return [];
 

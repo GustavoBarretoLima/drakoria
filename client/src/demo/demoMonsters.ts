@@ -1,3 +1,4 @@
+import { createDungeonMonster } from "../../../shared/src/constants/dungeonMonsters.js";
 import type {
   BattleRewards,
   CombatantState,
@@ -6,10 +7,10 @@ import type {
 type DemoMonsterFactory = () => CombatantState;
 
 const ORC_SPRITES = {
-  idle: "/img/monstros/orc-idle.png",
-  attack: "/img/monstros/orc-attack.png",
-  damage: "/img/monstros/orc-damage.png",
-  death: "/img/monstros/orc-death.png",
+  idle: "/img/monstros/orc/idle.gif",
+  attack: "/img/monstros/orc/attack.gif",
+  damage: "/img/monstros/orc/damage.gif",
+  death: "/img/monstros/orc/death.gif",
 };
 
 const GOBLIN_SPRITES = {
@@ -143,6 +144,15 @@ function createScaledRewards(monsterId: string): BattleRewards | null {
 }
 
 export function createDemoMonster(monsterId: string): CombatantState {
+  const dungeon = createDungeonMonster(monsterId);
+  if (dungeon) {
+    const { magicPower: _magicPower, ...stats } = dungeon.stats;
+    return {
+    id: dungeon.id, name: dungeon.name, sprites: dungeon.sprites,
+    stats: { ...stats, magicDefense: dungeon.stats.magicDefense ?? 0, speed: { goblin: 12, orc: 8, undead: 9, beast: 14 }[dungeon.family as "goblin" | "orc" | "undead" | "beast"] },
+    atb: 0, defending: false, isAlive: true,
+  };
+  }
   const parsed = parseDemoMonster(monsterId);
   if (parsed) return parsed;
 
@@ -152,6 +162,8 @@ export function createDemoMonster(monsterId: string): CombatantState {
 }
 
 export function getDemoMonsterRewards(monsterId: string): BattleRewards {
+  const dungeon = createDungeonMonster(monsterId);
+  if (dungeon) return { xp: dungeon.xpReward, gold: dungeon.goldReward };
   return (
     createScaledRewards(monsterId) ??
     DEMO_REWARDS[monsterId] ??

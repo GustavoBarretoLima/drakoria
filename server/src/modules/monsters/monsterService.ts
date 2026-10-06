@@ -1,3 +1,4 @@
+import { DUNGEON_MONSTERS, folderSprites } from "../../../../shared/src/constants/dungeonMonsters.js";
 import type {
   MonsterDefinition,
   MonsterFamily,
@@ -9,11 +10,12 @@ import { generateMonsterCatalog } from "./monsterGenerator.js";
 const MONSTER_SPRITE_OVERRIDES: Partial<
   Record<MonsterFamily, MonsterSpriteSet>
 > = {
+  undead: folderSprites("esqueleto_guerreiro"),
   orc: {
-    idle: "/img/monstros/orc-idle.png",
-    attack: "/img/monstros/orc-attack.png",
-    damage: "/img/monstros/orc-damage.png",
-    death: "/img/monstros/orc-death.png",
+    idle: "/img/monstros/orc/idle.gif",
+    attack: "/img/monstros/orc/attack.gif",
+    damage: "/img/monstros/orc/damage.gif",
+    death: "/img/monstros/orc/death.gif",
   },
 };
 
@@ -25,10 +27,10 @@ const GOBLIN_SPRITES: MonsterSpriteSet = {
 };
 
 const ORC_SPRITES: MonsterSpriteSet = {
-  idle: "/img/monstros/orc-idle.png",
-  attack: "/img/monstros/orc-attack.png",
-  damage: "/img/monstros/orc-damage.png",
-  death: "/img/monstros/orc-death.png",
+  idle: "/img/monstros/orc/idle.gif",
+  attack: "/img/monstros/orc/attack.gif",
+  damage: "/img/monstros/orc/damage.gif",
+  death: "/img/monstros/orc/death.gif",
 };
 
 function getEarlyDungeonMultiplier(level: number): number {
@@ -137,6 +139,7 @@ const GENERATED_CATALOG = generateMonsterCatalog()
   );
 
 const MONSTER_CATALOG = [
+  ...DUNGEON_MONSTERS,
   ...EARLY_DUNGEON_MONSTERS,
   ...ORC_WARLORD_MINI_BOSSES,
   ...GENERATED_CATALOG,

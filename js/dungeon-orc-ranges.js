@@ -1,4 +1,12 @@
 const DUNGEON_ORC_CONFIG = {
+  fortaleza: {
+    id: "dungeon-orc-king", label: "Fortaleza do Orc Rei", minLevel: 5, maxLevel: 15,
+    miniBossChance: 0.15, miniBossLevel: 15, kingChance: 0.10,
+  },
+  cripta: {
+    id: "dungeon-mutants", label: "Cripta dos Mutantes", minLevel: 5, maxLevel: 15,
+    miniBossChance: 0, monsters: ["hobgoblin", "skeleton-warrior", "mutant-rat"],
+  },
   iniciante: {
     id: "dungeon-orc-1-5",
     label: "Covil Orc I",
@@ -23,7 +31,16 @@ function dungeonOrcRandomInt(min, max) {
 }
 
 function dungeonOrcPickMonster(config) {
-  const roll = Math.random();
+  if (config.monsters) {
+    const type = config.monsters[dungeonOrcRandomInt(0, config.monsters.length - 1)];
+    const level = dungeonOrcRandomInt(config.minLevel, config.maxLevel);
+    return { monsterId: `${type}-normal-lvl-${level}`, type, level };
+  }
+  let roll = Math.random();
+  if (config.kingChance) {
+    if (roll < config.kingChance) return { monsterId: "orc-king-boss-lvl-15", type: "boss", level: 15 };
+    roll -= config.kingChance;
+  }
 
   if (config.miniBossChance > 0 && roll < config.miniBossChance) {
     const level = config.miniBossLevel || config.maxLevel;
@@ -38,7 +55,7 @@ function dungeonOrcPickMonster(config) {
   const familyRoll = config.miniBossChance > 0
     ? (roll - config.miniBossChance) / (1 - config.miniBossChance)
     : roll;
-  const family = familyRoll < 0.5 ? "goblin" : "orc";
+  const family = config.kingChance ? "orc" : familyRoll < 0.5 ? "goblin" : "orc";
 
   return {
     monsterId: `${family}-normal-lvl-${level}`,
@@ -69,11 +86,29 @@ function abrirDungeonOrcPorFaixa() {
     <div class="panel-header">
       <div>
         <span class="panel-kicker">Portão das Dungeons</span>
-        <h2>Dungeons Orc</h2>
+        <h2>Dungeons de Drakoria</h2>
       </div>
     </div>
 
     <div class="dungeon-tier-list">
+      <article class="dungeon-tier-card">
+        <div>
+          <span class="panel-kicker">Níveis 5–15</span>
+          <h3>Fortaleza do Orc Rei</h3>
+          <p>Guerreiros Orcs defendem os portões e o Senhor da Guerra protege o trono.</p>
+          <small>Por encontro: Orc Rei Nv.15 (10%), Senhor da Guerra Nv.15 (15%) ou Orc (75%).</small>
+        </div>
+        <button type="button" onclick="entrarFortalezaOrcRei()">Entrar</button>
+      </article>
+      <article class="dungeon-tier-card">
+        <div>
+          <span class="panel-kicker">Níveis 5–15</span>
+          <h3>Cripta dos Mutantes</h3>
+          <p>Explore túneis infestados por Hobgoblins, Esqueletos Guerreiros e Ratos Mutantes.</p>
+          <small>Os três monstros têm a mesma chance de encontro.</small>
+        </div>
+        <button type="button" onclick="entrarCriptaMutantes()">Entrar</button>
+      </article>
       <article class="dungeon-tier-card">
         <div>
           <span class="panel-kicker">Níveis 1–5</span>
@@ -126,3 +161,6 @@ window.entrarDungeonAleatoria = entrarDungeonOrc1a5;
 window.entrarDungeonGoblin = entrarDungeonOrc1a5;
 window.entrarDungeonOrc = entrarDungeonOrc5a15;
 window.entrarMiniBossOrc = entrarMiniBossOrcDaFaixa;
+
+window.entrarFortalezaOrcRei = () => dungeonOrcStart(DUNGEON_ORC_CONFIG.fortaleza);
+window.entrarCriptaMutantes = () => dungeonOrcStart(DUNGEON_ORC_CONFIG.cripta);
