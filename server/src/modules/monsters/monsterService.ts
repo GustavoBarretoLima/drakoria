@@ -122,8 +122,7 @@ const EARLY_DUNGEON_MONSTERS = Array.from({ length: 14 }, (_, index) => index + 
     createEarlyDungeonMonster("orc", level),
   ]);
 
-const ORC_WARLORD_MINI_BOSSES = [1, ...Array.from({ length: 11 }, (_, index) => index + 5)]
-  .map(createOrcWarlordMiniBoss);
+const ORC_WARLORD_MINI_BOSSES = [1, 15].map(createOrcWarlordMiniBoss);
 
 const GENERATED_CATALOG = generateMonsterCatalog()
   .map(applySpriteOverrides)
