@@ -1,6 +1,9 @@
 import type { BattleRewards } from "../../../shared/src/types/combat.js";
 import type { EquipmentRarity } from "../../../shared/src/types/equipment.js";
-import type { RewardResult } from "../progression/progressionClient.js";
+import type {
+  DefeatPenaltyResult,
+  RewardResult,
+} from "../progression/progressionClient.js";
 
 export interface RewardDrop {
   name: string;
@@ -22,14 +25,9 @@ export function renderVictoryRewardOverlay(
   result: RewardResult,
   drops: RewardDrop[] = [],
 ): void {
-  document.getElementById("battleRewardOverlay")?.remove();
+  removeBattleResultOverlays();
 
-  const overlay = document.createElement("div");
-  overlay.id = "battleRewardOverlay";
-  overlay.className = "reward-overlay";
-  overlay.setAttribute("role", "status");
-  overlay.setAttribute("aria-live", "polite");
-
+  const overlay = createBaseOverlay("battleRewardOverlay", "reward-overlay");
   const panel = document.createElement("div");
   panel.className = "reward-panel";
 
@@ -82,6 +80,63 @@ export function renderVictoryRewardOverlay(
   panel.appendChild(progress);
 
   overlay.appendChild(panel);
+  showOverlay(overlay);
+}
+
+export function renderDefeatOverlay(result: DefeatPenaltyResult): void {
+  removeBattleResultOverlays();
+
+  const overlay = createBaseOverlay(
+    "battleDefeatOverlay",
+    "reward-overlay defeat-overlay",
+  );
+  const panel = document.createElement("div");
+  panel.className = "reward-panel defeat-panel";
+
+  const defeat = document.createElement("div");
+  defeat.className = "reward-victory defeat-heading";
+  defeat.textContent = "DERROTA";
+
+  const title = document.createElement("h2");
+  title.className = "reward-title";
+  title.textContent = "Penalidades da derrota";
+
+  const penalties = document.createElement("div");
+  penalties.className = "reward-grid";
+  penalties.append(
+    createRewardCard("XP perdido", `-${result.xpLost}`, "defeat-xp"),
+    createRewardCard("Ouro perdido", `-${result.goldLost}`, "defeat-gold"),
+  );
+
+  const explanation = document.createElement("p");
+  explanation.className = "defeat-explanation";
+  explanation.textContent =
+    "Você perdeu 5% da XP atual e até 200 de ouro. Retornando para a Praça...";
+
+  const progress = document.createElement("div");
+  progress.className = "reward-progress";
+  progress.textContent = `Nível ${result.progress.nivel} • XP ${result.progress.xp}/${result.progress.xpParaProximoNivel} • Ouro restante ${result.progress.ouro}`;
+
+  panel.append(defeat, title, penalties, explanation, progress);
+  overlay.appendChild(panel);
+  showOverlay(overlay);
+}
+
+function createBaseOverlay(id: string, className: string): HTMLDivElement {
+  const overlay = document.createElement("div");
+  overlay.id = id;
+  overlay.className = className;
+  overlay.setAttribute("role", "status");
+  overlay.setAttribute("aria-live", "polite");
+  return overlay;
+}
+
+function removeBattleResultOverlays(): void {
+  document.getElementById("battleRewardOverlay")?.remove();
+  document.getElementById("battleDefeatOverlay")?.remove();
+}
+
+function showOverlay(overlay: HTMLDivElement): void {
   document.body.appendChild(overlay);
 
   requestAnimationFrame(() => {

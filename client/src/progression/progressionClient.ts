@@ -18,6 +18,12 @@ export interface RewardResult {
   levelsGained: number;
 }
 
+export interface DefeatPenaltyResult {
+  progress: PlayerProgress;
+  xpLost: number;
+  goldLost: number;
+}
+
 const DEFAULT_PROGRESS: PlayerProgress = {
   goblinInicialDerrotado: false,
   entrouEmDrakoria: false,
@@ -72,6 +78,20 @@ export function awardBattleRewards(rewards: BattleRewards): RewardResult {
     progress,
     levelsGained: progress.nivel - startingLevel,
   };
+}
+
+export function applyDefeatPenalty(): DefeatPenaltyResult {
+  const progress = loadProgress();
+  const currentXp = Math.max(0, Math.floor(progress.xp));
+  const currentGold = Math.max(0, Math.floor(progress.ouro));
+  const xpLost = currentXp > 0 ? Math.ceil(currentXp * 0.05) : 0;
+  const goldLost = Math.min(200, currentGold);
+
+  progress.xp = Math.max(0, currentXp - xpLost);
+  progress.ouro = Math.max(0, currentGold - goldLost);
+  saveProgress(progress);
+
+  return { progress, xpLost, goldLost };
 }
 
 function saveProgress(progress: PlayerProgress): void {
