@@ -35,31 +35,22 @@ const RARITY_LABELS = {
 };
 
 const CLASS_STATUS_STATS = {
-  guerreiro: {
-    attack: 14,
-    defense: 10,
-    magicDefense: 6,
-    magicPower: 14,
-    speed: 10,
-  },
-  mago: {
-    attack: 16,
-    defense: 5,
-    magicDefense: 12,
-    magicPower: 16,
-    speed: 11,
-  },
-  arqueiro: {
-    attack: 13,
-    defense: 7,
-    magicDefense: 8,
-    magicPower: 13,
-    speed: 14,
-  },
+  guerreiro: { attack: 14, defense: 10, magicDefense: 6, magicPower: 14, speed: 10 },
+  mago: { attack: 16, defense: 5, magicDefense: 12, magicPower: 16, speed: 11 },
+  arqueiro: { attack: 13, defense: 7, magicDefense: 8, magicPower: 13, speed: 14 },
 };
 
 function getPainelPraca() {
   return document.getElementById("painelPraca");
+}
+
+function getClasseHeroi() {
+  const classe = (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase();
+  return ["guerreiro", "mago", "arqueiro"].includes(classe) ? classe : "guerreiro";
+}
+
+function getNivelHeroi() {
+  return window.progressoDrakoria?.carregarProgresso?.()?.nivel ?? 1;
 }
 
 function carregarInventarioPersistente() {
@@ -85,12 +76,22 @@ function salvarInventarioPersistente(inventario) {
 function getEquipados(inventario) {
   return Object.entries(inventario.equipped)
     .map(([slot, itemId]) => {
-      const entry = inventario.items.find(
-        (candidate) => candidate.item.id === itemId,
-      );
+      const entry = inventario.items.find((candidate) => candidate.item.id === itemId);
       return entry ? { slot, item: entry.item } : null;
     })
     .filter(Boolean);
+}
+
+function podeEquipar(item) {
+  const classe = getClasseHeroi();
+  const nivel = getNivelHeroi();
+  const classes = Array.isArray(item.allowedClasses) ? item.allowedClasses : ["universal"];
+  const classePermitida = classes.includes("universal") || classes.includes(classe);
+  return {
+    permitido: classePermitida && nivel >= Number(item.level || 1),
+    classePermitida,
+    nivelSuficiente: nivel >= Number(item.level || 1),
+  };
 }
 
 function calcularStatusHeroi(classe, inventario) {
@@ -109,24 +110,6 @@ function calcularStatusHeroi(classe, inventario) {
   return base;
 }
 
-function formatarStats(stats = {}) {
-  const labels = {
-    hp: "HP",
-    mana: "Mana",
-    attack: "Ataque",
-    defense: "Defesa",
-    criticalChance: "Crítico",
-    criticalDamage: "Dano crítico",
-    dodgeChance: "Esquiva",
-    magicPower: "Magia",
-  };
-
-  return Object.entries(stats)
-    .filter(([, valor]) => Number(valor) !== 0)
-    .map(([chave, valor]) => `+${valor} ${labels[chave] || chave}`)
-    .join(" • ");
-}
-
 function criarSlotInventario(entry, index, inventario) {
   if (!entry) {
     return `<div class="inventory-slot empty"><span>${index + 1}</span></div>`;
@@ -134,18 +117,23 @@ function criarSlotInventario(entry, index, inventario) {
 
   const { item, quantity } = entry;
   const equipado = inventario.equipped[item.slot] === item.id;
+  const uso = podeEquipar(item);
+  let bloqueio = "";
+  if (!uso.classePermitida) bloqueio = "Classe incompatível";
+  else if (!uso.nivelSuficiente) bloqueio = `Requer nível ${item.level}`;
+
   return `
-    <button
-      type="button"
-      class="inventory-slot filled rarity-${item.rarity}${equipado ? " equipped" : ""}"
-      onclick="equiparItemInventario('${item.id}')"
-      title="${item.description || item.name}"
-    >
+    <div class="inventory-slot filled rarity-${item.rarity}${equipado ? " equipped" : ""}${uso.permitido ? "" : " locked"}" title="${item.description || item.name}">
       <span class="inventory-slot-index">${index + 1}</span>
       <strong>${item.name}</strong>
       ${quantity > 1 ? `<small>x${quantity}</small>` : ""}
       <em>${RARITY_LABELS[item.rarity] || item.rarity}</em>
-    </button>
+      ${bloqueio ? `<small class="inventory-restriction">${bloqueio}</small>` : ""}
+      <div class="inventory-slot-actions">
+        <button type="button" ${uso.permitido ? `onclick="equiparItemInventario('${item.id}')"` : "disabled"}>${equipado ? "Equipado" : "Equipar"}</button>
+        <button type="button" ${equipado ? "disabled" : `onclick="venderItemInventario('${item.id}')"`}>Vender ${item.sellPrice || 0}g</button>
+      </div>
+    </div>
   `;
 }
 
@@ -163,11 +151,7 @@ function abrirInventario() {
     .map(([slot, label]) => {
       const equipado = equipados.find((entry) => entry.slot === slot);
       return `
-        <button
-          type="button"
-          class="equipment-slot${equipado ? " occupied" : ""}"
-          ${equipado ? `onclick="desequiparSlotInventario('${slot}')"` : "disabled"}
-        >
+        <button type="button" class="equipment-slot${equipado ? " occupied" : ""}" ${equipado ? `onclick="desequiparSlotInventario('${slot}')"` : "disabled"}>
           <span>${label}</span>
           <strong>${equipado ? equipado.item.name : "Vazio"}</strong>
           ${equipado ? "<small>Clique para desequipar</small>" : ""}
@@ -179,23 +163,15 @@ function abrirInventario() {
   painel.classList.remove("hidden");
   painel.innerHTML = `
     <div class="panel-header">
-      <div>
-        <span class="panel-kicker">Mochila do aventureiro</span>
-        <h2>Inventário</h2>
-      </div>
+      <div><span class="panel-kicker">Mochila do aventureiro</span><h2>Inventário</h2></div>
       <span class="inventory-capacity">${inventario.items.length}/${INVENTORY_SLOTS}</span>
     </div>
-
     <h3 class="section-title">Equipamentos</h3>
     <div class="equipment-grid">${equipamentoSlots}</div>
-
     <h3 class="section-title">Itens</h3>
-    <p class="inventory-help">Enquanto não houver ícones próprios, os drops aparecem pelo nome. Clique em um item para equipar.</p>
+    <p class="inventory-help">Itens podem exigir classe e nível. Equipamentos não equipados podem ser vendidos por ouro.</p>
     <div class="inventory-grid">${slots}</div>
-
-    <div class="painel-acoes">
-      <button type="button" onclick="fecharPainelPraca()">Fechar</button>
-    </div>
+    <div class="painel-acoes"><button type="button" onclick="fecharPainelPraca()">Fechar</button></div>
   `;
 }
 
@@ -203,6 +179,9 @@ function equiparItemInventario(itemId) {
   const inventario = carregarInventarioPersistente();
   const entry = inventario.items.find((candidate) => candidate.item.id === itemId);
   if (!entry) return;
+
+  const uso = podeEquipar(entry.item);
+  if (!uso.permitido) return;
 
   inventario.equipped[entry.item.slot] = itemId;
   salvarInventarioPersistente(inventario);
@@ -216,6 +195,22 @@ function desequiparSlotInventario(slot) {
   abrirInventario();
 }
 
+function venderItemInventario(itemId) {
+  const inventario = carregarInventarioPersistente();
+  const entryIndex = inventario.items.findIndex((candidate) => candidate.item.id === itemId);
+  if (entryIndex < 0) return;
+
+  const entry = inventario.items[entryIndex];
+  if (!entry || inventario.equipped[entry.item.slot] === itemId) return;
+
+  const valor = Math.max(0, Number(entry.item.sellPrice || 0));
+  entry.quantity -= 1;
+  if (entry.quantity <= 0) inventario.items.splice(entryIndex, 1);
+  salvarInventarioPersistente(inventario);
+  window.progressoDrakoria?.adicionarRecompensa?.({ ouro: valor, xp: 0 });
+  abrirInventario();
+}
+
 function abrirDungeon() {
   const painel = getPainelPraca();
   if (!painel) return;
@@ -223,9 +218,10 @@ function abrirDungeon() {
   painel.classList.remove("hidden");
   painel.innerHTML = `
     <h2>Portão das Dungeons</h2>
-    <p>Ao norte da Praça de Drakoria, um portal antigo pulsa com energia sombria. Goblins e Orcs vagam pelos corredores, e cada entrada pode levar a um encontro diferente.</p>
+    <p>Goblins e Orcs vagam pelos corredores. Rumores falam de um Senhor da Guerra Orc que aparece em uma rota mais perigosa.</p>
     <div class="painel-acoes">
-      <button type="button" onclick="entrarDungeonAleatoria()">Entrar na Dungeon Aleatória</button>
+      <button type="button" onclick="entrarDungeonAleatoria()">Dungeon Aleatória</button>
+      <button type="button" onclick="entrarMiniBossOrc()">⚔ Mini-boss Orc</button>
       <button type="button" onclick="fecharPainelPraca()">Voltar</button>
     </div>
   `;
@@ -240,6 +236,12 @@ function entrarDungeonAleatoria() {
   const monsterId = sortearMonstroDungeon();
   localStorage.setItem("tipoBatalhaAtual", "dungeon-random");
   localStorage.setItem("monsterIdAtual", monsterId);
+  window.location.href = "batalha.html";
+}
+
+function entrarMiniBossOrc() {
+  localStorage.setItem("tipoBatalhaAtual", "dungeon-mini-boss-orc");
+  localStorage.setItem("monsterIdAtual", "orc-warlord-mini-boss-lvl-1");
   window.location.href = "batalha.html";
 }
 
@@ -258,7 +260,7 @@ function abrirStatus() {
   if (!painel) return;
 
   const nome = localStorage.getItem("nomeHeroi") || "Herói";
-  const classeRaw = (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase();
+  const classeRaw = getClasseHeroi();
   const classeTexto = localStorage.getItem("classeHeroiTexto") || classeRaw;
   const genero = localStorage.getItem("generoHeroi") || "Masculino";
   const progresso = window.progressoDrakoria?.carregarProgresso?.();
@@ -269,34 +271,20 @@ function abrirStatus() {
   const equipamentosHtml = Object.entries(SLOT_LABELS)
     .map(([slot, label]) => {
       const equipado = equipados.find((entry) => entry.slot === slot);
-      return `
-        <div class="status-equipment-row">
-          <span>${label}</span>
-          <strong>${equipado ? equipado.item.name : "—"}</strong>
-        </div>
-      `;
+      return `<div class="status-equipment-row"><span>${label}</span><strong>${equipado ? equipado.item.name : "—"}</strong></div>`;
     })
     .join("");
 
   painel.classList.remove("hidden");
   painel.innerHTML = `
     <div class="panel-header status-header">
-      <div>
-        <span class="panel-kicker">Ficha do aventureiro</span>
-        <h2>${nome}</h2>
-        <p>${classeTexto} • ${genero}</p>
-      </div>
-      <div class="level-badge">
-        <span>Nível</span>
-        <strong>${progresso?.nivel ?? 1}</strong>
-      </div>
+      <div><span class="panel-kicker">Ficha do aventureiro</span><h2>${nome}</h2><p>${classeTexto} • ${genero}</p></div>
+      <div class="level-badge"><span>Nível</span><strong>${progresso?.nivel ?? 1}</strong></div>
     </div>
-
     <div class="progress-summary">
       <div><span>EXP</span><strong>${progresso?.xp ?? 0}/${progresso?.xpParaProximoNivel ?? 100}</strong></div>
       <div><span>Ouro</span><strong>${progresso?.ouro ?? 0}</strong></div>
     </div>
-
     <h3 class="section-title">Atributos</h3>
     <div class="status-stats-grid">
       <div class="status-stat"><span>Ataque</span><strong>${stats.attack}</strong></div>
@@ -305,14 +293,9 @@ function abrirStatus() {
       <div class="status-stat"><span>Magia</span><strong>${stats.magicPower}</strong></div>
       <div class="status-stat"><span>Speed</span><strong>${stats.speed}</strong></div>
     </div>
-
     <h3 class="section-title">Equipamentos</h3>
     <div class="status-equipment-list">${equipamentosHtml}</div>
-
-    <div class="painel-acoes">
-      <button type="button" onclick="abrirInventario()">Abrir Inventário</button>
-      <button type="button" onclick="fecharPainelPraca()">Fechar</button>
-    </div>
+    <div class="painel-acoes"><button type="button" onclick="abrirInventario()">Abrir Inventário</button><button type="button" onclick="fecharPainelPraca()">Fechar</button></div>
   `;
 }
 
@@ -348,8 +331,10 @@ function fecharPainelPraca() {
 window.abrirInventario = abrirInventario;
 window.equiparItemInventario = equiparItemInventario;
 window.desequiparSlotInventario = desequiparSlotInventario;
+window.venderItemInventario = venderItemInventario;
 window.abrirDungeon = abrirDungeon;
 window.entrarDungeonAleatoria = entrarDungeonAleatoria;
+window.entrarMiniBossOrc = entrarMiniBossOrc;
 window.entrarDungeonGoblin = entrarDungeonGoblin;
 window.entrarDungeonOrc = entrarDungeonOrc;
 window.abrirStatus = abrirStatus;
