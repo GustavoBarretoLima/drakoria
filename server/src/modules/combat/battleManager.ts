@@ -10,8 +10,14 @@ export class BattleManager {
     heroClass: HeroClass = "guerreiro",
     monsterId = "goblin-normal-lvl-1",
     equippedItems: EquipmentItem[] = [],
+    heroLevel = 1,
   ): BattleState {
-    const battle = createInitialBattleState(heroClass, monsterId, equippedItems);
+    const battle = createInitialBattleState(
+      heroClass,
+      monsterId,
+      equippedItems,
+      heroLevel,
+    );
     this.battles.set(playerId, battle);
     return battle;
   }
