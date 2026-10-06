@@ -60,6 +60,21 @@ Já implementado:
 - quando o mini-boss aparece, ele é sempre **Nv.15**;
 - possui tabela própria de loot com equipamentos incomuns e armas raras.
 
+#### Fortaleza do Orc Rei — Nv. 5 a 15
+
+- Orcs Nv.5–15 (75%), Senhor da Guerra Nv.15 (15%) e Orc Rei Nv.15 (10%) por encontro;
+- Orc Rei usa seus próprios assets e rank `boss`, com atributos e recompensas superiores ao mini-boss;
+- loot do rei reutiliza os equipamentos da tabela do Senhor da Guerra.
+
+#### Cripta dos Mutantes — Nv. 5 a 15
+
+- Hobgoblin, Esqueleto Guerreiro e Rato Mutante, com chances iguais;
+- atributos, XP e ouro compartilhados entre servidor e demo;
+- loot reutiliza equipamentos existentes: goblin para Hobgoblin/Rato e orc para Esqueleto;
+- animações `idle.gif`, `attack.gif`, `damage.gif` e `death.gif` nas pastas de cada monstro. PNGs e spritesheets permanecem disponíveis, sem conversão.
+
+Verificação da integração: `npx tsx tests/dungeonMonsters.test.ts`.
+
 ## 🧱 Estrutura do projeto
 
 | Pasta | Descrição |
