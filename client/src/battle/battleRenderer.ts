@@ -4,6 +4,7 @@ import { renderBattleMessage } from "../ui/renderMessages.js";
 import { gifsHeroi, gifsGoblin } from "../assets/gifs.js";
 
 let previousEventKey = "";
+let renderedBattleId = "";
 let victoryRedirectScheduled = false;
 
 function getHeroGender(): "Masculino" | "Feminino" {
@@ -89,8 +90,14 @@ function renderSpritesBase(state: BattleState) {
   const enemyImg = document.getElementById(
     "inimigoBatalha",
   ) as HTMLImageElement | null;
+  const isNewBattle = renderedBattleId !== state.id;
 
-  if (heroImg && state.hero.className) {
+  if (isNewBattle) {
+    renderedBattleId = state.id;
+    previousEventKey = "";
+  }
+
+  if (heroImg && state.hero.className && isNewBattle) {
     const gender = getHeroGender();
     const heroGifs = gifsHeroi[state.hero.className]?.[gender];
 
@@ -101,7 +108,12 @@ function renderSpritesBase(state: BattleState) {
 
   if (enemyImg) {
     const enemySprites = getEnemySprites(state);
-    enemyImg.src = state.enemy.isAlive ? enemySprites.idle : enemySprites.death;
+
+    if (!state.enemy.isAlive) {
+      enemyImg.src = enemySprites.death;
+    } else if (isNewBattle) {
+      enemyImg.src = enemySprites.idle;
+    }
   }
 }
 
