@@ -1,0 +1,174 @@
+.reward-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.reward-overlay-visible {
+  opacity: 1;
+}
+
+.reward-panel {
+  width: min(92vw, 520px);
+  padding: 28px;
+  box-sizing: border-box;
+  border: 2px solid rgba(255, 204, 0, 0.9);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at top, rgba(255, 184, 0, 0.2), transparent 46%),
+    linear-gradient(180deg, rgba(24, 18, 8, 0.98), rgba(5, 5, 5, 0.98));
+  box-shadow:
+    0 0 28px rgba(255, 174, 0, 0.42),
+    0 18px 60px rgba(0, 0, 0, 0.72);
+  text-align: center;
+  transform: translateY(18px) scale(0.94);
+  animation: rewardPanelEnter 420ms cubic-bezier(0.18, 0.82, 0.26, 1.18) forwards;
+}
+
+.reward-victory {
+  margin-bottom: 6px;
+  color: #ffe082;
+  font-size: clamp(1.8rem, 6vw, 3rem);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-shadow:
+    0 0 10px rgba(255, 193, 7, 0.95),
+    0 0 24px rgba(255, 111, 0, 0.7);
+}
+
+.reward-title {
+  margin: 0 0 20px;
+  color: #fff6d8;
+  font-size: clamp(1rem, 3.7vw, 1.25rem);
+  font-weight: 700;
+}
+
+.reward-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.reward-card {
+  display: flex;
+  min-height: 108px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.035);
+}
+
+.reward-value {
+  font-size: clamp(1.8rem, 7vw, 2.6rem);
+  line-height: 1;
+}
+
+.reward-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reward-xp .reward-value,
+.reward-xp .reward-label {
+  color: #8bd3ff;
+}
+
+.reward-gold .reward-value,
+.reward-gold .reward-label {
+  color: #ffd54f;
+}
+
+.reward-level-up {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid rgba(126, 249, 157, 0.7);
+  border-radius: 12px;
+  background: rgba(46, 125, 50, 0.2);
+  color: #a5ffb7;
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px rgba(76, 255, 120, 0.5);
+}
+
+.reward-drops {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.reward-drops h3 {
+  margin: 0 0 10px;
+  color: #f5f5f5;
+  font-size: 1rem;
+}
+
+.reward-drop-item {
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  font-weight: 700;
+}
+
+.reward-progress {
+  margin-top: 18px;
+  color: #d7d7d7;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+@keyframes rewardPanelEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 520px) {
+  .reward-overlay {
+    padding: 14px;
+  }
+
+  .reward-panel {
+    padding: 22px 16px;
+    border-radius: 15px;
+  }
+
+  .reward-card {
+    min-height: 92px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reward-overlay,
+  .reward-panel {
+    transition: none;
+    animation: none;
+  }
+
+  .reward-panel {
+    transform: none;
+  }
+}
