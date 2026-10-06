@@ -29,6 +29,10 @@ function getSelectedHeroClass(): HeroClass {
   );
 }
 
+function getSelectedMonsterId(): string {
+  return localStorage.getItem("monsterIdAtual") || "goblin-normal-lvl-1";
+}
+
 function renderAtbPhase(state: BattleState): void {
   const indicator = document.getElementById("indicadorTurno");
   if (!indicator || state.finished) return;
@@ -42,22 +46,29 @@ function renderAtbPhase(state: BattleState): void {
     state.turnOwnerId === state.hero.id ? "Ação pronta!" : "Inimigo agindo...";
 }
 
+function scheduleDemoVictoryRedirect(): void {
+  if (demoVictoryRedirectScheduled) return;
+  demoVictoryRedirectScheduled = true;
+
+  const battleType = localStorage.getItem("tipoBatalhaAtual") || "historia-goblin-inicial";
+  const isDungeon = battleType.startsWith("dungeon-");
+  const targetPage = isDungeon ? "praca.html" : "caminho-drakoria.html";
+
+  window.setTimeout(() => {
+    localStorage.removeItem("tipoBatalhaAtual");
+    localStorage.removeItem("monsterIdAtual");
+    window.location.href = `${import.meta.env.BASE_URL}pages/${targetPage}`;
+  }, 2000);
+}
+
 function renderState(state: BattleState): void {
   console.log("Novo estado da batalha:", state);
   setEnemyGifs(state.enemy.sprites);
   renderBattle(state);
   renderAtbPhase(state);
 
-  if (
-    demoMode &&
-    state.finished &&
-    state.winnerId === state.hero.id &&
-    !demoVictoryRedirectScheduled
-  ) {
-    demoVictoryRedirectScheduled = true;
-    window.setTimeout(() => {
-      window.location.href = `${import.meta.env.BASE_URL}pages/caminho-drakoria.html`;
-    }, 2000);
+  if (demoMode && state.finished && state.winnerId === state.hero.id) {
+    scheduleDemoVictoryRedirect();
   }
 }
 
@@ -69,8 +80,7 @@ if (demoMode) {
 
     socket.emit("player:setup", {
       className: getSelectedHeroClass(),
-      monsterId:
-        localStorage.getItem("monsterIdAtual") || "goblin-normal-lvl-1",
+      monsterId: getSelectedMonsterId(),
     });
   });
 
@@ -84,6 +94,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const banner = document.getElementById("demoModeBanner");
     if (banner) banner.hidden = false;
 
-    startDemoBattle(getSelectedHeroClass());
+    startDemoBattle(getSelectedHeroClass(), getSelectedMonsterId());
   }
 });

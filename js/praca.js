@@ -17,6 +17,11 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+const DUNGEON_RANDOM_MONSTERS = [
+  "goblin-normal-lvl-1",
+  "orc-normal-lvl-1",
+];
+
 function getPainelPraca() {
   return document.getElementById("painelPraca");
 }
@@ -50,12 +55,12 @@ function abrirDungeon() {
 
     <p>
       Ao norte da Praça de Drakoria, um portal antigo pulsa com energia sombria.
-      Heróis entram ali em busca de tesouros, glória e perigos.
+      Goblins e Orcs vagam pelos corredores, e cada entrada pode levar a um encontro diferente.
     </p>
 
     <div class="painel-acoes">
-      <button type="button" onclick="entrarDungeonGoblin()">
-        Entrar na Dungeon dos Goblins
+      <button type="button" onclick="entrarDungeonAleatoria()">
+        Entrar na Dungeon Aleatória
       </button>
 
       <button type="button" onclick="fecharPainelPraca()">
@@ -64,14 +69,26 @@ function abrirDungeon() {
     </div>
   `;
 }
-function entrarDungeonGoblin() {
-  localStorage.setItem("tipoBatalhaAtual", "dungeon-goblin");
-  localStorage.setItem("monsterIdAtual", "goblin-normal-lvl-1");
+
+function sortearMonstroDungeon() {
+  const index = Math.floor(Math.random() * DUNGEON_RANDOM_MONSTERS.length);
+  return DUNGEON_RANDOM_MONSTERS[index] || "goblin-normal-lvl-1";
+}
+
+function entrarDungeonAleatoria() {
+  const monsterId = sortearMonstroDungeon();
+  localStorage.setItem("tipoBatalhaAtual", "dungeon-random");
+  localStorage.setItem("monsterIdAtual", monsterId);
   window.location.href = "batalha.html";
 }
+
+function entrarDungeonGoblin() {
+  entrarDungeonAleatoria();
+}
+
 function entrarDungeonOrc() {
   localStorage.setItem("tipoBatalhaAtual", "dungeon-orc");
-  localStorage.setItem("monsterIdAtual", "orc-normal-lvl-10");
+  localStorage.setItem("monsterIdAtual", "orc-normal-lvl-1");
   window.location.href = "batalha.html";
 }
 
@@ -167,7 +184,7 @@ function abrirMissoes() {
     <div class="missao-card">
       <h3>Sussurros nas Dungeons</h3>
       <p>
-        Criaturas continuam surgindo além das muralhas. Investigue a Dungeon dos Goblins.
+        Criaturas continuam surgindo além das muralhas. Investigue a dungeon e enfrente o que encontrar.
       </p>
       <strong>Status:</strong> Disponível
     </div>
@@ -194,7 +211,9 @@ function fecharPainelPraca() {
 
 window.abrirInventario = abrirInventario;
 window.abrirDungeon = abrirDungeon;
+window.entrarDungeonAleatoria = entrarDungeonAleatoria;
 window.entrarDungeonGoblin = entrarDungeonGoblin;
+window.entrarDungeonOrc = entrarDungeonOrc;
 window.abrirStatus = abrirStatus;
 window.abrirLoja = abrirLoja;
 window.abrirMissoes = abrirMissoes;
