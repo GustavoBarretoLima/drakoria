@@ -11,6 +11,7 @@ import {
   advanceBattleAtb,
   ATB_TICK_MS,
 } from "../../shared/src/combat/atb.js";
+import { normalizeHeroLevel } from "../../shared/src/combat/classStats.js";
 import type { BattleAction } from "../../shared/src/combat/actions.js";
 import { STARTER_LOOT_ITEMS } from "../../shared/src/loot/lootTables.js";
 import type { HeroClass } from "../../shared/src/types/combat.js";
@@ -44,6 +45,7 @@ function normalizeHeroClass(className?: string): HeroClass {
 function resolveEquippedItems(
   ids: string[] | undefined,
   heroClass: HeroClass,
+  heroLevel: number,
 ): EquipmentItem[] {
   if (!Array.isArray(ids)) return [];
 
@@ -54,10 +56,11 @@ function resolveEquippedItems(
     const item = getEquipmentById(id) ?? STARTER_LOOT_ITEMS[id];
     if (!item || seenSlots.has(item.slot)) continue;
 
-    const canUse =
+    const canUseClass =
       item.allowedClasses.includes("universal") ||
       item.allowedClasses.includes(heroClass);
-    if (!canUse) continue;
+    const canUseLevel = heroLevel >= item.level;
+    if (!canUseClass || !canUseLevel) continue;
 
     seenSlots.add(item.slot);
     items.push(item);
@@ -202,12 +205,15 @@ io.on("connection", (socket) => {
       className?: string;
       monsterId?: string;
       equippedItemIds?: string[];
+      heroLevel?: number;
     }) => {
       const className = normalizeHeroClass(payload.className);
+      const heroLevel = normalizeHeroLevel(Number(payload.heroLevel ?? 1));
       const monsterId = payload.monsterId || "goblin-normal-lvl-1";
       const equippedItems = resolveEquippedItems(
         payload.equippedItemIds,
         className,
+        heroLevel,
       );
 
       try {
@@ -216,6 +222,7 @@ io.on("connection", (socket) => {
           className,
           monsterId,
           equippedItems,
+          heroLevel,
         );
 
         socket.emit("battle:update", battleState);
