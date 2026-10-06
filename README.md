@@ -7,9 +7,9 @@
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-4.x-010101?logo=socketdotio&logoColor=white)
 ![Language](https://img.shields.io/github/languages/top/GustavoBarretoLima/drakoria)
 
-**Drakoria** é um RPG online para navegador em desenvolvimento, com combate inspirado em sistemas de turno/ATB, classes distintas, monstros, equipamentos e progressão.
+**Drakoria** é um RPG online para navegador em desenvolvimento, com combate em tempo real baseado em ATB, classes distintas, progressão de personagem, loot, equipamentos, dungeons e monstros com níveis diferentes.
 
-> 🎮 A versão do GitHub Pages possui um **modo demonstração** da primeira batalha. Essa luta roda localmente no navegador e não salva progresso. O modo online completo continua dependendo do backend Socket.IO.
+> 🎮 A versão publicada no GitHub Pages roda em **modo demo local**, sem depender do backend para a batalha. Progressão, inventário e equipamentos da demo ficam salvos no `localStorage` do navegador. O modo online autoritativo continua dependendo do backend Socket.IO.
 
 ## 🎮 Jogar
 
@@ -21,37 +21,55 @@ Acesse a versão publicada:
 
 Já implementado:
 
-- 3 classes: Guerreiro, Mago e Arqueiro;
-- batalhas independentes por jogador;
+- 3 classes: **Guerreiro, Mago e Arqueiro**;
+- combate com **ATB baseado em velocidade**;
 - ataque, defesa e magia;
-- defesa física e defesa mágica;
-- chance e dano crítico configuráveis;
-- atributo de velocidade preparado para o sistema ATB;
-- catálogo de monstros;
-- catálogo de equipamentos;
-- interface de batalha com HP, mana e atributos defensivos;
+- HP, mana, ataque, defesa, defesa mágica, velocidade e crítico;
+- progressão de atributos por nível;
+- XP, níveis e ouro;
+- overlay de vitória com recompensas e drops;
+- overlay de derrota com penalidade de **5% da XP atual** e até **200 de ouro**;
+- retorno automático para a Praça após derrota;
+- inventário com 20 slots;
+- 9 slots de equipamento;
+- restrições de item por classe e nível;
+- paper doll de equipamentos com tooltips;
+- bônus dos equipamentos exibidos no inventário e no status;
+- loot com raridades, pesos e preço de venda;
+- catálogo de monstros e equipamentos;
+- Goblins e Orcs com níveis variáveis;
+- mini-boss **Senhor da Guerra Orc Nv.15**;
+- armas raras do mini-boss: machado, espada, cajado e arco;
+- venda de equipamentos por ouro;
+- batalhas independentes por jogador no backend;
 - comunicação cliente/servidor com Socket.IO;
-- modo demo da primeira batalha no GitHub Pages;
 - deploy automático do frontend no GitHub Pages.
 
-Em evolução:
+### Dungeons disponíveis
 
-- sistema ATB baseado em `speed`;
-- progressão no servidor;
-- integração completa de inventário e equipamentos;
-- persistência em banco de dados;
-- dungeons, quests e conteúdo multiplayer.
+#### Covil Orc I — Nv. 1 a 5
+
+- Goblins e Orcs aleatórios;
+- nível dos monstros varia entre 1 e 5;
+- atributos, XP e ouro escalam conforme o nível.
+
+#### Covil Orc II — Nv. 5 a 15
+
+- Goblins e Orcs aleatórios entre os níveis 5 e 15;
+- **15% de chance** de encontro com o Senhor da Guerra Orc;
+- quando o mini-boss aparece, ele é sempre **Nv.15**;
+- possui tabela própria de loot com equipamentos incomuns e armas raras.
 
 ## 🧱 Estrutura do projeto
 
 | Pasta | Descrição |
 |---|---|
-| `client/src` | Cliente TypeScript: batalha, UI, páginas, rede, demo e assets |
+| `client/src` | Cliente TypeScript: batalha, UI, páginas, rede, demo, progressão e inventário |
 | `server/src` | Servidor Node.js/Socket.IO e regras autoritativas do jogo |
-| `shared/src` | Tipos, atributos e estruturas compartilhadas entre cliente e servidor |
+| `shared/src` | Tipos, combate, equipamentos, loot e regras compartilhadas |
 | `pages` | Páginas HTML do jogo |
 | `css` | Estilos da interface |
-| `js` | Código legado ainda em migração gradual |
+| `js` | Código legado e integrações da Praça ainda em migração gradual |
 | `img` | Imagens, sprites e recursos visuais |
 | `audio` | Áudios e efeitos sonoros |
 
@@ -60,7 +78,7 @@ Em evolução:
 - TypeScript 6
 - Vite 6
 - Node.js
-- Socket.IO
+- Socket.IO 4
 - HTML5
 - CSS3
 - JavaScript
@@ -102,27 +120,43 @@ URL:
 
 **https://gustavobarretolima.github.io/drakoria/**
 
-No GitHub Pages, a primeira batalha usa uma engine de demonstração executada no próprio navegador. Ela permite testar ataque, defesa, magia, crítico e turno inimigo, mas o progresso é descartado ao recarregar a página.
+No GitHub Pages, as batalhas usam uma engine de demonstração executada no próprio navegador. O estado de progressão, inventário e equipamentos é persistido localmente no navegador para permitir testar o loop atual do jogo.
 
-O GitHub Pages continua hospedando apenas arquivos estáticos. Para multiplayer, persistência e batalhas autoritativas, o backend em `server/src` precisa ser hospedado em um serviço compatível com Node.js e WebSocket/Socket.IO.
+O GitHub Pages continua hospedando apenas arquivos estáticos. Para multiplayer, persistência centralizada e batalhas autoritativas, o backend em `server/src` precisa ser hospedado em um serviço compatível com Node.js e WebSocket/Socket.IO.
 
 ## 🗺️ Roadmap
 
-### Sprint 3 — ATB / Speed
+### Concluído
 
-- transformar `speed` em tempo real de carregamento de ação;
-- controlar ordem de turnos pelo servidor;
-- preparar barras ATB na interface.
+- Battle Rooms isoladas por jogador;
+- sistema de atributos de combate;
+- ATB por velocidade;
+- progressão de nível;
+- loot, inventário e equipamentos;
+- paper doll e status detalhado;
+- dungeons Orc por faixa de nível;
+- mini-boss Nv.15 e loot raro;
+- overlays de vitória e derrota;
+- deploy no GitHub Pages.
 
 ### Próximas etapas
 
-- progressão de XP, nível e ouro no servidor;
-- integração inventário → equipamento → atributos → combate;
-- persistência e banco de dados;
-- sprites genéricos para diferentes monstros;
-- quests e dungeons;
-- economia e marketplace;
-- multiplayer avançado e PvP.
+- adicionar `magicPower` real ao combate e alinhar magia com os bônus dos equipamentos;
+- implementar `dodgeChance` no combate;
+- skills e árvore de habilidades por classe;
+- consumíveis;
+- inventário e propriedade de itens autoritativos no servidor;
+- persistência em banco de dados;
+- mais famílias de monstros, bosses e dungeons;
+- quests mais profundas;
+- economia, marketplace e multiplayer avançado;
+- PvP.
+
+## ⚠️ Estado da arquitetura
+
+A base atual é híbrida: funcionalidades novas estão sendo implementadas principalmente em TypeScript, enquanto partes da Praça e de sistemas antigos ainda utilizam JavaScript legado. A migração está sendo feita gradualmente para evitar reescritas grandes de uma vez.
+
+A versão demo usa `localStorage`, portanto o progresso pode ser alterado manualmente pelo navegador. Persistência segura e propriedade autoritativa de itens ainda fazem parte das próximas etapas do backend.
 
 ## 🧙 Autor
 
