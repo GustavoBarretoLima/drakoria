@@ -7,6 +7,7 @@ import {
   startDemoBattle,
   subscribeDemoBattle,
 } from "./demo/demoBattle.js";
+import { addDropsToInventory } from "./inventory/inventoryClient.js";
 import { awardBattleRewards } from "./progression/progressionClient.js";
 import { renderVictoryRewardOverlay } from "./ui/rewardOverlay.js";
 import type {
@@ -19,10 +20,7 @@ let victoryRedirectScheduled = false;
 let rewardedBattleId: string | null = null;
 
 function normalizeHeroClass(className: string): HeroClass {
-  if (className === "mago" || className === "arqueiro") {
-    return className;
-  }
-
+  if (className === "mago" || className === "arqueiro") return className;
   return "guerreiro";
 }
 
@@ -56,7 +54,17 @@ function applyVictoryRewards(state: BattleState): void {
 
   rewardedBattleId = state.id;
   const result = awardBattleRewards(state.rewards);
-  renderVictoryRewardOverlay(state.rewards, result);
+  const drops = state.rewards.drops ?? [];
+  addDropsToInventory(drops);
+  renderVictoryRewardOverlay(
+    state.rewards,
+    result,
+    drops.map((drop) => ({
+      name: drop.item.name,
+      quantity: drop.quantity,
+      rarity: drop.item.rarity,
+    })),
+  );
 }
 
 function scheduleVictoryRedirect(): void {
@@ -108,7 +116,6 @@ window.addEventListener("DOMContentLoaded", () => {
   if (demoMode) {
     const banner = document.getElementById("demoModeBanner");
     if (banner) banner.hidden = false;
-
     startDemoBattle(getSelectedHeroClass(), getSelectedMonsterId());
   }
 });
