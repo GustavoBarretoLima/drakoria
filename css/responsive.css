@@ -469,3 +469,36 @@ body:has(#batalha) {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Monstros maiores sem alterar os GIFs ou as transformações do combate. */
+#batalha #inimigoBatalha {
+  width: min(100%, clamp(140px, 22vw, 230px));
+  height: auto;
+  max-height: none;
+  object-fit: contain;
+}
+
+/* Todas as animações e níveis do Orc Rei usam a mesma pasta. */
+#batalha #inimigoBatalha[src*="/orc_rei/"] {
+  width: min(100%, clamp(190px, 30vw, 310px));
+}
+
+@media (max-width: 600px) {
+  #batalha #inimigoBatalha {
+    width: min(100%, clamp(110px, 34vw, 160px));
+  }
+
+  #batalha #inimigoBatalha[src*="/orc_rei/"] {
+    width: min(100%, clamp(140px, 44vw, 210px));
+  }
+}
+
+@media (max-height: 700px) and (orientation: landscape) {
+  #batalha #inimigoBatalha {
+    max-height: 140px;
+  }
+
+  #batalha #inimigoBatalha[src*="/orc_rei/"] {
+    max-height: 180px;
+  }
+}
