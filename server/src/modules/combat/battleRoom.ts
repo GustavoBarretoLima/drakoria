@@ -1,4 +1,5 @@
-import { createStatsForLevel } from "../../../../shared/src/combat/classStats.js";
+import { hasMonsterInsight } from "../../../../shared/src/equipment/monsterInsight.js";
+import { createStatsForLevel, normalizeHeroLevel } from "../../../../shared/src/combat/classStats.js";
 import { applyEquipmentStats } from "../../../../shared/src/equipment/equipmentStats.js";
 import { rollMonsterDrops } from "../../../../shared/src/loot/lootTables.js";
 import type {
@@ -51,6 +52,7 @@ export function createInitialBattleState(
       id: "player-1",
       name: "Heroi",
       className: heroClass,
+      level: normalizeHeroLevel(heroLevel),
       stats: applyEquipmentStats(
         createStatsForLevel(heroClass, heroLevel),
         equippedItems,
@@ -86,6 +88,7 @@ export function createInitialBattleState(
       gold: monster.goldReward,
       drops: rollMonsterDrops(monster.id),
     },
+    revealEnemyStats: hasMonsterInsight(equippedItems, heroLevel),
     turnOwnerId: null,
     finished: false,
   };

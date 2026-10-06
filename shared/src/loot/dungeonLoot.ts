@@ -1,3 +1,4 @@
+import { INSIGHT_ACCESSORY } from "../equipment/monsterInsight.js";
 import type { EquipmentDrop, EquipmentItem, EquipmentRarity, EquipmentSlot, EquipmentStats, HeroClass } from "../types/equipment.js";
 
 export const DUNGEON_EQUIPMENT_NAMES: Record<HeroClass, Record<EquipmentSlot, string>> = {
@@ -41,6 +42,8 @@ export const DUNGEON_LOOT_ITEMS: Record<string, EquipmentItem> = Object.fromEntr
     })))),
 );
 
+DUNGEON_LOOT_ITEMS[INSIGHT_ACCESSORY.id] = INSIGHT_ACCESSORY;
+
 interface DropProfile { chance: number; rarities: Array<{ rarity: DungeonRarity; weight: number }> }
 export const DUNGEON_DROP_PROFILES: Record<string, DropProfile> = {
   normal: { chance: 0.35, rarities: [{ rarity: "common", weight: 70 }, { rarity: "uncommon", weight: 25 }, { rarity: "rare", weight: 5 }] },
@@ -69,5 +72,9 @@ export function rollDungeonDrops(monsterId: string): EquipmentDrop[] | undefined
   const slot = DUNGEON_EQUIPMENT_SLOTS[Math.floor(Math.random() * DUNGEON_EQUIPMENT_SLOTS.length)]!;
   const heroClass = CLASSES[Math.floor(Math.random() * CLASSES.length)]!;
   const item = DUNGEON_LOOT_ITEMS[`dungeon-${slot}-${heroClass}-${rarity}-lvl-${level}`]!;
-  return [{ item: { ...item, allowedClasses: [...item.allowedClasses], stats: { ...item.stats } }, quantity: 1 }];
+  const drops: EquipmentDrop[] = [{ item: { ...item, allowedClasses: [...item.allowedClasses], stats: { ...item.stats } }, quantity: 1 }];
+  if (type === "orc-king-boss" && Math.random() < 0.01) {
+    drops.push({ item: { ...INSIGHT_ACCESSORY, allowedClasses: [...INSIGHT_ACCESSORY.allowedClasses], stats: { ...INSIGHT_ACCESSORY.stats }, uniqueEffect: { ...INSIGHT_ACCESSORY.uniqueEffect! } }, quantity: 1 });
+  }
+  return drops;
 }
