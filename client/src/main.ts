@@ -37,6 +37,19 @@ function getSelectedMonsterId(): string {
   return localStorage.getItem("monsterIdAtual") || "goblin-normal-lvl-1";
 }
 
+function getHeroLevel(): number {
+  const saved = localStorage.getItem("drakoriaProgresso");
+  if (!saved) return 1;
+
+  try {
+    const level = Number((JSON.parse(saved) as { nivel?: number }).nivel ?? 1);
+    if (!Number.isFinite(level)) return 1;
+    return Math.min(100, Math.max(1, Math.floor(level)));
+  } catch {
+    return 1;
+  }
+}
+
 function renderAtbPhase(state: BattleState): void {
   const indicator = document.getElementById("indicadorTurno");
   if (!indicator || state.finished) return;
@@ -107,6 +120,7 @@ if (demoMode) {
     socket.emit("player:setup", {
       className: getSelectedHeroClass(),
       monsterId: getSelectedMonsterId(),
+      heroLevel: getHeroLevel(),
       equippedItemIds: getEquippedItems().map((item) => item.id),
     });
   });
@@ -120,6 +134,10 @@ window.addEventListener("DOMContentLoaded", () => {
   if (demoMode) {
     const banner = document.getElementById("demoModeBanner");
     if (banner) banner.hidden = false;
-    startDemoBattle(getSelectedHeroClass(), getSelectedMonsterId());
+    startDemoBattle(
+      getSelectedHeroClass(),
+      getSelectedMonsterId(),
+      getHeroLevel(),
+    );
   }
 });
