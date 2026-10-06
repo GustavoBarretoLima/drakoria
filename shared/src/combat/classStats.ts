@@ -12,6 +12,8 @@ type BaseStats = Pick<
   | "criticalDamage"
 >;
 
+type LevelGrowth = Record<keyof BaseStats, number>;
+
 export const CLASS_STATS: Record<HeroClass, BaseStats> = {
   guerreiro: {
     maxHp: 120,
@@ -45,18 +47,84 @@ export const CLASS_STATS: Record<HeroClass, BaseStats> = {
   },
 };
 
+export const CLASS_LEVEL_GROWTH: Record<HeroClass, LevelGrowth> = {
+  guerreiro: {
+    maxHp: 7,
+    maxMana: 2,
+    attack: 1,
+    defense: 1,
+    magicDefense: 1,
+    speed: 0.2,
+    criticalChance: 0.15,
+    criticalDamage: 0.3,
+  },
+  mago: {
+    maxHp: 4,
+    maxMana: 6,
+    attack: 1,
+    defense: 1,
+    magicDefense: 1,
+    speed: 0.2,
+    criticalChance: 0.2,
+    criticalDamage: 0.4,
+  },
+  arqueiro: {
+    maxHp: 5,
+    maxMana: 3,
+    attack: 1,
+    defense: 1,
+    magicDefense: 1,
+    speed: 0.3,
+    criticalChance: 0.3,
+    criticalDamage: 0.5,
+  },
+};
+
+export function normalizeHeroLevel(level: number): number {
+  if (!Number.isFinite(level)) return 1;
+  return Math.min(100, Math.max(1, Math.floor(level)));
+}
+
 export function createInitialStats(heroClass: HeroClass): Stats {
+  return createStatsForLevel(heroClass, 1);
+}
+
+export function createStatsForLevel(
+  heroClass: HeroClass,
+  level: number,
+): Stats {
   const base = CLASS_STATS[heroClass];
+  const growth = CLASS_LEVEL_GROWTH[heroClass];
+  const levelsGained = normalizeHeroLevel(level) - 1;
+
+  const scaled: BaseStats = {
+    maxHp: Math.floor(base.maxHp + growth.maxHp * levelsGained),
+    maxMana: Math.floor(base.maxMana + growth.maxMana * levelsGained),
+    attack: Math.floor(base.attack + growth.attack * levelsGained),
+    defense: Math.floor(base.defense + growth.defense * levelsGained),
+    magicDefense: Math.floor(
+      base.magicDefense + growth.magicDefense * levelsGained,
+    ),
+    speed: Math.floor(base.speed + growth.speed * levelsGained),
+    criticalChance: Math.min(
+      50,
+      Math.floor(base.criticalChance + growth.criticalChance * levelsGained),
+    ),
+    criticalDamage: Math.floor(
+      base.criticalDamage + growth.criticalDamage * levelsGained,
+    ),
+  };
+
   return {
-    hp: base.maxHp,
-    maxHp: base.maxHp,
-    mana: base.maxMana,
-    maxMana: base.maxMana,
-    attack: base.attack,
-    defense: base.defense,
-    magicDefense: base.magicDefense,
-    speed: base.speed,
-    criticalChance: base.criticalChance,
-    criticalDamage: base.criticalDamage,
+    hp: scaled.maxHp,
+    maxHp: scaled.maxHp,
+    mana: scaled.maxMana,
+    maxMana: scaled.maxMana,
+    attack: scaled.attack,
+    defense: scaled.defense,
+    magicDefense: scaled.magicDefense,
+    speed: scaled.speed,
+    criticalChance: scaled.criticalChance,
+    criticalDamage: scaled.criticalDamage,
   };
 }

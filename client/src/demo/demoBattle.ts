@@ -1,4 +1,4 @@
-import { createInitialStats } from "../../../shared/src/combat/classStats.js";
+import { createStatsForLevel } from "../../../shared/src/combat/classStats.js";
 import {
   advanceBattleAtb,
   ATB_TICK_MS,
@@ -66,11 +66,12 @@ function startAtbLoop(expectedBattleId: string): void {
 export function startDemoBattle(
   heroClass: HeroClass,
   monsterId = "goblin-normal-lvl-1",
+  heroLevel = 1,
 ): void {
   stopAtbLoop();
   const baseRewards = getDemoMonsterRewards(monsterId);
   const heroStats = applyEquipmentStats(
-    createInitialStats(heroClass),
+    createStatsForLevel(heroClass, heroLevel),
     getEquippedItems(),
   );
 

@@ -1,4 +1,4 @@
-import { createInitialStats } from "../../../../shared/src/combat/classStats.js";
+import { createStatsForLevel } from "../../../../shared/src/combat/classStats.js";
 import { applyEquipmentStats } from "../../../../shared/src/equipment/equipmentStats.js";
 import { rollMonsterDrops } from "../../../../shared/src/loot/lootTables.js";
 import type {
@@ -39,6 +39,7 @@ export function createInitialBattleState(
   heroClass: HeroClass = "guerreiro",
   monsterId = "goblin-normal-lvl-1",
   equippedItems: EquipmentItem[] = [],
+  heroLevel = 1,
 ): BattleState {
   const monster = getMonsterById(monsterId);
 
@@ -50,7 +51,10 @@ export function createInitialBattleState(
       id: "player-1",
       name: "Heroi",
       className: heroClass,
-      stats: applyEquipmentStats(createInitialStats(heroClass), equippedItems),
+      stats: applyEquipmentStats(
+        createStatsForLevel(heroClass, heroLevel),
+        equippedItems,
+      ),
       atb: 0,
       defending: false,
       isAlive: true,
