@@ -1,5 +1,6 @@
 import socket from "./network/socket.js";
 import { renderBattle } from "./battle/battleRenderer.js";
+import { setEnemyGifs } from "./assets/gifs.js";
 import { setupBattlePage } from "./pages/battlePage.js";
 import {
   isPagesDemoMode,
@@ -43,6 +44,7 @@ function renderAtbPhase(state: BattleState): void {
 
 function renderState(state: BattleState): void {
   console.log("Novo estado da batalha:", state);
+  setEnemyGifs(state.enemy.sprites);
   renderBattle(state);
   renderAtbPhase(state);
 

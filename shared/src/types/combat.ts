@@ -1,3 +1,5 @@
+import type { MonsterSpriteSet } from "./monster.js";
+
 export type HeroClass = "guerreiro" | "mago" | "arqueiro";
 
 export interface Stats {
@@ -17,6 +19,7 @@ export interface CombatantState {
   id: string;
   name: string;
   className?: HeroClass;
+  sprites?: MonsterSpriteSet;
   stats: Stats;
   atb: number;
   defending: boolean;

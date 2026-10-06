@@ -1,3 +1,5 @@
+import type { MonsterSpriteSet } from "../../../shared/src/types/monster.js";
+
 function assetPath(path: string): string {
   const normalizedPath = path.replace(/^\/+/, "");
   return `${import.meta.env.BASE_URL}${normalizedPath}`;
@@ -59,4 +61,13 @@ export const gifsGoblin = {
   atk: assetPath("img/monstros/goblin-ataque.gif"),
   damage: assetPath("img/monstros/goblin-dano.gif"),
   morte: assetPath("img/monstros/goblin-dano.gif"),
-} as const;
+};
+
+export function setEnemyGifs(sprites?: MonsterSpriteSet): void {
+  if (!sprites) return;
+
+  gifsGoblin.padrao = assetPath(sprites.idle);
+  gifsGoblin.atk = assetPath(sprites.attack);
+  gifsGoblin.damage = assetPath(sprites.damage);
+  gifsGoblin.morte = assetPath(sprites.death ?? sprites.damage);
+}

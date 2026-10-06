@@ -3,9 +3,30 @@ import type {
   BattleState,
   HeroClass,
 } from "../../../../shared/src/types/combat.js";
+import type { MonsterFamily } from "../../../../shared/src/types/monster.js";
 import { getMonsterById } from "../monsters/monsterService.js";
 
-const DEFAULT_MONSTER_SPEED = 10;
+const MONSTER_SPEED_BY_FAMILY: Record<MonsterFamily, number> = {
+  goblin: 12,
+  orc: 8,
+  undead: 9,
+  beast: 14,
+  demon: 11,
+  dragon: 10,
+  elemental: 10,
+  slime: 7,
+  spider: 13,
+  troll: 6,
+  construct: 5,
+  cultist: 10,
+  reptile: 11,
+  plant: 7,
+  spirit: 13,
+  insect: 8,
+  aquatic: 12,
+  giant: 5,
+  void: 12,
+};
 
 function getMonsterMagicDefense(defense: number, magicPower: number): number {
   return Math.max(0, Math.floor((defense + magicPower) / 2));
@@ -35,6 +56,7 @@ export function createInitialBattleState(
     enemy: {
       id: monster.id,
       name: monster.name,
+      sprites: monster.sprites,
       stats: {
         hp: monster.stats.hp,
         maxHp: monster.stats.maxHp,
@@ -48,7 +70,7 @@ export function createInitialBattleState(
             monster.stats.defense,
             monster.stats.magicPower,
           ),
-        speed: DEFAULT_MONSTER_SPEED,
+        speed: MONSTER_SPEED_BY_FAMILY[monster.family],
         criticalChance: monster.stats.criticalChance,
         criticalDamage: monster.stats.criticalDamage,
       },
