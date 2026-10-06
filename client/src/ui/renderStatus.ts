@@ -48,24 +48,17 @@ export function renderStatus(state: BattleState) {
 
   const heroDefense = document.getElementById("defesaHeroi");
   const heroMagicDefense = document.getElementById("defesaMagicaHeroi");
+  const heroSpeed = document.getElementById("velocidadeHeroi");
   const enemyDefense = document.getElementById("defesaInimigo");
   const enemyMagicDefense = document.getElementById("defesaMagicaInimigo");
+  const enemySpeed = document.getElementById("velocidadeInimigo");
 
-  if (heroDefense) {
-    heroDefense.textContent = String(state.hero.stats.defense);
-  }
-
-  if (heroMagicDefense) {
-    heroMagicDefense.textContent = String(state.hero.stats.magicDefense);
-  }
-
-  if (enemyDefense) {
-    enemyDefense.textContent = String(state.enemy.stats.defense);
-  }
-
-  if (enemyMagicDefense) {
-    enemyMagicDefense.textContent = String(state.enemy.stats.magicDefense);
-  }
+  if (heroDefense) heroDefense.textContent = String(state.hero.stats.defense);
+  if (heroMagicDefense) heroMagicDefense.textContent = String(state.hero.stats.magicDefense);
+  if (heroSpeed) heroSpeed.textContent = String(state.hero.stats.speed);
+  if (enemyDefense) enemyDefense.textContent = String(state.enemy.stats.defense);
+  if (enemyMagicDefense) enemyMagicDefense.textContent = String(state.enemy.stats.magicDefense);
+  if (enemySpeed) enemySpeed.textContent = String(state.enemy.stats.speed);
 
   const heroName = document.getElementById("nomeHeroi");
   const heroClass = document.getElementById("classeHeroi");
