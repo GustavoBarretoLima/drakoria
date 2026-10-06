@@ -7,7 +7,10 @@ import {
   startDemoBattle,
   subscribeDemoBattle,
 } from "./demo/demoBattle.js";
-import { addDropsToInventory } from "./inventory/inventoryClient.js";
+import {
+  addDropsToInventory,
+  getEquippedItems,
+} from "./inventory/inventoryClient.js";
 import { awardBattleRewards } from "./progression/progressionClient.js";
 import { renderVictoryRewardOverlay } from "./ui/rewardOverlay.js";
 import type {
@@ -104,6 +107,7 @@ if (demoMode) {
     socket.emit("player:setup", {
       className: getSelectedHeroClass(),
       monsterId: getSelectedMonsterId(),
+      equippedItemIds: getEquippedItems().map((item) => item.id),
     });
   });
 
