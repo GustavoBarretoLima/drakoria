@@ -21,22 +21,22 @@ const STATUS_LEVEL_BASE = {
 
 const STATUS_LEVEL_GROWTH = {
   guerreiro: {
-    attack: 1.1,
-    defense: 0.9,
-    magicDefense: 0.45,
-    speed: 0.16,
+    attack: 1,
+    defense: 1,
+    magicDefense: 1,
+    speed: 0.2,
   },
   mago: {
-    attack: 1.25,
-    defense: 0.45,
-    magicDefense: 0.9,
-    speed: 0.18,
+    attack: 1,
+    defense: 1,
+    magicDefense: 1,
+    speed: 0.2,
   },
   arqueiro: {
     attack: 1,
-    defense: 0.6,
-    magicDefense: 0.6,
-    speed: 0.28,
+    defense: 1,
+    magicDefense: 1,
+    speed: 0.3,
   },
 };
 
@@ -86,8 +86,7 @@ function calcularStatusPorNivel(classe, nivel, inventario) {
     speed: Math.floor(base.speed + growth.speed * levelsGained),
   };
 
-  for (const [slot, itemId] of Object.entries(inventario.equipped)) {
-    void slot;
+  for (const itemId of Object.values(inventario.equipped)) {
     const entry = inventario.items.find((candidate) => candidate.item.id === itemId);
     if (!entry) continue;
 
@@ -143,7 +142,7 @@ function abrirStatusComProgressao() {
       <div><span>EXP</span><strong>${progresso.xp}/${progresso.xpParaProximoNivel}</strong></div>
       <div><span>Ouro</span><strong>${progresso.ouro}</strong></div>
     </div>
-    <p class="inventory-help">Seus atributos base crescem levemente a cada nível e depois recebem os bônus dos equipamentos.</p>
+    <p class="inventory-help">Ataque, DEF, DEF M, HP e Mana crescem a cada nível. Speed e crítico sobem em um ritmo mais lento.</p>
     <h3 class="section-title">Atributos</h3>
     <div class="status-stats-grid">
       <div class="status-stat"><span>Ataque</span><strong>${stats.attack}</strong></div>
