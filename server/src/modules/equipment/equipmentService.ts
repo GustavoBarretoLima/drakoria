@@ -1,3 +1,4 @@
+import { DUNGEON_LOOT_ITEMS } from "../../../../shared/src/loot/dungeonLoot.js";
 import type {
   EquipmentItem,
   EquipmentRarity,
@@ -6,7 +7,7 @@ import type {
 } from "../../../../shared/src/types/equipment.js";
 import { generateEquipmentCatalog } from "../../../../shared/src/types/equipmentGenerator.js";
 
-const EQUIPMENT_CATALOG = generateEquipmentCatalog();
+const EQUIPMENT_CATALOG = [...Object.values(DUNGEON_LOOT_ITEMS), ...generateEquipmentCatalog()];
 
 export interface EquipmentFilters {
   level?: number;
