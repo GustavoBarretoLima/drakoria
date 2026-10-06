@@ -1,0 +1,59 @@
+.dungeon-tier-list {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.dungeon-tier-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid rgba(255, 211, 106, 0.22);
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.dungeon-tier-card h3 {
+  margin: 4px 0 6px;
+  color: #f7e6bc;
+}
+
+.dungeon-tier-card p {
+  margin: 0;
+  color: #c7b898;
+  line-height: 1.45;
+}
+
+.dungeon-tier-card small {
+  display: block;
+  margin-top: 7px;
+  color: #d89a43;
+}
+
+.dungeon-tier-card > button {
+  flex: 0 0 auto;
+  min-width: 108px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 211, 106, 0.4);
+  border-radius: 8px;
+  background: rgba(255, 180, 80, 0.12);
+  color: #ffe5aa;
+  cursor: pointer;
+}
+
+.dungeon-tier-card > button:hover {
+  background: rgba(255, 180, 80, 0.22);
+}
+
+@media (max-width: 560px) {
+  .dungeon-tier-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .dungeon-tier-card > button {
+    width: 100%;
+  }
+}

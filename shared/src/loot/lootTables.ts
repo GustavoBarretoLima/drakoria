@@ -67,11 +67,35 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     description: "Uma arma rara tomada de um líder orc.",
     slot: "weapon",
     rarity: "rare",
-    level: 2,
+    level: 10,
     allowedClasses: ["guerreiro"],
-    stats: { attack: 14, criticalDamage: 10 },
+    stats: { attack: 18, criticalDamage: 12 },
     icon: "/img/itens/weapon.png",
-    sellPrice: 55,
+    sellPrice: 75,
+  },
+  "orc-warlord-sword": {
+    id: "orc-warlord-sword",
+    name: "Espada do Senhor da Guerra",
+    description: "Uma lâmina rara, pesada e marcada pelas campanhas do Senhor da Guerra.",
+    slot: "weapon",
+    rarity: "rare",
+    level: 10,
+    allowedClasses: ["guerreiro", "arqueiro"],
+    stats: { attack: 15, criticalChance: 4, criticalDamage: 8 },
+    icon: "/img/itens/weapon.png",
+    sellPrice: 72,
+  },
+  "orc-warlord-staff": {
+    id: "orc-warlord-staff",
+    name: "Cajado Rúnico do Senhor da Guerra",
+    description: "Um cajado raro saqueado pelos orcs e reforçado com runas de guerra.",
+    slot: "weapon",
+    rarity: "rare",
+    level: 10,
+    allowedClasses: ["mago"],
+    stats: { attack: 12, mana: 24, criticalChance: 4 },
+    icon: "/img/itens/weapon.png",
+    sellPrice: 78,
   },
   "orc-warlord-chest": {
     id: "orc-warlord-chest",
@@ -79,11 +103,47 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     description: "Armadura reforçada usada pela elite orc.",
     slot: "armor",
     rarity: "rare",
-    level: 2,
+    level: 10,
     allowedClasses: ["guerreiro", "arqueiro"],
-    stats: { defense: 10, hp: 40 },
+    stats: { defense: 12, hp: 55 },
     icon: "/img/itens/armor.png",
-    sellPrice: 60,
+    sellPrice: 70,
+  },
+  "orc-warlord-shield": {
+    id: "orc-warlord-shield",
+    name: "Escudo de Guerra Orc",
+    description: "Um escudo grosso de ferro batido usado pela guarda pessoal do comandante.",
+    slot: "shield",
+    rarity: "uncommon",
+    level: 8,
+    allowedClasses: ["guerreiro"],
+    stats: { defense: 9, hp: 30 },
+    icon: "/img/itens/shield.png",
+    sellPrice: 42,
+  },
+  "orc-warlord-ring": {
+    id: "orc-warlord-ring",
+    name: "Anel de Comando Orc",
+    description: "Um anel de patente tomado de um oficial do clã.",
+    slot: "ring",
+    rarity: "uncommon",
+    level: 8,
+    allowedClasses: ["universal"],
+    stats: { criticalChance: 2, hp: 18, mana: 8 },
+    icon: "/img/itens/ring.png",
+    sellPrice: 40,
+  },
+  "orc-warlord-gloves": {
+    id: "orc-warlord-gloves",
+    name: "Manoplas do Clã Orc",
+    description: "Manoplas reforçadas com rebites e couro espesso.",
+    slot: "gloves",
+    rarity: "uncommon",
+    level: 8,
+    allowedClasses: ["universal"],
+    stats: { defense: 5, attack: 3 },
+    icon: "/img/itens/gloves.png",
+    sellPrice: 38,
   },
 };
 
@@ -109,26 +169,30 @@ const LOOT_TABLES: Record<string, MonsterLootTable> = {
   orc: {
     dropChance: 0.24,
     entries: [
-      { itemId: "orc-iron-axe", weight: 48 },
-      { itemId: "orc-iron-chest", weight: 47 },
-      { itemId: "orc-warlord-axe", weight: 3 },
-      { itemId: "orc-warlord-chest", weight: 2 },
+      { itemId: "orc-iron-axe", weight: 51 },
+      { itemId: "orc-iron-chest", weight: 49 },
     ],
   },
-  "orc-warlord-mini-boss-lvl-1": {
-    dropChance: 0.65,
+  "orc-warlord-mini-boss": {
+    dropChance: 0.72,
     entries: [
-      { itemId: "orc-iron-axe", weight: 25 },
-      { itemId: "orc-iron-chest", weight: 25 },
-      { itemId: "orc-warlord-axe", weight: 25 },
-      { itemId: "orc-warlord-chest", weight: 25 },
+      { itemId: "orc-warlord-axe", weight: 10 },
+      { itemId: "orc-warlord-sword", weight: 10 },
+      { itemId: "orc-warlord-staff", weight: 10 },
+      { itemId: "orc-warlord-chest", weight: 15 },
+      { itemId: "orc-warlord-shield", weight: 20 },
+      { itemId: "orc-warlord-ring", weight: 20 },
+      { itemId: "orc-warlord-gloves", weight: 15 },
     ],
   },
 };
 
 export function rollMonsterDrops(monsterId: string): EquipmentDrop[] {
   const family = monsterId.split("-")[0] ?? "";
-  const table = LOOT_TABLES[monsterId] ?? LOOT_TABLES[family];
+  const miniBossTable = monsterId.startsWith("orc-warlord-mini-boss-lvl-")
+    ? LOOT_TABLES["orc-warlord-mini-boss"]
+    : undefined;
+  const table = miniBossTable ?? LOOT_TABLES[monsterId] ?? LOOT_TABLES[family];
   if (!table || table.entries.length === 0) return [];
   if (Math.random() >= table.dropChance) return [];
 

@@ -17,36 +17,93 @@ const MONSTER_SPRITE_OVERRIDES: Partial<
   },
 };
 
-const ORC_WARLORD_MINI_BOSS: MonsterDefinition = {
-  id: "orc-warlord-mini-boss-lvl-1",
-  name: "Senhor da Guerra Orc Nv.1",
-  description: "Um comandante orc mais resistente, agressivo e bem equipado.",
-  family: "orc",
-  rank: "elite",
-  element: "physical",
-  level: 1,
-  stats: {
-    hp: 155,
-    maxHp: 155,
-    mana: 0,
-    maxMana: 0,
-    attack: 18,
-    defense: 9,
-    magicDefense: 5,
-    magicPower: 0,
-    criticalChance: 8,
-    criticalDamage: 70,
-  },
-  xpReward: 35,
-  goldReward: 20,
-  sprites: {
-    idle: "/img/monstros/orc-idle.png",
-    attack: "/img/monstros/orc-attack.png",
-    damage: "/img/monstros/orc-damage.png",
-    death: "/img/monstros/orc-death.png",
-  },
-  skills: [],
+const GOBLIN_SPRITES: MonsterSpriteSet = {
+  idle: "/img/monstros/goblin.gif",
+  attack: "/img/monstros/goblin-ataque.gif",
+  damage: "/img/monstros/goblin-dano.gif",
+  death: "/img/monstros/goblin-dano.gif",
 };
+
+const ORC_SPRITES: MonsterSpriteSet = {
+  idle: "/img/monstros/orc-idle.png",
+  attack: "/img/monstros/orc-attack.png",
+  damage: "/img/monstros/orc-damage.png",
+  death: "/img/monstros/orc-death.png",
+};
+
+function getEarlyDungeonMultiplier(level: number): number {
+  return 1 + (Math.max(1, level) - 1) * 0.08;
+}
+
+function createEarlyDungeonMonster(
+  family: "goblin" | "orc",
+  level: number,
+): MonsterDefinition {
+  const multiplier = getEarlyDungeonMultiplier(level);
+  const isGoblin = family === "goblin";
+  const baseHp = isGoblin ? 60 : 95;
+  const baseAttack = isGoblin ? 8 : 14;
+  const baseDefense = isGoblin ? 3 : 6;
+  const criticalChance = isGoblin ? 5 : 6;
+  const criticalDamage = isGoblin ? 50 : 60;
+
+  return {
+    id: `${family}-normal-lvl-${level}`,
+    name: `${isGoblin ? "Goblin" : "Orc"} Nv.${level}`,
+    description: isGoblin
+      ? "Criatura traiçoeira, rápida e comum nas estradas de Drakoria."
+      : "Guerreiro brutal que usa força bruta para esmagar inimigos.",
+    family,
+    rank: "normal",
+    element: "physical",
+    level,
+    stats: {
+      hp: Math.floor(baseHp * multiplier),
+      maxHp: Math.floor(baseHp * multiplier),
+      mana: 0,
+      maxMana: 0,
+      attack: Math.floor(baseAttack * multiplier),
+      defense: Math.floor(baseDefense * multiplier),
+      magicPower: 0,
+      criticalChance,
+      criticalDamage,
+    },
+    xpReward: Math.max(1, Math.floor(15 * multiplier)),
+    goldReward: Math.max(1, Math.floor(8 * multiplier)),
+    sprites: isGoblin ? GOBLIN_SPRITES : ORC_SPRITES,
+    skills: [],
+  };
+}
+
+function createOrcWarlordMiniBoss(level: number): MonsterDefinition {
+  const multiplier = getEarlyDungeonMultiplier(level);
+
+  return {
+    id: `orc-warlord-mini-boss-lvl-${level}`,
+    name: `Senhor da Guerra Orc Nv.${level}`,
+    description: "Um comandante orc mais resistente, agressivo e bem equipado.",
+    family: "orc",
+    rank: "elite",
+    element: "physical",
+    level,
+    stats: {
+      hp: Math.floor(155 * multiplier),
+      maxHp: Math.floor(155 * multiplier),
+      mana: 0,
+      maxMana: 0,
+      attack: Math.floor(18 * multiplier),
+      defense: Math.floor(9 * multiplier),
+      magicDefense: Math.floor(5 * multiplier),
+      magicPower: 0,
+      criticalChance: 8,
+      criticalDamage: 70,
+    },
+    xpReward: Math.max(1, Math.floor(35 * multiplier)),
+    goldReward: Math.max(1, Math.floor(20 * multiplier)),
+    sprites: ORC_SPRITES,
+    skills: [],
+  };
+}
 
 function applySpriteOverrides(monster: MonsterDefinition): MonsterDefinition {
   const sprites = MONSTER_SPRITE_OVERRIDES[monster.family];
@@ -59,9 +116,30 @@ function applySpriteOverrides(monster: MonsterDefinition): MonsterDefinition {
   };
 }
 
+const EARLY_DUNGEON_MONSTERS = Array.from({ length: 14 }, (_, index) => index + 2)
+  .flatMap((level) => [
+    createEarlyDungeonMonster("goblin", level),
+    createEarlyDungeonMonster("orc", level),
+  ]);
+
+const ORC_WARLORD_MINI_BOSSES = [1, 15].map(createOrcWarlordMiniBoss);
+
+const GENERATED_CATALOG = generateMonsterCatalog()
+  .map(applySpriteOverrides)
+  .filter(
+    (monster) =>
+      !(
+        monster.rank === "normal" &&
+        (monster.family === "goblin" || monster.family === "orc") &&
+        monster.level >= 2 &&
+        monster.level <= 15
+      ),
+  );
+
 const MONSTER_CATALOG = [
-  ...generateMonsterCatalog().map(applySpriteOverrides),
-  ORC_WARLORD_MINI_BOSS,
+  ...EARLY_DUNGEON_MONSTERS,
+  ...ORC_WARLORD_MINI_BOSSES,
+  ...GENERATED_CATALOG,
 ];
 
 export interface MonsterFilters {
