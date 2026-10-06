@@ -169,10 +169,8 @@ const LOOT_TABLES: Record<string, MonsterLootTable> = {
   orc: {
     dropChance: 0.24,
     entries: [
-      { itemId: "orc-iron-axe", weight: 48 },
-      { itemId: "orc-iron-chest", weight: 47 },
-      { itemId: "orc-warlord-axe", weight: 3 },
-      { itemId: "orc-warlord-chest", weight: 2 },
+      { itemId: "orc-iron-axe", weight: 51 },
+      { itemId: "orc-iron-chest", weight: 49 },
     ],
   },
   "orc-warlord-mini-boss": {
