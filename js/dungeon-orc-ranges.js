@@ -1,20 +1,4 @@
-const DUNGEON_ORC_CONFIG = {
-  iniciante: { id: "dungeon-orc-1-10", label: "Covil dos Goblins e Orcs", minLevel: 1, maxLevel: 10, monsters: ["goblin", "orc"], description: "Goblins e Orcs em encontros de níveis 1 a 10." },
-  cripta: { id: "dungeon-mutants", label: "Cripta dos Mutantes", minLevel: 1, maxLevel: 10, monsters: ["skeleton-warrior", "mutant-rat"], description: "Esqueletos Guerreiros e Ratos Mutantes em encontros de níveis 1 a 10." },
-  avancada: { id: "dungeon-hobgoblin", label: "Acampamento Hobgoblin", minLevel: 10, maxLevel: 15, monsters: ["hobgoblin"], eliteChance: 0.20, description: "Hobgoblins de níveis 10 a 15. Chance de elite: 20%; mais forte, com drops raros e épicos." },
-  fortaleza: { id: "dungeon-orc-king", label: "Trono do Orc Rei", minLevel: 15, maxLevel: 25, monsters: ["orc-king"], rank: "boss", description: "Orc Rei de níveis 15 a 25. Um equipamento elite garantido: raro (40%) ou épico (60%)." },
-};
-
-function dungeonOrcRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function dungeonOrcPickMonster(config) {
-  const type = config.monsters[dungeonOrcRandomInt(0, config.monsters.length - 1)];
-  const level = dungeonOrcRandomInt(config.minLevel, config.maxLevel);
-  const rank = config.rank || (config.eliteChance && Math.random() < config.eliteChance ? "elite" : "normal");
-  return { monsterId: `${type}-${rank}-lvl-${level}`, type: rank === "normal" ? type : rank, level };
-}
+import { DUNGEON_CONFIG as DUNGEON_ORC_CONFIG, pickDungeonEncounter as dungeonOrcPickMonster } from "../shared/src/dungeons/dungeonEncounters.ts";
 
 function dungeonOrcStart(config) {
   const encounter = dungeonOrcPickMonster(config);
