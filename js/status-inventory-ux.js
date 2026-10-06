@@ -35,6 +35,9 @@ const INVENTORY_UX_STAT_LABELS = {
   speed: "Speed",
 };
 
+let paperTooltipPortal = null;
+let paperTooltipActiveSlot = null;
+
 function inventoryUxEscape(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -142,6 +145,8 @@ function inventoryUxOpen() {
   const panel = document.getElementById("painelPraca");
   if (!panel) return;
 
+  hidePaperTooltipPortal();
+
   const inventory = inventoryUxLoad();
   const equipped = inventoryUxEquippedEntries(inventory);
   const itemSlots = Array.from({ length: INVENTORY_UX_SLOTS }, (_, index) =>
@@ -212,51 +217,118 @@ function inventoryUxSell(itemId) {
   inventoryUxOpen();
 }
 
-function positionPaperTooltip(slot) {
-  const tooltip = slot.querySelector(".paper-tooltip");
-  if (!tooltip) return;
+function ensurePaperTooltipPortal() {
+  if (paperTooltipPortal?.isConnected) return paperTooltipPortal;
 
+  paperTooltipPortal = document.createElement("div");
+  paperTooltipPortal.id = "paperTooltipPortal";
+  paperTooltipPortal.className = "paper-tooltip paper-tooltip-portal";
+  paperTooltipPortal.setAttribute("role", "tooltip");
+  paperTooltipPortal.setAttribute("aria-hidden", "true");
+  document.body.appendChild(paperTooltipPortal);
+  return paperTooltipPortal;
+}
+
+function getPaperTooltipRarityClass(slot) {
+  return Array.from(slot.classList).find((className) =>
+    className.startsWith("paper-rarity-"),
+  );
+}
+
+function positionPaperTooltipPortal(slot) {
+  const portal = ensurePaperTooltipPortal();
   const slotRect = slot.getBoundingClientRect();
   const margin = 12;
   const gap = 10;
-  const tooltipWidth = Math.min(280, window.innerWidth - margin * 2);
+  const tooltipWidth = Math.min(300, window.innerWidth - margin * 2);
 
-  tooltip.style.setProperty("--paper-tooltip-left", `${margin}px`);
-  tooltip.style.setProperty("--paper-tooltip-top", `${margin}px`);
+  portal.style.width = `${tooltipWidth}px`;
+  portal.style.maxHeight = `${Math.min(420, window.innerHeight - margin * 2)}px`;
 
-  const tooltipHeight = Math.min(tooltip.scrollHeight || 320, window.innerHeight * 0.7, 420);
+  const portalRect = portal.getBoundingClientRect();
+  const tooltipHeight = Math.min(portalRect.height || portal.scrollHeight || 320, window.innerHeight - margin * 2);
+
   let left = slotRect.right + gap;
   if (left + tooltipWidth > window.innerWidth - margin) {
     left = slotRect.left - tooltipWidth - gap;
   }
   if (left < margin) {
-    left = Math.max(margin, (window.innerWidth - tooltipWidth) / 2);
+    left = Math.max(margin, Math.min(slotRect.left, window.innerWidth - tooltipWidth - margin));
   }
 
-  let top = slotRect.top;
-  if (top + tooltipHeight > window.innerHeight - margin) {
-    top = window.innerHeight - tooltipHeight - margin;
-  }
-  top = Math.max(margin, top);
+  let top = slotRect.top + slotRect.height / 2 - tooltipHeight / 2;
+  top = Math.max(margin, Math.min(top, window.innerHeight - tooltipHeight - margin));
 
-  tooltip.style.setProperty("--paper-tooltip-left", `${Math.round(left)}px`);
-  tooltip.style.setProperty("--paper-tooltip-top", `${Math.round(top)}px`);
+  portal.style.left = `${Math.round(left)}px`;
+  portal.style.top = `${Math.round(top)}px`;
+}
+
+function showPaperTooltipPortal(slot) {
+  const source = slot.querySelector(".paper-tooltip");
+  if (!source) return;
+
+  const portal = ensurePaperTooltipPortal();
+  const rarityClass = getPaperTooltipRarityClass(slot);
+
+  portal.className = "paper-tooltip paper-tooltip-portal";
+  if (rarityClass) portal.classList.add(rarityClass);
+  portal.innerHTML = source.innerHTML;
+  portal.classList.add("is-visible");
+  portal.setAttribute("aria-hidden", "false");
+  paperTooltipActiveSlot = slot;
+
+  positionPaperTooltipPortal(slot);
+}
+
+function hidePaperTooltipPortal() {
+  if (!paperTooltipPortal) return;
+  paperTooltipPortal.classList.remove("is-visible");
+  paperTooltipPortal.setAttribute("aria-hidden", "true");
+  paperTooltipActiveSlot = null;
 }
 
 document.addEventListener("mouseover", (event) => {
   const slot = event.target.closest?.(".paper-slot-filled");
-  if (slot) positionPaperTooltip(slot);
+  if (!slot || slot === paperTooltipActiveSlot) return;
+  showPaperTooltipPortal(slot);
+});
+
+document.addEventListener("mouseout", (event) => {
+  const slot = event.target.closest?.(".paper-slot-filled");
+  if (!slot) return;
+  if (event.relatedTarget && slot.contains(event.relatedTarget)) return;
+  if (slot === paperTooltipActiveSlot && !slot.matches(":focus-within")) {
+    hidePaperTooltipPortal();
+  }
 });
 
 document.addEventListener("focusin", (event) => {
   const slot = event.target.closest?.(".paper-slot-filled");
-  if (slot) positionPaperTooltip(slot);
+  if (slot) showPaperTooltipPortal(slot);
+});
+
+document.addEventListener("focusout", (event) => {
+  const slot = event.target.closest?.(".paper-slot-filled");
+  if (!slot) return;
+  if (event.relatedTarget && slot.contains(event.relatedTarget)) return;
+  if (slot === paperTooltipActiveSlot && !slot.matches(":hover")) {
+    hidePaperTooltipPortal();
+  }
 });
 
 window.addEventListener("resize", () => {
-  const active = document.querySelector(".paper-slot-filled:hover, .paper-slot-filled:focus-within");
-  if (active) positionPaperTooltip(active);
+  if (paperTooltipActiveSlot?.isConnected) {
+    positionPaperTooltipPortal(paperTooltipActiveSlot);
+  } else {
+    hidePaperTooltipPortal();
+  }
 });
+
+window.addEventListener("scroll", () => {
+  if (paperTooltipActiveSlot?.isConnected) {
+    positionPaperTooltipPortal(paperTooltipActiveSlot);
+  }
+}, true);
 
 window.abrirInventario = inventoryUxOpen;
 window.equiparItemInventario = inventoryUxEquip;
