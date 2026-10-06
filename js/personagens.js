@@ -84,9 +84,9 @@ function selecionarPersonagem(classe) {
   // Definir imagem/gif correto conforme gênero
   const isFeminino = generoSelecionado.toLowerCase() === "feminino";
   const imagens = {
-    guerreiro: isFeminino ? "guerreira.gif" : "guerreiro.gif",
-    mago: isFeminino ? "maga.gif" : "mago.gif",
-    arqueiro: isFeminino ? "arqueira.gif" : "arqueiro.gif",
+    guerreiro: isFeminino ? "../img/personagens/guerreira_anime/idle.gif" : "../img/personagens/heroi_anime/idle.gif",
+    mago: isFeminino ? "../img/personagens/maga_anime/idle.gif" : "../img/personagens/mago_anime/idle.gif",
+    arqueiro: isFeminino ? "../img/personagens/elfa_anime/idle.gif" : "../img/personagens/elfo_anime/idle.gif",
   };
 
   const imagemHeroi = imagens[classeBase];

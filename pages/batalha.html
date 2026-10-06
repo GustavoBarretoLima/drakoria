@@ -132,7 +132,16 @@
       const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
       const classeHeroiTexto =
         localStorage.getItem("classeHeroiTexto") || "Classe";
-      const imagemHeroi = localStorage.getItem("imagemHeroi");
+      const pastasHeroi = {
+        guerreiro: { masculino: "heroi_anime", feminino: "guerreira_anime" },
+        mago: { masculino: "mago_anime", feminino: "maga_anime" },
+        arqueiro: { masculino: "elfo_anime", feminino: "elfa_anime" },
+      };
+      const classe = (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase();
+      const genero = (localStorage.getItem("generoHeroi") || "masculino").toLowerCase();
+      const pasta = pastasHeroi[classe]?.[genero] || "heroi_anime";
+      const imagemHeroi = `../img/personagens/${pasta}/idle.gif`;
+      localStorage.setItem("imagemHeroi", imagemHeroi);
 
       if (imagemHeroi) {
         document.getElementById("heroiBatalha").src = imagemHeroi;
