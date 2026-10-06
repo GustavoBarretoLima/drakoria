@@ -2,10 +2,33 @@ import type {
   MonsterDefinition,
   MonsterFamily,
   MonsterRank,
+  MonsterSpriteSet,
 } from "../../../../shared/src/types/monster.js";
 import { generateMonsterCatalog } from "./monsterGenerator.js";
 
-const MONSTER_CATALOG = generateMonsterCatalog();
+const MONSTER_SPRITE_OVERRIDES: Partial<
+  Record<MonsterFamily, MonsterSpriteSet>
+> = {
+  orc: {
+    idle: "/img/monstros/orc-idle.png",
+    attack: "/img/monstros/orc-attack.png",
+    damage: "/img/monstros/orc-damage.png",
+    death: "/img/monstros/orc-death.png",
+  },
+};
+
+function applySpriteOverrides(monster: MonsterDefinition): MonsterDefinition {
+  const sprites = MONSTER_SPRITE_OVERRIDES[monster.family];
+
+  if (!sprites) return monster;
+
+  return {
+    ...monster,
+    sprites,
+  };
+}
+
+const MONSTER_CATALOG = generateMonsterCatalog().map(applySpriteOverrides);
 
 export interface MonsterFilters {
   level?: number;
