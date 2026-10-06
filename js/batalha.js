@@ -70,7 +70,7 @@ function iniciarBatalha() {
   // Usa o mapa de gifs com classe base + gênero em minúsculo
   heroiBatalha.src =
     gifsHeroi[classeHeroi][generoHeroi]?.padrao ||
-    "../img/personagens/guerreiro.gif";
+    "../img/personagens/heroi_anime/idle.gif";
 
   if (gifsGoblin) {
     inimigo.src = gifsGoblin.padrao;
