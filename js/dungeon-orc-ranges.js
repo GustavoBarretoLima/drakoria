@@ -12,6 +12,7 @@ const DUNGEON_ORC_CONFIG = {
     minLevel: 5,
     maxLevel: 15,
     miniBossChance: 0.15,
+    miniBossLevel: 15,
   },
 };
 
@@ -22,10 +23,10 @@ function dungeonOrcRandomInt(min, max) {
 }
 
 function dungeonOrcPickMonster(config) {
-  const level = dungeonOrcRandomInt(config.minLevel, config.maxLevel);
   const roll = Math.random();
 
   if (config.miniBossChance > 0 && roll < config.miniBossChance) {
+    const level = config.miniBossLevel || config.maxLevel;
     return {
       monsterId: `orc-warlord-mini-boss-lvl-${level}`,
       type: "mini-boss",
@@ -33,6 +34,7 @@ function dungeonOrcPickMonster(config) {
     };
   }
 
+  const level = dungeonOrcRandomInt(config.minLevel, config.maxLevel);
   const familyRoll = config.miniBossChance > 0
     ? (roll - config.miniBossChance) / (1 - config.miniBossChance)
     : roll;
@@ -85,8 +87,8 @@ function abrirDungeonOrcPorFaixa() {
         <div>
           <span class="panel-kicker">Níveis 5–15</span>
           <h3>Covil Orc II</h3>
-          <p>Goblins, Orcs e Senhores da Guerra Orc podem aparecer entre os níveis 5 e 15.</p>
-          <small>Mini-Boss: 15% de chance por encontro.</small>
+          <p>Goblins e Orcs aparecem entre os níveis 5 e 15. O Senhor da Guerra Orc, quando surge, é sempre Nv.15.</p>
+          <small>Mini-Boss Nv.15: 15% de chance por encontro.</small>
         </div>
         <button type="button" onclick="entrarDungeonOrc5a15()">Entrar</button>
       </article>
@@ -108,7 +110,7 @@ function entrarDungeonOrc5a15() {
 
 function entrarMiniBossOrcDaFaixa() {
   const config = DUNGEON_ORC_CONFIG.avancada;
-  const level = dungeonOrcRandomInt(config.minLevel, config.maxLevel);
+  const level = config.miniBossLevel || 15;
   localStorage.setItem("tipoBatalhaAtual", "dungeon-mini-boss-orc");
   localStorage.setItem("monsterIdAtual", `orc-warlord-mini-boss-lvl-${level}`);
   localStorage.setItem("dungeonAtual", config.id);
