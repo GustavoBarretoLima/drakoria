@@ -42,24 +42,30 @@
 .paper-slot-legs { right: 154px; bottom: 18px; }
 .paper-slot-boots { left: 154px; bottom: 18px; }
 
-.paper-tooltip {
+.paper-slot .paper-tooltip {
+  display: none !important;
+}
+
+.paper-tooltip-portal {
   position: fixed !important;
   z-index: 10000 !important;
-  top: var(--paper-tooltip-top, 12px) !important;
-  left: var(--paper-tooltip-left, 12px) !important;
-  width: min(280px, calc(100vw - 24px));
+  display: block !important;
+  top: 12px;
+  left: 12px;
+  width: min(300px, calc(100vw - 24px));
   max-height: min(70vh, 420px);
   overflow-y: auto;
   overscroll-behavior: contain;
   transform: none !important;
   pointer-events: none;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity 100ms ease;
 }
 
-.paper-slot:hover .paper-tooltip,
-.paper-slot:focus-within .paper-tooltip,
-.paper-slot:focus-visible .paper-tooltip {
-  opacity: 1;
-  visibility: visible;
+.paper-tooltip-portal.is-visible {
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .inventory-item-stats {
@@ -113,7 +119,7 @@
 }
 
 @media (max-width: 430px) {
-  .paper-tooltip {
+  .paper-tooltip-portal {
     width: calc(100vw - 20px);
     max-height: 62vh;
   }
