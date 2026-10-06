@@ -28,9 +28,23 @@ function getSelectedHeroClass(): HeroClass {
   );
 }
 
+function renderAtbPhase(state: BattleState): void {
+  const indicator = document.getElementById("indicadorTurno");
+  if (!indicator || state.finished) return;
+
+  if (state.turnOwnerId === null) {
+    indicator.textContent = "ATB carregando...";
+    return;
+  }
+
+  indicator.textContent =
+    state.turnOwnerId === state.hero.id ? "Ação pronta!" : "Inimigo agindo...";
+}
+
 function renderState(state: BattleState): void {
   console.log("Novo estado da batalha:", state);
   renderBattle(state);
+  renderAtbPhase(state);
 
   if (
     demoMode &&
