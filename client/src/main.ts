@@ -8,6 +8,7 @@ import {
   subscribeDemoBattle,
 } from "./demo/demoBattle.js";
 import { awardBattleRewards } from "./progression/progressionClient.js";
+import { renderVictoryRewardOverlay } from "./ui/rewardOverlay.js";
 import type {
   BattleState,
   HeroClass,
@@ -48,24 +49,6 @@ function renderAtbPhase(state: BattleState): void {
     state.turnOwnerId === state.hero.id ? "Ação pronta!" : "Inimigo agindo...";
 }
 
-function renderRewardMessage(
-  state: BattleState,
-  levelsGained: number,
-  level: number,
-): void {
-  if (!state.rewards) return;
-
-  const messages = document.getElementById("mensagens");
-  if (!messages) return;
-
-  const rewardLine = document.createElement("div");
-  rewardLine.className = "battle-reward-message";
-  rewardLine.textContent = `Recompensas: +${state.rewards.xp} XP, +${state.rewards.gold} ouro${
-    levelsGained > 0 ? ` — nível ${level}!` : ""
-  }`;
-  messages.appendChild(rewardLine);
-}
-
 function applyVictoryRewards(state: BattleState): void {
   if (!state.finished || state.winnerId !== state.hero.id) return;
   if (!state.rewards) return;
@@ -73,7 +56,7 @@ function applyVictoryRewards(state: BattleState): void {
 
   rewardedBattleId = state.id;
   const result = awardBattleRewards(state.rewards);
-  renderRewardMessage(state, result.levelsGained, result.progress.nivel);
+  renderVictoryRewardOverlay(state.rewards, result);
 }
 
 function scheduleDemoVictoryRedirect(): void {
@@ -89,7 +72,7 @@ function scheduleDemoVictoryRedirect(): void {
     localStorage.removeItem("tipoBatalhaAtual");
     localStorage.removeItem("monsterIdAtual");
     window.location.href = `${import.meta.env.BASE_URL}pages/${targetPage}`;
-  }, 2500);
+  }, 4200);
 }
 
 function renderState(state: BattleState): void {
