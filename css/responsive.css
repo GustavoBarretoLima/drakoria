@@ -469,3 +469,28 @@ body:has(#batalha) {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Sprites maiores no desktop; mantém as regras atuais de mobile. */
+@media (min-width: 769px) {
+  #batalha .campo {
+    width: min(1100px, 100%);
+  }
+
+  #batalha .heroi,
+  #batalha .inimigo {
+    max-width: 440px;
+  }
+
+  #batalha #heroiBatalha,
+  #batalha #inimigoBatalha {
+    width: clamp(260px, 27vw, 340px);
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  #batalha #inimigoBatalha[src*="/orc_rei/"] {
+    width: clamp(330px, 35vw, 440px);
+  }
+}
