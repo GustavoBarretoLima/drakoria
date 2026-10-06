@@ -9,10 +9,9 @@ import type {
   BattleState,
   HeroClass,
 } from "../../../shared/src/types/combat.js";
+import { createDemoMonster } from "./demoMonsters.js";
 
 type BattleListener = (state: BattleState) => void;
-
-const DEMO_ENEMY_ID = "goblin-normal-lvl-1";
 
 let battleState: BattleState | null = null;
 let listener: BattleListener | null = null;
@@ -58,7 +57,10 @@ function startAtbLoop(expectedBattleId: string): void {
   }, ATB_TICK_MS);
 }
 
-export function startDemoBattle(heroClass: HeroClass): void {
+export function startDemoBattle(
+  heroClass: HeroClass,
+  monsterId = "goblin-normal-lvl-1",
+): void {
   stopAtbLoop();
 
   battleState = {
@@ -72,25 +74,7 @@ export function startDemoBattle(heroClass: HeroClass): void {
       defending: false,
       isAlive: true,
     },
-    enemy: {
-      id: DEMO_ENEMY_ID,
-      name: "Goblin Nv.1",
-      stats: {
-        hp: 60,
-        maxHp: 60,
-        mana: 0,
-        maxMana: 0,
-        attack: 8,
-        defense: 3,
-        magicDefense: 1,
-        speed: 10,
-        criticalChance: 5,
-        criticalDamage: 50,
-      },
-      atb: 0,
-      defending: false,
-      isAlive: true,
-    },
+    enemy: createDemoMonster(monsterId),
     turnOwnerId: null,
     finished: false,
   };
