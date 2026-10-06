@@ -20,6 +20,7 @@ export interface CombatantState {
   id: string;
   name: string;
   className?: HeroClass;
+  level?: number;
   sprites?: MonsterSpriteSet;
   stats: Stats;
   atb: number;
@@ -47,6 +48,7 @@ export interface BattleState {
   hero: CombatantState;
   enemy: CombatantState;
   rewards?: BattleRewards;
+  revealEnemyStats?: boolean;
   turnOwnerId: string | null;
   finished: boolean;
   winnerId?: string;

@@ -35,7 +35,7 @@ for (const item of Object.values(DUNGEON_LOOT_ITEMS)) {
   assert.ok(existsSync(`.${item.icon}`), item.icon);
   assert.equal(item.allowedClasses.length, 1);
   for (const heroClass of classes) {
-    assert.equal(canEquipItem(item, heroClass, item.level), item.allowedClasses.includes(heroClass));
+    assert.equal(canEquipItem(item, heroClass, item.level), item.allowedClasses.includes("universal") || item.allowedClasses.includes(heroClass));
     assert.equal(canEquipItem(item, heroClass, item.level - 1), false);
   }
 }
@@ -53,7 +53,7 @@ try {
   for (const monster of DUNGEON_MONSTERS) {
     Math.random = () => 0;
     const drops = rollMonsterDrops(monster.id);
-    assert.equal(drops.length, 1);
+    assert.equal(drops.length, monster.rank === "boss" ? 2 : 1);
     assert.equal(drops[0]!.item.level, monster.level);
     assert.ok(DUNGEON_LOOT_ITEMS[drops[0]!.item.id]);
     Math.random = () => 0.99;

@@ -1,4 +1,5 @@
-import { createStatsForLevel } from "../../../shared/src/combat/classStats.js";
+import { hasMonsterInsight } from "../../../shared/src/equipment/monsterInsight.js";
+import { createStatsForLevel, normalizeHeroLevel } from "../../../shared/src/combat/classStats.js";
 import {
   advanceBattleAtb,
   ATB_TICK_MS,
@@ -70,9 +71,10 @@ export function startDemoBattle(
 ): void {
   stopAtbLoop();
   const baseRewards = getDemoMonsterRewards(monsterId);
+  const equippedItems = getEquippedItems();
   const heroStats = applyEquipmentStats(
     createStatsForLevel(heroClass, heroLevel),
-    getEquippedItems(),
+    equippedItems,
   );
 
   battleState = {
@@ -81,6 +83,7 @@ export function startDemoBattle(
       id: "demo-player",
       name: localStorage.getItem("nomeHeroi") || "Heroi",
       className: heroClass,
+      level: normalizeHeroLevel(heroLevel),
       stats: heroStats,
       atb: 0,
       defending: false,
@@ -91,6 +94,7 @@ export function startDemoBattle(
       ...baseRewards,
       drops: rollMonsterDrops(monsterId),
     },
+    revealEnemyStats: hasMonsterInsight(equippedItems, heroLevel),
     turnOwnerId: null,
     finished: false,
   };

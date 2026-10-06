@@ -79,7 +79,7 @@ Cada peça existe por nível (1–25) e qualidade: Recruta (comum), Veterano (in
 | Hobgoblin elite | 85% | Raro 80%, épico 20% |
 | Orc Rei boss | 100% | Raro 40%, épico 60% |
 
-“Elite” descreve o conjunto raro/épico, preservando as raridades atuais da UI. Um encontro concede no máximo um equipamento. A progressão de atributos usa `1 + (nível - 1) × 0,08`, multiplicada por 1/1,2/1,5/1,85 conforme a qualidade. No combate atual, cajados melhoram ataque (também usado no dano mágico) e mana. Equipamentos antigos continuam no inventário; peças incompatíveis não podem ser usadas nem dar bônus. Itens antigos de ferro/placas e a espada do Senhor da Guerra passam a ser exclusivos do Guerreiro.
+“Elite” descreve o conjunto raro/épico, preservando as raridades atuais da UI. O Orc Rei também tem 1% de chance independente de conceder um segundo equipamento: Olho da Verdade, colar lendário de nível 15 para todas as classes. Equipado, revela os atributos dos monstros. Sem ele, a batalha exibe nome, classe e nível do personagem e barras sem números. Os demais encontros concedem no máximo um equipamento. A progressão de atributos usa `1 + (nível - 1) × 0,08`, multiplicada por 1/1,2/1,5/1,85 conforme a qualidade. No combate atual, cajados melhoram ataque (também usado no dano mágico) e mana. Equipamentos antigos continuam no inventário; peças incompatíveis não podem ser usadas nem dar bônus. Itens antigos de ferro/placas e a espada do Senhor da Guerra passam a ser exclusivos do Guerreiro.
 
 Verificação: `npx tsc --noEmit`, `npm run build` e `npx tsx tests/dungeonMonsters.test.ts`.
 

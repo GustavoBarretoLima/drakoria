@@ -53,17 +53,15 @@
           <div class="status heroi-status">
             <h2 id="nomeHeroi">Herói</h2>
             <p>Classe: <span id="classeHeroi">Classe</span></p>
-            <p>Defesa: <span id="defesaHeroi">0</span></p>
-            <p>Defesa Mágica: <span id="defesaMagicaHeroi">0</span></p>
-            <p>Velocidade: <span id="velocidadeHeroi">0</span></p>
+            <p>Nível: <span id="nivelHeroi"></span></p>
             <div class="barra">
               <div id="hpHeroiBar" class="hp" style="width: 100%">
-                <span id="hpHeroiTexto">100/100</span>
+                <span id="hpHeroiTexto">Vida</span>
               </div>
             </div>
             <div class="barra">
               <div id="manaHeroiBar" class="mana" style="width: 100%">
-                <span id="manaHeroiTexto">50/50</span>
+                <span id="manaHeroiTexto">Mana</span>
               </div>
             </div>
             <div class="barra">
@@ -72,7 +70,7 @@
                 class="mana"
                 style="width: 0%; background: linear-gradient(90deg, #ffb703, #fb8500)"
               >
-                <span id="atbHeroiTexto">ATB 0%</span>
+                <span id="atbHeroiTexto">ATB</span>
               </div>
             </div>
           </div>
@@ -87,12 +85,19 @@
           />
           <div class="status inimigo-status">
             <h2 id="nomeInimigo">Inimigo</h2>
-            <p>Defesa: <span id="defesaInimigo">0</span></p>
-            <p>Defesa Mágica: <span id="defesaMagicaInimigo">0</span></p>
-            <p>Velocidade: <span id="velocidadeInimigo">0</span></p>
+            <div id="atributosInimigo" hidden>
+              <p>Visão da Verdade</p>
+              <p>Ataque: <span id="ataqueInimigo"></span></p>
+              <p>Defesa: <span id="defesaInimigo"></span></p>
+              <p>Defesa Mágica: <span id="defesaMagicaInimigo"></span></p>
+              <p>Velocidade: <span id="velocidadeInimigo"></span></p>
+              <p>Mana: <span id="manaInimigo"></span></p>
+              <p>Chance crítica: <span id="criticoInimigo"></span></p>
+              <p>Dano crítico: <span id="danoCriticoInimigo"></span></p>
+            </div>
             <div class="barra">
               <div id="hpInimigoBar" class="hp" style="width: 100%">
-                <span id="hpInimigoTexto">60/60</span>
+                <span id="hpInimigoTexto">Vida</span>
               </div>
             </div>
             <div class="barra">
@@ -101,7 +106,7 @@
                 class="mana"
                 style="width: 0%; background: linear-gradient(90deg, #ffd166, #ef476f)"
               >
-                <span id="atbInimigoTexto">ATB 0%</span>
+                <span id="atbInimigoTexto">ATB</span>
               </div>
             </div>
           </div>
