@@ -1,10 +1,21 @@
 import type { BattleRewards } from "../../../shared/src/types/combat.js";
+import type { EquipmentRarity } from "../../../shared/src/types/equipment.js";
 import type { RewardResult } from "../progression/progressionClient.js";
 
 export interface RewardDrop {
   name: string;
   quantity?: number;
+  rarity?: EquipmentRarity;
 }
+
+const RARITY_LABELS: Record<EquipmentRarity, string> = {
+  common: "Comum",
+  uncommon: "Incomum",
+  rare: "Raro",
+  epic: "Épico",
+  legendary: "Lendário",
+  mythic: "Mítico",
+};
 
 export function renderVictoryRewardOverlay(
   rewards: BattleRewards,
@@ -56,8 +67,9 @@ export function renderVictoryRewardOverlay(
 
     for (const drop of drops) {
       const dropLine = document.createElement("div");
-      dropLine.className = "reward-drop-item";
-      dropLine.textContent = `${drop.name}${drop.quantity && drop.quantity > 1 ? ` x${drop.quantity}` : ""}`;
+      dropLine.className = `reward-drop-item${drop.rarity ? ` rarity-${drop.rarity}` : ""}`;
+      const rarity = drop.rarity ? ` • ${RARITY_LABELS[drop.rarity]}` : "";
+      dropLine.textContent = `${drop.name}${drop.quantity && drop.quantity > 1 ? ` x${drop.quantity}` : ""}${rarity}`;
       dropsSection.appendChild(dropLine);
     }
 

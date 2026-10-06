@@ -1,4 +1,5 @@
 import type { BattleState, HeroClass } from "../../../../shared/src/types/combat.js";
+import type { EquipmentItem } from "../../../../shared/src/types/equipment.js";
 import { createInitialBattleState } from "./battleRoom.js";
 
 export class BattleManager {
@@ -8,8 +9,9 @@ export class BattleManager {
     playerId: string,
     heroClass: HeroClass = "guerreiro",
     monsterId = "goblin-normal-lvl-1",
+    equippedItems: EquipmentItem[] = [],
   ): BattleState {
-    const battle = createInitialBattleState(heroClass, monsterId);
+    const battle = createInitialBattleState(heroClass, monsterId, equippedItems);
     this.battles.set(playerId, battle);
     return battle;
   }

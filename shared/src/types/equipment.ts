@@ -59,3 +59,8 @@ export interface EquipmentItem {
   icon: string;
   sellPrice: number;
 }
+
+export interface EquipmentDrop {
+  item: EquipmentItem;
+  quantity: number;
+}

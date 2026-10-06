@@ -1,8 +1,11 @@
 import { createInitialStats } from "../../../../shared/src/combat/classStats.js";
+import { applyEquipmentStats } from "../../../../shared/src/equipment/equipmentStats.js";
+import { rollMonsterDrops } from "../../../../shared/src/loot/lootTables.js";
 import type {
   BattleState,
   HeroClass,
 } from "../../../../shared/src/types/combat.js";
+import type { EquipmentItem } from "../../../../shared/src/types/equipment.js";
 import type { MonsterFamily } from "../../../../shared/src/types/monster.js";
 import { getMonsterById } from "../monsters/monsterService.js";
 
@@ -35,12 +38,11 @@ function getMonsterMagicDefense(defense: number, magicPower: number): number {
 export function createInitialBattleState(
   heroClass: HeroClass = "guerreiro",
   monsterId = "goblin-normal-lvl-1",
+  equippedItems: EquipmentItem[] = [],
 ): BattleState {
   const monster = getMonsterById(monsterId);
 
-  if (!monster) {
-    throw new Error(`Monstro nao encontrado: ${monsterId}`);
-  }
+  if (!monster) throw new Error(`Monstro nao encontrado: ${monsterId}`);
 
   return {
     id: `battle-${Date.now()}`,
@@ -48,7 +50,7 @@ export function createInitialBattleState(
       id: "player-1",
       name: "Heroi",
       className: heroClass,
-      stats: createInitialStats(heroClass),
+      stats: applyEquipmentStats(createInitialStats(heroClass), equippedItems),
       atb: 0,
       defending: false,
       isAlive: true,
@@ -66,10 +68,7 @@ export function createInitialBattleState(
         defense: monster.stats.defense,
         magicDefense:
           monster.stats.magicDefense ??
-          getMonsterMagicDefense(
-            monster.stats.defense,
-            monster.stats.magicPower,
-          ),
+          getMonsterMagicDefense(monster.stats.defense, monster.stats.magicPower),
         speed: MONSTER_SPEED_BY_FAMILY[monster.family],
         criticalChance: monster.stats.criticalChance,
         criticalDamage: monster.stats.criticalDamage,
@@ -81,6 +80,7 @@ export function createInitialBattleState(
     rewards: {
       xp: monster.xpReward,
       gold: monster.goldReward,
+      drops: rollMonsterDrops(monster.id),
     },
     turnOwnerId: null,
     finished: false,

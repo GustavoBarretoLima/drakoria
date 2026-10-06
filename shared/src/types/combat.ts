@@ -1,3 +1,4 @@
+import type { EquipmentDrop } from "./equipment.js";
 import type { MonsterSpriteSet } from "./monster.js";
 
 export type HeroClass = "guerreiro" | "mago" | "arqueiro";
@@ -29,6 +30,7 @@ export interface CombatantState {
 export interface BattleRewards {
   xp: number;
   gold: number;
+  drops?: EquipmentDrop[];
 }
 
 export interface BattleEvent {

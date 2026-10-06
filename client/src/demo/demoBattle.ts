@@ -4,11 +4,14 @@ import {
   ATB_TICK_MS,
 } from "../../../shared/src/combat/atb.js";
 import type { BattleAction } from "../../../shared/src/combat/actions.js";
+import { applyEquipmentStats } from "../../../shared/src/equipment/equipmentStats.js";
+import { rollMonsterDrops } from "../../../shared/src/loot/lootTables.js";
 import type {
   BattleEvent,
   BattleState,
   HeroClass,
 } from "../../../shared/src/types/combat.js";
+import { getEquippedItems } from "../inventory/inventoryClient.js";
 import {
   createDemoMonster,
   getDemoMonsterRewards,
@@ -65,6 +68,11 @@ export function startDemoBattle(
   monsterId = "goblin-normal-lvl-1",
 ): void {
   stopAtbLoop();
+  const baseRewards = getDemoMonsterRewards(monsterId);
+  const heroStats = applyEquipmentStats(
+    createInitialStats(heroClass),
+    getEquippedItems(),
+  );
 
   battleState = {
     id: `demo-battle-${Date.now()}`,
@@ -72,13 +80,16 @@ export function startDemoBattle(
       id: "demo-player",
       name: localStorage.getItem("nomeHeroi") || "Heroi",
       className: heroClass,
-      stats: createInitialStats(heroClass),
+      stats: heroStats,
       atb: 0,
       defending: false,
       isAlive: true,
     },
     enemy: createDemoMonster(monsterId),
-    rewards: getDemoMonsterRewards(monsterId),
+    rewards: {
+      ...baseRewards,
+      drops: rollMonsterDrops(monsterId),
+    },
     turnOwnerId: null,
     finished: false,
   };
@@ -94,9 +105,7 @@ export function performDemoAction(action: BattleAction): void {
   battleState = applyHeroAction(battleState, action);
   emitState();
 
-  if (battleState.finished) {
-    stopAtbLoop();
-  }
+  if (battleState.finished) stopAtbLoop();
 }
 
 function applyHeroAction(state: BattleState, action: BattleAction): BattleState {
@@ -116,11 +125,9 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
       const damage = critical
         ? applyCriticalDamage(mitigatedDamage, hero.stats.criticalDamage)
         : mitigatedDamage;
-
       enemy.stats.hp = Math.max(0, enemy.stats.hp - damage);
       enemy.isAlive = enemy.stats.hp > 0;
       enemy.defending = false;
-
       event = createEvent(
         hero.id,
         enemy.id,
@@ -133,7 +140,6 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
       );
       break;
     }
-
     case "DEFEND": {
       hero.defending = true;
       event = createEvent(
@@ -144,7 +150,6 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
       );
       break;
     }
-
     case "CAST_MAGIC": {
       if (hero.stats.mana >= 10) {
         hero.stats.mana -= 10;
@@ -158,11 +163,9 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
         const damage = critical
           ? applyCriticalDamage(mitigatedDamage, hero.stats.criticalDamage)
           : mitigatedDamage;
-
         enemy.stats.hp = Math.max(0, enemy.stats.hp - damage);
         enemy.isAlive = enemy.stats.hp > 0;
         enemy.defending = false;
-
         event = createEvent(
           hero.id,
           enemy.id,
@@ -183,7 +186,6 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
       }
       break;
     }
-
     default: {
       const exhaustiveCheck: never = action;
       void exhaustiveCheck;
@@ -192,7 +194,6 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
   }
 
   const finished = !enemy.isAlive;
-
   return {
     ...state,
     hero,
@@ -205,15 +206,10 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
 }
 
 function processEnemyTurn(expectedBattleId: string): void {
-  if (!battleState) return;
-  if (battleState.id !== expectedBattleId) return;
-  if (battleState.finished) return;
+  if (!battleState || battleState.id !== expectedBattleId || battleState.finished) return;
   if (battleState.turnOwnerId !== battleState.enemy.id) return;
 
-  const hero = {
-    ...battleState.hero,
-    stats: { ...battleState.hero.stats },
-  };
+  const hero = { ...battleState.hero, stats: { ...battleState.hero.stats } };
   const enemy = {
     ...battleState.enemy,
     stats: { ...battleState.enemy.stats },
@@ -228,7 +224,6 @@ function processEnemyTurn(expectedBattleId: string): void {
   const damage = critical
     ? applyCriticalDamage(mitigatedDamage, enemy.stats.criticalDamage)
     : mitigatedDamage;
-
   const wasDefending = hero.defending;
   hero.stats.hp = Math.max(0, hero.stats.hp - damage);
   hero.isAlive = hero.stats.hp > 0;
@@ -256,16 +251,11 @@ function processEnemyTurn(expectedBattleId: string): void {
   };
 
   emitState();
-
-  if (battleState.finished) {
-    stopAtbLoop();
-  }
+  if (battleState.finished) stopAtbLoop();
 }
 
 function emitState(): void {
-  if (battleState && listener) {
-    listener(battleState);
-  }
+  if (battleState && listener) listener(battleState);
 }
 
 function randomInt(min: number, max: number): number {
@@ -291,11 +281,7 @@ function calculateDamageTaken(
   const safeDefense = Math.max(0, Math.floor(defense));
   const defenseReduction = Math.floor(safeDefense * 0.5);
   let damage = Math.max(1, safeBaseDamage - defenseReduction);
-
-  if (defending) {
-    damage = Math.max(1, Math.floor(damage / 2));
-  }
-
+  if (defending) damage = Math.max(1, Math.floor(damage / 2));
   return damage;
 }
 
@@ -307,15 +293,8 @@ function createEvent(
   damage?: number,
   critical?: boolean,
 ): BattleEvent {
-  const event: BattleEvent = {
-    actorId,
-    targetId,
-    action,
-    message,
-  };
-
+  const event: BattleEvent = { actorId, targetId, action, message };
   if (damage !== undefined) event.damage = damage;
   if (critical !== undefined) event.critical = critical;
-
   return event;
 }
