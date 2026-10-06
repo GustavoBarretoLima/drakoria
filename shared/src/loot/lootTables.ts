@@ -56,10 +56,18 @@ const DROP_POOLS: Record<string, string[]> = {
   orc: ["orc-iron-axe", "orc-iron-chest"],
 };
 
+const DROP_CHANCE_BY_FAMILY: Record<string, number> = {
+  goblin: 0.18,
+  orc: 0.24,
+};
+
 export function rollMonsterDrops(monsterId: string): EquipmentDrop[] {
   const family = monsterId.split("-")[0] ?? "";
   const pool = DROP_POOLS[family];
   if (!pool || pool.length === 0) return [];
+
+  const dropChance = DROP_CHANCE_BY_FAMILY[family] ?? 0.15;
+  if (Math.random() >= dropChance) return [];
 
   const itemId = pool[Math.floor(Math.random() * pool.length)];
   if (!itemId) return [];
