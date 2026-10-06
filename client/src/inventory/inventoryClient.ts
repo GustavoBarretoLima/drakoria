@@ -1,3 +1,6 @@
+import { canEquipItem, canonicalEquipment } from "../../../shared/src/equipment/equipmentRules.js";
+import { loadProgress } from "../progression/progressionClient.js";
+import type { HeroClass } from "../../../shared/src/types/equipment.js";
 import type { EquipmentDrop, EquipmentItem, EquipmentSlot } from "../../../shared/src/types/equipment.js";
 
 const INVENTORY_KEY = "drakoriaInventario";
@@ -24,7 +27,7 @@ export function loadInventory(): InventoryState {
   try {
     const parsed = JSON.parse(saved) as Partial<InventoryState>;
     return {
-      items: Array.isArray(parsed.items) ? parsed.items : [],
+      items: Array.isArray(parsed.items) ? parsed.items.map(entry => ({ ...entry, item: canonicalEquipment(entry.item) })) : [],
       equipped: parsed.equipped ?? {},
     };
   } catch {
@@ -60,7 +63,7 @@ export function addDropsToInventory(drops: EquipmentDrop[] = []): InventoryState
 export function equipItem(itemId: string): InventoryState {
   const inventory = loadInventory();
   const entry = inventory.items.find((candidate) => candidate.item.id === itemId);
-  if (!entry) return inventory;
+  if (!entry || !canEquipItem(entry.item, inventoryHeroClass(), loadProgress().nivel)) return inventory;
 
   inventory.equipped[entry.item.slot] = itemId;
   saveInventory(inventory);
@@ -78,7 +81,7 @@ export function getEquippedItems(): EquipmentItem[] {
   const inventory = loadInventory();
   const equippedIds = new Set(Object.values(inventory.equipped));
   return inventory.items
-    .filter((entry) => equippedIds.has(entry.item.id))
+    .filter((entry) => equippedIds.has(entry.item.id) && canEquipItem(entry.item, inventoryHeroClass(), loadProgress().nivel))
     .map((entry) => entry.item);
 }
 
@@ -90,4 +93,9 @@ function cloneInventory(inventory: InventoryState): InventoryState {
     })),
     equipped: { ...inventory.equipped },
   };
+}
+
+function inventoryHeroClass(): HeroClass {
+  const heroClass = (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase();
+  return heroClass === "mago" || heroClass === "arqueiro" ? heroClass : "guerreiro";
 }

@@ -1,3 +1,4 @@
+import { DUNGEON_EQUIPMENT_NAMES } from "../loot/dungeonLoot.js";
 import type {
   EquipmentItem,
   EquipmentRarity,
@@ -84,6 +85,7 @@ export function generateEquipmentCatalog(): EquipmentItem[] {
     for (const slot of slots) {
       for (const rarity of rarities) {
         for (const heroClass of classes) {
+          if (heroClass === "universal" && !["ring", "earring", "necklace"].includes(slot)) continue;
           items.push(createEquipmentItem(level, slot, rarity, heroClass));
         }
       }
@@ -115,14 +117,14 @@ function createEquipmentItem(
 
   return {
     id,
-    name: `${RARITY_PREFIX[rarity]} ${SLOT_LABELS[slot]} ${CLASS_LABELS[heroClass]} Nv.${level}`,
+    name: `${RARITY_PREFIX[rarity]} ${heroClass === "universal" ? SLOT_LABELS[slot] : DUNGEON_EQUIPMENT_NAMES[heroClass][slot]} ${CLASS_LABELS[heroClass]} Nv.${level}`,
     description: `Equipamento ${RARITY_PREFIX[rarity].toLowerCase()} de nível ${level}.`,
     slot,
     rarity,
     level,
     allowedClasses: heroClass === "universal" ? ["universal"] : [heroClass],
     stats,
-    icon: `/img/itens/${slot}.png`,
+    icon: `/img/itens/${slot}.svg`,
     sellPrice: Math.floor(levelMultiplier * rarityMeta.powerMultiplier * 10),
   };
 }
@@ -165,7 +167,7 @@ function createEventItems(): EquipmentItem[] {
       slot: "weapon",
       rarity: "legendary",
       level: 100,
-      allowedClasses: ["universal"],
+      allowedClasses: ["guerreiro"],
       eventType: "natal",
       stats: {
         attack: 180,

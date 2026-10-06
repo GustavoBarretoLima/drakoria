@@ -4,7 +4,7 @@ const INVENTORY_UX_SLOTS = 20;
 const INVENTORY_UX_SLOT_LABELS = {
   weapon: "Arma",
   armor: "Armadura",
-  shield: "Escudo",
+  shield: "Mão secundária",
   legs: "Perna",
   boots: "Bota",
   gloves: "Luva",
@@ -80,7 +80,9 @@ function inventoryUxCanEquip(item) {
   const allowed = Array.isArray(item.allowedClasses)
     ? item.allowedClasses
     : ["universal"];
-  const classAllowed = allowed.includes("universal") || allowed.includes(heroClass);
+  const legacyWarriorOnly = ["orc-iron-axe", "orc-iron-chest", "orc-warlord-sword", "orc-warlord-chest", "orc-warlord-gloves", "weapon-universal-legendary-natal-lvl-100"].includes(item.id);
+  const universalSlot = ["ring", "earring", "necklace"].includes(item.slot);
+  const classAllowed = legacyWarriorOnly ? heroClass === "guerreiro" : item.id === "goblin-hide-gloves" ? heroClass !== "mago" : allowed.includes(heroClass) || (universalSlot && allowed.includes("universal"));
   const levelAllowed = heroLevel >= Math.max(1, Number(item.level || 1));
   return { allowed: classAllowed && levelAllowed, classAllowed, levelAllowed };
 }
@@ -106,7 +108,7 @@ function inventoryUxEquippedEntries(inventory) {
   return Object.entries(inventory.equipped)
     .map(([slot, itemId]) => {
       const entry = inventory.items.find((candidate) => candidate.item.id === itemId);
-      return entry ? { slot, item: entry.item } : null;
+      return entry && inventoryUxCanEquip(entry.item).allowed ? { slot, item: entry.item } : null;
     })
     .filter(Boolean);
 }

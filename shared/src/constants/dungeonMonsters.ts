@@ -13,25 +13,30 @@ const PROFILES = {
 } as const;
 
 export function createDungeonMonster(id: string): MonsterDefinition | undefined {
-  const match = /^(orc-king-boss|hobgoblin-normal|skeleton-warrior-normal|mutant-rat-normal)-lvl-(\d+)$/.exec(id);
+  const match = /^(orc-king-boss|hobgoblin-normal|hobgoblin-elite|skeleton-warrior-normal|mutant-rat-normal)-lvl-(\d+)$/.exec(id);
   if (!match) return undefined;
-  const key = match[1]!.replace(/-(boss|normal)$/, "") as keyof typeof PROFILES;
+  const key = match[1]!.replace(/-(boss|normal|elite)$/, "") as keyof typeof PROFILES;
   const profile = PROFILES[key];
   const level = Number(match[2]);
-  if (profile.rank === "boss" ? level !== 15 : level < 5 || level > 15) return undefined;
-  const multiplier = 1 + (level - 1) * 0.08;
+  const elite = match[1] === "hobgoblin-elite";
+  const minLevel = key === "orc-king" ? 15 : key === "hobgoblin" ? 10 : 1;
+  const maxLevel = key === "orc-king" ? 25 : key === "hobgoblin" ? 15 : 10;
+  if (level < minLevel || level > maxLevel) return undefined;
+  const multiplier = (1 + (level - 1) * 0.08) * (elite ? 1.6 : 1);
   const hp = Math.floor(profile.hp * multiplier);
   const defense = Math.floor(profile.defense * multiplier);
   return {
-    id, name: `${profile.name} Nv.${level}`, description: profile.rank === "boss" ? "Rei do clã orc, protegido por guerreiros e comandantes da fortaleza." : `Habitante hostil da Cripta dos Mutantes: ${profile.name}.`,
-    family: profile.family, rank: profile.rank, element: profile.element, level,
+    id, name: `${profile.name}${elite ? " Elite" : ""} Nv.${level}`, description: profile.rank === "boss" ? "Rei do clã orc, protegido por guerreiros e comandantes da fortaleza." : key === "hobgoblin" ? "Guerreiro do Acampamento Hobgoblin, treinado para emboscadas." : `Habitante hostil da Cripta dos Mutantes: ${profile.name}.`,
+    family: profile.family, rank: elite ? "elite" : profile.rank, element: profile.element, level,
     stats: { hp, maxHp: hp, mana: 0, maxMana: 0, attack: Math.floor(profile.attack * multiplier), defense, magicDefense: Math.floor(defense / 2), magicPower: 0, criticalChance: 6, criticalDamage: 60 },
-    xpReward: Math.floor(profile.xp * multiplier), goldReward: Math.floor(profile.gold * multiplier), sprites: folderSprites(profile.folder), skills: [],
+    xpReward: Math.floor(profile.xp * multiplier * (elite ? 1.25 : 1)), goldReward: Math.floor(profile.gold * multiplier * (elite ? 1.25 : 1)), sprites: folderSprites(profile.folder), skills: [],
   };
 }
 
 export const DUNGEON_MONSTERS: MonsterDefinition[] = [
-  createDungeonMonster("orc-king-boss-lvl-15")!,
-  ...Array.from({ length: 11 }, (_, index) => index + 5).flatMap(level =>
-    ["hobgoblin", "skeleton-warrior", "mutant-rat"].map(key => createDungeonMonster(`${key}-normal-lvl-${level}`)!)),
+  ...Array.from({ length: 11 }, (_, i) => createDungeonMonster(`orc-king-boss-lvl-${i + 15}`)!),
+  ...Array.from({ length: 6 }, (_, i) => i + 10).flatMap(level =>
+    ["normal", "elite"].map(rank => createDungeonMonster(`hobgoblin-${rank}-lvl-${level}`)!)),
+  ...Array.from({ length: 10 }, (_, i) => i + 1).flatMap(level =>
+    ["skeleton-warrior", "mutant-rat"].map(key => createDungeonMonster(`${key}-normal-lvl-${level}`)!)),
 ];
