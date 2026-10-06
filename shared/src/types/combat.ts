@@ -18,6 +18,7 @@ export interface CombatantState {
   name: string;
   className?: HeroClass;
   stats: Stats;
+  atb: number;
   defending: boolean;
   isAlive: boolean;
 }
@@ -35,7 +36,7 @@ export interface BattleState {
   id: string;
   hero: CombatantState;
   enemy: CombatantState;
-  turnOwnerId: string;
+  turnOwnerId: string | null;
   finished: boolean;
   winnerId?: string;
   lastEvent?: BattleEvent;

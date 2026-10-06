@@ -1,4 +1,8 @@
 import { createInitialStats } from "../../../shared/src/combat/classStats.js";
+import {
+  advanceBattleAtb,
+  ATB_TICK_MS,
+} from "../../../shared/src/combat/atb.js";
 import type { BattleAction } from "../../../shared/src/combat/actions.js";
 import type {
   BattleEvent,
@@ -12,7 +16,7 @@ const DEMO_ENEMY_ID = "goblin-normal-lvl-1";
 
 let battleState: BattleState | null = null;
 let listener: BattleListener | null = null;
-let enemyTurnTimer: number | null = null;
+let atbTimer: number | null = null;
 
 export function isPagesDemoMode(): boolean {
   return (
@@ -26,11 +30,36 @@ export function subscribeDemoBattle(nextListener: BattleListener): void {
   listener = nextListener;
 }
 
+function stopAtbLoop(): void {
+  if (atbTimer === null) return;
+  window.clearInterval(atbTimer);
+  atbTimer = null;
+}
+
+function startAtbLoop(expectedBattleId: string): void {
+  stopAtbLoop();
+
+  atbTimer = window.setInterval(() => {
+    if (!battleState || battleState.id !== expectedBattleId || battleState.finished) {
+      stopAtbLoop();
+      return;
+    }
+
+    const nextState = advanceBattleAtb(battleState);
+
+    if (nextState !== battleState) {
+      battleState = nextState;
+      emitState();
+    }
+
+    if (battleState.turnOwnerId === battleState.enemy.id) {
+      processEnemyTurn(expectedBattleId);
+    }
+  }, ATB_TICK_MS);
+}
+
 export function startDemoBattle(heroClass: HeroClass): void {
-  if (enemyTurnTimer !== null) {
-    window.clearTimeout(enemyTurnTimer);
-    enemyTurnTimer = null;
-  }
+  stopAtbLoop();
 
   battleState = {
     id: `demo-battle-${Date.now()}`,
@@ -39,6 +68,7 @@ export function startDemoBattle(heroClass: HeroClass): void {
       name: localStorage.getItem("nomeHeroi") || "Heroi",
       className: heroClass,
       stats: createInitialStats(heroClass),
+      atb: 0,
       defending: false,
       isAlive: true,
     },
@@ -57,14 +87,16 @@ export function startDemoBattle(heroClass: HeroClass): void {
         criticalChance: 5,
         criticalDamage: 50,
       },
+      atb: 0,
       defending: false,
       isAlive: true,
     },
-    turnOwnerId: "demo-player",
+    turnOwnerId: null,
     finished: false,
   };
 
   emitState();
+  startAtbLoop(battleState.id);
 }
 
 export function performDemoAction(action: BattleAction): void {
@@ -74,16 +106,13 @@ export function performDemoAction(action: BattleAction): void {
   battleState = applyHeroAction(battleState, action);
   emitState();
 
-  if (!battleState.finished && battleState.turnOwnerId === battleState.enemy.id) {
-    const expectedBattleId = battleState.id;
-    enemyTurnTimer = window.setTimeout(() => {
-      processEnemyTurn(expectedBattleId);
-    }, 900);
+  if (battleState.finished) {
+    stopAtbLoop();
   }
 }
 
 function applyHeroAction(state: BattleState, action: BattleAction): BattleState {
-  const hero = { ...state.hero, stats: { ...state.hero.stats } };
+  const hero = { ...state.hero, stats: { ...state.hero.stats }, atb: 0 };
   const enemy = { ...state.enemy, stats: { ...state.enemy.stats } };
   let event: BattleEvent;
 
@@ -182,14 +211,12 @@ function applyHeroAction(state: BattleState, action: BattleAction): BattleState 
     enemy,
     finished,
     ...(finished ? { winnerId: hero.id } : {}),
-    turnOwnerId: finished ? hero.id : enemy.id,
+    turnOwnerId: finished ? hero.id : null,
     lastEvent: event,
   };
 }
 
 function processEnemyTurn(expectedBattleId: string): void {
-  enemyTurnTimer = null;
-
   if (!battleState) return;
   if (battleState.id !== expectedBattleId) return;
   if (battleState.finished) return;
@@ -199,7 +226,11 @@ function processEnemyTurn(expectedBattleId: string): void {
     ...battleState.hero,
     stats: { ...battleState.hero.stats },
   };
-  const enemy = battleState.enemy;
+  const enemy = {
+    ...battleState.enemy,
+    stats: { ...battleState.enemy.stats },
+    atb: 0,
+  };
   const critical = rollCritical(enemy.stats.criticalChance);
   const mitigatedDamage = calculateDamageTaken(
     enemy.stats.attack,
@@ -218,9 +249,10 @@ function processEnemyTurn(expectedBattleId: string): void {
   battleState = {
     ...battleState,
     hero,
+    enemy,
     finished: !hero.isAlive,
     ...(!hero.isAlive ? { winnerId: enemy.id } : {}),
-    turnOwnerId: !hero.isAlive ? enemy.id : hero.id,
+    turnOwnerId: !hero.isAlive ? enemy.id : null,
     lastEvent: createEvent(
       enemy.id,
       hero.id,
@@ -236,6 +268,10 @@ function processEnemyTurn(expectedBattleId: string): void {
   };
 
   emitState();
+
+  if (battleState.finished) {
+    stopAtbLoop();
+  }
 }
 
 function emitState(): void {

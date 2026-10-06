@@ -28,6 +28,7 @@ export function createInitialBattleState(
       name: "Heroi",
       className: heroClass,
       stats: createInitialStats(heroClass),
+      atb: 0,
       defending: false,
       isAlive: true,
     },
@@ -51,10 +52,11 @@ export function createInitialBattleState(
         criticalChance: monster.stats.criticalChance,
         criticalDamage: monster.stats.criticalDamage,
       },
+      atb: 0,
       defending: false,
       isAlive: true,
     },
-    turnOwnerId: "player-1",
+    turnOwnerId: null,
     finished: false,
   };
 }

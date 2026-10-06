@@ -3,7 +3,9 @@ import type { BattleState } from "../../../shared/src/types/combat.js";
 export function renderStatus(state: BattleState) {
   const heroHpBar = document.getElementById("hpHeroiBar");
   const heroManaBar = document.getElementById("manaHeroiBar");
+  const heroAtbBar = document.getElementById("atbHeroiBar");
   const enemyHpBar = document.getElementById("hpInimigoBar");
+  const enemyAtbBar = document.getElementById("atbInimigoBar");
 
   const heroHpPercent = (state.hero.stats.hp / state.hero.stats.maxHp) * 100;
   const heroManaPercent =
@@ -14,11 +16,15 @@ export function renderStatus(state: BattleState) {
 
   if (heroHpBar) heroHpBar.style.width = `${Math.max(heroHpPercent, 0)}%`;
   if (heroManaBar) heroManaBar.style.width = `${Math.max(heroManaPercent, 0)}%`;
+  if (heroAtbBar) heroAtbBar.style.width = `${Math.max(0, Math.min(100, state.hero.atb))}%`;
   if (enemyHpBar) enemyHpBar.style.width = `${Math.max(enemyHpPercent, 0)}%`;
+  if (enemyAtbBar) enemyAtbBar.style.width = `${Math.max(0, Math.min(100, state.enemy.atb))}%`;
 
   const heroHpText = document.getElementById("hpHeroiTexto");
   const heroManaText = document.getElementById("manaHeroiTexto");
+  const heroAtbText = document.getElementById("atbHeroiTexto");
   const enemyHpText = document.getElementById("hpInimigoTexto");
+  const enemyAtbText = document.getElementById("atbInimigoTexto");
 
   if (heroHpText) {
     heroHpText.textContent = `${state.hero.stats.hp}/${state.hero.stats.maxHp}`;
@@ -28,8 +34,16 @@ export function renderStatus(state: BattleState) {
     heroManaText.textContent = `${state.hero.stats.mana}/${state.hero.stats.maxMana}`;
   }
 
+  if (heroAtbText) {
+    heroAtbText.textContent = `ATB ${Math.floor(state.hero.atb)}%`;
+  }
+
   if (enemyHpText) {
     enemyHpText.textContent = `${state.enemy.stats.hp}/${state.enemy.stats.maxHp}`;
+  }
+
+  if (enemyAtbText) {
+    enemyAtbText.textContent = `ATB ${Math.floor(state.enemy.atb)}%`;
   }
 
   const heroDefense = document.getElementById("defesaHeroi");

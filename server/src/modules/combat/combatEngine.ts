@@ -54,13 +54,8 @@ function createEvent(
     message,
   };
 
-  if (damage !== undefined) {
-    event.damage = damage;
-  }
-
-  if (critical !== undefined) {
-    event.critical = critical;
-  }
+  if (damage !== undefined) event.damage = damage;
+  if (critical !== undefined) event.critical = critical;
 
   return event;
 }
@@ -72,7 +67,7 @@ export function applyBattleAction(
   if (state.finished) return state;
   if (state.turnOwnerId !== state.hero.id) return state;
 
-  const hero = { ...state.hero, stats: { ...state.hero.stats } };
+  const hero = { ...state.hero, stats: { ...state.hero.stats }, atb: 0 };
   const enemy = { ...state.enemy, stats: { ...state.enemy.stats } };
 
   let event: BattleEvent;
@@ -173,7 +168,7 @@ export function applyBattleAction(
     enemy,
     finished,
     ...(finished ? { winnerId: hero.id } : {}),
-    turnOwnerId: finished ? hero.id : enemy.id,
+    turnOwnerId: finished ? hero.id : null,
     lastEvent: event,
   };
 }

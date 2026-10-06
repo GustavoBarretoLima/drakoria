@@ -7,6 +7,10 @@ import {
   calculateDamageTaken,
   rollCritical,
 } from "./modules/combat/combatEngine.js";
+import {
+  advanceBattleAtb,
+  ATB_TICK_MS,
+} from "../../shared/src/combat/atb.js";
 import type { BattleAction } from "../../shared/src/combat/actions.js";
 import type { HeroClass } from "../../shared/src/types/combat.js";
 import {
@@ -28,6 +32,7 @@ const io = new Server(httpServer, {
 });
 
 const battleManager = new BattleManager();
+const atbIntervals = new Map<string, NodeJS.Timeout>();
 
 function normalizeHeroClass(className?: string): HeroClass {
   if (className === "mago" || className === "arqueiro") {
@@ -35,6 +40,14 @@ function normalizeHeroClass(className?: string): HeroClass {
   }
 
   return "guerreiro";
+}
+
+function stopAtbLoop(playerId: string) {
+  const interval = atbIntervals.get(playerId);
+  if (!interval) return;
+
+  clearInterval(interval);
+  atbIntervals.delete(playerId);
 }
 
 function processEnemyTurn(playerId: string, expectedBattleId: string) {
@@ -49,19 +62,21 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
     ...battleState.hero,
     stats: { ...battleState.hero.stats },
   };
+  const enemy = {
+    ...battleState.enemy,
+    stats: { ...battleState.enemy.stats },
+    atb: 0,
+  };
 
   const wasDefending = hero.defending;
-  const critical = rollCritical(battleState.enemy.stats.criticalChance);
+  const critical = rollCritical(enemy.stats.criticalChance);
   const mitigatedDamage = calculateDamageTaken(
-    battleState.enemy.stats.attack,
+    enemy.stats.attack,
     hero.stats.defense,
     wasDefending,
   );
   const finalDamage = critical
-    ? applyCriticalDamage(
-        mitigatedDamage,
-        battleState.enemy.stats.criticalDamage,
-      )
+    ? applyCriticalDamage(mitigatedDamage, enemy.stats.criticalDamage)
     : mitigatedDamage;
 
   hero.stats.hp = Math.max(0, hero.stats.hp - finalDamage);
@@ -69,20 +84,21 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
   hero.defending = false;
 
   const message = critical
-    ? `CRITICO! ${battleState.enemy.name} causou ${finalDamage} de dano em ${hero.name}.`
+    ? `CRITICO! ${enemy.name} causou ${finalDamage} de dano em ${hero.name}.`
     : wasDefending
-      ? `${battleState.enemy.name} atacou, mas ${hero.name} se defendeu e recebeu apenas ${finalDamage} de dano.`
-      : `${battleState.enemy.name} atacou e causou ${finalDamage} de dano.`;
+      ? `${enemy.name} atacou, mas ${hero.name} se defendeu e recebeu apenas ${finalDamage} de dano.`
+      : `${enemy.name} atacou e causou ${finalDamage} de dano.`;
 
   const nextBattleState = {
     ...battleState,
     hero,
+    enemy,
     finished: !hero.isAlive,
-    ...(!hero.isAlive ? { winnerId: battleState.enemy.id } : {}),
-    turnOwnerId: !hero.isAlive ? battleState.enemy.id : battleState.hero.id,
+    ...(!hero.isAlive ? { winnerId: enemy.id } : {}),
+    turnOwnerId: !hero.isAlive ? enemy.id : null,
     lastEvent: {
-      actorId: battleState.enemy.id,
-      targetId: battleState.hero.id,
+      actorId: enemy.id,
+      targetId: hero.id,
       action: "ATTACK" as const,
       damage: finalDamage,
       critical,
@@ -92,6 +108,41 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
 
   battleManager.set(playerId, nextBattleState);
   io.to(playerId).emit("battle:update", nextBattleState);
+
+  if (nextBattleState.finished) {
+    stopAtbLoop(playerId);
+  }
+}
+
+function startAtbLoop(playerId: string, expectedBattleId: string) {
+  stopAtbLoop(playerId);
+
+  const interval = setInterval(() => {
+    const currentBattle = battleManager.get(playerId);
+
+    if (!currentBattle || currentBattle.id !== expectedBattleId) {
+      stopAtbLoop(playerId);
+      return;
+    }
+
+    if (currentBattle.finished) {
+      stopAtbLoop(playerId);
+      return;
+    }
+
+    const nextBattle = advanceBattleAtb(currentBattle);
+
+    if (nextBattle !== currentBattle) {
+      battleManager.set(playerId, nextBattle);
+      io.to(playerId).emit("battle:update", nextBattle);
+    }
+
+    if (nextBattle.turnOwnerId === nextBattle.enemy.id) {
+      processEnemyTurn(playerId, expectedBattleId);
+    }
+  }, ATB_TICK_MS);
+
+  atbIntervals.set(playerId, interval);
 }
 
 io.on("connection", (socket) => {
@@ -140,6 +191,7 @@ io.on("connection", (socket) => {
         );
 
         socket.emit("battle:update", battleState);
+        startAtbLoop(socket.id, battleState.id);
       } catch (error) {
         console.error("Falha ao criar batalha:", error);
         socket.emit("battle:error", {
@@ -160,21 +212,21 @@ io.on("connection", (socket) => {
     }
 
     const nextBattleState = applyBattleAction(currentBattle, action);
+
+    if (nextBattleState === currentBattle) {
+      return;
+    }
+
     battleManager.set(socket.id, nextBattleState);
     socket.emit("battle:update", nextBattleState);
 
-    if (
-      !nextBattleState.finished &&
-      nextBattleState.turnOwnerId === nextBattleState.enemy.id
-    ) {
-      const expectedBattleId = nextBattleState.id;
-      setTimeout(() => {
-        processEnemyTurn(socket.id, expectedBattleId);
-      }, 1000);
+    if (nextBattleState.finished) {
+      stopAtbLoop(socket.id);
     }
   });
 
   socket.on("disconnect", () => {
+    stopAtbLoop(socket.id);
     battleManager.remove(socket.id);
     console.log(`Jogador desconectado: ${socket.id}`);
   });
