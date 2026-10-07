@@ -15,11 +15,7 @@ export interface SubclassBookDrop {
 }
 
 export function isBossMonsterId(monsterId: string): boolean {
-  return (
-    monsterId.startsWith("orc-king-boss-lvl-") ||
-    monsterId.startsWith("orc-warlord-mini-boss-lvl-") ||
-    /-boss-lvl-\d+$/.test(monsterId)
-  );
+  return /-boss-lvl-\d+$/.test(monsterId);
 }
 
 export function rollSubclassBookDrops(
