@@ -83,7 +83,7 @@ export function startDemoBattle(
   heroStats.hp = vitals.hp;
   heroStats.mana = vitals.mana;
   const enemy = createDemoMonster(monsterId);
-  const classBooks = rollSubclassBookDrops(monsterId);
+  const classBooks = rollSubclassBookDrops(monsterId, Math.random, localStorage.getItem("nomeHeroi") || "");
   if (monsterId.startsWith("orc-king-boss-lvl-")) enemy.phase = 1;
 
   battleState = {

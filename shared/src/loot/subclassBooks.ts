@@ -3,6 +3,7 @@ import {
   SUBCLASS_IDS,
   type SubclassId,
 } from "../classes/subclasses.js";
+import { isTestCharacter } from "../testing/testCharacter.js";
 
 export const SUBCLASS_BOOK_DROP_CHANCE = 0.005;
 
@@ -21,9 +22,11 @@ export function isBossMonsterId(monsterId: string): boolean {
 export function rollSubclassBookDrops(
   monsterId: string,
   random: () => number = Math.random,
+  heroName?: string,
 ): SubclassBookDrop[] {
   if (!isBossMonsterId(monsterId)) return [];
-  if (random() >= SUBCLASS_BOOK_DROP_CHANCE) return [];
+  const chance = isTestCharacter(heroName) ? 1 : SUBCLASS_BOOK_DROP_CHANCE;
+  if (random() >= chance) return [];
 
   const index = Math.min(
     SUBCLASS_IDS.length - 1,

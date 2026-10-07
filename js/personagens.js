@@ -57,7 +57,7 @@ function atualizarImagens() {
 }
 
 // Seleciona personagem e salva dados
-function selecionarPersonagem(classe) {
+async function selecionarPersonagem(classe) {
   const inputNome = document.getElementById("nomeHeroi");
   const erroNome = document.getElementById("erroNome");
 
@@ -106,6 +106,10 @@ function selecionarPersonagem(classe) {
     imagem: imagemHeroi, // <-- novo
   };
 
+  if (!window.testCharacterReady) {
+    await new Promise(resolve => window.addEventListener("drakoria:test-character-ready", resolve, { once: true }));
+  }
+  window.dispatchEvent(new Event("drakoria:character-created"));
   window.location.href = "intro.html";
 }
 

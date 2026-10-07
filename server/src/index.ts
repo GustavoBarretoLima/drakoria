@@ -160,6 +160,7 @@ io.on("connection", (socket) => {
     (payload: {
       className?: string;
       subclassId?: string;
+      heroName?: string;
       monsterId?: string;
       equippedItemIds?: string[];
       heroLevel?: number;
@@ -188,6 +189,7 @@ io.on("connection", (socket) => {
             ...(Number.isFinite(payload.currentMana) ? { mana: Number(payload.currentMana) } : {}),
           },
           subclassId,
+          typeof payload.heroName === "string" ? payload.heroName.trim().slice(0, 40) : "Heroi",
         );
 
         socket.emit("battle:update", battleState);

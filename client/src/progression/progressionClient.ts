@@ -94,7 +94,7 @@ export function applyDefeatPenalty(): DefeatPenaltyResult {
   return { progress, xpLost, goldLost };
 }
 
-function saveProgress(progress: PlayerProgress): void {
+export function saveProgress(progress: PlayerProgress): void {
   localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
 }
 

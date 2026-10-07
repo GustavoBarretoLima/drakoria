@@ -252,6 +252,7 @@ if (demoMode) {
     const vitals = getCurrentHeroVitals();
 
     socket.emit("player:setup", {
+      heroName: localStorage.getItem("nomeHeroi") || "Heroi",
       className: getSelectedHeroClass(),
       subclassId: getActiveSubclass(),
       monsterId: getSelectedMonsterId(),
