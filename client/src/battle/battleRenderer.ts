@@ -92,6 +92,7 @@ function renderSpritesBase(state: BattleState) {
     "inimigoBatalha",
   ) as HTMLImageElement | null;
   const isNewBattle = renderedBattleId !== state.id;
+  if (enemyImg) enemyImg.dataset.size = /-(?:boss|world-boss|mini-boss)-lvl-\d+$/.test(state.enemy.id) ? "boss" : "normal";
 
   if (isNewBattle) {
     renderedBattleId = state.id;
