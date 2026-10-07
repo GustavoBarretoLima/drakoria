@@ -4,6 +4,17 @@ import { renderBattleMessage } from "../ui/renderMessages.js";
 import { gifsHeroi, gifsGoblin } from "../assets/gifs.js";
 import { renderSkills } from "../ui/renderSkills.js";
 import { sendSkill } from "./battleClient.js";
+import { SPRITE_BOUNDS } from "../assets/spriteBounds.js";
+
+function setVisibleSpriteSize(image: HTMLImageElement, path: string): void {
+  const key = path.slice(path.indexOf("img/"));
+  const bounds = SPRITE_BOUNDS[key] ?? [1, 1, .5, 0];
+  const frame = image.parentElement;
+  if (!frame) return;
+  for (const [index, name] of ["--sprite-width", "--sprite-height", "--sprite-center", "--sprite-top"].entries()) {
+    frame.style.setProperty(name, String(bounds[index]));
+  }
+}
 
 let previousEventKey = "";
 let renderedBattleId = "";
@@ -105,11 +116,14 @@ function renderSpritesBase(state: BattleState) {
 
     if (heroGifs?.padrao) {
       heroImg.src = heroGifs.padrao;
+      setVisibleSpriteSize(heroImg, heroGifs.padrao);
     }
   }
 
   if (enemyImg) {
     const enemySprites = getEnemySprites(state);
+    if (isNewBattle) setVisibleSpriteSize(enemyImg, enemySprites.idle);
+    enemyImg.parentElement?.setAttribute("data-size", enemyImg.dataset.size ?? "normal");
 
     if (!state.enemy.isAlive) {
       enemyImg.src = enemySprites.death;
