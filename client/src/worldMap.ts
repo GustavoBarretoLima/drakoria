@@ -18,7 +18,7 @@ function selectRegion(id: WorldRegionId): void {
   title.textContent = config.label;
   description.textContent = config.description;
   inhabitants.textContent = `Monstros: ${monsters}.`;
-  levels.textContent = `Níveis ${config.minLevel}–${config.maxLevel}${config.bossLevel ? ` · Orc Rei nível ${config.bossLevel}` : ""}.`;
+  levels.textContent = `Níveis ${config.minLevel}–${config.maxLevel}${config.bossLevel ? ` · ${config.bossName} nível ${config.bossLevel}` : ""}.`;
   details.hidden = false;
   explore.textContent = `Explorar ${config.label}`;
   message.textContent = "";

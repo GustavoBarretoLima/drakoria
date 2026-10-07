@@ -50,11 +50,14 @@ Já implementado:
 | Local | Níveis dos monstros | Encontros |
 |---|---|---|
 | Acampamento Orc | 1–10 | Goblin e Orc, 50% cada |
-| Cemitério Esquecido | 1–10 | Esqueleto Guerreiro |
-| Pântano Corrompido | 1–10 | Rato Mutante |
+| Cemitério Esquecido | 1–10; boss 10 | Esqueleto Guerreiro e Espectro do Cemitério; boss Coveiro Maldito |
+| Pântano Corrompido | 1–10; boss 10 | Rato Mutante e Aranha Pestilenta; boss Hidra da Corrupção |
+| Floresta Sombria | 1–10; boss 10 | Lobo Sombrio e Árvore Demoníaca; boss Lobo Mutante |
 | Fortaleza do Rei Orc | 10–15; boss 20 | Hobgoblin normal 80%, elite 20%; Orc Rei após cinco vitórias |
 
-O menu da praça abre `pages/mapa.html`, usando a imagem em `img/mapas/arredores_de_drakoria.png`. Os locais têm botões sobre o mapa e uma lista acessível para telas pequenas. Drakoria retorna à praça. Floresta Sombria e Ruínas da Vigília permanecem sem encontros.
+O menu da praça abre `pages/mapa.html`, usando a imagem em `img/mapas/arredores_de_drakoria.png`. Os locais têm botões sobre o mapa e uma lista acessível para telas pequenas. Drakoria retorna à praça. Ruínas da Vigília permanece sem encontros.
+
+Cemitério, Pântano e Floresta liberam seus bosses após cinco vitórias, com alerta DANGER. Derrotar o boss conclui a exploração e permite voltar ao mapa. Os novos monstros têm animações de idle, ataque, dano e morte, atributos e recompensas compartilhados entre demo e backend. Monstros normais seguem os drops comuns; bosses garantem equipamento raro ou épico do seu nível.
 
 Cada região inicia sua própria exploração e mantém seus monstros ao continuar. HP, mana, inventário e progresso são preservados; sair após a vitória retorna ao mapa. A derrota continua retornando à praça para recuperação. IDs antigos de dungeon continuam disponíveis para compatibilidade com partidas salvas. Demo e backend usam os mesmos IDs de encontros.
 

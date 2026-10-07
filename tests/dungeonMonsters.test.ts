@@ -98,8 +98,9 @@ for (const names of Object.values(DUNGEON_EQUIPMENT_NAMES)) for (const name of O
 
 for (const [key, species, min, max] of [
   ["iniciante", ["goblin", "orc"], 1, 10],
-  ["cemiterio", ["skeleton-warrior"], 1, 10],
-  ["pantano", ["mutant-rat"], 1, 10],
+  ["cemiterio", ["skeleton-warrior", "cemetery-specter"], 1, 10],
+  ["pantano", ["mutant-rat", "pestilent-spider"], 1, 10],
+  ["floresta", ["shadow-wolf", "demonic-tree"], 1, 10],
   ["avancada", ["hobgoblin"], 10, 15],
 ] as const) {
   for (const random of [0, 0.49, 0.99]) {

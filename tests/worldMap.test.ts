@@ -9,8 +9,9 @@ import { createDemoMonster } from "../client/src/demo/demoMonsters.js";
 const saved = new Map<string, string>();
 const storage = { getItem: (key: string) => saved.get(key) ?? null, setItem: (key: string, value: string) => saved.set(key, value), removeItem: (key: string) => saved.delete(key) };
 const families: Record<string, string[]> = {
-  "cemiterio-esquecido": ["skeleton-warrior"],
-  "pantano-corrompido": ["mutant-rat"],
+  "cemiterio-esquecido": ["skeleton-warrior", "cemetery-specter"],
+  "pantano-corrompido": ["mutant-rat", "pestilent-spider"],
+  "floresta-sombria": ["shadow-wolf", "demonic-tree"],
   "acampamento-orc": ["goblin", "orc"],
   "fortaleza-rei-orc": ["hobgoblin"],
 };
@@ -54,7 +55,7 @@ saved.set("drakoriaHeroVitals", '{"hp":0,"mana":8}');
 const before = [...saved];
 assert.equal(enterWorldRegion(storage, "cemiterio-esquecido"), false);
 assert.deepEqual([...saved], before);
-for (const id of ["floresta-sombria", "ruinas-da-vigilia", "invalid", "__proto__"]) {
+for (const id of ["ruinas-da-vigilia", "invalid", "__proto__"]) {
   assert.equal(getWorldRegion(id), undefined);
   assert.equal(enterWorldRegion(storage, id), false);
 }

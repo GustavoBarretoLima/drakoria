@@ -53,7 +53,7 @@ export const DUNGEON_DROP_PROFILES: Record<string, DropProfile> = {
 };
 
 export function rollDungeonDrops(monsterId: string): EquipmentDrop[] | undefined {
-  const match = /^(goblin-normal|orc-normal|skeleton-warrior-normal|mutant-rat-normal|hobgoblin-normal|hobgoblin-elite|orc-king-boss)-lvl-(\d+)$/.exec(monsterId);
+  const match = /^(goblin-normal|orc-normal|skeleton-warrior-normal|mutant-rat-normal|hobgoblin-normal|hobgoblin-elite|orc-king-boss|pestilent-spider-normal|cemetery-specter-normal|shadow-wolf-normal|demonic-tree-normal|corruption-hydra-boss|cursed-gravedigger-boss|mutant-wolf-boss)-lvl-(\d+)$/.exec(monsterId);
   if (!match) return undefined;
   const level = Number(match[2]);
   const type = match[1]!;

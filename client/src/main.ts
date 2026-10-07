@@ -1,6 +1,7 @@
 import { prepareNextMonster, clearBattleStorage } from "./battle/victoryNavigation.js";
 import { getBattleExitPage } from "./battle/worldMapNavigation.js";
 import { setupBattleArena } from "./assets/battleArena.js";
+import { getDungeonConfig } from "../../shared/src/dungeons/dungeonEncounters.js";
 import { registerDungeonVictory } from "./battle/dungeonRunClient.js";
 import {
   loadConsumables,
@@ -136,6 +137,7 @@ function applyVictoryRewards(state: BattleState): void {
   const drops = state.rewards.drops ?? [];
   addDropsToInventory(drops);
   const run = registerDungeonVictory(state.enemy.id);
+  const regionConfig = run ? getDungeonConfig(run.dungeonId) : undefined;
   const vitals = loadHeroVitals(state.hero.stats.maxHp, state.hero.stats.maxMana);
   const consumables = loadConsumables();
 
@@ -181,6 +183,7 @@ function applyVictoryRewards(state: BattleState): void {
       ...(run ? { depth: run.depth } : {}),
       danger: Boolean(run?.bossPending),
       bossDefeated: Boolean(run?.bossDefeated),
+      ...(regionConfig?.bossName ? { bossName: regionConfig.bossName, regionName: regionConfig.label } : {}),
       vitals,
     },
   );

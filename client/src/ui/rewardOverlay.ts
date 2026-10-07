@@ -46,6 +46,8 @@ export interface VictoryActions {
   depth?: number;
   danger?: boolean;
   bossDefeated?: boolean;
+  bossName?: string;
+  regionName?: string;
   vitals?: PotionActionResult["vitals"];
 }
 
@@ -128,12 +130,12 @@ export function renderVictoryRewardOverlay(
     if (actions.danger) {
       const danger = document.createElement("div");
       danger.className = "reward-danger";
-      danger.textContent = "⚠ DANGER — Uma presença esmagadora bloqueia o caminho. O Orc Rei apareceu!";
+      danger.textContent = `⚠ DANGER — Uma presença esmagadora bloqueia o caminho: ${actions.bossName ?? "Orc Rei"}!`;
       panel.appendChild(danger);
     } else if (actions.bossDefeated) {
       const cleared = document.createElement("div");
       cleared.className = "reward-level-up";
-      cleared.textContent = "A Fortaleza foi conquistada. O Orc Rei caiu.";
+      cleared.textContent = `${actions.regionName ?? "Fortaleza do Rei Orc"}: ${actions.bossName ?? "Orc Rei"} foi derrotado. Exploração concluída!`;
       panel.appendChild(cleared);
     } else if (actions.depth !== undefined) {
       const depth = document.createElement("div");
@@ -217,7 +219,7 @@ export function renderVictoryRewardOverlay(
       nextButton = document.createElement("button");
       nextButton.type = "button";
       nextButton.textContent = actions.danger
-        ? "Enfrentar o Orc Rei"
+        ? `Enfrentar ${actions.bossName ?? "Orc Rei"}`
         : "Continuar explorando";
       nextButton.addEventListener("click", () => {
         if (chosen) return;

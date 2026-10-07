@@ -31,7 +31,8 @@ export function recordDungeonVictory(
   run: DungeonRunState,
   defeatedMonsterId: string,
 ): DungeonRunState {
-  const defeatedBoss = defeatedMonsterId.startsWith("orc-king-boss-lvl-");
+  const bossMonster = config.bossMonster ?? (config.rank === "boss" ? config.monsters[0] : undefined);
+  const defeatedBoss = Boolean(bossMonster && defeatedMonsterId.startsWith(`${bossMonster}-boss-lvl-`));
   const victories = run.victories + 1;
   const bossPending = Boolean(
     !defeatedBoss &&

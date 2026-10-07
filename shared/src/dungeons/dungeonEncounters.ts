@@ -11,6 +11,7 @@ export interface DungeonConfig {
   introDepths?: number;
   bossAfterVictories?: number;
   bossMonster?: string;
+  bossName?: string;
   bossLevel?: number;
   hidden?: boolean;
 }
@@ -38,16 +39,36 @@ export const DUNGEON_CONFIG: Record<string, DungeonConfig> = {
     label: "Cemitério Esquecido",
     minLevel: 1,
     maxLevel: 10,
-    monsters: ["skeleton-warrior"],
-    description: "Esqueletos Guerreiros guardam as sepulturas. Os encontros ficam mais fortes conforme a exploração avança.",
+    monsters: ["skeleton-warrior", "cemetery-specter"],
+    bossAfterVictories: 5,
+    bossMonster: "cursed-gravedigger",
+    bossName: "Coveiro Maldito",
+    bossLevel: 10,
+    description: "Esqueletos e Espectros guardam as sepulturas. Após cinco vitórias, o Coveiro Maldito aparece.",
   },
   pantano: {
     id: "pantano-corrompido",
     label: "Pântano Corrompido",
     minLevel: 1,
     maxLevel: 10,
-    monsters: ["mutant-rat"],
-    description: "Ratos Mutantes infestam o pântano. Os encontros ficam mais fortes conforme a exploração avança.",
+    monsters: ["mutant-rat", "pestilent-spider"],
+    bossAfterVictories: 5,
+    bossMonster: "corruption-hydra",
+    bossName: "Hidra da Corrupção",
+    bossLevel: 10,
+    description: "Ratos Mutantes e Aranhas Pestilentas infestam o pântano. Após cinco vitórias, a Hidra da Corrupção aparece.",
+  },
+  floresta: {
+    id: "floresta-sombria",
+    label: "Floresta Sombria",
+    minLevel: 1,
+    maxLevel: 10,
+    monsters: ["shadow-wolf", "demonic-tree"],
+    bossAfterVictories: 5,
+    bossMonster: "mutant-wolf",
+    bossName: "Lobo Mutante",
+    bossLevel: 10,
+    description: "Lobos Sombrios e Árvores Demoníacas espreitam entre as árvores. Após cinco vitórias, o Lobo Mutante aparece.",
   },
   avancada: {
     id: "dungeon-orc-fortress",
@@ -60,6 +81,7 @@ export const DUNGEON_CONFIG: Record<string, DungeonConfig> = {
     eliteChance: 0.20,
     bossAfterVictories: 5,
     bossMonster: "orc-king",
+    bossName: "Orc Rei",
     bossLevel: 20,
     description: "Hobgoblins e Hobgoblins Elite defendem a fortaleza. Após cinco vitórias, o Orc Rei aparece.",
   },
