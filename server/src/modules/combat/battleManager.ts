@@ -11,12 +11,14 @@ export class BattleManager {
     monsterId = "goblin-normal-lvl-1",
     equippedItems: EquipmentItem[] = [],
     heroLevel = 1,
+    initialResources: { hp?: number; mana?: number } = {},
   ): BattleState {
     const battle = createInitialBattleState(
       heroClass,
       monsterId,
       equippedItems,
       heroLevel,
+      initialResources,
     );
     this.battles.set(playerId, battle);
     return battle;
