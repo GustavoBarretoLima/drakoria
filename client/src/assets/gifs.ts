@@ -71,3 +71,17 @@ export function setEnemyGifs(sprites?: MonsterSpriteSet): void {
   gifsGoblin.damage = assetPath(sprites.damage);
   gifsGoblin.morte = assetPath(sprites.death ?? sprites.damage);
 }
+
+/** The subclass changes appearance while retaining the warrior combat identity. */
+export function getHeroGifs(className: keyof typeof gifsHeroi, gender: "Masculino" | "Feminino", subclassId?: string) {
+  const base = gifsHeroi[className][gender];
+  if (className !== "guerreiro" || subclassId !== "berserker") return { ...base, morte: base.damage };
+  return {
+    ...base,
+    padrao: assetPath("img/personagens/berserk_primal/idle.gif"),
+    defesa: assetPath("img/personagens/berserk_primal/idle.gif"),
+    atk: assetPath("img/personagens/berserk_primal/attack.gif"),
+    damage: assetPath("img/personagens/berserk_primal/damage.gif"),
+    morte: assetPath("img/personagens/berserk_primal/death.gif"),
+  };
+}

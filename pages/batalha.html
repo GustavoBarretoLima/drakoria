@@ -156,7 +156,10 @@
       };
       const classe = (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase();
       const genero = (localStorage.getItem("generoHeroi") || "masculino").toLowerCase();
-      const pasta = pastasHeroi[classe]?.[genero] || "heroi_anime";
+      let activeSubclass;
+      try { activeSubclass = JSON.parse(localStorage.getItem("drakoriaSubclassProgress") || "{}").activeSubclass; } catch {}
+      const pasta = classe === "guerreiro" && activeSubclass === "berserker"
+        ? "berserk_primal" : pastasHeroi[classe]?.[genero] || "heroi_anime";
       const imagemHeroi = `../img/personagens/${pasta}/idle.gif`;
       localStorage.setItem("imagemHeroi", imagemHeroi);
 
