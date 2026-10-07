@@ -8,8 +8,8 @@ import {
 import type { BattleAction } from "../../../shared/src/combat/actions.js";
 import { applyEquipmentStats } from "../../../shared/src/equipment/equipmentStats.js";
 import { rollMonsterDrops } from "../../../shared/src/loot/lootTables.js";
+import { rollSubclassBookDrops } from "../../../shared/src/loot/subclassBooks.js";
 import type {
-  BattleEvent,
   BattleState,
   HeroClass,
 } from "../../../shared/src/types/combat.js";
@@ -46,20 +46,16 @@ function stopAtbLoop(): void {
 
 function startAtbLoop(expectedBattleId: string): void {
   stopAtbLoop();
-
   atbTimer = window.setInterval(() => {
     if (!battleState || battleState.id !== expectedBattleId || battleState.finished) {
       stopAtbLoop();
       return;
     }
-
     const nextState = advanceBattleAtb(battleState);
-
     if (nextState !== battleState) {
       battleState = nextState;
       emitState();
     }
-
     if (battleState.turnOwnerId === battleState.enemy.id) {
       processEnemyTurn(expectedBattleId);
     }
@@ -82,6 +78,7 @@ export function startDemoBattle(
   heroStats.hp = vitals.hp;
   heroStats.mana = vitals.mana;
   const enemy = createDemoMonster(monsterId);
+  const classBooks = rollSubclassBookDrops(monsterId);
   if (monsterId.startsWith("orc-king-boss-lvl-")) enemy.phase = 1;
 
   battleState = {
@@ -100,6 +97,7 @@ export function startDemoBattle(
     rewards: {
       ...baseRewards,
       drops: rollMonsterDrops(monsterId),
+      ...(classBooks.length > 0 ? { classBooks } : {}),
     },
     revealEnemyStats: hasMonsterInsight(equippedItems, heroLevel),
     turnOwnerId: null,
