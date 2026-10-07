@@ -133,7 +133,7 @@ function applyVictoryRewards(state: BattleState): void {
       },
       onUsePotion: useRestorativePotion,
       potionCount: consumables.restorativePotion,
-      depth: run?.depth,
+      ...(run ? { depth: run.depth } : {}),
       danger: Boolean(run?.bossPending),
       bossDefeated: Boolean(run?.bossDefeated),
       vitals,
