@@ -17,6 +17,7 @@ export default defineConfig(({ command }) => ({
         login: path.resolve(__dirname, "pages/login.html"),
         personagens: path.resolve(__dirname, "pages/personagens.html"),
         praca: path.resolve(__dirname, "pages/praca.html"),
+        mapa: path.resolve(__dirname, "pages/mapa.html"),
       },
     },
   },

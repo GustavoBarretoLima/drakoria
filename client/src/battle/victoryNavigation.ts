@@ -41,7 +41,7 @@ export function prepareNextMonster(storage: BattleStorage, random: () => number 
 }
 
 export function clearBattleStorage(storage: BattleStorage): void {
-  for (const key of ["tipoBatalhaAtual", "monsterIdAtual", "dungeonAtual", "dungeonNivelMin", "dungeonNivelMax", "dungeonEncontroTipo", "dungeonEncontroNivel", "dungeonDanger", RUN_KEY]) {
+  for (const key of ["worldRegionAtual", "tipoBatalhaAtual", "monsterIdAtual", "dungeonAtual", "dungeonNivelMin", "dungeonNivelMax", "dungeonEncontroTipo", "dungeonEncontroNivel", "dungeonDanger", RUN_KEY]) {
     storage.removeItem(key);
   }
 }

@@ -91,13 +91,15 @@ const context = vm.createContext({
 });
 vm.runInContext(readFileSync("js/dungeon-orc-ranges.js", "utf8").replace(/^import[^\n]*\n/gm, ""), context);
 vm.runInContext("window.abrirDungeon()", context);
-for (const label of ["Covil dos Goblins e Orcs", "Cripta dos Mutantes", "Fortaleza do Orc Rei"]) assert.ok(panel.innerHTML.includes(label));
+for (const label of ["Acampamento Orc", "Cemitério Esquecido", "Pântano Corrompido", "Fortaleza do Rei Orc"]) assert.ok(panel.innerHTML.includes(label));
+assert.ok(!panel.innerHTML.includes("Cripta dos Mutantes"));
 assert.ok(!panel.innerHTML.includes("Trono do Orc Rei"));
 for (const names of Object.values(DUNGEON_EQUIPMENT_NAMES)) for (const name of Object.values(names)) assert.ok(panel.innerHTML.includes(name));
 
 for (const [key, species, min, max] of [
   ["iniciante", ["goblin", "orc"], 1, 10],
-  ["cripta", ["skeleton-warrior", "mutant-rat"], 1, 10],
+  ["cemiterio", ["skeleton-warrior"], 1, 10],
+  ["pantano", ["mutant-rat"], 1, 10],
   ["avancada", ["hobgoblin"], 10, 15],
 ] as const) {
   for (const random of [0, 0.49, 0.99]) {
