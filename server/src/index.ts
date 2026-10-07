@@ -1,4 +1,5 @@
 import { canEquipItem } from "../../shared/src/equipment/equipmentRules.js";
+import { SUBCLASS_DEFINITIONS, type SubclassId } from "../../shared/src/classes/subclasses.js";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import { BattleManager } from "./modules/combat/battleManager.js";
@@ -39,6 +40,12 @@ const atbIntervals = new Map<string, NodeJS.Timeout>();
 function normalizeHeroClass(className?: string): HeroClass {
   if (className === "mago" || className === "arqueiro") return className;
   return "guerreiro";
+}
+
+function normalizeSubclass(subclassId: unknown, heroClass: HeroClass): SubclassId | undefined {
+  if (typeof subclassId !== "string") return undefined;
+  const id = subclassId as SubclassId;
+  return SUBCLASS_DEFINITIONS[id]?.baseClass === heroClass ? id : undefined;
 }
 
 function resolveEquippedItems(
@@ -152,6 +159,7 @@ io.on("connection", (socket) => {
     "player:setup",
     (payload: {
       className?: string;
+      subclassId?: string;
       monsterId?: string;
       equippedItemIds?: string[];
       heroLevel?: number;
@@ -159,6 +167,7 @@ io.on("connection", (socket) => {
       currentMana?: number;
     }) => {
       const className = normalizeHeroClass(payload.className);
+      const subclassId = normalizeSubclass(payload.subclassId, className);
       const heroLevel = normalizeHeroLevel(Number(payload.heroLevel ?? 1));
       const monsterId = payload.monsterId || "goblin-normal-lvl-1";
       const equippedItems = resolveEquippedItems(
@@ -178,6 +187,7 @@ io.on("connection", (socket) => {
             ...(Number.isFinite(payload.currentHp) ? { hp: Number(payload.currentHp) } : {}),
             ...(Number.isFinite(payload.currentMana) ? { mana: Number(payload.currentMana) } : {}),
           },
+          subclassId,
         );
 
         socket.emit("battle:update", battleState);
