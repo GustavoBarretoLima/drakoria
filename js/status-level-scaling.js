@@ -205,6 +205,7 @@ function criarSlotPaperDollStatus(slot, label, inventario) {
       <span class="paper-slot-label">${label}</span>
       <strong>${nome}</strong>
       <span class="paper-slot-rarity">${rarityLabel}</span>
+      <span class="item-equipped-badge">✓ Equipado</span>
       <div class="paper-tooltip" role="tooltip">
         <div class="paper-tooltip-header">
           <strong>${nome}</strong>

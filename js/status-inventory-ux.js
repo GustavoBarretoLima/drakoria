@@ -141,8 +141,9 @@ function inventoryUxItemSlot(entry, index, inventory) {
   else if (!use.levelAllowed) restriction = `Requer nível ${Math.max(1, Number(item.level || 1))}`;
 
   return `
-    <div class="inventory-slot filled rarity-${rarity}${equipped ? " equipped" : ""}${use.allowed ? "" : " locked"}">
+    <div class="inventory-slot filled rarity-${rarity}${equipped ? " equipped" : ""}${use.allowed ? "" : " locked"}${use.classAllowed ? "" : " class-incompatible"}">
       <span class="inventory-slot-index">${index + 1}</span>
+      ${equipped ? '<span class="item-equipped-badge">✓ Equipado</span>' : ""}
       <strong>${inventoryUxEscape(item.name)}</strong>
       ${quantity > 1 ? `<small>x${quantity}</small>` : ""}
       <em>${inventoryUxEscape(INVENTORY_UX_RARITIES[rarity] || rarity)}</em>
@@ -178,6 +179,7 @@ function inventoryUxOpen() {
         <button type="button" class="equipment-slot${current ? ` occupied rarity-${rarity}` : ""}" ${current ? `onclick="desequiparSlotInventario('${slot}')"` : "disabled"}>
           <span>${label}</span>
           <strong>${current ? inventoryUxEscape(current.item.name) : "Vazio"}</strong>
+          ${current ? '<span class="item-equipped-badge">✓ Equipado</span>' : ""}
           ${current ? inventoryUxRequirementsHtml(current.item) : ""}
           ${current ? inventoryUxStatsHtml(current.item.stats) : ""}
           ${current ? "<small>Clique para desequipar</small>" : ""}
