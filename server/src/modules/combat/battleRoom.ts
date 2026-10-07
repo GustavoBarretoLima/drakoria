@@ -50,6 +50,7 @@ export function createInitialBattleState(
   heroLevel = 1,
   initialResources: InitialHeroResources = {},
   subclassId?: SubclassId,
+  heroName = "Heroi",
 ): BattleState {
   const monster = getMonsterById(monsterId);
 
@@ -75,7 +76,7 @@ export function createInitialBattleState(
     id: `battle-${Date.now()}`,
     hero: {
       id: "player-1",
-      name: "Heroi",
+      name: heroName,
       className: heroClass,
       level: normalizeHeroLevel(heroLevel),
       stats: heroStats,
@@ -112,7 +113,7 @@ export function createInitialBattleState(
       xp: monster.xpReward,
       gold: monster.goldReward,
       drops: rollMonsterDrops(monster.id),
-      classBooks: rollSubclassBookDrops(monster.id),
+      classBooks: rollSubclassBookDrops(monster.id, Math.random, heroName),
     },
     revealEnemyStats: hasMonsterInsight(equippedItems, heroLevel),
     turnOwnerId: null,

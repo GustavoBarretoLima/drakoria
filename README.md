@@ -156,6 +156,14 @@ O desenvolvimento local usa o backend. O modo demo é ativado automaticamente no
 
 ## ✅ Validação
 
+### Personagem de testes
+
+Na criação de personagem, use o nome **Taichou** (maiúsculas/minúsculas e espaços nas extremidades são ignorados). Ele começa com nível mínimo 20, vida/mana completas e os nove equipamentos míticos de nível 20 da classe escolhida já equipados. A preparação preserva outros itens e não duplica o set ao ser executada novamente.
+
+Para esse nome, bosses elegíveis para livros de subclasse têm **100% de chance de conceder um livro**, na demo e no backend. A subclasse do livro continua aleatória; monstros comuns e mini-bosses mantêm as regras atuais. Outros personagens continuam com a chance normal de 0,5%. O nome é um atalho de testes, sem autenticação ou permissões administrativas de conta.
+
+### Comandos
+
 ```bash
 npm test
 npx tsc --noEmit
