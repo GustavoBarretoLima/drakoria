@@ -79,8 +79,15 @@ export function useRestorativePotion(): PotionUseResult {
     }
   }
 
-  if (consumables.restorativePotion <= 0) {
-    return { used: false, remaining: 0, vitals };
+  if (
+    consumables.restorativePotion <= 0 ||
+    (vitals.hp >= vitals.maxHp && vitals.mana >= vitals.maxMana)
+  ) {
+    return {
+      used: false,
+      remaining: consumables.restorativePotion,
+      vitals,
+    };
   }
 
   vitals.hp = Math.min(vitals.maxHp, vitals.hp + 40);
