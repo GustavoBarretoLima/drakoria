@@ -91,6 +91,7 @@ function bookCard(subclassId, state) {
       <p class="subclass-book-count">Quantidade: ${count}</p>
       <p><strong>${escapeHtml(definition.name)}</strong> — ${escapeHtml(definition.role)}</p>
       <p>${escapeHtml(definition.description)}</p>
+      <p><strong>Passiva:</strong> ${escapeHtml(definition.passiveSummary)}</p>
       <div class="subclass-book-tags">${definition.mechanics.map((mechanic) => `<span>${escapeHtml(mechanic)}</span>`).join("")}</div>
       <button type="button" ${disabled ? "disabled" : ""} data-subclass-book="${subclassId}">${escapeHtml(buttonLabel)}</button>
     </article>
@@ -126,7 +127,7 @@ function openSubclassBooks() {
       ? `<div class="subclass-books-grid">${ownedCards}</div>`
       : '<div class="subclass-empty">Você ainda não encontrou nenhum livro de subclasse.</div>'}
     <div class="subclass-future-note">
-      <strong>Próxima evolução:</strong> as árvores específicas usarão estas identidades — Paladino (tank/cura/proteção), Berserker (dano puro), Espadachim (velocidade/crítico), Necromante (espíritos e invocação), Bruxo (efeitos negativos), Elemental (elementos), Assassino (sangramento/crítico), Caçador (falcão/controle) e Elfo Negro (dano/crítico/debuffs).
+      <strong>Identidades de árvore:</strong> Paladino (tank/cura/proteção), Berserk (dano puro), Espadachim (velocidade/crítico), Necromante (espíritos e invocação), Bruxo (efeitos negativos), Elemental (elementos), Assassino (sangramento/crítico), Caçador (falcão/controle) e Elfo Negro (dano/crítico/debuffs).
     </div>
     <div class="painel-acoes"><button type="button" onclick="fecharPainelPraca()">Fechar</button></div>
   `;
