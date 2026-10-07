@@ -29,6 +29,7 @@ import {
   applyDefeatPenalty,
   awardBattleRewards,
 } from "./progression/progressionClient.js";
+import { addSubclassBookDrops } from "./progression/subclassClient.js";
 import {
   renderDefeatOverlay,
   renderVictoryRewardOverlay,
@@ -137,7 +138,9 @@ function applyVictoryRewards(state: BattleState): void {
   rewardedBattleId = state.id;
   const result = awardBattleRewards(state.rewards);
   const drops = state.rewards.drops ?? [];
+  const classBooks = state.rewards.classBooks ?? [];
   addDropsToInventory(drops);
+  addSubclassBookDrops(classBooks);
   const run = registerDungeonVictory(state.enemy.id);
   const regionConfig = run ? getDungeonConfig(run.dungeonId) : undefined;
   const vitals = loadHeroVitals(state.hero.stats.maxHp, state.hero.stats.maxMana);
@@ -146,13 +149,20 @@ function applyVictoryRewards(state: BattleState): void {
   renderVictoryRewardOverlay(
     state.rewards,
     result,
-    drops.map((drop) => ({
-      name: drop.item.name,
-      quantity: drop.quantity,
-      rarity: drop.item.rarity,
-      level: drop.item.level,
-      allowedClasses: drop.item.allowedClasses,
-    })),
+    [
+      ...drops.map((drop) => ({
+        name: drop.item.name,
+        quantity: drop.quantity,
+        rarity: drop.item.rarity,
+        level: drop.item.level,
+        allowedClasses: drop.item.allowedClasses,
+      })),
+      ...classBooks.map((book) => ({
+        name: `📖 ${book.name}`,
+        quantity: book.quantity,
+        rarity: "mythic" as const,
+      })),
+    ],
     {
       onNextMonster: () => {
         prepareNextMonster(localStorage);
