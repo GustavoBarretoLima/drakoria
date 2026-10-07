@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/efeitos.css" />
     <link rel="stylesheet" href="../css/responsive.css" />
     <link rel="stylesheet" href="../css/reward-overlay.css" />
+    <link rel="stylesheet" href="../css/battle-commands.css" />
   </head>
   <body>
     <section id="batalha" style="position: relative">
@@ -115,21 +116,27 @@
         </div>
       </div>
 
-      <div class="acoes">
-        <button id="btnAtacar">Atacar</button>
-        <button id="btnDefender">Defender</button>
-        <button id="btnMagia">Magia</button>
-        <button id="btnFugir">Fugir</button>
+      <div id="battleCommandDock" class="battle-command-dock">
+        <div class="battle-command-feedback">
+          <div id="mensagens" role="status" aria-live="polite"></div>
+          <div id="indicadorTurno" class="indicador-turno">ATB carregando...</div>
+        </div>
+        <div id="comandosBatalha" class="acoes">
+          <button id="btnAtacar">Atacar</button>
+          <button id="btnDefender">Defender</button>
+          <button id="btnMagia">Magia</button>
+          <button id="btnHabilidades" aria-expanded="false" aria-controls="painelHabilidades" hidden>Habilidades</button>
+          <button id="btnFugir">Fugir</button>
+        </div>
+        <section id="painelHabilidades" class="battle-skill-menu" aria-labelledby="tituloHabilidades" hidden>
+          <header class="battle-skill-heading">
+            <h3 id="tituloHabilidades">Habilidades</h3>
+            <button id="btnVoltarHabilidades" type="button">◀ Voltar</button>
+          </header>
+          <div id="habilidadesClasse" class="battle-skill-list"></div>
+          <p id="descricaoHabilidade" class="battle-skill-description"></p>
+        </section>
       </div>
-
-      <details id="painelHabilidades" class="battle-skills" hidden>
-        <summary id="tituloHabilidades">Habilidades da classe</summary>
-        <p class="battle-skills-help">Liberadas nos níveis 1, 5 e 10. A recuperação avança ao realizar outras ações, não com o tempo.</p>
-        <div id="habilidadesClasse" class="battle-skills-grid"></div>
-      </details>
-
-      <div id="mensagens" role="status" aria-live="polite"></div>
-      <div id="indicadorTurno" class="indicador-turno">ATB carregando...</div>
     </section>
 
     <div id="praca"></div>
