@@ -106,7 +106,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     rarity: "rare",
     level: 10,
     allowedClasses: ["mago"],
-    stats: { attack: 12, mana: 24, criticalChance: 4 },
+    stats: { magicPower: 12, mana: 24, criticalChance: 4 },
     icon: "/img/itens/weapon.png",
     sellPrice: 78,
   },

@@ -57,7 +57,7 @@ const overlay = documentStub.getElementById("battleRewardOverlay")!;
 assert.equal(overlay.attributes.get("role"), "dialog");
 assert.equal(overlay.attributes.get("aria-modal"), "true");
 const buttons = all(overlay).filter(el => el.type === "button");
-assert.deepEqual(buttons.map(button => button.textContent), ["Buscar próximo monstro", "Voltar para a cidade"]);
+assert.deepEqual(buttons.map(button => button.textContent), ["Continuar explorando", "Sair da dungeon"]);
 assert.equal(documentStub.activeElement, buttons[0]);
 assert.ok(all(overlay).some(el => el.textContent.includes("Cajado Rúnico")));
 buttons[0]!.click(); buttons[0]!.click(); buttons[1]!.click();

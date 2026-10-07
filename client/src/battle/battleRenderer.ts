@@ -156,6 +156,12 @@ function playBattleEventEffects(state: BattleState) {
   const heroDamageGif = heroGifs.damage ?? heroDefaultGif;
   const heroSkillGif = "magia" in heroGifs ? heroGifs.magia : "";
 
+  if (lastEvent.dodged) return;
+  if (lastEvent.actorId === state.enemy.id && lastEvent.action === "DEFEND") {
+    pulseDefend(enemyWrapper);
+    return;
+  }
+
   if (lastEvent.actorId === state.hero.id) {
     if (lastEvent.action === "ATTACK") {
       heroImg.src = heroAttackGif;

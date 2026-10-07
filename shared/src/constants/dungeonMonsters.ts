@@ -28,7 +28,7 @@ export function createDungeonMonster(id: string): MonsterDefinition | undefined 
   return {
     id, name: `${profile.name}${elite ? " Elite" : ""} Nv.${level}`, description: profile.rank === "boss" ? "Rei do clã orc, protegido por guerreiros e comandantes da fortaleza." : key === "hobgoblin" ? "Guerreiro do Acampamento Hobgoblin, treinado para emboscadas." : `Habitante hostil da Cripta dos Mutantes: ${profile.name}.`,
     family: profile.family, rank: elite ? "elite" : profile.rank, element: profile.element, level,
-    stats: { hp, maxHp: hp, mana: 0, maxMana: 0, attack: Math.floor(profile.attack * multiplier), defense, magicDefense: Math.floor(defense / 2), magicPower: 0, criticalChance: 6, criticalDamage: 60 },
+    stats: { hp, maxHp: hp, mana: 0, maxMana: 0, attack: Math.floor(profile.attack * multiplier), defense, magicDefense: Math.floor(defense / 2), magicPower: key === "orc-king" ? Math.floor(24 * multiplier) : 0, criticalChance: 6, criticalDamage: 60 },
     xpReward: Math.floor(profile.xp * multiplier * (elite ? 1.25 : 1)), goldReward: Math.floor(profile.gold * multiplier * (elite ? 1.25 : 1)), sprites: folderSprites(profile.folder), skills: [],
   };
 }

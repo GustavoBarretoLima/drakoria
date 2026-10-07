@@ -87,6 +87,8 @@ export function createInitialBattleState(
         mana: monster.stats.mana,
         maxMana: monster.stats.maxMana,
         attack: monster.stats.attack,
+        magicPower: monster.stats.magicPower,
+        dodgeChance: 0,
         defense: monster.stats.defense,
         magicDefense:
           monster.stats.magicDefense ??

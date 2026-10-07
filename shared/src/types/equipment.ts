@@ -31,6 +31,8 @@ export interface EquipmentStats {
   hp?: number;
   mana?: number;
   attack?: number;
+  speed?: number;
+  magicDefense?: number;
   defense?: number;
   criticalChance?: number;
   criticalDamage?: number;

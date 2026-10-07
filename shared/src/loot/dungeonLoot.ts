@@ -9,8 +9,8 @@ export const DUNGEON_EQUIPMENT_NAMES: Record<HeroClass, Record<EquipmentSlot, st
 
 const BASE_STATS: Record<HeroClass, Record<EquipmentSlot, EquipmentStats>> = {
   guerreiro: { weapon: { attack: 5 }, armor: { defense: 4, hp: 14 }, shield: { defense: 3, hp: 8 }, legs: { defense: 2, hp: 8 }, boots: { defense: 1, hp: 5 }, gloves: { attack: 1, defense: 1 }, ring: { hp: 8, attack: 1 }, earring: { hp: 5, criticalDamage: 2 }, necklace: { hp: 10, defense: 1 } },
-  mago: { weapon: { attack: 5, mana: 8 }, armor: { defense: 2, mana: 14 }, shield: { attack: 1, mana: 8 }, legs: { defense: 1, mana: 8 }, boots: { defense: 1, mana: 5 }, gloves: { attack: 1, mana: 4 }, ring: { attack: 1, mana: 8 }, earring: { mana: 6, criticalDamage: 2 }, necklace: { hp: 5, mana: 10 } },
-  arqueiro: { weapon: { attack: 5, criticalDamage: 2 }, armor: { defense: 3, hp: 8 }, shield: { defense: 2, hp: 5 }, legs: { defense: 2, hp: 5 }, boots: { defense: 1, hp: 4 }, gloves: { attack: 2 }, ring: { attack: 1, hp: 5 }, earring: { hp: 5, criticalDamage: 2 }, necklace: { hp: 8, attack: 1 } },
+  mago: { weapon: { magicPower: 5, mana: 8 }, armor: { defense: 2, mana: 14 }, shield: { magicPower: 1, mana: 8 }, legs: { defense: 1, mana: 8 }, boots: { defense: 1, mana: 5 }, gloves: { magicPower: 1, mana: 4 }, ring: { magicPower: 1, mana: 8 }, earring: { mana: 6, criticalDamage: 2 }, necklace: { hp: 5, mana: 10 } },
+  arqueiro: { weapon: { attack: 5, criticalDamage: 2 }, armor: { defense: 3, hp: 8 }, shield: { defense: 2, hp: 5 }, legs: { defense: 2, hp: 5 }, boots: { defense: 1, hp: 4, speed: 1, dodgeChance: 2 }, gloves: { attack: 2, criticalChance: 1 }, ring: { attack: 1, hp: 5 }, earring: { hp: 5, criticalDamage: 2 }, necklace: { hp: 8, attack: 1 } },
 };
 
 const QUALITY = { common: { label: "do Recruta", power: 1 }, uncommon: { label: "do Veterano", power: 1.2 }, rare: { label: "da Elite", power: 1.5 }, epic: { label: "do Soberano", power: 1.85 } } as const;

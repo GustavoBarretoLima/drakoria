@@ -30,6 +30,7 @@ export function renderStatus(state: BattleState) {
   if (panel) panel.hidden = !reveal;
   const stats = state.enemy.stats;
   for (const [id, value] of Object.entries({
+    magiaInimigo: String(stats.magicPower), esquivaInimigo: `${stats.dodgeChance}%`,
     ataqueInimigo: String(stats.attack), defesaInimigo: String(stats.defense),
     defesaMagicaInimigo: String(stats.magicDefense), velocidadeInimigo: String(stats.speed),
     manaInimigo: `${stats.mana}/${stats.maxMana}`, criticoInimigo: `${stats.criticalChance}%`,
