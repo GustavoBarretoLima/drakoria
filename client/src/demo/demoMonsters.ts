@@ -1,4 +1,5 @@
 import { createDungeonMonster } from "../../../shared/src/constants/dungeonMonsters.js";
+import { createHabitatMonster } from "../../../shared/src/constants/habitatMonsters.js";
 import type {
   BattleRewards,
   CombatantState,
@@ -148,7 +149,7 @@ function createScaledRewards(monsterId: string): BattleRewards | null {
 }
 
 export function createDemoMonster(monsterId: string): CombatantState {
-  const dungeon = createDungeonMonster(monsterId);
+  const dungeon = createDungeonMonster(monsterId) ?? createHabitatMonster(monsterId);
   if (dungeon) {
     const stats = dungeon.stats;
     return {
@@ -159,8 +160,8 @@ export function createDemoMonster(monsterId: string): CombatantState {
         ...stats,
         dodgeChance: 0,
         magicDefense: dungeon.stats.magicDefense ?? 0,
-        speed: { goblin: 12, orc: 8, undead: 9, beast: 14 }[
-          dungeon.family as "goblin" | "orc" | "undead" | "beast"
+        speed: { goblin: 12, orc: 8, undead: 9, beast: 14, spider: 13, spirit: 13, plant: 7, reptile: 11 }[
+          dungeon.family as "goblin" | "orc" | "undead" | "beast" | "spider" | "spirit" | "plant" | "reptile"
         ],
       },
       atb: 0,
@@ -178,7 +179,7 @@ export function createDemoMonster(monsterId: string): CombatantState {
 }
 
 export function getDemoMonsterRewards(monsterId: string): BattleRewards {
-  const dungeon = createDungeonMonster(monsterId);
+  const dungeon = createDungeonMonster(monsterId) ?? createHabitatMonster(monsterId);
   if (dungeon) return { xp: dungeon.xpReward, gold: dungeon.goldReward };
   return (
     createScaledRewards(monsterId) ??

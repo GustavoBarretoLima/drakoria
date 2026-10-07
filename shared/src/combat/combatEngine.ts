@@ -244,9 +244,10 @@ export function applyEnemyTurn(state: BattleState): BattleState {
   if (state.finished || state.turnOwnerId !== state.enemy.id) return state;
   const hero = { ...state.hero, stats: { ...state.hero.stats } };
   const enemy = { ...state.enemy, stats: { ...state.enemy.stats }, atb: 0 };
-  const boss = enemy.id.startsWith("orc-king-boss-lvl-");
+  const orcKing = enemy.id.startsWith("orc-king-boss-lvl-");
+  const boss = /-boss-lvl-\d+$/.test(enemy.id);
   const elite = enemy.id.startsWith("hobgoblin-elite-lvl-");
-  const entersPhaseTwo = boss && enemy.phase !== 2 && enemy.stats.hp <= enemy.stats.maxHp / 2;
+  const entersPhaseTwo = orcKing && enemy.phase !== 2 && enemy.stats.hp <= enemy.stats.maxHp / 2;
   if (entersPhaseTwo) {
     enemy.phase = 2;
     enemy.stats.attack = Math.floor(enemy.stats.attack * 1.3);
@@ -266,7 +267,7 @@ export function applyEnemyTurn(state: BattleState): BattleState {
         message: `${enemy.name} ergue o escudo e prepara uma estocada perfurante. Defenda-se!` } };
   }
   const ambush = elite && enemy.charging === true;
-  const usesMagic = boss ? enemy.phase === 2 && special : special && enemy.stats.magicPower > 0;
+  const usesMagic = orcKing ? enemy.phase === 2 && special : special && enemy.stats.magicPower > 0;
   const ability = ambush ? "Estocada Perfurante" : special ? usesMagic ? "Magia Sombria" : "Golpe Poderoso" : undefined;
   if (ambush || special) enemy.specialCooldown = boss && enemy.phase === 2 ? 1 : 2;
   enemy.charging = false;

@@ -1,4 +1,5 @@
 import { DUNGEON_MONSTERS, folderSprites } from "../../../../shared/src/constants/dungeonMonsters.js";
+import { HABITAT_MONSTERS } from "../../../../shared/src/constants/habitatMonsters.js";
 import type {
   MonsterDefinition,
   MonsterFamily,
@@ -140,6 +141,7 @@ const GENERATED_CATALOG = generateMonsterCatalog()
 
 const MONSTER_CATALOG = [
   ...DUNGEON_MONSTERS,
+  ...HABITAT_MONSTERS,
   ...EARLY_DUNGEON_MONSTERS,
   ...ORC_WARLORD_MINI_BOSSES,
   ...GENERATED_CATALOG,
