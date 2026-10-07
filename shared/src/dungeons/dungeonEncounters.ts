@@ -36,7 +36,7 @@ export const DUNGEON_CONFIG: Record<string, DungeonConfig> = {
     id: "dungeon-orc-fortress",
     label: "Fortaleza do Orc Rei",
     minLevel: 10,
-    maxLevel: 18,
+    maxLevel: 15,
     monsters: ["hobgoblin", "orc"],
     introMonsters: ["hobgoblin"],
     introDepths: 2,
