@@ -85,6 +85,9 @@ export function useSubclassBook(
   };
 }
 
-export function getActiveSubclass(): SubclassId | undefined {
-  return loadSubclassProgress().activeSubclass;
+export function getActiveSubclass(heroClass?: HeroClass): SubclassId | undefined {
+  const activeSubclass = loadSubclassProgress().activeSubclass;
+  if (!activeSubclass) return undefined;
+  if (heroClass && SUBCLASS_DEFINITIONS[activeSubclass].baseClass !== heroClass) return undefined;
+  return activeSubclass;
 }
