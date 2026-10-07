@@ -46,6 +46,16 @@
   display: none !important;
 }
 
+.inventory-comparison-source { display: none !important; }
+.inventory-slot.filled:focus-visible { outline: 2px solid #ffd36a; outline-offset: 3px; }
+.inventory-comparison-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.inventory-comparison-table th, .inventory-comparison-table td { padding: 5px 3px; text-align: right; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }
+.inventory-comparison-table th:first-child { text-align: left; }
+.inventory-comparison-table .comparison-gain { color: #76e28d; }
+.inventory-comparison-table .comparison-loss { color: #ff8f8f; }
+.inventory-comparison-table .comparison-same { color: #c4c4c4; }
+.inventory-comparison-portal .comparison-note { font-size: 0.72rem; color: #c4c4c4; }
+
 .paper-tooltip-portal {
   position: fixed !important;
   z-index: 10000 !important;
