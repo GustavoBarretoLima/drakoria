@@ -268,7 +268,7 @@ export function renderDefeatOverlay(result: DefeatPenaltyResult): void {
   const explanation = document.createElement("p");
   explanation.className = "defeat-explanation";
   explanation.textContent =
-    "Você perdeu 5% da XP atual e até 200 de ouro. Seu HP e mana não são restaurados; visite a Taberna para descansar.";
+    "Você perdeu 5% da XP atual e até 200 de ouro. Você retornará à cidade com 30% da vida máxima (perda de 70%). A mana restante é mantida. Você pode continuar explorando ou descansar na Taberna.";
 
   const progress = document.createElement("div");
   progress.className = "reward-progress";

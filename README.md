@@ -29,7 +29,7 @@ Já implementado:
 - XP, níveis e ouro;
 - overlay de vitória com recompensas e drops;
 - overlay de derrota com penalidade de **5% da XP atual** e até **200 de ouro**;
-- retorno automático para a Praça após derrota;
+- retorno automático para a Praça após derrota com 30% da vida máxima, mantendo a mana restante e permitindo continuar sem ouro; saves antigos com zero HP também recuperam essa vida ao entrar na praça;
 - inventário com 20 slots;
 - 9 slots de equipamento;
 - restrições de item por classe e nível;
