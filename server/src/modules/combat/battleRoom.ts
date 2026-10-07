@@ -2,6 +2,7 @@ import { hasMonsterInsight } from "../../../../shared/src/equipment/monsterInsig
 import { createStatsForLevel, normalizeHeroLevel } from "../../../../shared/src/combat/classStats.js";
 import { applyEquipmentStats } from "../../../../shared/src/equipment/equipmentStats.js";
 import { rollMonsterDrops } from "../../../../shared/src/loot/lootTables.js";
+import { rollSubclassBookDrops } from "../../../../shared/src/loot/subclassBooks.js";
 import type {
   BattleState,
   HeroClass,
@@ -106,6 +107,7 @@ export function createInitialBattleState(
       xp: monster.xpReward,
       gold: monster.goldReward,
       drops: rollMonsterDrops(monster.id),
+      classBooks: rollSubclassBookDrops(monster.id),
     },
     revealEnemyStats: hasMonsterInsight(equippedItems, heroLevel),
     turnOwnerId: null,
