@@ -1,6 +1,7 @@
 import { hasMonsterInsight } from "../../../../shared/src/equipment/monsterInsight.js";
 import { createStatsForLevel, normalizeHeroLevel } from "../../../../shared/src/combat/classStats.js";
 import { applyEquipmentStats } from "../../../../shared/src/equipment/equipmentStats.js";
+import { applySubclassStats, type SubclassId } from "../../../../shared/src/classes/subclasses.js";
 import { rollMonsterDrops } from "../../../../shared/src/loot/lootTables.js";
 import { rollSubclassBookDrops } from "../../../../shared/src/loot/subclassBooks.js";
 import type {
@@ -48,14 +49,18 @@ export function createInitialBattleState(
   equippedItems: EquipmentItem[] = [],
   heroLevel = 1,
   initialResources: InitialHeroResources = {},
+  subclassId?: SubclassId,
 ): BattleState {
   const monster = getMonsterById(monsterId);
 
   if (!monster) throw new Error(`Monstro nao encontrado: ${monsterId}`);
 
-  const heroStats = applyEquipmentStats(
-    createStatsForLevel(heroClass, heroLevel),
-    equippedItems,
+  const heroStats = applySubclassStats(
+    applyEquipmentStats(
+      createStatsForLevel(heroClass, heroLevel),
+      equippedItems,
+    ),
+    subclassId,
   );
   heroStats.hp = Math.min(
     heroStats.maxHp,
