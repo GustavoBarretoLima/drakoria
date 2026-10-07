@@ -30,7 +30,9 @@ const context = vm.createContext({ window: uiWindow, localStorage: globalThis.lo
 vm.runInContext(readFileSync("js/inventory-backpack.js", "utf8"), context);
 vm.runInContext(readFileSync("js/status-inventory-ux.js", "utf8"), context);
 vm.runInContext(`window.equiparItemInventario('${sword.id}')`, context);
-const backpackHtml = panel.innerHTML.split('<div class="inventory-grid">')[1]!;
+// Comparison tooltip mentions the equipped item without adding a backpack copy.
+const backpackHtml = panel.innerHTML.split('<div class="inventory-grid">')[1]!
+  .replace(/<div class="paper-tooltip inventory-comparison-source">[\s\S]*?<\/div>/g, "");
 assert.ok(!backpackHtml.includes(sword.name));
 assert.ok(panel.innerHTML.split('<h3 class="section-title">Itens')[0]!.includes(sword.name));
 vm.runInContext('window.desequiparSlotInventario("weapon")', context);

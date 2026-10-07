@@ -127,6 +127,32 @@ function inventoryUxEquippedEntries(inventory) {
     .filter(Boolean);
 }
 
+function inventoryUxComparisonHtml(item, inventory) {
+  const current = inventoryUxEquippedEntries(inventory).find(entry => entry.slot === item.slot)?.item;
+  const numeric = value => Number.isFinite(Number(value)) ? Number(value) : 0;
+  const keys = Object.keys(INVENTORY_UX_STAT_LABELS).filter(key => numeric(item.stats?.[key]) || numeric(current?.stats?.[key]));
+  const rows = keys.map(key => {
+    const before = numeric(current?.stats?.[key]);
+    const after = numeric(item.stats?.[key]);
+    const delta = Math.round((after - before) * 100) / 100;
+    const percentage = ["criticalChance", "criticalDamage", "dodgeChance"].includes(key);
+    const unit = percentage ? "%" : "";
+    const change = `${delta > 0 ? "+" : ""}${delta}${percentage ? " p.p." : ""}`;
+    return `<tr><th scope="row">${inventoryUxEscape(INVENTORY_UX_STAT_LABELS[key])}</th><td>${before}${unit}</td><td>${after}${unit}</td><td class="comparison-${delta > 0 ? "gain" : delta < 0 ? "loss" : "same"}">${change}</td></tr>`;
+  }).join("");
+  const use = inventoryUxCanEquip(item);
+  return `<div class="paper-tooltip inventory-comparison-source">
+    <strong>${inventoryUxEscape(item.name)}</strong>
+    <p>Comparação: ${inventoryUxEscape(INVENTORY_UX_SLOT_LABELS[item.slot] || item.slot)}</p>
+    <p>Equipado: ${current ? inventoryUxEscape(current.name) : "Slot vazio"}</p>
+    ${!use.allowed ? `<p class="inventory-restriction">${use.classAllowed ? `Requer nível ${Math.max(1, Number(item.level || 1))}` : "Classe incompatível"}</p>` : ""}
+    <table class="inventory-comparison-table"><thead><tr><th>Atributo</th><th>Atual</th><th>Item</th><th>Troca</th></tr></thead><tbody>${rows || '<tr><td colspan="4">Sem bônus de atributos</td></tr>'}</tbody></table>
+    ${current?.uniqueEffect ? `<p>Efeito atual: ${inventoryUxEscape(current.uniqueEffect.name)} — ${inventoryUxEscape(current.uniqueEffect.description)}</p>` : ""}
+    ${item.uniqueEffect ? `<p>Efeito do item: ${inventoryUxEscape(item.uniqueEffect.name)} — ${inventoryUxEscape(item.uniqueEffect.description)}</p>` : ""}
+    <p class="comparison-note">Diferença dos bônus da peça. Percentuais são comparados em pontos percentuais.</p>
+  </div>`;
+}
+
 function inventoryUxItemSlot(entry, index, inventory) {
   if (!entry) {
     return `<div class="inventory-slot empty"><span>${index + 1}</span></div>`;
@@ -140,7 +166,7 @@ function inventoryUxItemSlot(entry, index, inventory) {
   else if (!use.levelAllowed) restriction = `Requer nível ${Math.max(1, Number(item.level || 1))}`;
 
   return `
-    <div class="inventory-slot filled rarity-${rarity}${use.allowed ? "" : " locked"}${use.classAllowed ? "" : " class-incompatible"}">
+    <div tabindex="0" class="inventory-slot filled rarity-${rarity}${use.allowed ? "" : " locked"}${use.classAllowed ? "" : " class-incompatible"}">
       <span class="inventory-slot-index">${index + 1}</span>
       <strong>${inventoryUxEscape(item.name)}</strong>
       ${quantity > 1 ? `<small>x${quantity}</small>` : ""}
@@ -149,6 +175,7 @@ function inventoryUxItemSlot(entry, index, inventory) {
       ${inventoryUxStatsHtml(item.stats)}
       <small class="inventory-slot-description">${inventoryUxEscape(item.description || "Sem descrição.")}</small>
       ${restriction ? `<small class="inventory-restriction">${inventoryUxEscape(restriction)}</small>` : ""}
+      ${inventoryUxComparisonHtml(item, inventory)}
       <div class="inventory-slot-actions">
         <button type="button" ${use.allowed ? `onclick="equiparItemInventario('${inventoryUxEscape(item.id)}')"` : "disabled"}>Equipar</button>
         <button type="button" onclick="venderItemInventario('${inventoryUxEscape(item.id)}')">Vender ${Number(item.sellPrice || 0)}g</button>
@@ -197,7 +224,7 @@ function inventoryUxOpen() {
     <p class="inventory-help">Os bônus de cada equipamento aparecem diretamente no slot.</p>
     <div class="equipment-grid">${equipmentSlots}</div>
     <h3 class="section-title">Itens</h3>
-    <p class="inventory-help">Cada item mostra seus atributos, raridade e requisitos antes de ser equipado.</p>
+    <p class="inventory-help">Passe o mouse ou selecione um item para comparar com a peça equipada no mesmo slot.</p>
     <div class="inventory-grid">${itemSlots}</div>
     <div class="painel-acoes"><button type="button" onclick="fecharPainelPraca()">Fechar</button></div>
   `;
@@ -259,7 +286,7 @@ function positionPaperTooltipPortal(slot) {
   const slotRect = slot.getBoundingClientRect();
   const margin = 12;
   const gap = 10;
-  const tooltipWidth = Math.min(300, window.innerWidth - margin * 2);
+  const tooltipWidth = Math.min(slot.matches(".inventory-slot") ? 380 : 300, window.innerWidth - margin * 2);
 
   portal.style.width = `${tooltipWidth}px`;
   portal.style.maxHeight = `${Math.min(420, window.innerHeight - margin * 2)}px`;
@@ -290,6 +317,7 @@ function showPaperTooltipPortal(slot) {
   const rarityClass = getPaperTooltipRarityClass(slot);
 
   portal.className = "paper-tooltip paper-tooltip-portal";
+  if (slot.matches(".inventory-slot")) portal.classList.add("inventory-comparison-portal");
   if (rarityClass) portal.classList.add(rarityClass);
   portal.innerHTML = source.innerHTML;
   portal.classList.add("is-visible");
@@ -307,13 +335,13 @@ function hidePaperTooltipPortal() {
 }
 
 document.addEventListener("mouseover", (event) => {
-  const slot = event.target.closest?.(".paper-slot-filled");
+  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled");
   if (!slot || slot === paperTooltipActiveSlot) return;
   showPaperTooltipPortal(slot);
 });
 
 document.addEventListener("mouseout", (event) => {
-  const slot = event.target.closest?.(".paper-slot-filled");
+  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled");
   if (!slot) return;
   if (event.relatedTarget && slot.contains(event.relatedTarget)) return;
   if (slot === paperTooltipActiveSlot && !slot.matches(":focus-within")) {
@@ -322,12 +350,12 @@ document.addEventListener("mouseout", (event) => {
 });
 
 document.addEventListener("focusin", (event) => {
-  const slot = event.target.closest?.(".paper-slot-filled");
+  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled");
   if (slot) showPaperTooltipPortal(slot);
 });
 
 document.addEventListener("focusout", (event) => {
-  const slot = event.target.closest?.(".paper-slot-filled");
+  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled");
   if (!slot) return;
   if (event.relatedTarget && slot.contains(event.relatedTarget)) return;
   if (slot === paperTooltipActiveSlot && !slot.matches(":hover")) {
