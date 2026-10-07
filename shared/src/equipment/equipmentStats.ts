@@ -17,11 +17,16 @@ export function applyEquipmentStats(base: Stats, items: EquipmentItem[]): Stats 
       stats.mana += bonus.mana;
     }
 
+    stats.magicPower += bonus.magicPower ?? 0;
+    stats.magicDefense += bonus.magicDefense ?? 0;
+    stats.speed += bonus.speed ?? 0;
+    stats.dodgeChance += bonus.dodgeChance ?? 0;
     stats.attack += bonus.attack ?? 0;
     stats.defense += bonus.defense ?? 0;
     stats.criticalChance += bonus.criticalChance ?? 0;
     stats.criticalDamage += bonus.criticalDamage ?? 0;
   }
 
+  stats.dodgeChance = Number.isFinite(stats.dodgeChance) ? Math.min(50, Math.max(0, stats.dodgeChance)) : 0;
   return stats;
 }

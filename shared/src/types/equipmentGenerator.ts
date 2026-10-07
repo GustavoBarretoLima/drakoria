@@ -105,7 +105,12 @@ function createEquipmentItem(
 ): EquipmentItem {
   const rarityMeta = EQUIPMENT_RARITY_META[rarity];
   const levelMultiplier = level === 1 ? 1 : level / 10;
-  const baseStats = BASE_STATS_BY_SLOT[slot];
+  const baseStats = { ...BASE_STATS_BY_SLOT[slot] };
+  if (heroClass === "mago" && baseStats.attack) {
+    baseStats.magicPower = (baseStats.magicPower ?? 0) + baseStats.attack;
+    delete baseStats.attack;
+  }
+  if (heroClass === "arqueiro" && slot === "boots") baseStats.speed = 1;
   const classBonus = CLASS_STAT_BONUS[heroClass];
 
   const stats = scaleStats(

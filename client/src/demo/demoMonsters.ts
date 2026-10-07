@@ -44,6 +44,8 @@ function createScaledDemoMonster(
       maxHp: Math.floor(baseHp * multiplier),
       mana: 0,
       maxMana: 0,
+      magicPower: 0,
+      dodgeChance: 0,
       attack: Math.floor(baseAttack * multiplier),
       defense: Math.floor(baseDefense * multiplier),
       magicDefense: Math.floor(baseMagicDefense * multiplier),
@@ -69,6 +71,8 @@ function createScaledMiniBoss(level: number): CombatantState {
       maxHp: Math.floor(155 * multiplier),
       mana: 0,
       maxMana: 0,
+      magicPower: 0,
+      dodgeChance: 0,
       attack: Math.floor(18 * multiplier),
       defense: Math.floor(9 * multiplier),
       magicDefense: Math.floor(5 * multiplier),
@@ -146,13 +150,14 @@ function createScaledRewards(monsterId: string): BattleRewards | null {
 export function createDemoMonster(monsterId: string): CombatantState {
   const dungeon = createDungeonMonster(monsterId);
   if (dungeon) {
-    const { magicPower: _magicPower, ...stats } = dungeon.stats;
+    const stats = dungeon.stats;
     return {
       id: dungeon.id,
       name: dungeon.name,
       sprites: dungeon.sprites,
       stats: {
         ...stats,
+        dodgeChance: 0,
         magicDefense: dungeon.stats.magicDefense ?? 0,
         speed: { goblin: 12, orc: 8, undead: 9, beast: 14 }[
           dungeon.family as "goblin" | "orc" | "undead" | "beast"

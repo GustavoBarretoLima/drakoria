@@ -164,8 +164,6 @@ O GitHub Pages continua hospedando apenas arquivos estáticos. Para multiplayer,
 
 ### Próximas etapas
 
-- adicionar `magicPower` real ao combate e alinhar magia com os bônus dos equipamentos;
-- implementar `dodgeChance` no combate;
 - skills e árvore de habilidades por classe;
 - consumíveis;
 - inventário e propriedade de itens autoritativos no servidor;
@@ -185,3 +183,35 @@ A versão demo usa `localStorage`, portanto o progresso pode ser alterado manual
 
 Desenvolvido por **Gustavo Barreto Lima**  
 📧 gustavobarretolima@gmail.com
+
+## Sprint 8 — Combat Core 2.0
+
+Demo e backend executam as mesmas regras em `shared/src/combat/combatEngine.ts`.
+Ataques físicos usam `attack`/`defense`; magia usa `magicPower`/`magicDefense`.
+A fórmula de mitigação existente (metade da defesa, dano mínimo 1 e postura
+reduzindo o resultado pela metade) foi preservada. Magia do herói custa 10 mana.
+Esquiva é rolada antes do dano, vale também contra magia e limita-se a 0–50%;
+valores não finitos viram 0. Uma esquiva não consome a postura defensiva.
+
+Guerreiro lidera ataque físico/defesa, Mago poder mágico/mana e Arqueiro
+velocidade/crítico/esquiva em todos os níveis. Cajados e equipamentos arcanos
+concedem poder mágico; botas de Arqueiro concedem velocidade/esquiva e luvas,
+crítico. Itens salvos são atualizados pelo catálogo usando seus IDs originais.
+
+Inimigos alternam ataques básicos com especiais (25% de chance, dois turnos
+inimigos de cooldown). Hobgoblin Elite tem 40% de chance de preparar uma
+emboscada: ergue o escudo e anuncia o ataque; no próximo turno usa uma estocada
+com 35% de dano extra e ignora metade da defesa. A postura defensiva do herói
+continua eficaz. O Orc Rei tem 45% de chance de especial; aos 50% de vida entra
+uma única vez em fúria (+30% ataque, +25% defesa e +15% poder mágico). Na fase 2
+seu especial vira Magia Sombria e o cooldown cai para um turno inimigo.
+Especiais inimigas não consomem mana, sendo limitadas pelo cooldown.
+
+O painel da Praça usa os atributos compartilhados e inclui esquiva/crítico;
+a Visão da Verdade revela também poder mágico e esquiva do inimigo. Mensagens
+de combate anunciam esquivas e preparação do Elite sem adicionar controles.
+
+Validação: `npx tsc --noEmit`, `npm run build` e `npm test`.
+O balanceamento preserva HP, mana, velocidade, crítico e mitigação existentes;
+reduz o ataque físico do Mago e sua progressão de defesa, mantendo seu dano
+mágico inicial. A progressão de defesa do Arqueiro é levemente menor.

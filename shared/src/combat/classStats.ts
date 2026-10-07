@@ -5,6 +5,8 @@ type BaseStats = Pick<
   | "maxHp"
   | "maxMana"
   | "attack"
+  | "magicPower"
+  | "dodgeChance"
   | "defense"
   | "magicDefense"
   | "speed"
@@ -19,6 +21,8 @@ export const CLASS_STATS: Record<HeroClass, BaseStats> = {
     maxHp: 120,
     maxMana: 40,
     attack: 14,
+    magicPower: 6,
+    dodgeChance: 3,
     defense: 10,
     magicDefense: 6,
     speed: 10,
@@ -28,7 +32,9 @@ export const CLASS_STATS: Record<HeroClass, BaseStats> = {
   mago: {
     maxHp: 80,
     maxMana: 80,
-    attack: 16,
+    attack: 12,
+    magicPower: 16,
+    dodgeChance: 4,
     defense: 5,
     magicDefense: 12,
     speed: 11,
@@ -39,6 +45,8 @@ export const CLASS_STATS: Record<HeroClass, BaseStats> = {
     maxHp: 100,
     maxMana: 60,
     attack: 13,
+    magicPower: 8,
+    dodgeChance: 8,
     defense: 7,
     magicDefense: 8,
     speed: 14,
@@ -52,6 +60,8 @@ export const CLASS_LEVEL_GROWTH: Record<HeroClass, LevelGrowth> = {
     maxHp: 7,
     maxMana: 2,
     attack: 1,
+    magicPower: 0.4,
+    dodgeChance: 0.05,
     defense: 1,
     magicDefense: 1,
     speed: 0.2,
@@ -61,8 +71,10 @@ export const CLASS_LEVEL_GROWTH: Record<HeroClass, LevelGrowth> = {
   mago: {
     maxHp: 4,
     maxMana: 6,
-    attack: 1,
-    defense: 1,
+    attack: 0.8,
+    magicPower: 1.2,
+    dodgeChance: 0.05,
+    defense: 0.8,
     magicDefense: 1,
     speed: 0.2,
     criticalChance: 0.2,
@@ -72,7 +84,9 @@ export const CLASS_LEVEL_GROWTH: Record<HeroClass, LevelGrowth> = {
     maxHp: 5,
     maxMana: 3,
     attack: 1,
-    defense: 1,
+    magicPower: 0.5,
+    dodgeChance: 0.12,
+    defense: 0.9,
     magicDefense: 1,
     speed: 0.3,
     criticalChance: 0.3,
@@ -100,6 +114,8 @@ export function createStatsForLevel(
   const scaled: BaseStats = {
     maxHp: Math.floor(base.maxHp + growth.maxHp * levelsGained),
     maxMana: Math.floor(base.maxMana + growth.maxMana * levelsGained),
+    magicPower: Math.floor(base.magicPower + growth.magicPower * levelsGained),
+    dodgeChance: Math.min(50, base.dodgeChance + growth.dodgeChance * levelsGained),
     attack: Math.floor(base.attack + growth.attack * levelsGained),
     defense: Math.floor(base.defense + growth.defense * levelsGained),
     magicDefense: Math.floor(
@@ -121,6 +137,8 @@ export function createStatsForLevel(
     mana: scaled.maxMana,
     maxMana: scaled.maxMana,
     attack: scaled.attack,
+    magicPower: scaled.magicPower,
+    dodgeChance: scaled.dodgeChance,
     defense: scaled.defense,
     magicDefense: scaled.magicDefense,
     speed: scaled.speed,

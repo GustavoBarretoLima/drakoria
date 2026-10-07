@@ -1,44 +1,6 @@
-const STATUS_LEVEL_BASE = {
-  guerreiro: {
-    attack: 14,
-    defense: 10,
-    magicDefense: 6,
-    speed: 10,
-  },
-  mago: {
-    attack: 16,
-    defense: 5,
-    magicDefense: 12,
-    speed: 11,
-  },
-  arqueiro: {
-    attack: 13,
-    defense: 7,
-    magicDefense: 8,
-    speed: 14,
-  },
-};
-
-const STATUS_LEVEL_GROWTH = {
-  guerreiro: {
-    attack: 1,
-    defense: 1,
-    magicDefense: 1,
-    speed: 0.2,
-  },
-  mago: {
-    attack: 1,
-    defense: 1,
-    magicDefense: 1,
-    speed: 0.2,
-  },
-  arqueiro: {
-    attack: 1,
-    defense: 1,
-    magicDefense: 1,
-    speed: 0.3,
-  },
-};
+import { createStatsForLevel } from "../shared/src/combat/classStats.ts";
+import { canonicalEquipment, canEquipItem } from "../shared/src/equipment/equipmentRules.ts";
+import { applyEquipmentStats } from "../shared/src/equipment/equipmentStats.ts";
 
 const STATUS_SLOT_LABELS = {
   weapon: "Arma",
@@ -78,7 +40,7 @@ function carregarInventarioStatus() {
   try {
     const parsed = JSON.parse(localStorage.getItem("drakoriaInventario") || "{}");
     return {
-      items: Array.isArray(parsed.items) ? parsed.items : [],
+      items: Array.isArray(parsed.items) ? parsed.items.map(entry => ({ ...entry, item: canonicalEquipment(entry.item) })) : [],
       equipped: parsed.equipped || {},
     };
   } catch {
@@ -127,35 +89,12 @@ function getImagemHeroiStatus(classe, genero) {
 }
 
 function calcularStatusPorNivel(classe, nivel, inventario) {
-  const safeLevel = Math.min(100, Math.max(1, Math.floor(Number(nivel) || 1)));
-  const levelsGained = safeLevel - 1;
-  const base = STATUS_LEVEL_BASE[classe];
-  const growth = STATUS_LEVEL_GROWTH[classe];
-
-  const stats = {
-    attack: Math.floor(base.attack + growth.attack * levelsGained),
-    defense: Math.floor(base.defense + growth.defense * levelsGained),
-    magicDefense: Math.floor(
-      base.magicDefense + growth.magicDefense * levelsGained,
-    ),
-    speed: Math.floor(base.speed + growth.speed * levelsGained),
-  };
-
-  for (const itemId of Object.values(inventario.equipped)) {
-    const entry = inventario.items.find((candidate) => candidate.item.id === itemId);
-    if (!entry) continue;
-
-    const bonus = entry.item.stats || {};
-    stats.attack += Number(bonus.attack || 0);
-    stats.defense += Number(bonus.defense || 0);
-    stats.magicDefense += Number(bonus.magicDefense || 0);
-    stats.speed += Number(bonus.speed || 0);
-  }
-
-  return {
-    ...stats,
-    magicPower: stats.attack,
-  };
+  const items = Object.values(inventario.equipped)
+    .map(id => inventario.items.find(entry => entry.item.id === id)?.item)
+    .filter(Boolean)
+    .map(canonicalEquipment)
+    .filter(item => canEquipItem(item, classe, Number(nivel)));
+  return applyEquipmentStats(createStatsForLevel(classe, Number(nivel)), items);
 }
 
 function formatarBonusEquipamentoStatus(stats = {}) {
@@ -289,6 +228,8 @@ function abrirStatusComProgressao() {
       <div class="status-stat"><span>DEF</span><strong>${stats.defense}</strong></div>
       <div class="status-stat"><span>DEF M</span><strong>${stats.magicDefense}</strong></div>
       <div class="status-stat"><span>Magia</span><strong>${stats.magicPower}</strong></div>
+      <div class="status-stat"><span>Esquiva</span><strong>${stats.dodgeChance.toFixed(1)}%</strong></div>
+      <div class="status-stat"><span>Crítico</span><strong>${stats.criticalChance}%</strong></div>
       <div class="status-stat"><span>Speed</span><strong>${stats.speed}</strong></div>
     </div>
     <h3 class="section-title">Equipamentos</h3>

@@ -4,9 +4,7 @@ import { Server } from "socket.io";
 import { BattleManager } from "./modules/combat/battleManager.js";
 import {
   applyBattleAction,
-  applyCriticalDamage,
-  calculateDamageTaken,
-  rollCritical,
+  applyEnemyTurn,
 } from "./modules/combat/combatEngine.js";
 import {
   advanceBattleAtb,
@@ -82,73 +80,7 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
   if (battleState.finished) return;
   if (battleState.turnOwnerId !== battleState.enemy.id) return;
 
-  const hero = {
-    ...battleState.hero,
-    stats: { ...battleState.hero.stats },
-  };
-  const enemy = {
-    ...battleState.enemy,
-    stats: { ...battleState.enemy.stats },
-    atb: 0,
-  };
-
-  const entersPhaseTwo =
-    enemy.id.startsWith("orc-king-boss-lvl-") &&
-    enemy.phase !== 2 &&
-    enemy.stats.hp <= Math.floor(enemy.stats.maxHp / 2);
-
-  if (entersPhaseTwo) {
-    enemy.phase = 2;
-    enemy.stats.attack = Math.floor(enemy.stats.attack * 1.3);
-    enemy.stats.defense = Math.floor(enemy.stats.defense * 1.25);
-  }
-
-  const wasDefending = hero.defending;
-  const usesMagic = enemy.phase === 2 && Math.random() < 0.35;
-  const critical = rollCritical(enemy.stats.criticalChance);
-  const rawDamage = usesMagic
-    ? Math.floor(enemy.stats.attack * 1.15) + 6
-    : enemy.stats.attack;
-  const mitigatedDamage = calculateDamageTaken(
-    rawDamage,
-    usesMagic ? hero.stats.magicDefense : hero.stats.defense,
-    wasDefending,
-  );
-  const finalDamage = critical
-    ? applyCriticalDamage(mitigatedDamage, enemy.stats.criticalDamage)
-    : mitigatedDamage;
-
-  hero.stats.hp = Math.max(0, hero.stats.hp - finalDamage);
-  hero.isAlive = hero.stats.hp > 0;
-  hero.defending = false;
-
-  const phasePrefix = entersPhaseTwo
-    ? "DANGER! O Orc Rei entrou em fúria: ataque e defesa aumentaram. "
-    : "";
-  const message = usesMagic
-    ? `${phasePrefix}${enemy.name} lançou magia sombria e causou ${finalDamage} de dano em ${hero.name}.`
-    : critical
-      ? `${phasePrefix}CRITICO! ${enemy.name} causou ${finalDamage} de dano em ${hero.name}.`
-      : wasDefending
-        ? `${phasePrefix}${enemy.name} atacou, mas ${hero.name} se defendeu e recebeu apenas ${finalDamage} de dano.`
-        : `${phasePrefix}${enemy.name} atacou e causou ${finalDamage} de dano.`;
-
-  const nextBattleState = {
-    ...battleState,
-    hero,
-    enemy,
-    finished: !hero.isAlive,
-    ...(!hero.isAlive ? { winnerId: enemy.id } : {}),
-    turnOwnerId: !hero.isAlive ? enemy.id : null,
-    lastEvent: {
-      actorId: enemy.id,
-      targetId: hero.id,
-      action: usesMagic ? ("CAST_MAGIC" as const) : ("ATTACK" as const),
-      damage: finalDamage,
-      critical,
-      message,
-    },
-  };
+  const nextBattleState = applyEnemyTurn(battleState);
 
   battleManager.set(playerId, nextBattleState);
   io.to(playerId).emit("battle:update", nextBattleState);

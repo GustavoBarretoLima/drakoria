@@ -9,6 +9,8 @@ export interface Stats {
   mana: number;
   maxMana: number;
   attack: number;
+  magicPower: number;
+  dodgeChance: number;
   defense: number;
   magicDefense: number;
   speed: number;
@@ -27,6 +29,8 @@ export interface CombatantState {
   defending: boolean;
   isAlive: boolean;
   phase?: number;
+  specialCooldown?: number;
+  charging?: boolean;
 }
 
 export interface BattleRewards {
@@ -41,6 +45,8 @@ export interface BattleEvent {
   action: "ATTACK" | "DEFEND" | "CAST_MAGIC";
   damage?: number;
   critical?: boolean;
+  dodged?: boolean;
+  special?: string;
   message: string;
 }
 

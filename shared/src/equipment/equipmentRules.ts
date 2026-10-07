@@ -2,8 +2,12 @@ import type { EquipmentItem, HeroClass } from "../types/equipment.js";
 import { DUNGEON_LOOT_ITEMS } from "../loot/dungeonLoot.js";
 import { STARTER_LOOT_ITEMS } from "../loot/lootTables.js";
 
+import { generateEquipmentCatalog } from "../types/equipmentGenerator.js";
+
+const GENERATED_ITEMS = new Map(generateEquipmentCatalog().map(item => [item.id, item]));
+
 export function canonicalEquipment(item: EquipmentItem): EquipmentItem {
-  return DUNGEON_LOOT_ITEMS[item.id] ?? STARTER_LOOT_ITEMS[item.id] ?? item;
+  return DUNGEON_LOOT_ITEMS[item.id] ?? STARTER_LOOT_ITEMS[item.id] ?? GENERATED_ITEMS.get(item.id) ?? item;
 }
 
 export function canEquipItem(item: EquipmentItem, heroClass: HeroClass, heroLevel: number): boolean {
