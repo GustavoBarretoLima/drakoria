@@ -1,6 +1,7 @@
 import type { EquipmentDrop } from "./equipment.js";
 import type { MonsterSpriteSet } from "./monster.js";
 import type { SkillId } from "../combat/classSkills.js";
+import type { SubclassBookDrop } from "../loot/subclassBooks.js";
 
 export type HeroClass = "guerreiro" | "mago" | "arqueiro";
 
@@ -39,6 +40,7 @@ export interface BattleRewards {
   xp: number;
   gold: number;
   drops?: EquipmentDrop[];
+  classBooks?: SubclassBookDrop[];
 }
 
 export interface BattleEvent {
