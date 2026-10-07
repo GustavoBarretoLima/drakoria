@@ -1,5 +1,6 @@
 import { prepareNextMonster, clearBattleStorage } from "./battle/victoryNavigation.js";
 import { getBattleExitPage } from "./battle/worldMapNavigation.js";
+import { setupBattleArena } from "./assets/battleArena.js";
 import { registerDungeonVictory } from "./battle/dungeonRunClient.js";
 import {
   loadConsumables,
@@ -241,6 +242,7 @@ if (demoMode) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  setupBattleArena();
   setupBattlePage();
 
   if (demoMode) {
