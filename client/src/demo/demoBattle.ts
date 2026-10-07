@@ -2,6 +2,8 @@ import { applyBattleAction as applyHeroAction, applyEnemyTurn } from "../../../s
 import { hasMonsterInsight } from "../../../shared/src/equipment/monsterInsight.js";
 import { createStatsForLevel, normalizeHeroLevel } from "../../../shared/src/combat/classStats.js";
 import { applySubclassStats } from "../../../shared/src/classes/subclasses.js";
+import { applyTreeStats, normalizeTreeRanks } from "../../../shared/src/classes/skillTrees.js";
+import { loadSubclassProgress } from "../progression/subclassClient.js";
 import {
   advanceBattleAtb,
   ATB_TICK_MS,
@@ -72,13 +74,15 @@ export function startDemoBattle(
   stopAtbLoop();
   const baseRewards = getDemoMonsterRewards(monsterId);
   const equippedItems = getEquippedItems();
-  const heroStats = applySubclassStats(
+  const subclassId = getActiveSubclass(heroClass);
+  const treeRanks = normalizeTreeRanks(subclassId, heroLevel, loadSubclassProgress().treeRanks);
+  const heroStats = applyTreeStats(applySubclassStats(
     applyEquipmentStats(
       createStatsForLevel(heroClass, heroLevel),
       equippedItems,
     ),
-    getActiveSubclass(),
-  );
+    subclassId,
+  ), subclassId, heroLevel, treeRanks);
   const vitals = loadHeroVitals(heroStats.maxHp, heroStats.maxMana);
   heroStats.hp = vitals.hp;
   heroStats.mana = vitals.mana;
@@ -93,6 +97,7 @@ export function startDemoBattle(
       name: localStorage.getItem("nomeHeroi") || "Heroi",
       className: heroClass,
       level: normalizeHeroLevel(heroLevel),
+      ...(subclassId ? { subclassId } : {}), treeRanks,
       stats: heroStats,
       atb: 0,
       defending: false,

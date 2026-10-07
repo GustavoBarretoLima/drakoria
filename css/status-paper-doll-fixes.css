@@ -47,6 +47,22 @@
 }
 
 .inventory-comparison-source { display: none !important; }
+.subclass-tree { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; margin: 16px 0; }
+body:has(.subclass-tree) { margin: 0; overflow: hidden; }
+.talent-node { position: relative; border: 1px solid #756544; border-radius: 12px; padding: 16px; background: rgba(13, 10, 8, 0.85); }
+.talent-node.learned { border-color: #ffd36a; box-shadow: inset 0 0 18px rgba(255, 211, 106, 0.07); }
+.talent-node h3 { margin: 8px 0; color: #ffd36a; }
+.talent-node p, .talent-node small { font-size: 0.85rem; line-height: 1.5; overflow-wrap: anywhere; }
+.talent-node p { text-align: left; margin: 8px 0; }
+.talent-kind, .talent-requires { color: #c9bb9b; }
+.talent-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 12px 0; }
+.talent-footer button { padding: 10px 16px; color: #f5d79a; background: linear-gradient(180deg, #47351e, #261b10); border: 1px solid #b49a57; border-radius: 8px; font: inherit; cursor: pointer; }
+.talent-footer button:focus-visible { outline: 2px solid #ffd36a; outline-offset: 3px; }
+.talent-node button:disabled { opacity: 0.45; cursor: default; }
+.tree-wide { grid-column: 1 / -1; }
+.talent-node:not(:first-child)::before { content: "↓"; position: absolute; top: -24px; left: 50%; color: #ffd36a; }
+.tree-message { min-height: 24px; color: #a6e8b0; }
+@media (max-width: 600px) { .subclass-tree { grid-template-columns: minmax(0, 1fr); } .tree-wide { grid-column: auto; } }
 .inventory-slot.filled:focus-visible { outline: 2px solid #ffd36a; outline-offset: 3px; }
 .inventory-comparison-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 .inventory-comparison-table th, .inventory-comparison-table td { padding: 5px 3px; text-align: right; border-bottom: 1px solid rgba(255, 255, 255, 0.12); }

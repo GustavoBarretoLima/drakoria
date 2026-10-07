@@ -2,6 +2,7 @@ import { hasMonsterInsight } from "../../../../shared/src/equipment/monsterInsig
 import { createStatsForLevel, normalizeHeroLevel } from "../../../../shared/src/combat/classStats.js";
 import { applyEquipmentStats } from "../../../../shared/src/equipment/equipmentStats.js";
 import { applySubclassStats, type SubclassId } from "../../../../shared/src/classes/subclasses.js";
+import { applyTreeStats, normalizeTreeRanks } from "../../../../shared/src/classes/skillTrees.js";
 import { rollMonsterDrops } from "../../../../shared/src/loot/lootTables.js";
 import { rollSubclassBookDrops } from "../../../../shared/src/loot/subclassBooks.js";
 import type {
@@ -51,18 +52,20 @@ export function createInitialBattleState(
   initialResources: InitialHeroResources = {},
   subclassId?: SubclassId,
   heroName = "Heroi",
+  rawTreeRanks?: unknown,
 ): BattleState {
   const monster = getMonsterById(monsterId);
 
   if (!monster) throw new Error(`Monstro nao encontrado: ${monsterId}`);
 
-  const heroStats = applySubclassStats(
+  const treeRanks = normalizeTreeRanks(subclassId, heroLevel, rawTreeRanks);
+  const heroStats = applyTreeStats(applySubclassStats(
     applyEquipmentStats(
       createStatsForLevel(heroClass, heroLevel),
       equippedItems,
     ),
     subclassId,
-  );
+  ), subclassId, heroLevel, treeRanks);
   heroStats.hp = Math.min(
     heroStats.maxHp,
     Math.max(0, Math.floor(initialResources.hp ?? heroStats.maxHp)),
@@ -79,6 +82,7 @@ export function createInitialBattleState(
       name: heroName,
       className: heroClass,
       level: normalizeHeroLevel(heroLevel),
+      ...(subclassId ? { subclassId } : {}), treeRanks,
       stats: heroStats,
       atb: 0,
       defending: false,

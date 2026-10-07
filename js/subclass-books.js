@@ -2,6 +2,7 @@ import {
   SUBCLASS_DEFINITIONS,
   SUBCLASS_IDS,
 } from "../shared/src/classes/subclasses.js";
+import { syncCharacterVitals } from "../client/src/progression/heroStats.ts";
 
 const STORAGE_KEY = "drakoriaSubclassProgress";
 const CLASS_LABELS = {
@@ -30,6 +31,7 @@ function loadState() {
     return {
       books: parsed.books && typeof parsed.books === "object" ? parsed.books : {},
       activeSubclass: SUBCLASS_DEFINITIONS[parsed.activeSubclass] ? parsed.activeSubclass : undefined,
+      treeRanks: parsed.treeRanks || {},
     };
   } catch {
     return { books: {}, activeSubclass: undefined };
@@ -64,6 +66,7 @@ function useBook(subclassId) {
   state.books[subclassId] = count - 1;
   state.activeSubclass = subclassId;
   saveState(state);
+  syncCharacterVitals();
   openSubclassBooks();
 }
 

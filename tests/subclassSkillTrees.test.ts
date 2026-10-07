@@ -1,0 +1,133 @@
+import assert from "node:assert/strict";
+import { SUBCLASS_IDS, SUBCLASS_DEFINITIONS } from "../shared/src/classes/subclasses.js";
+import { SUBCLASS_TREES, applyTreeStats, earnedTreePoints, normalizeTreeRanks, spentTreePoints } from "../shared/src/classes/skillTrees.js";
+import { getHeroSkills, getSkillBlockReason } from "../shared/src/combat/classSkills.js";
+import { applyBattleAction, applyEnemyTurn } from "../shared/src/combat/combatEngine.js";
+import { createInitialBattleState } from "../server/src/modules/combat/battleRoom.js";
+import { createStatsForLevel } from "../shared/src/combat/classStats.js";
+import { investTreePoint, resetTreePoints, getTreeRanks } from "../client/src/progression/skillTreeClient.js";
+import { loadSubclassProgress, useSubclassBook } from "../client/src/progression/subclassClient.js";
+import { startDemoBattle, subscribeDemoBattle } from "../client/src/demo/demoBattle.js";
+import type { BattleState } from "../shared/src/types/combat.js";
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
+
+const saved = new Map<string, string>();
+Object.defineProperty(globalThis, "localStorage", { value: { getItem: (key: string) => saved.get(key) ?? null, setItem: (key: string, value: string) => saved.set(key, value) }, configurable: true });
+Object.defineProperty(globalThis, "window", { value: { setInterval: () => 1, clearInterval() {} }, configurable: true });
+const originalRandom = Math.random;
+Math.random = () => 0.99;
+try {
+  for (const id of SUBCLASS_IDS) {
+    const tree = SUBCLASS_TREES[id];
+    assert.equal(tree.length, 6);
+    assert.equal(tree.filter(node => node.skill).length, 3);
+    const full = Object.fromEntries(tree.map(node => [node.id, node.maxRank]));
+    assert.deepEqual(normalizeTreeRanks(id, 100, full), full);
+    assert.ok(spentTreePoints(full) <= earnedTreePoints(100));
+    assert.deepEqual(normalizeTreeRanks(id, 1, full), {});
+    assert.deepEqual(normalizeTreeRanks(id, 100, { [tree[5]!.id]: 1 }), {});
+    assert.deepEqual(normalizeTreeRanks(id, 100, { [tree[0]!.id]: 999, unknown: 1 }), {});
+    assert.deepEqual(normalizeTreeRanks(id, 100, { [tree[0]!.id]: NaN }), {});
+    const heroClass = SUBCLASS_DEFINITIONS[id].baseClass;
+    const stats = createStatsForLevel(heroClass, 100);
+    const boosted = applyTreeStats(stats, id, 100, full);
+    assert.ok(Object.keys(stats).some(key => boosted[key as keyof typeof stats] > stats[key as keyof typeof stats]));
+    assert.ok(boosted.dodgeChance <= 50 && boosted.criticalChance <= 100);
+    saved.clear(); saved.set("classeHeroi", heroClass); saved.set("drakoriaProgresso", '{"nivel":100}');
+    saved.set("drakoriaSubclassProgress", JSON.stringify({ activeSubclass: id, books: {}, treeRanks: full }));
+    const server = createInitialBattleState(heroClass, "orc-king-boss-lvl-20", [], 100, {}, id, "Heroi", full);
+    let demo: BattleState | undefined;
+    subscribeDemoBattle(state => { demo = state; });
+    startDemoBattle(heroClass, "orc-king-boss-lvl-20", 100);
+    assert.deepEqual(demo!.hero.stats, server.hero.stats);
+    assert.deepEqual(demo!.hero.treeRanks, server.hero.treeRanks);
+    assert.equal(getHeroSkills(server.hero).length, 6);
+    for (const skill of getHeroSkills(server.hero).filter(skill => skill.subclassId)) {
+      const state = structuredClone(server);
+      state.turnOwnerId = state.hero.id;
+      state.hero.stats.hp = Math.floor(state.hero.stats.maxHp / 2);
+      state.hero.stats.criticalChance = 0;
+      state.enemy.stats.hp = state.enemy.stats.maxHp = 100000;
+      state.enemy.stats.attack = 1;
+      state.enemy.stats.magicPower = 0;
+      const before = structuredClone(state);
+      const result = applyBattleAction(state, { type: "USE_SKILL", skillId: skill.id });
+      assert.notEqual(result, state);
+      assert.deepEqual(state, before);
+      assert.equal(result.hero.stats.mana, state.hero.stats.mana - skill.manaCost);
+      assert.equal(result.hero.skillCooldowns?.[skill.id], skill.cooldown);
+      assert.equal(result.lastEvent?.skillId, skill.id);
+      if (["heal", "healGuard", "drain"].includes(skill.effect)) assert.ok(result.hero.stats.hp > state.hero.stats.hp);
+      if (["guard", "healGuard"].includes(skill.effect)) assert.ok(result.hero.defending);
+      if (skill.effect === "recoil") assert.ok(result.hero.stats.hp < state.hero.stats.hp);
+      if (["burn", "bleed", "summon"].includes(skill.effect)) {
+        assert.equal(result.enemy.ongoingDamage?.turns, 3);
+        let ticking = result;
+        for (let turn = 0; turn < 3; turn++) ticking = applyEnemyTurn({ ...ticking, turnOwnerId: ticking.enemy.id });
+        assert.equal(ticking.enemy.ongoingDamage, undefined);
+        assert.ok(ticking.enemy.stats.hp < result.enemy.stats.hp);
+        assert.equal(result.enemy.ongoingDamage?.turns, 3);
+      }
+      if (skill.effect === "weaken") assert.equal(result.enemy.weakenedTurns, 3);
+      const locked = structuredClone(state); locked.hero.treeRanks = {};
+      assert.ok(getSkillBlockReason(locked.hero, skill));
+      assert.equal(applyBattleAction(locked, { type: "USE_SKILL", skillId: skill.id }), locked);
+    }
+    const forged = createInitialBattleState(heroClass, "goblin-normal-lvl-1", [], 1, {}, id, "Heroi", full);
+    assert.deepEqual(forged.hero.treeRanks, {});
+  }
+  // Existing book saves gain retroactive points, investments persist, and reset does not consume another book.
+  saved.clear(); saved.set("classeHeroi", "guerreiro"); saved.set("drakoriaProgresso", '{"nivel":20}');
+  saved.set("drakoriaSubclassProgress", '{"books":{"paladin":1}}');
+  assert.equal(investTreePoint("paladin-foundation"), "Use um livro compatível para liberar uma subclasse.");
+  assert.equal(useSubclassBook("paladin", "guerreiro").used, true);
+  assert.deepEqual(getTreeRanks(), {});
+  assert.equal(earnedTreePoints(20), 19);
+  saved.set("drakoriaHeroVitals", '{"hp":30,"mana":10,"maxHp":300,"maxMana":100}');
+  assert.equal(investTreePoint("paladin-foundation"), null);
+  assert.equal(getTreeRanks()["paladin-foundation"], 1);
+  assert.equal(JSON.parse(saved.get("drakoriaHeroVitals")!).hp, 30);
+  assert.ok(investTreePoint("paladin-ultimate"));
+  assert.ok(investTreePoint("warlock-foundation"));
+  resetTreePoints();
+  assert.deepEqual(getTreeRanks(), {});
+  assert.equal(loadSubclassProgress().activeSubclass, "paladin");
+  assert.equal(loadSubclassProgress().books.paladin, 0);
+  saved.set("drakoriaProgresso", '{"nivel":2}');
+  assert.equal(investTreePoint("paladin-foundation"), null);
+  assert.equal(investTreePoint("paladin-foundation"), "Sem pontos disponíveis");
+  resetTreePoints();
+  saved.set("drakoriaProgresso", '{"nivel":20}');
+  for (let rank = 0; rank < 5; rank++) assert.equal(investTreePoint("paladin-foundation"), null);
+  assert.equal(investTreePoint("paladin-foundation"), "Rank máximo");
+  const weakenedState = createInitialBattleState("mago", "orc-king-boss-lvl-20");
+  weakenedState.turnOwnerId = weakenedState.enemy.id;
+  weakenedState.hero.stats.defense = 0; weakenedState.hero.stats.dodgeChance = 0;
+  weakenedState.enemy.stats.attack = 100; weakenedState.enemy.stats.criticalChance = 0;
+  const normalHit = applyEnemyTurn(weakenedState);
+  const reducedHit = applyEnemyTurn({ ...weakenedState, enemy: { ...weakenedState.enemy, weakenedTurns: 3 } });
+  assert.equal(normalHit.lastEvent?.damage, 100);
+  assert.equal(reducedHit.lastEvent?.damage, 80);
+  assert.equal(reducedHit.enemy.weakenedTurns, 2);
+  const ongoingKill = createInitialBattleState("mago", "goblin-normal-lvl-1");
+  ongoingKill.turnOwnerId = ongoingKill.enemy.id;
+  ongoingKill.enemy.ongoingDamage = { damage: ongoingKill.enemy.stats.hp, turns: 1, name: "Queimadura" };
+  const finished = applyEnemyTurn(ongoingKill);
+  assert.equal(finished.winnerId, finished.hero.id);
+  assert.equal(finished.hero.stats.hp, ongoingKill.hero.stats.hp);
+  // Status shows the actual button only after a compatible book has activated a subclass.
+  const panel = { innerHTML: "", classList: { remove() {} } };
+  const context = vm.createContext({ createStatsForLevel, applyTreeStats, applyEquipmentStats: (stats: unknown) => stats,
+    applySubclassStats: (stats: unknown) => stats, canonicalEquipment: (item: unknown) => item, canEquipItem: () => true,
+    getTreeRanks, getClassSkills: () => [], SUBCLASS_DEFINITIONS,
+    localStorage: globalThis.localStorage, window: { progressoDrakoria: { carregarProgresso: () => ({ nivel: 20, xp: 0, ouro: 0 }) } },
+    document: { getElementById: () => panel } });
+  vm.runInContext(readFileSync("js/status-level-scaling.js", "utf8").replace(/^import .*;\r?\n/gm, ""), context);
+  vm.runInContext("window.abrirStatus()", context);
+  assert.ok(panel.innerHTML.includes('onclick="abrirArvoreSubclasse()"'));
+  saved.set("drakoriaSubclassProgress", '{"books":{}}');
+  vm.runInContext("window.abrirStatus()", context);
+  assert.ok(!panel.innerHTML.includes('onclick="abrirArvoreSubclasse()"'));
+} finally { Math.random = originalRandom; }
+console.log("subclassSkillTrees.test.ts: nine trees, budgets, prerequisites, book gate, saves, reset, 27 skills, combat effects, demo/backend parity and status passed");

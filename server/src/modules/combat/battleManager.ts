@@ -15,6 +15,7 @@ export class BattleManager {
     initialResources: { hp?: number; mana?: number } = {},
     subclassId?: SubclassId,
     heroName = "Heroi",
+    treeRanks?: unknown,
   ): BattleState {
     const battle = createInitialBattleState(
       heroClass,
@@ -24,6 +25,7 @@ export class BattleManager {
       initialResources,
       subclassId,
       heroName,
+      treeRanks,
     );
     this.battles.set(playerId, battle);
     return battle;

@@ -1,4 +1,4 @@
-import { getClassSkills, getSkillBlockReason, getSkillCooldown, type SkillId } from "../../../shared/src/combat/classSkills.js";
+import { getHeroSkills, getSkillBlockReason, getSkillCooldown, type SkillId } from "../../../shared/src/combat/classSkills.js";
 import type { BattleState } from "../../../shared/src/types/combat.js";
 
 /** A compact command submenu; nodes remain stable during ATB updates. */
@@ -13,7 +13,8 @@ export function renderSkills(state: BattleState, onUseSkill: (id: SkillId) => vo
   const back = document.getElementById("btnVoltarHabilidades");
   if (!dock || !panel || !commands || !container || !launcher || !back) return;
   const heroClass = state.hero.className;
-  const skills = heroClass ? getClassSkills(heroClass) : [];
+  const skills = heroClass ? getHeroSkills(state.hero) : [];
+  const skillKey = `${heroClass}:${skills.map(skill => skill.id).join(",")}`;
   const close = (restoreFocus = true) => {
     panel.hidden = true;
     commands.hidden = false;
@@ -63,10 +64,10 @@ export function renderSkills(state: BattleState, onUseSkill: (id: SkillId) => vo
     const labels = { guerreiro: "Guerreiro", mago: "Mago", arqueiro: "Arqueiro" };
     title.textContent = `Habilidades — ${labels[heroClass]}`;
   }
-  if (container.dataset.skillClass !== heroClass) {
+  if (container.dataset.skillClass !== skillKey) {
     close(false);
     container.replaceChildren();
-    container.dataset.skillClass = heroClass ?? "";
+    container.dataset.skillClass = skillKey;
     container.dataset.selectedSkill = skills[0]?.id ?? "";
     for (const skill of skills) {
       const row = document.createElement("div");
