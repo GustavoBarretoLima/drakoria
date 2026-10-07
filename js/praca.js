@@ -112,22 +112,21 @@ function criarSlotInventario(entry, index, inventario) {
   }
 
   const { item, quantity } = entry;
-  const equipado = inventario.equipped[item.slot] === item.id;
   const uso = podeEquipar(item);
   let bloqueio = "";
   if (!uso.classePermitida) bloqueio = "Classe incompatível";
   else if (!uso.nivelSuficiente) bloqueio = `Requer nível ${item.level}`;
 
   return `
-    <div class="inventory-slot filled rarity-${item.rarity}${equipado ? " equipped" : ""}${uso.permitido ? "" : " locked"}" title="${item.description || item.name}">
+    <div class="inventory-slot filled rarity-${item.rarity}${uso.permitido ? "" : " locked"}" title="${item.description || item.name}">
       <span class="inventory-slot-index">${index + 1}</span>
       <strong>${item.name}</strong>
       ${quantity > 1 ? `<small>x${quantity}</small>` : ""}
       <em>${RARITY_LABELS[item.rarity] || item.rarity}</em>
       ${bloqueio ? `<small class="inventory-restriction">${bloqueio}</small>` : ""}
       <div class="inventory-slot-actions">
-        <button type="button" ${uso.permitido ? `onclick="equiparItemInventario('${item.id}')"` : "disabled"}>${equipado ? "Equipado" : "Equipar"}</button>
-        <button type="button" ${equipado ? "disabled" : `onclick="venderItemInventario('${item.id}')"`}>Vender ${item.sellPrice || 0}g</button>
+        <button type="button" ${uso.permitido ? `onclick="equiparItemInventario('${item.id}')"` : "disabled"}>Equipar</button>
+        <button type="button" onclick="venderItemInventario('${item.id}')">Vender ${item.sellPrice || 0}g</button>
       </div>
     </div>
   `;
@@ -139,8 +138,9 @@ function abrirInventario() {
 
   const inventario = carregarInventarioPersistente();
   const equipados = getEquipados(inventario);
+  const backpack = window.getBackpackEntries(inventario);
   const slots = Array.from({ length: INVENTORY_SLOTS }, (_, index) =>
-    criarSlotInventario(inventario.items[index], index, inventario),
+    criarSlotInventario(backpack[index], index, inventario),
   ).join("");
 
   const equipamentoSlots = Object.entries(SLOT_LABELS)
@@ -160,7 +160,7 @@ function abrirInventario() {
   painel.innerHTML = `
     <div class="panel-header">
       <div><span class="panel-kicker">Mochila do aventureiro</span><h2>Inventário</h2></div>
-      <span class="inventory-capacity">${inventario.items.length}/${INVENTORY_SLOTS}</span>
+      <span class="inventory-capacity">${backpack.length}/${INVENTORY_SLOTS}</span>
     </div>
     <h3 class="section-title">Equipamentos</h3>
     <div class="equipment-grid">${equipamentoSlots}</div>
@@ -197,7 +197,7 @@ function venderItemInventario(itemId) {
   if (entryIndex < 0) return;
 
   const entry = inventario.items[entryIndex];
-  if (!entry || inventario.equipped[entry.item.slot] === itemId) return;
+  if (!entry || (inventario.equipped[entry.item.slot] === itemId && entry.quantity <= 1)) return;
 
   const valor = Math.max(0, Number(entry.item.sellPrice || 0));
   entry.quantity -= 1;

@@ -133,7 +133,6 @@ function inventoryUxItemSlot(entry, index, inventory) {
   }
 
   const { item, quantity } = entry;
-  const equipped = inventory.equipped[item.slot] === item.id;
   const use = inventoryUxCanEquip(item);
   const rarity = item.rarity || "common";
   let restriction = "";
@@ -141,9 +140,8 @@ function inventoryUxItemSlot(entry, index, inventory) {
   else if (!use.levelAllowed) restriction = `Requer nível ${Math.max(1, Number(item.level || 1))}`;
 
   return `
-    <div class="inventory-slot filled rarity-${rarity}${equipped ? " equipped" : ""}${use.allowed ? "" : " locked"}${use.classAllowed ? "" : " class-incompatible"}">
+    <div class="inventory-slot filled rarity-${rarity}${use.allowed ? "" : " locked"}${use.classAllowed ? "" : " class-incompatible"}">
       <span class="inventory-slot-index">${index + 1}</span>
-      ${equipped ? '<span class="item-equipped-badge">✓ Equipado</span>' : ""}
       <strong>${inventoryUxEscape(item.name)}</strong>
       ${quantity > 1 ? `<small>x${quantity}</small>` : ""}
       <em>${inventoryUxEscape(INVENTORY_UX_RARITIES[rarity] || rarity)}</em>
@@ -152,8 +150,8 @@ function inventoryUxItemSlot(entry, index, inventory) {
       <small class="inventory-slot-description">${inventoryUxEscape(item.description || "Sem descrição.")}</small>
       ${restriction ? `<small class="inventory-restriction">${inventoryUxEscape(restriction)}</small>` : ""}
       <div class="inventory-slot-actions">
-        <button type="button" ${use.allowed ? `onclick="equiparItemInventario('${inventoryUxEscape(item.id)}')"` : "disabled"}>${equipped ? "Equipado" : "Equipar"}</button>
-        <button type="button" ${equipped ? "disabled" : `onclick="venderItemInventario('${inventoryUxEscape(item.id)}')"`}>Vender ${Number(item.sellPrice || 0)}g</button>
+        <button type="button" ${use.allowed ? `onclick="equiparItemInventario('${inventoryUxEscape(item.id)}')"` : "disabled"}>Equipar</button>
+        <button type="button" onclick="venderItemInventario('${inventoryUxEscape(item.id)}')">Vender ${Number(item.sellPrice || 0)}g</button>
       </div>
     </div>
   `;
@@ -167,8 +165,9 @@ function inventoryUxOpen() {
 
   const inventory = inventoryUxLoad();
   const equipped = inventoryUxEquippedEntries(inventory);
+  const backpack = window.getBackpackEntries(inventory);
   const itemSlots = Array.from({ length: INVENTORY_UX_SLOTS }, (_, index) =>
-    inventoryUxItemSlot(inventory.items[index], index, inventory),
+    inventoryUxItemSlot(backpack[index], index, inventory),
   ).join("");
 
   const equipmentSlots = Object.entries(INVENTORY_UX_SLOT_LABELS)
@@ -192,7 +191,7 @@ function inventoryUxOpen() {
   panel.innerHTML = `
     <div class="panel-header">
       <div><span class="panel-kicker">Mochila do aventureiro</span><h2>Inventário</h2></div>
-      <span class="inventory-capacity">${inventory.items.length}/${INVENTORY_UX_SLOTS}</span>
+      <span class="inventory-capacity">${backpack.length}/${INVENTORY_UX_SLOTS}</span>
     </div>
     <h3 class="section-title">Equipamentos</h3>
     <p class="inventory-help">Os bônus de cada equipamento aparecem diretamente no slot.</p>
@@ -227,7 +226,7 @@ function inventoryUxSell(itemId) {
   if (index < 0) return;
 
   const entry = inventory.items[index];
-  if (!entry || inventory.equipped[entry.item.slot] === itemId) return;
+  if (!entry || (inventory.equipped[entry.item.slot] === itemId && entry.quantity <= 1)) return;
 
   const gold = Math.max(0, Number(entry.item.sellPrice || 0));
   entry.quantity -= 1;
