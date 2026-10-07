@@ -108,22 +108,23 @@
   #batalha .barra span { line-height: 12px; font-size: 0.65rem; }
 }
 
-/* Desktop proportions share a single size, keeping bosses twice the hero scale. */
+/* Scale visible artwork, excluding transparent GIF margins, on desktop only. */
 @media (min-width: 601px) and (min-height: 501px) {
-  #batalha { --hero-sprite-size: clamp(130px, calc((100dvh - 330px) / 2), 220px); }
+  #batalha { --hero-sprite-size: clamp(100px, calc((100dvh - 430px) / 2), 180px); }
   #batalha .campo { align-items: flex-end; }
-  #batalha .heroi, #batalha .inimigo { overflow: visible; }
-  #batalha #heroiBatalha {
-    width: var(--hero-sprite-size); height: var(--hero-sprite-size);
-    max-width: none; max-height: none; object-fit: contain;
+  #batalha .sprite-frame {
+    --visible-size: var(--hero-sprite-size);
+    position: relative; height: var(--visible-size); width: 100%;
   }
-  #batalha #inimigoBatalha:not([data-size="boss"]) {
-    width: calc(var(--hero-sprite-size) * 1.15); height: calc(var(--hero-sprite-size) * 1.15);
-    max-width: none; max-height: none; object-fit: contain;
-  }
-  #batalha #inimigoBatalha[data-size="boss"] {
-    width: calc(var(--hero-sprite-size) * 2); height: calc(var(--hero-sprite-size) * 2);
-    max-width: none; max-height: none; object-fit: contain;
-    margin-inline: calc((100% - var(--hero-sprite-size) * 2) / 2); display: block;
+  #batalha .inimigo .sprite-frame { --visible-size: calc(var(--hero-sprite-size) * 1.15); }
+  #batalha .inimigo .sprite-frame[data-size="boss"] { --visible-size: calc(var(--hero-sprite-size) * 2); }
+  #batalha .sprite-frame #heroiBatalha,
+  #batalha .sprite-frame #inimigoBatalha {
+    position: absolute;
+    width: calc(var(--visible-size) * var(--sprite-width, 1));
+    height: calc(var(--visible-size) * var(--sprite-height, 1));
+    max-width: none; max-height: none; object-fit: fill;
+    left: 50%; top: calc(var(--visible-size) * var(--sprite-top, 0) * -1);
+    margin: 0; margin-left: calc(var(--visible-size) * var(--sprite-center, .5) * -1);
   }
 }
