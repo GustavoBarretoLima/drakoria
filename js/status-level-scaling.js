@@ -1,6 +1,7 @@
 import { createStatsForLevel } from "../shared/src/combat/classStats.ts";
 import { canonicalEquipment, canEquipItem } from "../shared/src/equipment/equipmentRules.ts";
 import { applyEquipmentStats } from "../shared/src/equipment/equipmentStats.ts";
+import { getClassSkills } from "../shared/src/combat/classSkills.ts";
 
 const STATUS_SLOT_LABELS = {
   weapon: "Arma",
@@ -232,6 +233,8 @@ function abrirStatusComProgressao() {
       <div class="status-stat"><span>Crítico</span><strong>${stats.criticalChance}%</strong></div>
       <div class="status-stat"><span>Speed</span><strong>${stats.speed}</strong></div>
     </div>
+    <h3 class="section-title">Habilidades da classe</h3>
+    <p class="inventory-help">${getClassSkills(classe).map(skill => `${escaparHtmlStatus(skill.name)} — ${progresso.nivel >= skill.unlockLevel ? "Liberada" : `Nível ${skill.unlockLevel}`}`).join("<br>")}</p>
     <h3 class="section-title">Equipamentos</h3>
     ${paperDoll}
     <div class="painel-acoes">

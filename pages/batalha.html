@@ -122,7 +122,13 @@
         <button id="btnFugir">Fugir</button>
       </div>
 
-      <div id="mensagens"></div>
+      <details id="painelHabilidades" class="battle-skills" hidden>
+        <summary id="tituloHabilidades">Habilidades da classe</summary>
+        <p class="battle-skills-help">Liberadas nos níveis 1, 5 e 10. A recuperação avança ao realizar outras ações, não com o tempo.</p>
+        <div id="habilidadesClasse" class="battle-skills-grid"></div>
+      </details>
+
+      <div id="mensagens" role="status" aria-live="polite"></div>
       <div id="indicadorTurno" class="indicador-turno">ATB carregando...</div>
     </section>
 

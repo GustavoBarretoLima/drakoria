@@ -2,7 +2,8 @@ import type {
   BattleState,
   BattleEvent,
 } from "../types/combat.js";
-import type { BattleAction } from "./actions.js";
+import { isBattleAction, type BattleAction } from "./actions.js";
+import { CLASS_SKILLS, getSkill, getSkillBlockReason, getSkillCooldown } from "./classSkills.js";
 
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -64,8 +65,14 @@ export function applyBattleAction(
   state: BattleState,
   action: BattleAction,
 ): BattleState {
+  if (!isBattleAction(action)) return state;
   if (state.finished) return state;
   if (state.turnOwnerId !== state.hero.id) return state;
+  if (!state.hero.isAlive || !state.enemy.isAlive) return state;
+
+  const selectedSkill = action.type === "USE_SKILL" ? getSkill(action.skillId) : undefined;
+  // Rejected skills leave mana, ATB, cooldowns and the current turn untouched.
+  if (action.type === "USE_SKILL" && (!selectedSkill || getSkillBlockReason(state.hero, selectedSkill))) return state;
 
   const hero = { ...state.hero, stats: { ...state.hero.stats }, atb: 0 };
   const enemy = { ...state.enemy, stats: { ...state.enemy.stats } };
@@ -73,6 +80,45 @@ export function applyBattleAction(
   let event: BattleEvent;
 
   switch (action.type) {
+    case "USE_SKILL": {
+      if (!selectedSkill) return state;
+      hero.stats.mana -= selectedSkill.manaCost;
+      let damage = 0;
+      let critical = false;
+      let hits = 0;
+      for (let hit = 0; hit < selectedSkill.hits && enemy.isAlive; hit++) {
+        hits++;
+        if (rollDodge(enemy.stats.dodgeChance)) continue;
+        const hitCritical = rollCritical(hero.stats.criticalChance + selectedSkill.criticalBonus);
+        const magic = selectedSkill.damageType === "magic";
+        const power = magic ? hero.stats.magicPower : hero.stats.attack;
+        const baseDamage = magic ? randomInt(10, 25) : randomInt(5, 15);
+        const defense = (magic ? enemy.stats.magicDefense : enemy.stats.defense) * selectedSkill.defenseMultiplier;
+        const mitigated = calculateDamageTaken(baseDamage + power * selectedSkill.powerMultiplier, defense, enemy.defending);
+        const hitDamage = hitCritical ? applyCriticalDamage(mitigated, hero.stats.criticalDamage) : mitigated;
+        damage += hitDamage;
+        critical ||= hitCritical;
+        enemy.stats.hp = Math.max(0, enemy.stats.hp - hitDamage);
+        enemy.isAlive = enemy.stats.hp > 0;
+        enemy.defending = false;
+      }
+      const guarded = selectedSkill.effect === "guard";
+      const disrupted = selectedSkill.effect === "resetAtb" && damage > 0;
+      if (guarded) hero.defending = true;
+      if (disrupted) enemy.atb = 0;
+      event = {
+        actorId: hero.id, targetId: enemy.id,
+        action: selectedSkill.damageType === "magic" ? "CAST_MAGIC" : "ATTACK",
+        skillId: selectedSkill.id, special: selectedSkill.name, damage, critical, hits,
+        dodged: damage === 0,
+        message: (damage === 0
+          ? `${enemy.name} esquivou de ${selectedSkill.name}.`
+          : `${critical ? "CRITICO! " : ""}${hero.name} usou ${selectedSkill.name} e causou ${damage} de dano${hits > 1 ? ` em ${hits} tiros` : ""}.`)
+          + (guarded ? ` ${hero.name} assumiu postura defensiva.` : "")
+          + (disrupted ? " O ATB inimigo foi zerado." : ""),
+      };
+      break;
+    }
     case "ATTACK": {
       const dodged = rollDodge(enemy.stats.dodgeChance);
       const critical = !dodged && rollCritical(hero.stats.criticalChance);
@@ -162,9 +208,17 @@ export function applyBattleAction(
     }
   }
 
-  if (event.damage === 0) {
+  if (event.damage === 0 && !event.skillId) {
     event.dodged = true;
     event.message = `${enemy.name} esquivou do ataque de ${hero.name}.`;
+  }
+  if (state.hero.skillCooldowns || selectedSkill) {
+    hero.skillCooldowns = {};
+    for (const skill of CLASS_SKILLS) {
+      const remaining = getSkillCooldown(state.hero, skill.id);
+      if (remaining > 1) hero.skillCooldowns[skill.id] = remaining - 1;
+    }
+    if (selectedSkill) hero.skillCooldowns[selectedSkill.id] = selectedSkill.cooldown;
   }
   const finished = !enemy.isAlive;
 

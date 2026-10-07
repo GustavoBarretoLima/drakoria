@@ -5,5 +5,7 @@ export function renderBattleMessage(state: BattleState) {
 
   if (!mensagens) return;
 
-  mensagens.textContent = state.lastEvent?.message ?? "";
+  const message = state.lastEvent?.message ?? "";
+  // ATB ticks repeat the last event; announce it only when its text changes.
+  if (mensagens.textContent !== message) mensagens.textContent = message;
 }

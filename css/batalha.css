@@ -1,3 +1,31 @@
+/* Class skills stay collapsed until requested, including on narrow screens. */
+.battle-skills {
+  width: min(100%, 700px);
+  box-sizing: border-box;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #a87935;
+  border-radius: 10px;
+  background: rgba(10, 10, 15, 0.9);
+  position: relative;
+  z-index: 11;
+}
+.battle-skills[hidden] { display: none; }
+.battle-skills summary { cursor: pointer; color: #ffdd93; font-weight: bold; }
+.battle-skills-help { color: #ccc; font-size: 0.85rem; line-height: 1.4; }
+.battle-skills-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.battle-skill-card { min-width: 0; padding: 10px; border-radius: 8px; background: #202026; }
+.battle-skill-card button {
+  width: 100%; min-height: 64px; border: 1px solid #ac8846; border-radius: 6px;
+  padding: 8px; background: #44331c; color: #fff; cursor: pointer;
+}
+.battle-skill-card button span { display: block; margin-top: 5px; font-size: 0.8rem; }
+.battle-skill-card button:disabled { background: #29292e; color: #c0c0c5; border-color: #555; cursor: default; }
+.battle-skill-card button:focus-visible, .battle-skills summary:focus-visible { outline: 2px solid #ffdb85; outline-offset: 3px; }
+.battle-skill-card p { font-size: 0.82rem; line-height: 1.45; color: #ddd; margin: 8px 0 0; }
+.battle-skill-card .battle-skill-meta { color: #e2c993; }
+@media (max-width: 600px) { .battle-skills-grid { grid-template-columns: 1fr; } }
+
 /* Layout base */
 body {
   margin: 0;
