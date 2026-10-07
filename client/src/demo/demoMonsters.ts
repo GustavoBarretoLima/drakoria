@@ -1,6 +1,5 @@
 import { createDungeonMonster } from "../../../shared/src/constants/dungeonMonsters.js";
 import { createHabitatMonster } from "../../../shared/src/constants/habitatMonsters.js";
-import { rollSubclassBookDrops } from "../../../shared/src/loot/subclassBooks.js";
 import type {
   BattleRewards,
   CombatantState,
@@ -130,7 +129,6 @@ function createScaledRewards(monsterId: string): BattleRewards | null {
       return {
         xp: Math.max(1, Math.floor(15 * multiplier)),
         gold: Math.max(1, Math.floor(8 * multiplier)),
-        classBooks: rollSubclassBookDrops(monsterId),
       };
     }
   }
@@ -143,7 +141,6 @@ function createScaledRewards(monsterId: string): BattleRewards | null {
       return {
         xp: Math.max(1, Math.floor(35 * multiplier)),
         gold: Math.max(1, Math.floor(20 * multiplier)),
-        classBooks: rollSubclassBookDrops(monsterId),
       };
     }
   }
@@ -183,13 +180,7 @@ export function createDemoMonster(monsterId: string): CombatantState {
 
 export function getDemoMonsterRewards(monsterId: string): BattleRewards {
   const dungeon = createDungeonMonster(monsterId) ?? createHabitatMonster(monsterId);
-  if (dungeon) {
-    return {
-      xp: dungeon.xpReward,
-      gold: dungeon.goldReward,
-      classBooks: rollSubclassBookDrops(monsterId),
-    };
-  }
+  if (dungeon) return { xp: dungeon.xpReward, gold: dungeon.goldReward };
   return (
     createScaledRewards(monsterId) ??
     DEMO_REWARDS[monsterId] ??
