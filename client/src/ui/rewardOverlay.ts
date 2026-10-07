@@ -22,9 +22,26 @@ const RARITY_LABELS: Record<EquipmentRarity, string> = {
   mythic: "Mítico",
 };
 
+export interface PotionActionResult {
+  used: boolean;
+  remaining: number;
+  vitals: {
+    hp: number;
+    mana: number;
+    maxHp: number;
+    maxMana: number;
+  };
+}
+
 export interface VictoryActions {
   onNextMonster: () => void;
   onReturnToCity: () => void;
+  onUsePotion?: () => PotionActionResult;
+  potionCount?: number;
+  depth?: number;
+  danger?: boolean;
+  bossDefeated?: boolean;
+  vitals?: PotionActionResult["vitals"];
 }
 
 export function renderVictoryRewardOverlay(
@@ -102,34 +119,94 @@ export function renderVictoryRewardOverlay(
     overlay.setAttribute("aria-modal", "true");
     title.id = "battleVictoryTitle";
     overlay.setAttribute("aria-labelledby", title.id);
+
+    if (actions.danger) {
+      const danger = document.createElement("div");
+      danger.className = "reward-danger";
+      danger.textContent = "⚠ DANGER — Uma presença esmagadora bloqueia o caminho. O Orc Rei apareceu!";
+      panel.appendChild(danger);
+    } else if (actions.bossDefeated) {
+      const cleared = document.createElement("div");
+      cleared.className = "reward-level-up";
+      cleared.textContent = "A Fortaleza foi conquistada. O Orc Rei caiu.";
+      panel.appendChild(cleared);
+    } else if (actions.depth !== undefined) {
+      const depth = document.createElement("div");
+      depth.className = "reward-progress";
+      depth.textContent = `Profundidade atual: ${actions.depth}. Quanto mais fundo, mais fortes serão os inimigos.`;
+      panel.appendChild(depth);
+    }
+
+    const vitals = document.createElement("div");
+    vitals.className = "reward-progress";
+    const renderVitals = (hp: number, mana: number, maxHp: number, maxMana: number) => {
+      vitals.textContent = `Recursos da expedição: HP ${hp}/${maxHp} • Mana ${mana}/${maxMana}`;
+    };
+    if (actions.vitals) {
+      renderVitals(actions.vitals.hp, actions.vitals.mana, actions.vitals.maxHp, actions.vitals.maxMana);
+      panel.appendChild(vitals);
+    }
+
     const buttons = document.createElement("div");
     buttons.className = "reward-actions";
     let chosen = false;
-    const createAction = (label: string, action: () => void) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = label;
-      button.addEventListener("click", () => {
+
+    if (actions.onUsePotion) {
+      const potionButton = document.createElement("button");
+      potionButton.type = "button";
+      potionButton.className = "reward-action-secondary";
+      const setPotionLabel = (remaining: number) => {
+        potionButton.textContent = `Usar Poção Restauradora (${remaining})`;
+        potionButton.disabled = remaining <= 0;
+      };
+      setPotionLabel(actions.potionCount ?? 0);
+      potionButton.addEventListener("click", () => {
+        if (chosen) return;
+        const potionResult = actions.onUsePotion?.();
+        if (!potionResult) return;
+        setPotionLabel(potionResult.remaining);
+        renderVitals(
+          potionResult.vitals.hp,
+          potionResult.vitals.mana,
+          potionResult.vitals.maxHp,
+          potionResult.vitals.maxMana,
+        );
+      });
+      buttons.appendChild(potionButton);
+    }
+
+    const cityButton = document.createElement("button");
+    cityButton.type = "button";
+    cityButton.className = "reward-action-secondary";
+    cityButton.textContent = "Sair da dungeon";
+    cityButton.addEventListener("click", () => {
+      if (chosen) return;
+      chosen = true;
+      cityButton.disabled = true;
+      nextButton?.setAttribute("disabled", "true");
+      actions.onReturnToCity();
+    });
+
+    let nextButton: HTMLButtonElement | null = null;
+    if (!actions.bossDefeated) {
+      nextButton = document.createElement("button");
+      nextButton.type = "button";
+      nextButton.textContent = actions.danger
+        ? "Enfrentar o Orc Rei"
+        : "Continuar explorando";
+      nextButton.addEventListener("click", () => {
         if (chosen) return;
         chosen = true;
-        nextButton.disabled = true;
+        nextButton!.disabled = true;
         cityButton.disabled = true;
-        action();
+        actions.onNextMonster();
       });
-      return button;
-    };
-    const nextButton = createAction("Buscar próximo monstro", actions.onNextMonster);
-    const cityButton = createAction("Voltar para a cidade", actions.onReturnToCity);
-    cityButton.className = "reward-action-secondary";
-    buttons.append(nextButton, cityButton);
+      buttons.appendChild(nextButton);
+    }
+
+    buttons.appendChild(cityButton);
     panel.appendChild(buttons);
-    // Mantém a navegação por teclado dentro da escolha de vitória.
-    overlay.addEventListener("keydown", event => {
-      if (event.key !== "Tab") return;
-      event.preventDefault();
-      (document.activeElement === nextButton ? cityButton : nextButton).focus();
-    });
-    requestAnimationFrame(() => nextButton.focus());
+    requestAnimationFrame(() => (nextButton ?? cityButton).focus());
   }
 
   overlay.appendChild(panel);
@@ -164,7 +241,7 @@ export function renderDefeatOverlay(result: DefeatPenaltyResult): void {
   const explanation = document.createElement("p");
   explanation.className = "defeat-explanation";
   explanation.textContent =
-    "Você perdeu 5% da XP atual e até 200 de ouro. Retornando para a Praça...";
+    "Você perdeu 5% da XP atual e até 200 de ouro. Seu HP e mana não são restaurados; visite a Taberna para descansar.";
 
   const progress = document.createElement("div");
   progress.className = "reward-progress";
