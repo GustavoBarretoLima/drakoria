@@ -174,31 +174,55 @@ try {
 class Element {
   id = ""; type = ""; className = ""; textContent = ""; hidden = false; disabled = false; title = "";
   dataset: Record<string, string> = {}; children: Element[] = [];
-  attributes = new Map<string, string>(); listeners = new Map<string, () => void>();
+  attributes = new Map<string, string>(); listeners = new Map<string, (event: any) => void>();
   append(...children: Element[]) { this.children.push(...children); }
   replaceChildren() { this.children = []; }
   setAttribute(key: string, value: string) { this.attributes.set(key, value); }
-  addEventListener(key: string, listener: () => void) { this.listeners.set(key, listener); }
-  click() { this.listeners.get("click")?.(); }
+  addEventListener(key: string, listener: (event: any) => void) { this.listeners.set(key, listener); }
+  querySelectorAll(selector: string) { return all(this).filter(el => selector === "button" && el.type === "button"); }
+  focus() { documentStub.activeElement = this; this.listeners.get("focus")?.({}); }
+  click() { this.listeners.get("click")?.({}); }
 }
 const panel = new Element(); panel.id = "painelHabilidades";
 const container = new Element(); container.id = "habilidadesClasse";
 const summary = new Element(); summary.id = "tituloHabilidades";
-panel.append(summary, container);
+const detail = new Element(); detail.id = "descricaoHabilidade";
+const back = new Element(); back.id = "btnVoltarHabilidades"; back.type = "button";
+const launcher = new Element(); launcher.id = "btnHabilidades"; launcher.type = "button";
+const commands = new Element(); commands.id = "comandosBatalha"; commands.append(launcher);
+const dock = new Element(); dock.id = "battleCommandDock";
+panel.append(summary, back, container, detail); dock.append(commands, panel);
 function all(element: Element): Element[] { return [element, ...element.children.flatMap(all)]; }
-Object.defineProperty(globalThis, "document", { configurable: true, value: {
-  getElementById: (id: string) => all(panel).find(element => element.id === id) ?? null,
+const documentStub = {
+  activeElement: null as Element | null,
+  getElementById: (id: string) => all(dock).find(element => element.id === id) ?? null,
   createElement: () => new Element(),
-} });
+};
+Object.defineProperty(globalThis, "document", { configurable: true, value: documentStub });
 const selected: SkillId[] = [];
 const state = battle("guerreiro", 1);
 renderSkills(state, id => selected.push(id));
 assert.equal(container.children.length, 3);
+assert.equal(panel.hidden, true);
+launcher.click();
+assert.equal(panel.hidden, false);
+assert.equal(commands.hidden, true);
+assert.equal(launcher.attributes.get("aria-expanded"), "true");
 const button = all(panel).find(el => el.id === "skill-warrior-cleave")!;
 assert.equal(button.disabled, false);
 assert.ok(button.title.includes("6 mana"));
 assert.ok(button.attributes.get("aria-describedby")?.includes("skill-detail-warrior-cleave"));
 button.click(); assert.deepEqual(selected, ["warrior-cleave"]);
+assert.equal(panel.hidden, true);
+assert.equal(commands.hidden, false);
+assert.equal(documentStub.activeElement, launcher);
+launcher.click();
+back.click();
+assert.equal(panel.hidden, true);
+launcher.click();
+dock.listeners.get("keydown")?.({ key: "Escape", preventDefault() {} });
+assert.equal(panel.hidden, true);
+assert.equal(launcher.attributes.get("aria-expanded"), "false");
 const locked = all(panel).find(el => el.id === "skill-warrior-breaker")!;
 assert.equal(locked.disabled, true); locked.click(); assert.equal(selected.length, 1);
 renderSkills({ ...state, hero: { ...state.hero, level: 10, skillCooldowns: { "warrior-cleave": 1 } } }, id => selected.push(id));
@@ -206,6 +230,11 @@ assert.equal(all(panel).find(el => el.id === button.id), button);
 assert.equal(button.disabled, true);
 assert.ok(button.title.includes("Recuperação: 1"));
 assert.equal(locked.disabled, false);
+launcher.click();
+dock.listeners.get("keydown")?.({ key: "End", preventDefault() {} });
+assert.equal(documentStub.activeElement, locked);
+assert.equal(locked.dataset.selected, "true");
+assert.ok(detail.textContent.includes("ignora metade"));
 renderSkills({ ...state, turnOwnerId: null }, id => selected.push(id)); assert.equal(button.disabled, true);
 renderSkills({ ...state, finished: true }, id => selected.push(id)); assert.equal(locked.disabled, true);
 renderSkills({ ...state, hero: { ...state.hero, stats: { ...state.hero.stats, mana: 0 } } }, id => selected.push(id));
