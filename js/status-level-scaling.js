@@ -2,6 +2,7 @@ import { createStatsForLevel } from "../shared/src/combat/classStats.ts";
 import { canonicalEquipment, canEquipItem } from "../shared/src/equipment/equipmentRules.ts";
 import { applyEquipmentStats } from "../shared/src/equipment/equipmentStats.ts";
 import { getClassSkills } from "../shared/src/combat/classSkills.ts";
+import { applySubclassStats, SUBCLASS_DEFINITIONS } from "../shared/src/classes/subclasses.ts";
 
 const STATUS_SLOT_LABELS = {
   weapon: "Arma",
@@ -56,6 +57,16 @@ function normalizarClasseStatus() {
     : "guerreiro";
 }
 
+function carregarSubclasseStatus(classe) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem("drakoriaSubclassProgress") || "{}");
+    const definition = SUBCLASS_DEFINITIONS[parsed.activeSubclass];
+    return definition?.baseClass === classe ? definition : null;
+  } catch {
+    return null;
+  }
+}
+
 function normalizarGeneroStatus() {
   const genero = (localStorage.getItem("generoHeroi") || "masculino").toLowerCase();
   return genero.includes("fem") ? "feminino" : "masculino";
@@ -89,13 +100,14 @@ function getImagemHeroiStatus(classe, genero) {
   return imagens[classe]?.[genero] || imagens.guerreiro.masculino;
 }
 
-function calcularStatusPorNivel(classe, nivel, inventario) {
+function calcularStatusPorNivel(classe, nivel, inventario, subclasse) {
   const items = Object.values(inventario.equipped)
     .map(id => inventario.items.find(entry => entry.item.id === id)?.item)
     .filter(Boolean)
     .map(canonicalEquipment)
     .filter(item => canEquipItem(item, classe, Number(nivel)));
-  return applyEquipmentStats(createStatsForLevel(classe, Number(nivel)), items);
+  const stats = applyEquipmentStats(createStatsForLevel(classe, Number(nivel)), items);
+  return applySubclassStats(stats, subclasse?.id);
 }
 
 function formatarBonusEquipamentoStatus(stats = {}) {
@@ -190,6 +202,7 @@ function abrirStatusComProgressao() {
 
   const nome = localStorage.getItem("nomeHeroi") || "Herói";
   const classe = normalizarClasseStatus();
+  const subclasse = carregarSubclasseStatus(classe);
   const generoNormalizado = normalizarGeneroStatus();
   const classeTexto = localStorage.getItem("classeHeroiTexto") || classe;
   const generoTexto = localStorage.getItem("generoHeroi") || "Masculino";
@@ -200,7 +213,7 @@ function abrirStatusComProgressao() {
     ouro: 0,
   };
   const inventario = carregarInventarioStatus();
-  const stats = calcularStatusPorNivel(classe, progresso.nivel, inventario);
+  const stats = calcularStatusPorNivel(classe, progresso.nivel, inventario, subclasse);
   const paperDoll = criarPaperDollStatus(
     classe,
     generoNormalizado,
@@ -214,7 +227,7 @@ function abrirStatusComProgressao() {
       <div>
         <span class="panel-kicker">Ficha do aventureiro</span>
         <h2>${escaparHtmlStatus(nome)}</h2>
-        <p>${escaparHtmlStatus(classeTexto)} • ${escaparHtmlStatus(generoTexto)}</p>
+        <p>${escaparHtmlStatus(classeTexto)}${subclasse ? ` • ${escaparHtmlStatus(subclasse.name)}` : ""} • ${escaparHtmlStatus(generoTexto)}</p>
       </div>
       <div class="level-badge"><span>Nível</span><strong>${progresso.nivel}</strong></div>
     </div>
@@ -222,6 +235,7 @@ function abrirStatusComProgressao() {
       <div><span>EXP</span><strong>${progresso.xp}/${progresso.xpParaProximoNivel}</strong></div>
       <div><span>Ouro</span><strong>${progresso.ouro}</strong></div>
     </div>
+    ${subclasse ? `<p class="inventory-help"><strong>${escaparHtmlStatus(subclasse.name)}:</strong> ${escaparHtmlStatus(subclasse.passiveSummary)} ${escaparHtmlStatus(subclasse.role)}.</p>` : '<p class="inventory-help">Nenhuma subclasse ativa. Livros extremamente raros podem cair de bosses.</p>'}
     <p class="inventory-help">Ataque, DEF, DEF M, HP e Mana crescem a cada nível. Speed e crítico sobem em um ritmo mais lento.</p>
     <h3 class="section-title">Atributos</h3>
     <div class="status-stats-grid">

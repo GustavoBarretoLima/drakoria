@@ -1,5 +1,6 @@
 import type { BattleState, HeroClass } from "../../../../shared/src/types/combat.js";
 import type { EquipmentItem } from "../../../../shared/src/types/equipment.js";
+import type { SubclassId } from "../../../../shared/src/classes/subclasses.js";
 import { createInitialBattleState } from "./battleRoom.js";
 
 export class BattleManager {
@@ -12,6 +13,7 @@ export class BattleManager {
     equippedItems: EquipmentItem[] = [],
     heroLevel = 1,
     initialResources: { hp?: number; mana?: number } = {},
+    subclassId?: SubclassId,
   ): BattleState {
     const battle = createInitialBattleState(
       heroClass,
@@ -19,6 +21,7 @@ export class BattleManager {
       equippedItems,
       heroLevel,
       initialResources,
+      subclassId,
     );
     this.battles.set(playerId, battle);
     return battle;

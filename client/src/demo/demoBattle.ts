@@ -1,6 +1,7 @@
 import { applyBattleAction as applyHeroAction, applyEnemyTurn } from "../../../shared/src/combat/combatEngine.js";
 import { hasMonsterInsight } from "../../../shared/src/equipment/monsterInsight.js";
 import { createStatsForLevel, normalizeHeroLevel } from "../../../shared/src/combat/classStats.js";
+import { applySubclassStats } from "../../../shared/src/classes/subclasses.js";
 import {
   advanceBattleAtb,
   ATB_TICK_MS,
@@ -8,13 +9,14 @@ import {
 import type { BattleAction } from "../../../shared/src/combat/actions.js";
 import { applyEquipmentStats } from "../../../shared/src/equipment/equipmentStats.js";
 import { rollMonsterDrops } from "../../../shared/src/loot/lootTables.js";
+import { rollSubclassBookDrops } from "../../../shared/src/loot/subclassBooks.js";
 import type {
-  BattleEvent,
   BattleState,
   HeroClass,
 } from "../../../shared/src/types/combat.js";
 import { loadHeroVitals } from "../battle/heroVitals.js";
 import { getEquippedItems } from "../inventory/inventoryClient.js";
+import { getActiveSubclass } from "../progression/subclassClient.js";
 import {
   createDemoMonster,
   getDemoMonsterRewards,
@@ -46,20 +48,16 @@ function stopAtbLoop(): void {
 
 function startAtbLoop(expectedBattleId: string): void {
   stopAtbLoop();
-
   atbTimer = window.setInterval(() => {
     if (!battleState || battleState.id !== expectedBattleId || battleState.finished) {
       stopAtbLoop();
       return;
     }
-
     const nextState = advanceBattleAtb(battleState);
-
     if (nextState !== battleState) {
       battleState = nextState;
       emitState();
     }
-
     if (battleState.turnOwnerId === battleState.enemy.id) {
       processEnemyTurn(expectedBattleId);
     }
@@ -74,14 +72,18 @@ export function startDemoBattle(
   stopAtbLoop();
   const baseRewards = getDemoMonsterRewards(monsterId);
   const equippedItems = getEquippedItems();
-  const heroStats = applyEquipmentStats(
-    createStatsForLevel(heroClass, heroLevel),
-    equippedItems,
+  const heroStats = applySubclassStats(
+    applyEquipmentStats(
+      createStatsForLevel(heroClass, heroLevel),
+      equippedItems,
+    ),
+    getActiveSubclass(),
   );
   const vitals = loadHeroVitals(heroStats.maxHp, heroStats.maxMana);
   heroStats.hp = vitals.hp;
   heroStats.mana = vitals.mana;
   const enemy = createDemoMonster(monsterId);
+  const classBooks = rollSubclassBookDrops(monsterId);
   if (monsterId.startsWith("orc-king-boss-lvl-")) enemy.phase = 1;
 
   battleState = {
@@ -100,6 +102,7 @@ export function startDemoBattle(
     rewards: {
       ...baseRewards,
       drops: rollMonsterDrops(monsterId),
+      ...(classBooks.length > 0 ? { classBooks } : {}),
     },
     revealEnemyStats: hasMonsterInsight(equippedItems, heroLevel),
     turnOwnerId: null,

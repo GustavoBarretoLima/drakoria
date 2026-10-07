@@ -2,6 +2,7 @@ import { prepareNextMonster, clearBattleStorage } from "./battle/victoryNavigati
 import { getBattleExitPage } from "./battle/worldMapNavigation.js";
 import { setupBattleArena } from "./assets/battleArena.js";
 import { getDungeonConfig } from "../../shared/src/dungeons/dungeonEncounters.js";
+import { applySubclassStats } from "../../shared/src/classes/subclasses.js";
 import { recoverAfterDefeat } from "./battle/defeatRecovery.js";
 import { registerDungeonVictory } from "./battle/dungeonRunClient.js";
 import {
@@ -29,6 +30,10 @@ import {
   applyDefeatPenalty,
   awardBattleRewards,
 } from "./progression/progressionClient.js";
+import {
+  addSubclassBookDrops,
+  getActiveSubclass,
+} from "./progression/subclassClient.js";
 import {
   renderDefeatOverlay,
   renderVictoryRewardOverlay,
@@ -76,9 +81,12 @@ function getHeroLevel(): number {
 function getCurrentHeroVitals() {
   const heroClass = getSelectedHeroClass();
   const heroLevel = getHeroLevel();
-  const stats = applyEquipmentStats(
-    createStatsForLevel(heroClass, heroLevel),
-    getEquippedItems(),
+  const stats = applySubclassStats(
+    applyEquipmentStats(
+      createStatsForLevel(heroClass, heroLevel),
+      getEquippedItems(),
+    ),
+    getActiveSubclass(),
   );
   return loadHeroVitals(stats.maxHp, stats.maxMana);
 }
@@ -137,7 +145,9 @@ function applyVictoryRewards(state: BattleState): void {
   rewardedBattleId = state.id;
   const result = awardBattleRewards(state.rewards);
   const drops = state.rewards.drops ?? [];
+  const classBooks = state.rewards.classBooks ?? [];
   addDropsToInventory(drops);
+  addSubclassBookDrops(classBooks);
   const run = registerDungeonVictory(state.enemy.id);
   const regionConfig = run ? getDungeonConfig(run.dungeonId) : undefined;
   const vitals = loadHeroVitals(state.hero.stats.maxHp, state.hero.stats.maxMana);
@@ -146,13 +156,20 @@ function applyVictoryRewards(state: BattleState): void {
   renderVictoryRewardOverlay(
     state.rewards,
     result,
-    drops.map((drop) => ({
-      name: drop.item.name,
-      quantity: drop.quantity,
-      rarity: drop.item.rarity,
-      level: drop.item.level,
-      allowedClasses: drop.item.allowedClasses,
-    })),
+    [
+      ...drops.map((drop) => ({
+        name: drop.item.name,
+        quantity: drop.quantity,
+        rarity: drop.item.rarity,
+        level: drop.item.level,
+        allowedClasses: drop.item.allowedClasses,
+      })),
+      ...classBooks.map((book) => ({
+        name: `📖 ${book.name}`,
+        quantity: book.quantity,
+        rarity: "mythic" as const,
+      })),
+    ],
     {
       onNextMonster: () => {
         prepareNextMonster(localStorage);
@@ -236,6 +253,7 @@ if (demoMode) {
 
     socket.emit("player:setup", {
       className: getSelectedHeroClass(),
+      subclassId: getActiveSubclass(),
       monsterId: getSelectedMonsterId(),
       heroLevel: getHeroLevel(),
       equippedItemIds: getEquippedItems().map((item) => item.id),
