@@ -2,8 +2,28 @@ import { DUNGEON_CONFIG as DUNGEON_ORC_CONFIG } from "../shared/src/dungeons/dun
 import { createDungeonRun, pickDungeonRunEncounter } from "../shared/src/dungeons/dungeonRun.ts";
 
 const DUNGEON_RUN_KEY = "drakoriaDungeonRun";
+const HERO_VITALS_KEY = "drakoriaHeroVitals";
+
+function heroCanEnterDungeon() {
+  const saved = localStorage.getItem(HERO_VITALS_KEY);
+  if (!saved) return true;
+
+  try {
+    const vitals = JSON.parse(saved);
+    if (Number(vitals.hp) <= 0) {
+      window.alert("Você está sem HP. Descanse na Taberna antes de entrar em outra dungeon.");
+      return false;
+    }
+  } catch {
+    return true;
+  }
+
+  return true;
+}
 
 function dungeonOrcStart(config) {
+  if (!heroCanEnterDungeon()) return;
+
   const run = createDungeonRun(config.id);
   const encounter = pickDungeonRunEncounter(config, run);
   localStorage.setItem(DUNGEON_RUN_KEY, JSON.stringify(run));
