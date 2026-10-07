@@ -148,10 +148,21 @@ export function createDemoMonster(monsterId: string): CombatantState {
   if (dungeon) {
     const { magicPower: _magicPower, ...stats } = dungeon.stats;
     return {
-    id: dungeon.id, name: dungeon.name, sprites: dungeon.sprites,
-    stats: { ...stats, magicDefense: dungeon.stats.magicDefense ?? 0, speed: { goblin: 12, orc: 8, undead: 9, beast: 14 }[dungeon.family as "goblin" | "orc" | "undead" | "beast"] },
-    atb: 0, defending: false, isAlive: true,
-  };
+      id: dungeon.id,
+      name: dungeon.name,
+      sprites: dungeon.sprites,
+      stats: {
+        ...stats,
+        magicDefense: dungeon.stats.magicDefense ?? 0,
+        speed: { goblin: 12, orc: 8, undead: 9, beast: 14 }[
+          dungeon.family as "goblin" | "orc" | "undead" | "beast"
+        ],
+      },
+      atb: 0,
+      defending: false,
+      isAlive: true,
+      ...(dungeon.id.startsWith("orc-king-boss-lvl-") ? { phase: 1 } : {}),
+    };
   }
   const parsed = parseDemoMonster(monsterId);
   if (parsed) return parsed;
