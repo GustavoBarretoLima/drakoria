@@ -1,5 +1,6 @@
 import type { EquipmentDrop } from "./equipment.js";
 import type { MonsterSpriteSet } from "./monster.js";
+import type { SkillId } from "../combat/classSkills.js";
 
 export type HeroClass = "guerreiro" | "mago" | "arqueiro";
 
@@ -31,6 +32,7 @@ export interface CombatantState {
   phase?: number;
   specialCooldown?: number;
   charging?: boolean;
+  skillCooldowns?: Partial<Record<SkillId, number>>;
 }
 
 export interface BattleRewards {
@@ -47,6 +49,8 @@ export interface BattleEvent {
   critical?: boolean;
   dodged?: boolean;
   special?: string;
+  skillId?: SkillId;
+  hits?: number;
   message: string;
 }
 

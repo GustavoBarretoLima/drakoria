@@ -11,7 +11,7 @@ import {
   ATB_TICK_MS,
 } from "../../shared/src/combat/atb.js";
 import { normalizeHeroLevel } from "../../shared/src/combat/classStats.js";
-import type { BattleAction } from "../../shared/src/combat/actions.js";
+import { isBattleAction } from "../../shared/src/combat/actions.js";
 import { STARTER_LOOT_ITEMS } from "../../shared/src/loot/lootTables.js";
 import type { HeroClass } from "../../shared/src/types/combat.js";
 import type { EquipmentItem } from "../../shared/src/types/equipment.js";
@@ -191,7 +191,8 @@ io.on("connection", (socket) => {
     },
   );
 
-  socket.on("battle:action", (action: BattleAction) => {
+  socket.on("battle:action", (action: unknown) => {
+    if (!isBattleAction(action)) return;
     const currentBattle = battleManager.get(socket.id);
 
     if (!currentBattle) {

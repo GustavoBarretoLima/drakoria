@@ -164,7 +164,7 @@ O GitHub Pages continua hospedando apenas arquivos estáticos. Para multiplayer,
 
 ### Próximas etapas
 
-- skills e árvore de habilidades por classe;
+- árvore de habilidades e subclasses liberadas através de livros (sprint futuro);
 - consumíveis;
 - inventário e propriedade de itens autoritativos no servidor;
 - persistência em banco de dados;
@@ -215,3 +215,50 @@ Validação: `npx tsc --noEmit`, `npm run build` e `npm test`.
 O balanceamento preserva HP, mana, velocidade, crítico e mitigação existentes;
 reduz o ataque físico do Mago e sua progressão de defesa, mantendo seu dano
 mágico inicial. A progressão de defesa do Arqueiro é levemente menor.
+
+## Sprint 9 — Habilidades de Classe
+
+Cada classe tem três habilidades liberadas automaticamente nos níveis 1, 5 e
+10. O catálogo compartilhado em `shared/src/combat/classSkills.ts` define
+requisitos, custo, cooldown e efeitos; demo e backend usam o mesmo catálogo e
+engine. Não há pontos para distribuir ou mudança de classe neste sprint.
+
+| Classe | Habilidade | Nível | Mana | Recuperação (outras ações do herói) |
+| --- | --- | --- | --- | --- |
+| Guerreiro | Golpe Brutal | 1 | 6 | 1 |
+| Guerreiro | Golpe do Guardião | 5 | 8 | 2 |
+| Guerreiro | Rompe-armadura | 10 | 12 | 3 |
+| Mago | Projétil Arcano | 1 | 10 | 1 |
+| Mago | Pulso Gélido | 5 | 14 | 2 |
+| Mago | Explosão Arcana | 10 | 24 | 3 |
+| Arqueiro | Tiro Preciso | 1 | 6 | 1 |
+| Arqueiro | Flecha Perfurante | 5 | 10 | 2 |
+| Arqueiro | Disparo Duplo | 10 | 14 | 3 |
+
+O Guerreiro combina dano físico, postura defensiva e perfuração. O Mago usa
+`magicPower`; Pulso Gélido zera o ATB inimigo apenas se acertar. O Arqueiro
+ganha crítico, perfuração e dois tiros que rolam esquiva/crítico separadamente.
+Golpe do Guardião concede postura mesmo se o golpe errar; o próximo dano
+recebido é reduzido pela metade. Perfuração vale apenas para o golpe atual.
+Cada golpe mantém dano base, mitigação, defesa e críticos do Combat Core 2.0.
+
+Usar uma habilidade consome uma ação e seu custo de mana, mesmo quando o
+inimigo esquiva. A recuperação começa depois do uso: cooldown 2 exige duas
+outras ações do herói. ATB, tempo parado e turnos inimigos não reduzem esse
+contador. Outra habilidade também conta como ação e recebe seu próprio
+cooldown. Tentativas de habilidade desconhecida, de outra classe, bloqueada
+por nível, sem mana ou em recuperação são rejeitadas sem gastar mana, ATB ou
+turno. O backend recebe somente o ID; custos e efeitos enviados pelo cliente
+são ignorados. Cooldowns são locais à batalha e recomeçam em zero a cada
+encontro. Saves antigos continuam compatíveis, sem migração da progressão.
+
+Abra **Habilidades** na batalha para selecionar uma ação e consultar descrição,
+custo, nível e recuperação. O painel começa recolhido, mantém seus controles
+durante atualizações do ATB e adapta-se ao celular. A Praça também informa as
+habilidades liberadas e seus próximos níveis de desbloqueio.
+
+Validação: `npx tsc --noEmit`, `npm run build` e `npm test` (incluindo
+`tests/classSkills.test.ts` para catálogo, regras, efeitos, cooldowns e UI).
+
+A árvore de habilidades será planejada em um sprint futuro, com a ideia de
+liberar subclasses através de livros, conforme a direção definida para o jogo.

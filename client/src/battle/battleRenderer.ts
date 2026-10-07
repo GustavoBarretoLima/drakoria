@@ -2,6 +2,8 @@ import type { BattleState } from "../../../shared/src/types/combat.js";
 import { renderStatus } from "../ui/renderStatus.js";
 import { renderBattleMessage } from "../ui/renderMessages.js";
 import { gifsHeroi, gifsGoblin } from "../assets/gifs.js";
+import { renderSkills } from "../ui/renderSkills.js";
+import { sendSkill } from "./battleClient.js";
 
 let previousEventKey = "";
 let renderedBattleId = "";
@@ -40,6 +42,7 @@ export function renderBattle(state: BattleState) {
   renderBattleMessage(state);
   renderTurnIndicator(state);
   renderButtons(state);
+  renderSkills(state, sendSkill);
   renderSpritesBase(state);
   playBattleEventEffects(state);
 }
@@ -126,6 +129,7 @@ function playBattleEventEffects(state: BattleState) {
     lastEvent.action,
     lastEvent.damage ?? "",
     lastEvent.critical ? "crit" : "normal",
+    lastEvent.skillId ?? "",
     state.hero.stats.hp,
     state.enemy.stats.hp,
   ].join("|");
@@ -156,13 +160,17 @@ function playBattleEventEffects(state: BattleState) {
   const heroDamageGif = heroGifs.damage ?? heroDefaultGif;
   const heroSkillGif = "magia" in heroGifs ? heroGifs.magia : "";
 
-  if (lastEvent.dodged) return;
+  if (lastEvent.dodged) {
+    if (lastEvent.skillId === "warrior-guard") pulseDefend(heroWrapper);
+    return;
+  }
   if (lastEvent.actorId === state.enemy.id && lastEvent.action === "DEFEND") {
     pulseDefend(enemyWrapper);
     return;
   }
 
   if (lastEvent.actorId === state.hero.id) {
+    if (lastEvent.skillId === "warrior-guard") pulseDefend(heroWrapper);
     if (lastEvent.action === "ATTACK") {
       heroImg.src = heroAttackGif;
 
