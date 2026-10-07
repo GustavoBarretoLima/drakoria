@@ -85,6 +85,7 @@ function escaparHtmlStatus(valor) {
 }
 
 function getImagemHeroiStatus(classe, genero) {
+  if (carregarSubclasseStatus(classe)?.id === "berserker") return "../img/personagens/berserk_primal/idle.gif";
   const imagens = {
     guerreiro: {
       masculino: "../img/personagens/guerreiro.png",

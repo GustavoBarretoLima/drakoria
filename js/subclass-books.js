@@ -2,7 +2,11 @@ import {
   SUBCLASS_DEFINITIONS,
   SUBCLASS_IDS,
 } from "../shared/src/classes/subclasses.js";
-import { syncCharacterVitals } from "../client/src/progression/heroStats.ts";
+import { applySubclassStats } from "../shared/src/classes/subclasses.js";
+import { getHeroGifs } from "../client/src/assets/gifs.ts";
+import { SPRITE_BOUNDS } from "../client/src/assets/spriteBounds.ts";
+import { useSubclassBook } from "../client/src/progression/subclassClient.ts";
+import { getCurrentHeroStats, syncCharacterVitals } from "../client/src/progression/heroStats.ts";
 
 const STORAGE_KEY = "drakoriaSubclassProgress";
 const CLASS_LABELS = {
@@ -38,36 +42,66 @@ function loadState() {
   }
 }
 
-function saveState(state) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+const PREVIEW_STATS = [
+  ["maxHp", "Vida máxima"], ["maxMana", "Mana máxima"], ["attack", "Ataque físico"],
+  ["magicPower", "Poder mágico"], ["defense", "Defesa física"], ["magicDefense", "Defesa mágica"],
+  ["speed", "Velocidade"], ["criticalChance", "Chance crítica", true],
+  ["criticalDamage", "Dano crítico", true], ["dodgeChance", "Esquiva", true],
+];
+function previewPortrait(label, path) {
+  const key = path.slice(path.indexOf("img/"));
+  const [width, height, center, top] = SPRITE_BOUNDS[key] || [1, 1, .5, 0];
+  return `<article class="subclass-preview-portrait"><h3>${escapeHtml(label)}</h3>
+    <div class="subclass-preview-sprite" style="--sprite-width:${width};--sprite-height:${height};--sprite-center:${center};--sprite-top:${top}">
+      <img src="${escapeHtml(path)}" alt="${escapeHtml(label)} em repouso" />
+    </div></article>`;
 }
-
 function useBook(subclassId) {
   const state = loadState();
   const definition = SUBCLASS_DEFINITIONS[subclassId];
-  const count = Math.max(0, Math.floor(Number(state.books[subclassId] || 0)));
-  if (!definition || count <= 0) return;
-
-  if (definition.baseClass !== heroClass()) {
-    window.alert(`Este livro pertence à classe ${CLASS_LABELS[definition.baseClass]}.`);
-    return;
-  }
-
-  if (state.activeSubclass) {
-    window.alert(`Sua especialização já está definida como ${SUBCLASS_DEFINITIONS[state.activeSubclass].name}.`);
-    return;
-  }
-
-  const confirmed = window.confirm(
-    `Usar ${definition.bookName} e tornar-se ${definition.name}?\n\nA especialização é permanente para este personagem.`,
-  );
-  if (!confirmed) return;
-
-  state.books[subclassId] = count - 1;
-  state.activeSubclass = subclassId;
-  saveState(state);
-  syncCharacterVitals();
-  openSubclassBooks();
+  const panel = document.getElementById("painelPraca");
+  if (!panel || !definition || !(state.books[subclassId] > 0) || state.activeSubclass || definition.baseClass !== heroClass()) return;
+  document.getElementById("menuPraca")?.classList.add("hidden");
+  const current = getCurrentHeroStats();
+  const next = applySubclassStats(current, subclassId);
+  const gender = (localStorage.getItem("generoHeroi") || "masculino").toLowerCase() === "feminino" ? "Feminino" : "Masculino";
+  const rows = PREVIEW_STATS.map(([key, label, percent]) => {
+    const delta = next[key] - current[key];
+    const suffix = percent ? "%" : "";
+    return `<tr><th scope="row">${label}</th><td>${current[key]}${suffix}</td><td>${next[key]}${suffix}
+      <small class="${delta > 0 ? "stat-gain" : delta < 0 ? "stat-loss" : "stat-neutral"}">${delta ? `${delta > 0 ? "+" : ""}${delta}${percent ? " p.p." : ""}` : "—"}</small></td></tr>`;
+  }).join("");
+  panel.innerHTML = `<div class="panel-header"><div><span class="panel-kicker">Prévia da especialização</span>
+    <h2 tabindex="-1">Tornar-se ${escapeHtml(definition.name)}</h2></div></div>
+    <p>${escapeHtml(definition.description)}</p>
+    <div class="subclass-preview-grid">
+      ${previewPortrait(CLASS_LABELS[heroClass()], getHeroGifs(heroClass(), gender).padrao)}
+      <div class="subclass-preview-comparison"><table><caption>Seus atributos com os equipamentos atuais</caption>
+        <thead><tr><th>Atributo</th><th>Atual</th><th>Após escolher</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${previewPortrait(definition.name, getHeroGifs(heroClass(), gender, subclassId).padrao)}
+    </div>
+    <section class="subclass-preview-passives"><h3>Passivas ao escolher ${escapeHtml(definition.name)}</h3>
+      <p>${escapeHtml(definition.passiveSummary)}</p>
+      ${subclassId === "berserker" ? '<ul><li><strong>Força da fúria:</strong> aumenta o ataque físico em 20%.</li><li><strong>Críticos brutais:</strong> adiciona 20 pontos percentuais ao dano crítico.</li><li><strong>Guarda imprudente:</strong> reduz a defesa física em 10%.</li></ul>' : ""}
+      <p>As passivas da árvore de habilidades são liberadas depois, ao distribuir pontos no botão Subclasse da tela de status.</p>
+    </section>
+    <p>A escolha é permanente e consome um livro. A escolha não restaura vida ou mana.</p>
+    <p class="subclass-preview-message" role="alert"></p>
+    <div class="painel-acoes"><button type="button" data-preview-cancel>Voltar aos livros</button>
+      <button type="button" data-preview-confirm>Usar livro e escolher ${escapeHtml(definition.name)}</button></div>`;
+  panel.scrollTop = 0;
+  panel.querySelector("h2").focus();
+  panel.querySelector("[data-preview-cancel]").addEventListener("click", openSubclassBooks);
+  panel.querySelector("[data-preview-confirm]").addEventListener("click", (event) => {
+    event.currentTarget.disabled = true;
+    const result = useSubclassBook(subclassId, heroClass());
+    if (!result.used) {
+      panel.querySelector(".subclass-preview-message").textContent = result.message;
+      return;
+    }
+    syncCharacterVitals();
+    openSubclassBooks();
+  });
 }
 
 function bookCard(subclassId, state) {

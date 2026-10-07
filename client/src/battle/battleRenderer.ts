@@ -1,7 +1,7 @@
 import type { BattleState } from "../../../shared/src/types/combat.js";
 import { renderStatus } from "../ui/renderStatus.js";
 import { renderBattleMessage } from "../ui/renderMessages.js";
-import { gifsHeroi, gifsGoblin } from "../assets/gifs.js";
+import { getHeroGifs, gifsGoblin } from "../assets/gifs.js";
 import { renderSkills } from "../ui/renderSkills.js";
 import { sendSkill } from "./battleClient.js";
 import { SPRITE_BOUNDS } from "../assets/spriteBounds.js";
@@ -112,7 +112,7 @@ function renderSpritesBase(state: BattleState) {
 
   if (heroImg && state.hero.className && isNewBattle) {
     const gender = getHeroGender();
-    const heroGifs = gifsHeroi[state.hero.className]?.[gender];
+    const heroGifs = getHeroGifs(state.hero.className, gender, state.hero.subclassId);
 
     if (heroGifs?.padrao) {
       heroImg.src = heroGifs.padrao;
@@ -164,7 +164,7 @@ function playBattleEventEffects(state: BattleState) {
   if (!heroImg || !enemyImg) return;
 
   const gender = getHeroGender();
-  const heroGifs = gifsHeroi[state.hero.className]?.[gender];
+  const heroGifs = getHeroGifs(state.hero.className, gender, state.hero.subclassId);
 
   if (!heroGifs) return;
 
@@ -201,7 +201,7 @@ function playBattleEventEffects(state: BattleState) {
       );
 
       setTimeout(() => {
-        heroImg.src = heroDefaultGif;
+        heroImg.src = state.hero.isAlive ? heroDefaultGif : heroGifs.morte;
       }, 700);
 
       setTimeout(
@@ -230,7 +230,7 @@ function playBattleEventEffects(state: BattleState) {
       heroImg.src = heroDefenseGif;
 
       setTimeout(() => {
-        heroImg.src = heroDefaultGif;
+        heroImg.src = state.hero.isAlive ? heroDefaultGif : heroGifs.morte;
       }, 700);
 
       pulseDefend(heroWrapper);
@@ -247,7 +247,7 @@ function playBattleEventEffects(state: BattleState) {
       );
 
       setTimeout(() => {
-        heroImg.src = heroDefaultGif;
+        heroImg.src = state.hero.isAlive ? heroDefaultGif : heroGifs.morte;
       }, 700);
 
       flashTarget(enemyWrapper, true);
@@ -273,7 +273,7 @@ function playBattleEventEffects(state: BattleState) {
 
     setTimeout(() => {
       enemyImg.src = enemySprites.idle;
-      heroImg.src = heroDamageGif;
+      heroImg.src = state.hero.isAlive ? heroDamageGif : heroGifs.morte;
 
       shakeTarget(heroWrapper, lastEvent.critical === true);
       spawnDamageNumber(
@@ -283,7 +283,7 @@ function playBattleEventEffects(state: BattleState) {
       );
 
       setTimeout(() => {
-        heroImg.src = heroDefaultGif;
+        heroImg.src = state.hero.isAlive ? heroDefaultGif : heroGifs.morte;
       }, 500);
     }, 320);
   }

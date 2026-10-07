@@ -12,6 +12,7 @@ export const SPRITE_BOUNDS: Record<string, readonly [number, number, number, num
   "img/monstros/orc/idle.gif": [1.973568, 1.268722, 0.933921, 0.140969],
   "img/monstros/orc_rei/idle.gif": [1.953488, 1.674419, 0.926599, 0.578488],
   "img/monstros/rato_mutante/idle.gif": [2.630137, 1.753425, 1.263699, 0.691781],
+  "img/personagens/berserk_primal/idle.gif": [2.242991, 1.794393, 1.165888, 0.635514],
   "img/personagens/elfa_anime/idle.gif": [1.764706, 1.176471, 0.900735, 0.102941],
   "img/personagens/elfo_anime/idle.gif": [1.889764, 1.259843, 0.98622, 0.181102],
   "img/personagens/guerreira_anime/idle.gif": [1.860465, 1.24031, 0.875969, 0.162791],
