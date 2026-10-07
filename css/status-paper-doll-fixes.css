@@ -1,5 +1,5 @@
 .status-paper-doll {
-  min-height: 430px;
+  min-height: 510px;
   overflow: visible;
 }
 
@@ -33,12 +33,12 @@
 }
 
 .paper-slot-weapon { left: 18px; top: 84px; }
-.paper-slot-shield { left: 18px; top: 172px; }
-.paper-slot-gloves { left: 18px; top: 260px; }
+.paper-slot-shield { left: 18px; top: 194px; }
+.paper-slot-gloves { left: 18px; top: 304px; }
 .paper-slot-earring { left: 50%; top: 18px; transform: translateX(-50%); }
 .paper-slot-armor { right: 18px; top: 66px; }
-.paper-slot-necklace { right: 18px; top: 146px; }
-.paper-slot-ring { right: 18px; top: 226px; }
+.paper-slot-necklace { right: 18px; top: 176px; }
+.paper-slot-ring { right: 18px; top: 286px; }
 .paper-slot-legs { right: 154px; bottom: 18px; }
 .paper-slot-boots { left: 154px; bottom: 18px; }
 
@@ -101,6 +101,77 @@
   overflow: hidden;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+/* Equipment state uses a neutral check badge; rarity keeps its colored border. */
+.painel-praca {
+  box-sizing: border-box;
+}
+
+.inventory-slot,
+.equipment-slot,
+.paper-slot {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.item-equipped-badge,
+.equipment-slot .item-equipped-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 5px 0;
+  padding: 3px 6px;
+  border: 1px solid rgba(238, 244, 250, 0.55);
+  border-radius: 5px;
+  background: rgba(238, 244, 250, 0.12);
+  color: #eef4fa;
+  font-size: 0.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.equipment-slot.occupied,
+.paper-slot-filled {
+  outline: 2px solid rgba(238, 244, 250, 0.75);
+  outline-offset: -4px;
+}
+
+.equipment-slot:focus-visible,
+.paper-slot:focus-visible,
+.inventory-slot-actions button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.inventory-slot-actions button {
+  min-width: 0;
+  min-height: 32px;
+  overflow-wrap: anywhere;
+}
+
+.inventory-slot-description {
+  color: #c8b997 !important;
+}
+
+@media (min-width: 431px) and (max-width: 700px) {
+  .inventory-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .inventory-slot-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-slot-actions button {
+    min-height: 44px;
+  }
 }
 
 @media (max-width: 700px) {
