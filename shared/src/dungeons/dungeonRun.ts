@@ -65,17 +65,19 @@ export function pickDungeonRunEncounter(
     };
   }
 
-  const introMonsters =
+  const availableMonsters =
     config.introMonsters && run.depth <= (config.introDepths ?? 0)
       ? config.introMonsters
       : config.monsters;
-  const type = introMonsters[Math.floor(random() * introMonsters.length)]!;
+  const type = availableMonsters[Math.floor(random() * availableMonsters.length)]!;
   const depthBonus = Math.max(0, run.depth - 1);
   const lower = Math.min(config.maxLevel, config.minLevel + depthBonus);
   const upper = Math.min(config.maxLevel, lower + 2);
   const level = Math.floor(random() * (upper - lower + 1)) + lower;
   const rank = config.rank ??
-    (config.eliteChance && random() < config.eliteChance ? "elite" : "normal");
+    (type === "hobgoblin" && config.eliteChance && random() < config.eliteChance
+      ? "elite"
+      : "normal");
 
   return {
     monsterId: `${type}-${rank}-lvl-${level}`,
