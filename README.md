@@ -23,8 +23,11 @@ Já implementado:
 
 - 3 classes: **Guerreiro, Mago e Arqueiro**;
 - combate com **ATB baseado em velocidade**;
-- ataque, defesa e magia;
-- HP, mana, ataque, defesa, defesa mágica, velocidade e crítico;
+- ataque físico com `attack`/`defense` e magia com `magicPower`/`magicDefense`;
+- HP, mana, ataque, poder mágico, defesa, defesa mágica, velocidade, crítico e esquiva;
+- três habilidades por classe, liberadas nos níveis 1, 5 e 10, com custo de mana e recuperação por ações;
+- menu de habilidades compacto, inspirado em Final Fantasy, com descrições e retorno aos comandos da batalha;
+- IA inimiga com ataques básicos, especiais e cooldowns; Hobgoblin Elite prepara emboscadas e Orc Rei muda de fase aos 50% de vida;
 - progressão de atributos por nível;
 - XP, níveis e ouro;
 - overlay de vitória com recompensas e drops;
@@ -32,6 +35,8 @@ Já implementado:
 - retorno automático para a Praça após derrota com 30% da vida máxima, mantendo a mana restante e permitindo continuar sem ouro; saves antigos com zero HP também recuperam essa vida ao entrar na praça;
 - inventário com 20 slots;
 - 9 slots de equipamento;
+- itens equipados aparecem apenas em Equipamentos; trocar ou desequipar devolve a peça à mochila;
+- cópias extras permanecem na mochila e podem ser vendidas, sem vender a última cópia equipada;
 - restrições de item por classe e nível;
 - paper doll de equipamentos com tooltips;
 - bônus dos equipamentos exibidos no inventário e no status;
@@ -41,6 +46,7 @@ Já implementado:
 - mini-boss **Senhor da Guerra Orc Nv.15**;
 - armas raras do mini-boss: machado, espada, cajado e arco;
 - venda de equipamentos por ouro;
+- Taberna com descanso e compra de poções de HP e mana para recuperação entre batalhas;
 - batalhas independentes por jogador no backend;
 - comunicação cliente/servidor com Socket.IO;
 - deploy automático do frontend no GitHub Pages.
@@ -61,7 +67,9 @@ Cemitério, Pântano e Floresta liberam seus bosses após cinco vitórias, com a
 
 Cada região inicia sua própria exploração e mantém seus monstros ao continuar. HP, mana, inventário e progresso são preservados; sair após a vitória retorna ao mapa. A derrota continua retornando à praça para recuperação. IDs antigos de dungeon continuam disponíveis para compatibilidade com partidas salvas. Demo e backend usam os mesmos IDs de encontros.
 
-O Hobgoblin Elite usa os mesmos GIFs, com 1,6× HP/ataque/defesa e 2× XP/ouro (antes do arredondamento). As definições são compartilhadas entre demo e servidor. As faixas indicam o nível dos encontros; não há bloqueio de entrada por nível do jogador.
+O Hobgoblin Elite usa os mesmos GIFs, com 1,6× HP/ataque/defesa e 2× XP/ouro (antes do arredondamento), além de escudo e emboscada anunciada antes da estocada. As definições são compartilhadas entre demo e servidor. As faixas indicam o nível dos encontros; não há bloqueio de entrada por nível do jogador.
+
+Cada habitat tem sua arena de batalha. No desktop, monstros comuns aparecem um pouco maiores que os heróis e bosses usam uma escala maior; o enquadramento considera a área visível dos sprites para evitar que margens transparentes deixem monstros pequenos. No mobile, as proporções são adaptadas ao espaço disponível.
 
 ### Lista de equipamentos das dungeons
 
@@ -81,14 +89,14 @@ Cada peça existe por nível (1–25) e qualidade: Recruta (comum), Veterano (in
 
 | Encontro | Chance de equipamento | Raridade após o drop |
 |---|---|---|
-| Goblin/Orc/Esqueleto/Rato | 35% | Comum 70%, incomum 25%, raro 5% |
+| Monstros comuns dos habitats (exceto Hobgoblin) | 35% | Comum 70%, incomum 25%, raro 5% |
 | Hobgoblin normal | 45% | Incomum 75%, raro 25% |
 | Hobgoblin elite | 85% | Raro 80%, épico 20% |
-| Orc Rei boss | 100% | Raro 40%, épico 60% |
+| Bosses dos habitats e Orc Rei | 100% | Raro 40%, épico 60% |
 
-“Elite” descreve o conjunto raro/épico, preservando as raridades atuais da UI. O Orc Rei também tem 1% de chance independente de conceder um segundo equipamento: Olho da Verdade, colar lendário de nível 15 para todas as classes. Equipado, revela os atributos dos monstros. Sem ele, a batalha exibe nome, classe e nível do personagem e barras sem números. Os demais encontros concedem no máximo um equipamento. A progressão de atributos usa `1 + (nível - 1) × 0,08`, multiplicada por 1/1,2/1,5/1,85 conforme a qualidade. No combate atual, cajados melhoram ataque (também usado no dano mágico) e mana. Equipamentos antigos continuam no inventário; peças incompatíveis não podem ser usadas nem dar bônus. Itens antigos de ferro/placas e a espada do Senhor da Guerra passam a ser exclusivos do Guerreiro.
+“Elite” descreve o conjunto raro/épico, preservando as raridades atuais da UI. O Orc Rei também tem 1% de chance independente de conceder um segundo equipamento: Olho da Verdade, colar lendário de nível 15 para todas as classes. Equipado, revela os atributos dos monstros. Sem ele, a batalha exibe nome, classe e nível do personagem e barras sem números. Os demais encontros concedem no máximo um equipamento. A progressão de atributos usa `1 + (nível - 1) × 0,08`, multiplicada por 1/1,2/1,5/1,85 conforme a qualidade. Cajados concedem poder mágico e mana; equipamentos de Arqueiro podem conceder velocidade, crítico e esquiva. Equipamentos antigos continuam compatíveis; peças incompatíveis não podem ser usadas nem dar bônus. Itens antigos de ferro/placas e a espada do Senhor da Guerra são exclusivos do Guerreiro.
 
-Verificação: `npx tsc --noEmit`, `npm run build` e `npx tsx tests/dungeonMonsters.test.ts`.
+As quantidades salvas representam todas as cópias possuídas, incluindo a equipada. A mochila mostra apenas as cópias disponíveis, preservando os saves existentes e os bônus de status e combate.
 
 ## 🧱 Estrutura do projeto
 
@@ -134,6 +142,8 @@ npm run server
 
 O backend fica disponível em `http://localhost:3001`.
 
+O cliente usa esse endereço por padrão. Para outro backend, defina `VITE_API_URL` em um arquivo `.env.local` na raiz do projeto e reinicie o Vite.
+
 ### Cliente
 
 ```bash
@@ -141,6 +151,24 @@ npm run dev
 ```
 
 Abra o endereço informado pelo Vite, normalmente `http://localhost:5173`.
+
+O desenvolvimento local usa o backend. O modo demo é ativado automaticamente no build de produção publicado em `github.io/drakoria/`.
+
+## ✅ Validação
+
+```bash
+npm test
+npx tsc --noEmit
+npm run build
+```
+
+Os testes cobrem combate físico e mágico, esquiva, identidade de classe, especiais inimigos, fase do Orc Rei, habilidades e cooldowns, encontros e bosses por habitat, loot, mapa, navegação, consumíveis, recuperação após derrota e inventário/equipamentos.
+
+Para executar apenas um teste, por exemplo o fluxo de equipar e desequipar:
+
+```bash
+npx tsx tests/inventoryBackpack.test.ts
+```
 
 ## 🌐 Deploy
 
@@ -163,8 +191,12 @@ O GitHub Pages continua hospedando apenas arquivos estáticos. Para multiplayer,
 - ATB por velocidade;
 - progressão de nível;
 - loot, inventário e equipamentos;
+- separação visual entre mochila e equipamentos, com proteção da cópia equipada;
 - paper doll e status detalhado;
-- dungeons Orc por faixa de nível;
+- Combat Core 2.0: poder mágico, esquiva, identidade de classe e IA especial;
+- habilidades de classe e menu de batalha compacto;
+- exploração pelo mapa, arenas regionais e bosses por habitat;
+- poções de HP/mana e recuperação após derrota;
 - mini-boss Nv.15 e loot raro;
 - overlays de vitória e derrota;
 - deploy no GitHub Pages.
@@ -172,7 +204,7 @@ O GitHub Pages continua hospedando apenas arquivos estáticos. Para multiplayer,
 ### Próximas etapas
 
 - árvore de habilidades e subclasses liberadas através de livros (sprint futuro);
-- consumíveis;
+- expansão dos consumíveis e seus efeitos;
 - inventário e propriedade de itens autoritativos no servidor;
 - persistência em banco de dados;
 - mais famílias de monstros, bosses e dungeons;
