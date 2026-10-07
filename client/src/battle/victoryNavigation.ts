@@ -1,11 +1,35 @@
-import { DUNGEON_CONFIG, getDungeonConfig, pickDungeonEncounter } from "../../../shared/src/dungeons/dungeonEncounters.js";
+import { DUNGEON_CONFIG, getDungeonConfig } from "../../../shared/src/dungeons/dungeonEncounters.js";
+import {
+  createDungeonRun,
+  pickDungeonRunEncounter,
+  type DungeonRunState,
+} from "../../../shared/src/dungeons/dungeonRun.js";
 
 type BattleStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+const RUN_KEY = "drakoriaDungeonRun";
+
+function loadRun(storage: BattleStorage, dungeonId: string): DungeonRunState {
+  const saved = storage.getItem(RUN_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved) as DungeonRunState;
+      if (parsed.dungeonId === dungeonId) return parsed;
+    } catch {
+      // Começa uma nova run quando o estado salvo estiver inválido.
+    }
+  }
+
+  const run = createDungeonRun(dungeonId);
+  storage.setItem(RUN_KEY, JSON.stringify(run));
+  return run;
+}
 
 export function prepareNextMonster(storage: BattleStorage, random: () => number = Math.random): void {
   const config = getDungeonConfig(storage.getItem("dungeonAtual")) ??
     getDungeonConfig(storage.getItem("tipoBatalhaAtual")) ?? DUNGEON_CONFIG.iniciante!;
-  const encounter = pickDungeonEncounter(config, random);
+  const run = loadRun(storage, config.id);
+  const encounter = pickDungeonRunEncounter(config, run, random);
   storage.setItem("tipoBatalhaAtual", config.id);
   storage.setItem("dungeonAtual", config.id);
   storage.setItem("dungeonNivelMin", String(config.minLevel));
@@ -13,10 +37,11 @@ export function prepareNextMonster(storage: BattleStorage, random: () => number 
   storage.setItem("monsterIdAtual", encounter.monsterId);
   storage.setItem("dungeonEncontroTipo", encounter.type);
   storage.setItem("dungeonEncontroNivel", String(encounter.level));
+  storage.setItem("dungeonDanger", encounter.danger ? "1" : "0");
 }
 
 export function clearBattleStorage(storage: BattleStorage): void {
-  for (const key of ["tipoBatalhaAtual", "monsterIdAtual", "dungeonAtual", "dungeonNivelMin", "dungeonNivelMax", "dungeonEncontroTipo", "dungeonEncontroNivel"]) {
+  for (const key of ["tipoBatalhaAtual", "monsterIdAtual", "dungeonAtual", "dungeonNivelMin", "dungeonNivelMax", "dungeonEncontroTipo", "dungeonEncontroNivel", "dungeonDanger", RUN_KEY]) {
     storage.removeItem(key);
   }
 }
