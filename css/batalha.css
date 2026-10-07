@@ -30,11 +30,18 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: url("../img/stages/arena-fogo.png");
+  background-image: var(--battle-arena, url("../img/stages/arena-fogo.png"));
   background-size: cover;
   background-position: center;
   z-index: -2;
 }
+
+#batalha[data-arena="cemiterio-esquecido"] { --battle-arena: url("../img/stages/cemiterio_esquecido.png"); }
+#batalha[data-arena="pantano-corrompido"] { --battle-arena: url("../img/stages/pantano_corrompido.png"); }
+#batalha[data-arena="acampamento-orc"] { --battle-arena: url("../img/stages/acampamento_orc.png"); }
+#batalha[data-arena="fortaleza-rei-orc"] { --battle-arena: url("../img/stages/fortaleza_rei_orc.png"); }
+#batalha[data-arena="floresta-sombria"] { --battle-arena: url("../img/stages/floresta_sombria.png"); }
+#batalha[data-arena="ruinas-da-vigilia"] { --battle-arena: url("../img/stages/ruinas_da_vigilia.png"); }
 #batalha::after {
   content: "";
   position: absolute;
