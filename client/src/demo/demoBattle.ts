@@ -1,6 +1,7 @@
 import { applyBattleAction as applyHeroAction, applyEnemyTurn } from "../../../shared/src/combat/combatEngine.js";
 import { hasMonsterInsight } from "../../../shared/src/equipment/monsterInsight.js";
 import { createStatsForLevel, normalizeHeroLevel } from "../../../shared/src/combat/classStats.js";
+import { applySubclassStats } from "../../../shared/src/classes/subclasses.js";
 import {
   advanceBattleAtb,
   ATB_TICK_MS,
@@ -15,6 +16,7 @@ import type {
 } from "../../../shared/src/types/combat.js";
 import { loadHeroVitals } from "../battle/heroVitals.js";
 import { getEquippedItems } from "../inventory/inventoryClient.js";
+import { getActiveSubclass } from "../progression/subclassClient.js";
 import {
   createDemoMonster,
   getDemoMonsterRewards,
@@ -70,9 +72,12 @@ export function startDemoBattle(
   stopAtbLoop();
   const baseRewards = getDemoMonsterRewards(monsterId);
   const equippedItems = getEquippedItems();
-  const heroStats = applyEquipmentStats(
-    createStatsForLevel(heroClass, heroLevel),
-    equippedItems,
+  const heroStats = applySubclassStats(
+    applyEquipmentStats(
+      createStatsForLevel(heroClass, heroLevel),
+      equippedItems,
+    ),
+    getActiveSubclass(),
   );
   const vitals = loadHeroVitals(heroStats.maxHp, heroStats.maxMana);
   heroStats.hp = vitals.hp;
