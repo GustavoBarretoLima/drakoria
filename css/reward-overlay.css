@@ -109,6 +109,19 @@
   text-shadow: 0 0 12px rgba(76, 255, 120, 0.5);
 }
 
+.reward-danger {
+  margin-top: 16px;
+  padding: 14px;
+  border: 2px solid rgba(255, 82, 82, 0.9);
+  border-radius: 12px;
+  background: rgba(120, 0, 0, 0.34);
+  color: #ffb3b3;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px rgba(255, 0, 0, 0.55);
+  animation: dangerPulse 900ms ease-in-out infinite alternate;
+}
+
 .reward-drops {
   margin-top: 16px;
   padding-top: 14px;
@@ -187,6 +200,16 @@
   }
 }
 
+@keyframes dangerPulse {
+  from {
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.25);
+  }
+
+  to {
+    box-shadow: 0 0 24px rgba(255, 0, 0, 0.65);
+  }
+}
+
 @media (max-width: 520px) {
   .reward-overlay {
     padding: 14px;
@@ -204,7 +227,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .reward-overlay,
-  .reward-panel {
+  .reward-panel,
+  .reward-danger {
     transition: none;
     animation: none;
   }

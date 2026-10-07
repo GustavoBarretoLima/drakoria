@@ -26,6 +26,7 @@ export interface CombatantState {
   atb: number;
   defending: boolean;
   isAlive: boolean;
+  phase?: number;
 }
 
 export interface BattleRewards {

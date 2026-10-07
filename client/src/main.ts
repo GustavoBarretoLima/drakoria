@@ -1,4 +1,11 @@
 import { prepareNextMonster, clearBattleStorage } from "./battle/victoryNavigation.js";
+import { registerDungeonVictory } from "./battle/dungeonRunClient.js";
+import {
+  loadConsumables,
+  loadHeroVitals,
+  saveHeroVitals,
+  useRestorativePotion,
+} from "./battle/heroVitals.js";
 import socket from "./network/socket.js";
 import { renderBattle } from "./battle/battleRenderer.js";
 import { setEnemyGifs } from "./assets/gifs.js";
@@ -20,6 +27,8 @@ import {
   renderDefeatOverlay,
   renderVictoryRewardOverlay,
 } from "./ui/rewardOverlay.js";
+import { createStatsForLevel } from "../../shared/src/combat/classStats.js";
+import { applyEquipmentStats } from "../../shared/src/equipment/equipmentStats.js";
 import type {
   BattleState,
   HeroClass,
@@ -58,6 +67,25 @@ function getHeroLevel(): number {
   }
 }
 
+function getCurrentHeroVitals() {
+  const heroClass = getSelectedHeroClass();
+  const heroLevel = getHeroLevel();
+  const stats = applyEquipmentStats(
+    createStatsForLevel(heroClass, heroLevel),
+    getEquippedItems(),
+  );
+  return loadHeroVitals(stats.maxHp, stats.maxMana);
+}
+
+function persistBattleVitals(state: BattleState): void {
+  saveHeroVitals({
+    hp: state.hero.stats.hp,
+    mana: state.hero.stats.mana,
+    maxHp: state.hero.stats.maxHp,
+    maxMana: state.hero.stats.maxMana,
+  });
+}
+
 function renderAtbPhase(state: BattleState): void {
   const indicator = document.getElementById("indicadorTurno");
   if (!indicator || state.finished) return;
@@ -80,6 +108,10 @@ function applyVictoryRewards(state: BattleState): void {
   const result = awardBattleRewards(state.rewards);
   const drops = state.rewards.drops ?? [];
   addDropsToInventory(drops);
+  const run = registerDungeonVictory(state.enemy.id);
+  const vitals = loadHeroVitals(state.hero.stats.maxHp, state.hero.stats.maxMana);
+  const consumables = loadConsumables();
+
   renderVictoryRewardOverlay(
     state.rewards,
     result,
@@ -99,6 +131,12 @@ function applyVictoryRewards(state: BattleState): void {
         clearBattleStorage(localStorage);
         window.location.href = `${import.meta.env.BASE_URL}pages/praca.html`;
       },
+      onUsePotion: useRestorativePotion,
+      potionCount: consumables.restorativePotion,
+      ...(run ? { depth: run.depth } : {}),
+      danger: Boolean(run?.bossPending),
+      bossDefeated: Boolean(run?.bossDefeated),
+      vitals,
     },
   );
 }
@@ -124,6 +162,7 @@ function scheduleDefeatRedirect(): void {
 
 function renderState(state: BattleState): void {
   console.log("Novo estado da batalha:", state);
+  persistBattleVitals(state);
   setEnemyGifs(state.enemy.sprites);
   renderBattle(state);
   renderAtbPhase(state);
@@ -140,12 +179,15 @@ if (demoMode) {
 } else {
   socket.on("connect", () => {
     console.log("Cliente conectado ao servidor:", socket.id);
+    const vitals = getCurrentHeroVitals();
 
     socket.emit("player:setup", {
       className: getSelectedHeroClass(),
       monsterId: getSelectedMonsterId(),
       heroLevel: getHeroLevel(),
       equippedItemIds: getEquippedItems().map((item) => item.id),
+      currentHp: vitals.hp,
+      currentMana: vitals.mana,
     });
   });
 

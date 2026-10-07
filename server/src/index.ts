@@ -92,11 +92,26 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
     atb: 0,
   };
 
+  const entersPhaseTwo =
+    enemy.id.startsWith("orc-king-boss-lvl-") &&
+    enemy.phase !== 2 &&
+    enemy.stats.hp <= Math.floor(enemy.stats.maxHp / 2);
+
+  if (entersPhaseTwo) {
+    enemy.phase = 2;
+    enemy.stats.attack = Math.floor(enemy.stats.attack * 1.3);
+    enemy.stats.defense = Math.floor(enemy.stats.defense * 1.25);
+  }
+
   const wasDefending = hero.defending;
+  const usesMagic = enemy.phase === 2 && Math.random() < 0.35;
   const critical = rollCritical(enemy.stats.criticalChance);
+  const rawDamage = usesMagic
+    ? Math.floor(enemy.stats.attack * 1.15) + 6
+    : enemy.stats.attack;
   const mitigatedDamage = calculateDamageTaken(
-    enemy.stats.attack,
-    hero.stats.defense,
+    rawDamage,
+    usesMagic ? hero.stats.magicDefense : hero.stats.defense,
     wasDefending,
   );
   const finalDamage = critical
@@ -107,11 +122,16 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
   hero.isAlive = hero.stats.hp > 0;
   hero.defending = false;
 
-  const message = critical
-    ? `CRITICO! ${enemy.name} causou ${finalDamage} de dano em ${hero.name}.`
-    : wasDefending
-      ? `${enemy.name} atacou, mas ${hero.name} se defendeu e recebeu apenas ${finalDamage} de dano.`
-      : `${enemy.name} atacou e causou ${finalDamage} de dano.`;
+  const phasePrefix = entersPhaseTwo
+    ? "DANGER! O Orc Rei entrou em fúria: ataque e defesa aumentaram. "
+    : "";
+  const message = usesMagic
+    ? `${phasePrefix}${enemy.name} lançou magia sombria e causou ${finalDamage} de dano em ${hero.name}.`
+    : critical
+      ? `${phasePrefix}CRITICO! ${enemy.name} causou ${finalDamage} de dano em ${hero.name}.`
+      : wasDefending
+        ? `${phasePrefix}${enemy.name} atacou, mas ${hero.name} se defendeu e recebeu apenas ${finalDamage} de dano.`
+        : `${phasePrefix}${enemy.name} atacou e causou ${finalDamage} de dano.`;
 
   const nextBattleState = {
     ...battleState,
@@ -123,7 +143,7 @@ function processEnemyTurn(playerId: string, expectedBattleId: string) {
     lastEvent: {
       actorId: enemy.id,
       targetId: hero.id,
-      action: "ATTACK" as const,
+      action: usesMagic ? ("CAST_MAGIC" as const) : ("ATTACK" as const),
       damage: finalDamage,
       critical,
       message,
@@ -203,6 +223,8 @@ io.on("connection", (socket) => {
       monsterId?: string;
       equippedItemIds?: string[];
       heroLevel?: number;
+      currentHp?: number;
+      currentMana?: number;
     }) => {
       const className = normalizeHeroClass(payload.className);
       const heroLevel = normalizeHeroLevel(Number(payload.heroLevel ?? 1));
@@ -220,6 +242,10 @@ io.on("connection", (socket) => {
           monsterId,
           equippedItems,
           heroLevel,
+          {
+            ...(Number.isFinite(payload.currentHp) ? { hp: Number(payload.currentHp) } : {}),
+            ...(Number.isFinite(payload.currentMana) ? { mana: Number(payload.currentMana) } : {}),
+          },
         );
 
         socket.emit("battle:update", battleState);

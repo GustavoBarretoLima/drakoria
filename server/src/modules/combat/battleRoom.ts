@@ -36,15 +36,34 @@ function getMonsterMagicDefense(defense: number, magicPower: number): number {
   return Math.max(0, Math.floor((defense + magicPower) / 2));
 }
 
+export interface InitialHeroResources {
+  hp?: number;
+  mana?: number;
+}
+
 export function createInitialBattleState(
   heroClass: HeroClass = "guerreiro",
   monsterId = "goblin-normal-lvl-1",
   equippedItems: EquipmentItem[] = [],
   heroLevel = 1,
+  initialResources: InitialHeroResources = {},
 ): BattleState {
   const monster = getMonsterById(monsterId);
 
   if (!monster) throw new Error(`Monstro nao encontrado: ${monsterId}`);
+
+  const heroStats = applyEquipmentStats(
+    createStatsForLevel(heroClass, heroLevel),
+    equippedItems,
+  );
+  heroStats.hp = Math.min(
+    heroStats.maxHp,
+    Math.max(0, Math.floor(initialResources.hp ?? heroStats.maxHp)),
+  );
+  heroStats.mana = Math.min(
+    heroStats.maxMana,
+    Math.max(0, Math.floor(initialResources.mana ?? heroStats.maxMana)),
+  );
 
   return {
     id: `battle-${Date.now()}`,
@@ -53,13 +72,10 @@ export function createInitialBattleState(
       name: "Heroi",
       className: heroClass,
       level: normalizeHeroLevel(heroLevel),
-      stats: applyEquipmentStats(
-        createStatsForLevel(heroClass, heroLevel),
-        equippedItems,
-      ),
+      stats: heroStats,
       atb: 0,
       defending: false,
-      isAlive: true,
+      isAlive: heroStats.hp > 0,
     },
     enemy: {
       id: monster.id,
@@ -82,6 +98,7 @@ export function createInitialBattleState(
       atb: 0,
       defending: false,
       isAlive: true,
+      ...(monster.id.startsWith("orc-king-boss-lvl-") ? { phase: 1 } : {}),
     },
     rewards: {
       xp: monster.xpReward,

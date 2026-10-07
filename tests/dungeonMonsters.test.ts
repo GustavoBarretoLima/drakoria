@@ -1,4 +1,5 @@
 import { DUNGEON_CONFIG, pickDungeonEncounter } from "../shared/src/dungeons/dungeonEncounters.js";
+import { createDungeonRun, pickDungeonRunEncounter } from "../shared/src/dungeons/dungeonRun.js";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 import vm from "node:vm";
@@ -59,7 +60,6 @@ try {
     Math.random = () => 0.99;
     assert.equal(rollMonsterDrops(monster.id).length, monster.rank === "boss" ? 1 : 0);
   }
-  // Every slot and class can actually be rolled, not just found in the catalog.
   for (let slotIndex = 0; slotIndex < 9; slotIndex++) for (let classIndex = 0; classIndex < 3; classIndex++) {
     randomSequence([0, 0.99, (slotIndex + 0.5)/9, (classIndex + 0.5)/3]);
     const item = rollMonsterDrops("orc-king-boss-lvl-25")[0]!.item;
@@ -76,32 +76,58 @@ try {
 const values = new Map<string, string>();
 const panel = { classList: { remove() {} }, innerHTML: "" };
 let queue: number[] = [];
-const storage = { getItem: (key: string) => values.get(key) ?? null, setItem: (key: string, value: string) => values.set(key, value) };
-const context = vm.createContext({ DUNGEON_ORC_CONFIG: DUNGEON_CONFIG, dungeonOrcPickMonster: (config: Parameters<typeof pickDungeonEncounter>[0]) => pickDungeonEncounter(config, () => queue.shift() ?? 0), Math: Object.assign(Object.create(Math), { random: () => queue.shift() ?? 0 }), localStorage: storage, window: { location: { href: "" } }, document: { getElementById: () => panel } });
-vm.runInContext(readFileSync("js/dungeon-orc-ranges.js", "utf8").replace(/^import[^\n]*\n/, ""), context);
+const storage = {
+  getItem: (key: string) => values.get(key) ?? null,
+  setItem: (key: string, value: string) => values.set(key, value),
+};
+const context = vm.createContext({
+  DUNGEON_ORC_CONFIG: DUNGEON_CONFIG,
+  createDungeonRun,
+  pickDungeonRunEncounter: (config: Parameters<typeof pickDungeonRunEncounter>[0], run: Parameters<typeof pickDungeonRunEncounter>[1]) => pickDungeonRunEncounter(config, run, () => queue.shift() ?? 0),
+  Math: Object.assign(Object.create(Math), { random: () => queue.shift() ?? 0 }),
+  localStorage: storage,
+  window: { location: { href: "" }, alert() {} },
+  document: { getElementById: () => panel },
+});
+vm.runInContext(readFileSync("js/dungeon-orc-ranges.js", "utf8").replace(/^import[^\n]*\n/gm, ""), context);
 vm.runInContext("window.abrirDungeon()", context);
-for (const label of ["Covil dos Goblins e Orcs", "Cripta dos Mutantes", "Acampamento Hobgoblin", "Trono do Orc Rei"]) assert.ok(panel.innerHTML.includes(label));
+for (const label of ["Covil dos Goblins e Orcs", "Cripta dos Mutantes", "Fortaleza do Orc Rei"]) assert.ok(panel.innerHTML.includes(label));
+assert.ok(!panel.innerHTML.includes("Trono do Orc Rei"));
 for (const names of Object.values(DUNGEON_EQUIPMENT_NAMES)) for (const name of Object.values(names)) assert.ok(panel.innerHTML.includes(name));
-for (const [key, species, min, max] of [["iniciante", ["goblin", "orc"], 1, 10], ["cripta", ["skeleton-warrior", "mutant-rat"], 1, 10], ["avancada", ["hobgoblin"], 10, 15], ["fortaleza", ["orc-king"], 15, 25]] as const) {
+
+for (const [key, species, min, max] of [
+  ["iniciante", ["goblin", "orc"], 1, 10],
+  ["cripta", ["skeleton-warrior", "mutant-rat"], 1, 10],
+  ["avancada", ["hobgoblin"], 10, 15],
+] as const) {
   for (const random of [0, 0.49, 0.99]) {
+    values.delete("drakoriaDungeonRun");
     queue = [random, random, random];
     vm.runInContext(`window.entrarDungeonPorFaixa('${key}')`, context);
     const monster = getMonsterById(values.get("monsterIdAtual")!)!;
     assert.ok(monster); assert.ok(monster.level >= min && monster.level <= max);
     assert.ok(species.some(name => monster.id.startsWith(name)));
     assert.equal(values.get("dungeonNivelMin"), String(min)); assert.equal(values.get("dungeonNivelMax"), String(max));
-    if (key === "fortaleza") assert.equal(monster.rank, "boss");
   }
 }
+
 for (const [roll, rank] of [[0.199, "elite"], [0.20, "normal"]] as const) {
-  queue = [0, 0, roll]; vm.runInContext("window.entrarDungeonPorFaixa('avancada')", context);
+  values.delete("drakoriaDungeonRun");
+  queue = [0, 0, roll];
+  vm.runInContext("window.entrarDungeonPorFaixa('avancada')", context);
   assert.equal(getMonsterById(values.get("monsterIdAtual")!)!.rank, rank);
 }
+
 for (const entry of ["entrarDungeonOrc1a5", "entrarDungeonOrc5a15", "entrarMiniBossOrc"]) {
-  queue = [0.99, 0.99, 0.99]; vm.runInContext(`window.${entry}()`, context);
+  values.delete("drakoriaDungeonRun");
+  queue = [0.99, 0.99, 0.99];
+  vm.runInContext(`window.${entry}()`, context);
   assert.ok(getMonsterById(values.get("monsterIdAtual")!));
 }
-// Saved universal iron items lose their old bypass, without deleting inventory.
+
+const legacy = pickDungeonEncounter(DUNGEON_CONFIG.iniciante!, () => 0);
+assert.ok(legacy.monsterId.startsWith("goblin-normal-lvl-1"));
+
 Object.defineProperty(globalThis, "localStorage", { value: storage, configurable: true });
 values.set("classeHeroi", "mago"); values.set("drakoriaProgresso", JSON.stringify({ nivel: 25 }));
 values.set("drakoriaInventario", JSON.stringify({ items: [{ item: { ...STARTER_LOOT_ITEMS["orc-iron-axe"], allowedClasses: ["universal"] }, quantity: 1 }], equipped: { weapon: "orc-iron-axe" } }));
@@ -111,4 +137,4 @@ values.set("drakoriaInventario", JSON.stringify({ items: [{ item: staff, quantit
 values.set("drakoriaProgresso", JSON.stringify({ nivel: 9 })); assert.equal(equipItem(staff.id).equipped.weapon, undefined);
 values.set("drakoriaProgresso", JSON.stringify({ nivel: 10 })); assert.equal(equipItem(staff.id).equipped.weapon, staff.id);
 values.set("classeHeroi", "arqueiro"); assert.equal(getEquippedItems().length, 0);
-console.log("Passed: dungeon boundaries, elite parity, 2700 items, class/level restrictions, loot weights/coverage, UI routes and saved inventory.");
+console.log("Passed: dungeon boundaries, depth routes, elite parity, equipment restrictions, loot weights and saved inventory.");

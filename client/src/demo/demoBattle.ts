@@ -12,6 +12,7 @@ import type {
   BattleState,
   HeroClass,
 } from "../../../shared/src/types/combat.js";
+import { loadHeroVitals } from "../battle/heroVitals.js";
 import { getEquippedItems } from "../inventory/inventoryClient.js";
 import {
   createDemoMonster,
@@ -76,6 +77,11 @@ export function startDemoBattle(
     createStatsForLevel(heroClass, heroLevel),
     equippedItems,
   );
+  const vitals = loadHeroVitals(heroStats.maxHp, heroStats.maxMana);
+  heroStats.hp = vitals.hp;
+  heroStats.mana = vitals.mana;
+  const enemy = createDemoMonster(monsterId);
+  if (monsterId.startsWith("orc-king-boss-lvl-")) enemy.phase = 1;
 
   battleState = {
     id: `demo-battle-${Date.now()}`,
@@ -87,9 +93,9 @@ export function startDemoBattle(
       stats: heroStats,
       atb: 0,
       defending: false,
-      isAlive: true,
+      isAlive: heroStats.hp > 0,
     },
-    enemy: createDemoMonster(monsterId),
+    enemy,
     rewards: {
       ...baseRewards,
       drops: rollMonsterDrops(monsterId),
@@ -220,10 +226,24 @@ function processEnemyTurn(expectedBattleId: string): void {
     stats: { ...battleState.enemy.stats },
     atb: 0,
   };
+  const entersPhaseTwo =
+    enemy.id.startsWith("orc-king-boss-lvl-") &&
+    enemy.phase !== 2 &&
+    enemy.stats.hp <= Math.floor(enemy.stats.maxHp / 2);
+  if (entersPhaseTwo) {
+    enemy.phase = 2;
+    enemy.stats.attack = Math.floor(enemy.stats.attack * 1.3);
+    enemy.stats.defense = Math.floor(enemy.stats.defense * 1.25);
+  }
+
+  const usesMagic = enemy.phase === 2 && Math.random() < 0.35;
   const critical = rollCritical(enemy.stats.criticalChance);
+  const rawDamage = usesMagic
+    ? Math.floor(enemy.stats.attack * 1.15) + 6
+    : enemy.stats.attack;
   const mitigatedDamage = calculateDamageTaken(
-    enemy.stats.attack,
-    hero.stats.defense,
+    rawDamage,
+    usesMagic ? hero.stats.magicDefense : hero.stats.defense,
     hero.defending,
   );
   const damage = critical
@@ -233,6 +253,9 @@ function processEnemyTurn(expectedBattleId: string): void {
   hero.stats.hp = Math.max(0, hero.stats.hp - damage);
   hero.isAlive = hero.stats.hp > 0;
   hero.defending = false;
+  const phasePrefix = entersPhaseTwo
+    ? "DANGER! O Orc Rei entrou em fúria: ataque e defesa aumentaram. "
+    : "";
 
   battleState = {
     ...battleState,
@@ -244,12 +267,14 @@ function processEnemyTurn(expectedBattleId: string): void {
     lastEvent: createEvent(
       enemy.id,
       hero.id,
-      "ATTACK",
-      critical
-        ? `CRITICO! ${enemy.name} causou ${damage} de dano.`
-        : wasDefending
-          ? `${enemy.name} atacou, mas ${hero.name} se defendeu e recebeu apenas ${damage} de dano.`
-          : `${enemy.name} atacou e causou ${damage} de dano.`,
+      usesMagic ? "CAST_MAGIC" : "ATTACK",
+      usesMagic
+        ? `${phasePrefix}${enemy.name} lançou magia sombria e causou ${damage} de dano.`
+        : critical
+          ? `${phasePrefix}CRITICO! ${enemy.name} causou ${damage} de dano.`
+          : wasDefending
+            ? `${phasePrefix}${enemy.name} atacou, mas ${hero.name} se defendeu e recebeu apenas ${damage} de dano.`
+            : `${phasePrefix}${enemy.name} atacou e causou ${damage} de dano.`,
       damage,
       critical,
     ),
