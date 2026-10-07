@@ -15,7 +15,7 @@ export interface SubclassBookDrop {
 }
 
 export function isBossMonsterId(monsterId: string): boolean {
-  return /-boss-lvl-\d+$/.test(monsterId);
+  return !monsterId.includes("-mini-boss-") && /-boss-lvl-\d+$/.test(monsterId);
 }
 
 export function rollSubclassBookDrops(
