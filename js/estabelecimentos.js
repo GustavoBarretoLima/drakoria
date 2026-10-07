@@ -4,7 +4,9 @@
 
 const DRAKORIA_PROGRESS_KEY = "drakoriaProgresso";
 const DRAKORIA_VITALS_KEY = "drakoriaHeroVitals";
+const DRAKORIA_CONSUMABLES_KEY = "drakoriaConsumables";
 const TAVERN_REST_COST = 20;
+const POTION_PRICE = 5;
 
 function carregarInterior(id, titulo, descricao, icone, som) {
   const praca = document.getElementById("praca");
@@ -30,41 +32,57 @@ function carregarInterior(id, titulo, descricao, icone, som) {
   }, 800);
 }
 
-function getTavernStatus() {
-  let ouro = 0;
-  let vitals = null;
+function loadProgressData() {
   try {
-    const progress = JSON.parse(localStorage.getItem(DRAKORIA_PROGRESS_KEY) || "{}");
-    ouro = Math.max(0, Math.floor(Number(progress.ouro || 0)));
+    return JSON.parse(localStorage.getItem(DRAKORIA_PROGRESS_KEY) || "{}");
   } catch {
-    ouro = 0;
+    return {};
   }
+}
+
+function loadConsumablesData() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(DRAKORIA_CONSUMABLES_KEY) || "{}");
+    return {
+      restorativePotion: Math.max(0, Math.floor(Number(parsed.restorativePotion || 0))),
+      healthPotion: Math.max(0, Math.floor(Number(parsed.healthPotion || 0))),
+      manaPotion: Math.max(0, Math.floor(Number(parsed.manaPotion || 0))),
+    };
+  } catch {
+    return { restorativePotion: 0, healthPotion: 0, manaPotion: 0 };
+  }
+}
+
+function saveConsumablesData(consumables) {
+  localStorage.setItem(DRAKORIA_CONSUMABLES_KEY, JSON.stringify(consumables));
+}
+
+function getTavernStatus() {
+  const progress = loadProgressData();
+  const consumables = loadConsumablesData();
+  const ouro = Math.max(0, Math.floor(Number(progress.ouro || 0)));
+  let vitals = null;
   try {
     const parsed = JSON.parse(localStorage.getItem(DRAKORIA_VITALS_KEY) || "null");
     if (parsed) vitals = parsed;
   } catch {
     vitals = null;
   }
-  return { ouro, vitals };
+  return { ouro, vitals, consumables };
 }
 
 function renderTavernRestStatus(message = "") {
   const status = document.getElementById("tabernaDescansoStatus");
   if (!status) return;
-  const { ouro, vitals } = getTavernStatus();
+  const { ouro, vitals, consumables } = getTavernStatus();
   const resources = vitals
     ? `HP ${Math.max(0, Math.floor(vitals.hp))}/${Math.max(1, Math.floor(vitals.maxHp))} • Mana ${Math.max(0, Math.floor(vitals.mana))}/${Math.max(0, Math.floor(vitals.maxMana))}`
     : "HP e mana estão completos até sua primeira batalha.";
-  status.textContent = `${message ? `${message} ` : ""}${resources} • Ouro: ${ouro}`;
+  status.textContent = `${message ? `${message} ` : ""}${resources} • Ouro: ${ouro} • Poções HP: ${consumables.healthPotion} • Poções Mana: ${consumables.manaPotion}`;
 }
 
 function descansarTaberna() {
-  let progress;
-  try {
-    progress = JSON.parse(localStorage.getItem(DRAKORIA_PROGRESS_KEY) || "{}");
-  } catch {
-    progress = {};
-  }
+  const progress = loadProgressData();
   const ouro = Math.max(0, Math.floor(Number(progress.ouro || 0)));
 
   let vitals = null;
@@ -105,6 +123,34 @@ function descansarTaberna() {
   renderTavernRestStatus("Você descansou e recuperou completamente HP e mana.");
 }
 
+function comprarPocao(tipo) {
+  const progress = loadProgressData();
+  const ouro = Math.max(0, Math.floor(Number(progress.ouro || 0)));
+
+  if (ouro < POTION_PRICE) {
+    renderTavernRestStatus(`Você precisa de ${POTION_PRICE} moedas de ouro para comprar uma poção.`);
+    return;
+  }
+
+  const consumables = loadConsumablesData();
+  if (tipo === "hp") {
+    consumables.healthPotion += 1;
+  } else if (tipo === "mana") {
+    consumables.manaPotion += 1;
+  } else {
+    return;
+  }
+
+  progress.ouro = ouro - POTION_PRICE;
+  localStorage.setItem(DRAKORIA_PROGRESS_KEY, JSON.stringify(progress));
+  saveConsumablesData(consumables);
+  renderTavernRestStatus(
+    tipo === "hp"
+      ? "Você comprou 1 Poção de HP."
+      : "Você comprou 1 Poção de Mana.",
+  );
+}
+
 function carregarTaberna() {
   document.getElementById("taberna").style.display = "block";
   document.getElementById("taberna").innerHTML = `
@@ -114,6 +160,15 @@ function carregarTaberna() {
       <p>Descanse antes de uma nova expedição. O descanso custa <strong>${TAVERN_REST_COST} moedas de ouro</strong> e restaura totalmente HP e mana.</p>
       <p id="tabernaDescansoStatus"></p>
       <button type="button" onclick="descansarTaberna()">🛏️ Descansar — ${TAVERN_REST_COST} ouro</button>
+
+      <div class="taberna-loja-pocoes">
+        <h3>🧪 Poções</h3>
+        <p>Compre suprimentos para usar entre as batalhas da dungeon.</p>
+        <button type="button" onclick="comprarPocao('hp')">❤️ Poção de HP — ${POTION_PRICE} ouro</button>
+        <button type="button" onclick="comprarPocao('mana')">💧 Poção de Mana — ${POTION_PRICE} ouro</button>
+        <p><small>Poção de HP recupera até 40 HP. Poção de Mana recupera até 20 mana.</small></p>
+      </div>
+
       <button class="btn-voltar" onclick="window.location.href='praca.html'">⬅ Voltar à Praça</button>
     </div>
   `;
@@ -171,3 +226,4 @@ function voltarPraca() {
 }
 
 window.descansarTaberna = descansarTaberna;
+window.comprarPocao = comprarPocao;

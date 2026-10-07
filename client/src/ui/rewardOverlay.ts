@@ -38,6 +38,10 @@ export interface VictoryActions {
   onReturnToCity: () => void;
   onUsePotion?: () => PotionActionResult;
   potionCount?: number;
+  onUseHealthPotion?: () => PotionActionResult;
+  healthPotionCount?: number;
+  onUseManaPotion?: () => PotionActionResult;
+  manaPotionCount?: number;
   depth?: number;
   danger?: boolean;
   bossDefeated?: boolean;
@@ -151,20 +155,24 @@ export function renderVictoryRewardOverlay(
     buttons.className = "reward-actions";
     let chosen = false;
 
-    if (actions.onUsePotion) {
-      const potionButton = document.createElement("button");
-      potionButton.type = "button";
-      potionButton.className = "reward-action-secondary";
-      const setPotionLabel = (remaining: number) => {
-        potionButton.textContent = `Usar Poção Restauradora (${remaining})`;
-        potionButton.disabled = remaining <= 0;
+    const addPotionButton = (
+      label: string,
+      initialCount: number,
+      action: (() => PotionActionResult) | undefined,
+    ) => {
+      if (!action) return;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "reward-action-secondary";
+      const setLabel = (remaining: number) => {
+        button.textContent = `${label} (${remaining})`;
+        button.disabled = remaining <= 0;
       };
-      setPotionLabel(actions.potionCount ?? 0);
-      potionButton.addEventListener("click", () => {
+      setLabel(initialCount);
+      button.addEventListener("click", () => {
         if (chosen) return;
-        const potionResult = actions.onUsePotion?.();
-        if (!potionResult) return;
-        setPotionLabel(potionResult.remaining);
+        const potionResult = action();
+        setLabel(potionResult.remaining);
         renderVitals(
           potionResult.vitals.hp,
           potionResult.vitals.mana,
@@ -172,8 +180,24 @@ export function renderVictoryRewardOverlay(
           potionResult.vitals.maxMana,
         );
       });
-      buttons.appendChild(potionButton);
-    }
+      buttons.appendChild(button);
+    };
+
+    addPotionButton(
+      "Usar Poção de HP",
+      actions.healthPotionCount ?? 0,
+      actions.onUseHealthPotion,
+    );
+    addPotionButton(
+      "Usar Poção de Mana",
+      actions.manaPotionCount ?? 0,
+      actions.onUseManaPotion,
+    );
+    addPotionButton(
+      "Usar Poção Restauradora",
+      actions.potionCount ?? 0,
+      actions.onUsePotion,
+    );
 
     const cityButton = document.createElement("button");
     cityButton.type = "button";

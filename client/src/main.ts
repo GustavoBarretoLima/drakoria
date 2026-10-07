@@ -4,6 +4,8 @@ import {
   loadConsumables,
   loadHeroVitals,
   saveHeroVitals,
+  useHealthPotion,
+  useManaPotion,
   useRestorativePotion,
 } from "./battle/heroVitals.js";
 import socket from "./network/socket.js";
@@ -131,6 +133,10 @@ function applyVictoryRewards(state: BattleState): void {
         clearBattleStorage(localStorage);
         window.location.href = `${import.meta.env.BASE_URL}pages/praca.html`;
       },
+      onUseHealthPotion: useHealthPotion,
+      healthPotionCount: consumables.healthPotion,
+      onUseManaPotion: useManaPotion,
+      manaPotionCount: consumables.manaPotion,
       onUsePotion: useRestorativePotion,
       potionCount: consumables.restorativePotion,
       ...(run ? { depth: run.depth } : {}),
