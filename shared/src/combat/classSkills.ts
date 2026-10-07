@@ -1,10 +1,13 @@
 import type { CombatantState, HeroClass } from "../types/combat.js";
 import { normalizeHeroLevel } from "./classStats.js";
+import type { SubclassId } from "../classes/subclasses.js";
+import { SUBCLASS_SKILLS, normalizeTreeRanks } from "../classes/skillTrees.js";
 
 export type SkillId =
   | "warrior-cleave" | "warrior-guard" | "warrior-breaker"
   | "mage-bolt" | "mage-frost" | "mage-burst"
-  | "archer-aim" | "archer-pierce" | "archer-volley";
+  | "archer-aim" | "archer-pierce" | "archer-volley"
+  | `${SubclassId}-${"technique" | "signature" | "ultimate"}`;
 
 export interface ClassSkill {
   readonly id: SkillId;
@@ -19,7 +22,8 @@ export interface ClassSkill {
   readonly hits: number;
   readonly defenseMultiplier: number;
   readonly criticalBonus: number;
-  readonly effect: "none" | "guard" | "resetAtb";
+  readonly effect: "none" | "guard" | "resetAtb" | "heal" | "healGuard" | "drain" | "recoil" | "execute" | "bleed" | "burn" | "summon" | "weaken";
+  readonly subclassId?: SubclassId;
   readonly description: string;
 }
 
@@ -67,7 +71,13 @@ export function getClassSkills(heroClass: HeroClass): readonly ClassSkill[] {
 }
 
 export function getSkill(id: string): ClassSkill | undefined {
-  return CLASS_SKILLS.find(skill => skill.id === id);
+  return [...CLASS_SKILLS, ...SUBCLASS_SKILLS].find(skill => skill.id === id);
+}
+
+export function getHeroSkills(hero: CombatantState): readonly ClassSkill[] {
+  const ranks = normalizeTreeRanks(hero.subclassId, hero.level ?? 1, hero.treeRanks);
+  const skills = [...CLASS_SKILLS.filter(skill => skill.heroClass === hero.className), ...SUBCLASS_SKILLS.filter(skill => skill.subclassId === hero.subclassId && skill.heroClass === hero.className && (ranks[skill.id] ?? 0) > 0)];
+  return skills.map(skill => skill.subclassId ? { ...skill, powerMultiplier: skill.powerMultiplier + Math.max(0, (ranks[skill.id] ?? 1) - 1) * 0.1 } : skill);
 }
 
 export function getSkillCooldown(hero: CombatantState, id: SkillId): number {
@@ -78,6 +88,7 @@ export function getSkillCooldown(hero: CombatantState, id: SkillId): number {
 /** Shared by the UI and engine; the server never trusts client costs or effects. */
 export function getSkillBlockReason(hero: CombatantState, skill: ClassSkill): string | null {
   if (hero.className !== skill.heroClass) return "Habilidade de outra classe";
+  if (skill.subclassId && (hero.subclassId !== skill.subclassId || !normalizeTreeRanks(hero.subclassId, hero.level ?? 1, hero.treeRanks)[skill.id])) return "Habilidade não aprendida na árvore";
   if (normalizeHeroLevel(hero.level ?? 1) < skill.unlockLevel) return `Desbloqueia no nível ${skill.unlockLevel}`;
   const cooldown = getSkillCooldown(hero, skill.id);
   if (cooldown > 0) return `Recuperação: ${cooldown} ação(ões)`;

@@ -3,6 +3,9 @@ import { canonicalEquipment, canEquipItem } from "../shared/src/equipment/equipm
 import { applyEquipmentStats } from "../shared/src/equipment/equipmentStats.ts";
 import { getClassSkills } from "../shared/src/combat/classSkills.ts";
 import { applySubclassStats, SUBCLASS_DEFINITIONS } from "../shared/src/classes/subclasses.ts";
+import { applyTreeStats } from "../shared/src/classes/skillTrees.ts";
+import { getTreeRanks } from "../client/src/progression/skillTreeClient.ts";
+import "../client/src/pages/subclassTree.ts";
 
 const STATUS_SLOT_LABELS = {
   weapon: "Arma",
@@ -107,7 +110,7 @@ function calcularStatusPorNivel(classe, nivel, inventario, subclasse) {
     .map(canonicalEquipment)
     .filter(item => canEquipItem(item, classe, Number(nivel)));
   const stats = applyEquipmentStats(createStatsForLevel(classe, Number(nivel)), items);
-  return applySubclassStats(stats, subclasse?.id);
+  return applyTreeStats(applySubclassStats(stats, subclasse?.id), subclasse?.id, Number(nivel), getTreeRanks());
 }
 
 function formatarBonusEquipamentoStatus(stats = {}) {
@@ -236,15 +239,19 @@ function abrirStatusComProgressao() {
       <div><span>Ouro</span><strong>${progresso.ouro}</strong></div>
     </div>
     ${subclasse ? `<p class="inventory-help"><strong>${escaparHtmlStatus(subclasse.name)}:</strong> ${escaparHtmlStatus(subclasse.passiveSummary)} ${escaparHtmlStatus(subclasse.role)}.</p>` : '<p class="inventory-help">Nenhuma subclasse ativa. Livros extremamente raros podem cair de bosses.</p>'}
+    ${subclasse ? '<div class="painel-acoes"><button type="button" onclick="abrirArvoreSubclasse()">Subclasse</button></div>' : ""}
     <p class="inventory-help">Ataque, DEF, DEF M, HP e Mana crescem a cada nível. Speed e crítico sobem em um ritmo mais lento.</p>
     <h3 class="section-title">Atributos</h3>
     <div class="status-stats-grid">
+      <div class="status-stat"><span>Vida máxima</span><strong>${stats.maxHp}</strong></div>
+      <div class="status-stat"><span>Mana máxima</span><strong>${stats.maxMana}</strong></div>
       <div class="status-stat"><span>Ataque</span><strong>${stats.attack}</strong></div>
       <div class="status-stat"><span>DEF</span><strong>${stats.defense}</strong></div>
       <div class="status-stat"><span>DEF M</span><strong>${stats.magicDefense}</strong></div>
       <div class="status-stat"><span>Magia</span><strong>${stats.magicPower}</strong></div>
       <div class="status-stat"><span>Esquiva</span><strong>${stats.dodgeChance.toFixed(1)}%</strong></div>
       <div class="status-stat"><span>Crítico</span><strong>${stats.criticalChance}%</strong></div>
+      <div class="status-stat"><span>Dano crítico</span><strong>${stats.criticalDamage}%</strong></div>
       <div class="status-stat"><span>Speed</span><strong>${stats.speed}</strong></div>
     </div>
     <h3 class="section-title">Habilidades da classe</h3>
@@ -256,6 +263,7 @@ function abrirStatusComProgressao() {
       <button type="button" onclick="fecharPainelPraca()">Fechar</button>
     </div>
   `;
+  painel.scrollTop = 0;
 }
 
 window.abrirStatus = abrirStatusComProgressao;

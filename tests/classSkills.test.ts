@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { SUBCLASS_TREES } from "../shared/src/classes/skillTrees.js";
 import { CLASS_SKILLS, getClassSkills, getSkill, getSkillBlockReason, getSkillCooldown, type SkillId } from "../shared/src/combat/classSkills.js";
 import { isBattleAction, type BattleAction } from "../shared/src/combat/actions.js";
 import { applyBattleAction, applyEnemyTurn } from "../shared/src/combat/combatEngine.js";
@@ -243,4 +244,19 @@ renderSkills(battle("mago"), id => selected.push(id));
 assert.equal(container.children.length, 3);
 assert.equal(all(panel).some(el => el.id === button.id), false);
 assert.ok(summary.textContent.includes("Mago"));
+const trained = createInitialBattleState("guerreiro", "orc-king-boss-lvl-20", [], 100, {}, "paladin", "Heroi",
+  Object.fromEntries(SUBCLASS_TREES.paladin.map(node => [node.id, node.maxRank])));
+trained.turnOwnerId = trained.hero.id;
+renderSkills(trained, id => selected.push(id));
+assert.equal(container.children.length, 6);
+const heal = all(panel).find(el => el.id === "skill-paladin-technique")!;
+assert.equal(heal.disabled, false);
+heal.click();
+assert.equal(selected.at(-1), "paladin-technique");
+renderSkills({ ...trained, turnOwnerId: null }, id => selected.push(id));
+assert.equal(all(panel).find(el => el.id === heal.id), heal);
+assert.equal(heal.disabled, true);
+renderSkills({ ...trained, hero: { ...trained.hero, treeRanks: {} } }, id => selected.push(id));
+assert.equal(container.children.length, 3);
+assert.ok(!all(panel).some(el => el.id === heal.id));
 console.log("Passed: nine class skills, level gates, costs, cooldowns, damage, effects, rejection, parity and UI availability.");

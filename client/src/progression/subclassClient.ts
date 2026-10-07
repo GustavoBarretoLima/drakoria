@@ -4,12 +4,15 @@ import {
 } from "../../../shared/src/classes/subclasses.js";
 import type { SubclassBookDrop } from "../../../shared/src/loot/subclassBooks.js";
 import type { HeroClass } from "../../../shared/src/types/combat.js";
+import { normalizeTreeRanks, type TreeRanks } from "../../../shared/src/classes/skillTrees.js";
+import { loadProgress } from "./progressionClient.js";
 
 const SUBCLASS_STORAGE_KEY = "drakoriaSubclassProgress";
 
 export interface SubclassProgressState {
   books: Partial<Record<SubclassId, number>>;
   activeSubclass?: SubclassId;
+  treeRanks?: TreeRanks;
 }
 
 export interface UseSubclassBookResult {
@@ -21,6 +24,7 @@ export interface UseSubclassBookResult {
 function cloneState(state: SubclassProgressState): SubclassProgressState {
   return {
     books: { ...state.books },
+    treeRanks: { ...state.treeRanks },
     ...(state.activeSubclass ? { activeSubclass: state.activeSubclass } : {}),
   };
 }
@@ -30,12 +34,13 @@ export function loadSubclassProgress(): SubclassProgressState {
     const parsed = JSON.parse(localStorage.getItem(SUBCLASS_STORAGE_KEY) || "{}") as Partial<SubclassProgressState>;
     return {
       books: parsed.books && typeof parsed.books === "object" ? { ...parsed.books } : {},
+      treeRanks: normalizeTreeRanks(parsed.activeSubclass, loadProgress().nivel, parsed.treeRanks),
       ...(parsed.activeSubclass && SUBCLASS_DEFINITIONS[parsed.activeSubclass]
         ? { activeSubclass: parsed.activeSubclass }
         : {}),
     };
   } catch {
-    return { books: {} };
+    return { books: {}, treeRanks: {} };
   }
 }
 

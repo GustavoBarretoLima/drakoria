@@ -3,6 +3,7 @@ import { getBattleExitPage } from "./battle/worldMapNavigation.js";
 import { setupBattleArena } from "./assets/battleArena.js";
 import { getDungeonConfig } from "../../shared/src/dungeons/dungeonEncounters.js";
 import { applySubclassStats } from "../../shared/src/classes/subclasses.js";
+import { applyTreeStats } from "../../shared/src/classes/skillTrees.js";
 import { recoverAfterDefeat } from "./battle/defeatRecovery.js";
 import { registerDungeonVictory } from "./battle/dungeonRunClient.js";
 import {
@@ -33,6 +34,7 @@ import {
 import {
   addSubclassBookDrops,
   getActiveSubclass,
+  loadSubclassProgress,
 } from "./progression/subclassClient.js";
 import {
   renderDefeatOverlay,
@@ -81,13 +83,13 @@ function getHeroLevel(): number {
 function getCurrentHeroVitals() {
   const heroClass = getSelectedHeroClass();
   const heroLevel = getHeroLevel();
-  const stats = applySubclassStats(
+  const stats = applyTreeStats(applySubclassStats(
     applyEquipmentStats(
       createStatsForLevel(heroClass, heroLevel),
       getEquippedItems(),
     ),
-    getActiveSubclass(),
-  );
+    getActiveSubclass(getSelectedHeroClass()),
+  ), getActiveSubclass(getSelectedHeroClass()), getHeroLevel(), loadSubclassProgress().treeRanks);
   return loadHeroVitals(stats.maxHp, stats.maxMana);
 }
 
@@ -253,6 +255,7 @@ if (demoMode) {
 
     socket.emit("player:setup", {
       heroName: localStorage.getItem("nomeHeroi") || "Heroi",
+      treeRanks: loadSubclassProgress().treeRanks,
       className: getSelectedHeroClass(),
       subclassId: getActiveSubclass(),
       monsterId: getSelectedMonsterId(),

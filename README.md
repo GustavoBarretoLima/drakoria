@@ -211,7 +211,7 @@ O GitHub Pages continua hospedando apenas arquivos estáticos. Para multiplayer,
 
 ### Próximas etapas
 
-- árvore de habilidades e subclasses liberadas através de livros (sprint futuro);
+- expansão das árvores de subclasse, captura permanente de espíritos e evolução de companheiros;
 - expansão dos consumíveis e seus efeitos;
 - inventário e propriedade de itens autoritativos no servidor;
 - persistência em banco de dados;
@@ -307,5 +307,39 @@ habilidades liberadas e seus próximos níveis de desbloqueio.
 Validação: `npx tsc --noEmit`, `npm run build` e `npm test` (incluindo
 `tests/classSkills.test.ts` para catálogo, regras, efeitos, cooldowns e UI).
 
-A árvore de habilidades será planejada em um sprint futuro, com a ideia de
-liberar subclasses através de livros, conforme a direção definida para o jogo.
+A continuação desse sistema usa livros de subclasse e árvores de talentos, descritos abaixo.
+
+## Árvores de habilidades das subclasses
+
+Após usar um livro compatível, a tela de **Status** mostra o botão **Subclasse**. Cada uma das nove subclasses tem uma árvore própria com três talentos passivos e três habilidades ativas. As passivas originais da especialização permanecem; os talentos adicionam bônus sobre os atributos já calculados com nível, equipamento e subclasse.
+
+O personagem recebe **1 ponto por nível após o primeiro**, incluindo níveis anteriores ao livro. Um personagem de nível 20 tem 19 pontos. Cada rank custa um ponto; talentos passivos têm até cinco ranks e habilidades, três. Não existe saldo de pontos separado no save: os pontos livres são calculados pelo nível menos os ranks válidos investidos. Saves antigos recebem pontos retroativamente e começam com árvore vazia.
+
+| Subclasse | Talentos passivos | Novas habilidades |
+|---|---|---|
+| Paladino | Vitalidade Sagrada, Armadura da Fé, Égide Divina | Luz Restauradora, Golpe Consagrado, Santuário |
+| Berserk | Força Indomável, Sede de Combate, Fúria Implacável | Golpe Temerário, Dilacerar, Execução Furiosa |
+| Espadachim | Ritmo da Lâmina, Precisão do Duelista, Passo Evasivo | Corte Duplo, Riposta, Dança das Espadas |
+| Necromante | Domínio das Almas, Reservatório Espiritual, Véu dos Mortos | Drenar Vida, Invocar Espírito, Legião Espectral |
+| Bruxo | Pacto Sombrio, Vigor do Pacto, Olhar Maldito | Maldição da Fraqueza, Chama Profana, Colheita Sombria |
+| Elemental | Afinidade Elemental, Fluxo Arcano, Condutor de Raios | Incendiar, Prisão de Gelo, Tempestade Elemental |
+| Assassino | Passos Silenciosos, Ponto Vital, Lâmina Letal | Corte Sangrento, Ataque das Sombras, Finalizar |
+| Caçador | Olho de Águia, Reflexos da Caça, Passo do Rastreador | Investida do Falcão, Armadilha de Contenção, Caçada Coordenada |
+| Elfo Negro | Precisão Noturna, Poder do Eclipse, Arsenal Sombrio | Flecha Maldita, Sifão do Crepúsculo, Eclipse |
+
+Todas as árvores seguem uma raiz e dois caminhos que se reencontram na habilidade final:
+
+- Raiz: talento passivo, disponível no nível 1; investir exige pontos, portanto começa no nível 2.
+- Caminho de habilidades: primeira habilidade no nível 5, exige raiz rank 1; segunda no nível 10, exige primeira rank 2.
+- Caminho de atributos: segundo talento no nível 5, exige raiz rank 2; terceiro no nível 10, exige segundo rank 3.
+- Habilidade final: nível 20, exige segunda habilidade rank 2 e terceiro talento rank 2.
+
+A tela informa bônus por rank, custo de mana, recuperação, pré-requisitos e motivo de bloqueio. Habilidades aprendidas entram no menu compacto **Habilidades** junto das três habilidades da classe base. Ranks adicionais aumentam o multiplicador de dano em 0,1; habilidades de cura aumentam a cura em três pontos percentuais da vida máxima por rank adicional. Custos de mana e recuperação permanecem fixos.
+
+As novas ações incluem cura, proteção, drenagem de vida, sacrifício de HP, execução contra alvos com até 30% de vida, golpes múltiplos, sangramento/queimadura, ataques temporários de espírito ou falcão, enfraquecimento e interrupção do ATB. Dano contínuo e invocações atuam por três turnos inimigos. Há um efeito de dano contínuo/companheiro por alvo; reaplicar substitui o anterior. Maldição reduz o dano direto inimigo em 20% durante três turnos. Captura permanente de almas e evolução de companheiros continuam como expansão futura.
+
+**Redistribuir pontos** devolve todos os pontos gratuitamente na cidade, sem consumir outro livro nem trocar a subclasse. A mudança atualiza limites de HP/mana sem curar gratuitamente. Builds são copiadas ao iniciar uma batalha; redistribuir não altera uma batalha já iniciada. Demo e backend aplicam o mesmo catálogo e validam níveis, ranks, pré-requisitos e orçamento; atributos, custos e efeitos enviados pelo cliente não são usados como regras. Persistência e propriedade da subclasse continuam locais, conforme a arquitetura atual.
+
+O desenho foi inspirado na combinação de habilidades e talentos passivos das [especializações de Guild Wars 2](https://help.guildwars2.com/hc/en-us/articles/4417183530387-Using-Elite-Specializations) e nas opções de construção de personagem descritas pela [Blizzard para Diablo IV](https://news.blizzard.com/en-us/article/23938756/make-sanctuary-yoursplay-your-way-in-diablo-iv). Nomes, números e árvores são próprios do Drakoria.
+
+Validação: `npm test`, `npx tsc --noEmit` e `npm run build`. `tests/subclassSkillTrees.test.ts` cobre as nove árvores, 27 habilidades, pré-requisitos, orçamento, livros, persistência, redistribuição, efeitos, vitórias por dano contínuo, paridade demo/backend e botão no status. O teste de habilidades também verifica as novas ações no menu de batalha.

@@ -2,6 +2,8 @@ import type { EquipmentDrop } from "./equipment.js";
 import type { MonsterSpriteSet } from "./monster.js";
 import type { SkillId } from "../combat/classSkills.js";
 import type { SubclassBookDrop } from "../loot/subclassBooks.js";
+import type { SubclassId } from "../classes/subclasses.js";
+import type { TreeRanks } from "../classes/skillTrees.js";
 
 export type HeroClass = "guerreiro" | "mago" | "arqueiro";
 
@@ -34,6 +36,10 @@ export interface CombatantState {
   specialCooldown?: number;
   charging?: boolean;
   skillCooldowns?: Partial<Record<SkillId, number>>;
+  subclassId?: SubclassId;
+  treeRanks?: TreeRanks;
+  ongoingDamage?: { damage: number; turns: number; name: string };
+  weakenedTurns?: number;
 }
 
 export interface BattleRewards {

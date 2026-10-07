@@ -3,7 +3,8 @@ import type {
   BattleEvent,
 } from "../types/combat.js";
 import { isBattleAction, type BattleAction } from "./actions.js";
-import { CLASS_SKILLS, getSkill, getSkillBlockReason, getSkillCooldown } from "./classSkills.js";
+import { CLASS_SKILLS, getHeroSkills, getSkill, getSkillBlockReason, getSkillCooldown } from "./classSkills.js";
+import { SUBCLASS_SKILLS } from "../classes/skillTrees.js";
 
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -70,7 +71,7 @@ export function applyBattleAction(
   if (state.turnOwnerId !== state.hero.id) return state;
   if (!state.hero.isAlive || !state.enemy.isAlive) return state;
 
-  const selectedSkill = action.type === "USE_SKILL" ? getSkill(action.skillId) : undefined;
+  const selectedSkill = action.type === "USE_SKILL" ? getHeroSkills(state.hero).find(skill => skill.id === action.skillId) ?? getSkill(action.skillId) : undefined;
   // Rejected skills leave mana, ATB, cooldowns and the current turn untouched.
   if (action.type === "USE_SKILL" && (!selectedSkill || getSkillBlockReason(state.hero, selectedSkill))) return state;
 
@@ -94,7 +95,8 @@ export function applyBattleAction(
         const power = magic ? hero.stats.magicPower : hero.stats.attack;
         const baseDamage = magic ? randomInt(10, 25) : randomInt(5, 15);
         const defense = (magic ? enemy.stats.magicDefense : enemy.stats.defense) * selectedSkill.defenseMultiplier;
-        const mitigated = calculateDamageTaken(baseDamage + power * selectedSkill.powerMultiplier, defense, enemy.defending);
+        const execution = selectedSkill.effect === "execute" && enemy.stats.hp <= enemy.stats.maxHp * 0.3 ? 1.3 : 1;
+        const mitigated = calculateDamageTaken((baseDamage + power * selectedSkill.powerMultiplier) * execution, defense, enemy.defending);
         const hitDamage = hitCritical ? applyCriticalDamage(mitigated, hero.stats.criticalDamage) : mitigated;
         damage += hitDamage;
         critical ||= hitCritical;
@@ -102,21 +104,38 @@ export function applyBattleAction(
         enemy.isAlive = enemy.stats.hp > 0;
         enemy.defending = false;
       }
-      const guarded = selectedSkill.effect === "guard";
+      const guarded = selectedSkill.effect === "guard" || selectedSkill.effect === "healGuard";
       const disrupted = selectedSkill.effect === "resetAtb" && damage > 0;
       if (guarded) hero.defending = true;
       if (disrupted) enemy.atb = 0;
+      let recovery = 0;
+      if (["heal", "healGuard", "drain"].includes(selectedSkill.effect)) {
+        const rank = hero.treeRanks?.[selectedSkill.id] ?? 1;
+        const amount = selectedSkill.effect === "drain" ? Math.floor(damage * 0.25) : Math.floor(hero.stats.maxHp * ((selectedSkill.effect === "healGuard" ? 0.35 : 0.2) + (rank - 1) * 0.03));
+        recovery = Math.min(amount, hero.stats.maxHp - hero.stats.hp);
+        hero.stats.hp += recovery;
+      }
+      if (selectedSkill.effect === "recoil") hero.stats.hp = Math.max(1, hero.stats.hp - Math.floor(hero.stats.maxHp * 0.05));
+      if (damage > 0 && selectedSkill.effect === "weaken") enemy.weakenedTurns = 3;
+      if (damage > 0 && ["bleed", "burn", "summon"].includes(selectedSkill.effect)) {
+        const power = selectedSkill.damageType === "magic" ? hero.stats.magicPower : hero.stats.attack;
+        enemy.ongoingDamage = { damage: Math.max(1, Math.floor(power * (0.15 + selectedSkill.powerMultiplier * 0.05))), turns: 3,
+          name: selectedSkill.effect === "summon" ? selectedSkill.name : selectedSkill.effect === "bleed" ? "Sangramento" : "Queimadura" };
+      }
       event = {
-        actorId: hero.id, targetId: enemy.id,
-        action: selectedSkill.damageType === "magic" ? "CAST_MAGIC" : "ATTACK",
+        actorId: hero.id, targetId: selectedSkill.hits === 0 ? hero.id : enemy.id,
+        action: selectedSkill.hits === 0 ? "DEFEND" : selectedSkill.damageType === "magic" ? "CAST_MAGIC" : "ATTACK",
         skillId: selectedSkill.id, special: selectedSkill.name, damage, critical, hits,
-        dodged: damage === 0,
-        message: (damage === 0
+        dodged: selectedSkill.hits > 0 && damage === 0,
+        message: (selectedSkill.hits === 0 ? `${hero.name} usou ${selectedSkill.name}.` : damage === 0
           ? `${enemy.name} esquivou de ${selectedSkill.name}.`
           : `${critical ? "CRITICO! " : ""}${hero.name} usou ${selectedSkill.name} e causou ${damage} de dano${hits > 1 ? ` em ${hits} tiros` : ""}.`)
           + (guarded ? ` ${hero.name} assumiu postura defensiva.` : "")
           + (disrupted ? " O ATB inimigo foi zerado." : ""),
       };
+      if (recovery > 0) event.message += ` Recuperou ${recovery} HP.`;
+      if (damage > 0 && selectedSkill.effect === "weaken") event.message += " Alvo enfraquecido por três turnos.";
+      if (damage > 0 && ["bleed", "burn", "summon"].includes(selectedSkill.effect)) event.message += ` ${enemy.ongoingDamage!.name} ativo por três turnos.`;
       break;
     }
     case "ATTACK": {
@@ -214,7 +233,7 @@ export function applyBattleAction(
   }
   if (state.hero.skillCooldowns || selectedSkill) {
     hero.skillCooldowns = {};
-    for (const skill of CLASS_SKILLS) {
+    for (const skill of [...CLASS_SKILLS, ...SUBCLASS_SKILLS]) {
       const remaining = getSkillCooldown(state.hero, skill.id);
       if (remaining > 1) hero.skillCooldowns[skill.id] = remaining - 1;
     }
@@ -244,6 +263,18 @@ export function applyEnemyTurn(state: BattleState): BattleState {
   if (state.finished || state.turnOwnerId !== state.enemy.id) return state;
   const hero = { ...state.hero, stats: { ...state.hero.stats } };
   const enemy = { ...state.enemy, stats: { ...state.enemy.stats }, atb: 0 };
+  let ongoingMessage = "";
+  if (enemy.ongoingDamage && enemy.ongoingDamage.turns > 0) {
+    const ongoing = enemy.ongoingDamage;
+    const damage = Math.min(enemy.stats.hp, ongoing.damage);
+    enemy.stats.hp = Math.max(0, enemy.stats.hp - damage);
+    enemy.isAlive = enemy.stats.hp > 0;
+    if (ongoing.turns > 1) enemy.ongoingDamage = { ...ongoing, turns: ongoing.turns - 1 };
+    else delete enemy.ongoingDamage;
+    ongoingMessage = `${ongoing.name} causou ${damage} de dano. `;
+    if (!enemy.isAlive) return { ...state, hero, enemy, finished: true, winnerId: hero.id, turnOwnerId: hero.id,
+      lastEvent: { actorId: hero.id, targetId: enemy.id, action: "CAST_MAGIC", damage, message: ongoingMessage } };
+  }
   const orcKing = enemy.id.startsWith("orc-king-boss-lvl-");
   const boss = /-boss-lvl-\d+$/.test(enemy.id);
   const elite = enemy.id.startsWith("hobgoblin-elite-lvl-");
@@ -254,7 +285,9 @@ export function applyEnemyTurn(state: BattleState): BattleState {
     enemy.stats.defense = Math.floor(enemy.stats.defense * 1.25);
     enemy.stats.magicPower = Math.floor(enemy.stats.magicPower * 1.15);
   }
-  const prefix = entersPhaseTwo ? "DANGER! O Orc Rei entrou em fúria. " : "";
+  const prefix = ongoingMessage + (entersPhaseTwo ? "DANGER! O Orc Rei entrou em fúria. " : "");
+  const weakened = (enemy.weakenedTurns ?? 0) > 0;
+  enemy.weakenedTurns = Math.max(0, (enemy.weakenedTurns ?? 0) - 1);
   const cooldown = enemy.specialCooldown ?? 0;
   enemy.specialCooldown = Math.max(0, cooldown - 1);
   const special = !enemy.charging && cooldown === 0 && Math.random() < (elite ? 0.4 : boss ? 0.45 : 0.25);
@@ -264,7 +297,7 @@ export function applyEnemyTurn(state: BattleState): BattleState {
     enemy.defending = true;
     return { ...state, hero, enemy, turnOwnerId: null,
       lastEvent: { actorId: enemy.id, targetId: enemy.id, action: "DEFEND", special: "Preparar Emboscada",
-        message: `${enemy.name} ergue o escudo e prepara uma estocada perfurante. Defenda-se!` } };
+        message: `${prefix}${enemy.name} ergue o escudo e prepara uma estocada perfurante. Defenda-se!` } };
   }
   const ambush = elite && enemy.charging === true;
   const usesMagic = orcKing ? enemy.phase === 2 && special : special && enemy.stats.magicPower > 0;
@@ -274,7 +307,7 @@ export function applyEnemyTurn(state: BattleState): BattleState {
   const dodged = rollDodge(hero.stats.dodgeChance);
   const critical = !dodged && rollCritical(enemy.stats.criticalChance);
   const power = usesMagic ? enemy.stats.magicPower : enemy.stats.attack;
-  const rawDamage = power * (ambush ? 1.35 : special ? 1.15 : 1) + (usesMagic ? 6 : 0);
+  const rawDamage = (power * (ambush ? 1.35 : special ? 1.15 : 1) + (usesMagic ? 6 : 0)) * (weakened ? 0.8 : 1);
   const defense = usesMagic ? hero.stats.magicDefense : hero.stats.defense * (ambush ? 0.5 : 1);
   const mitigated = calculateDamageTaken(rawDamage, defense, hero.defending);
   const damage = dodged ? 0 : critical ? applyCriticalDamage(mitigated, enemy.stats.criticalDamage) : mitigated;
