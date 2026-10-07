@@ -107,3 +107,23 @@
   #batalha .barra { height: 12px; margin-block: 3px; }
   #batalha .barra span { line-height: 12px; font-size: 0.65rem; }
 }
+
+/* Desktop proportions share a single size, keeping bosses twice the hero scale. */
+@media (min-width: 601px) and (min-height: 501px) {
+  #batalha { --hero-sprite-size: clamp(130px, calc((100dvh - 330px) / 2), 220px); }
+  #batalha .campo { align-items: flex-end; }
+  #batalha .heroi, #batalha .inimigo { overflow: visible; }
+  #batalha #heroiBatalha {
+    width: var(--hero-sprite-size); height: var(--hero-sprite-size);
+    max-width: none; max-height: none; object-fit: contain;
+  }
+  #batalha #inimigoBatalha:not([data-size="boss"]) {
+    width: calc(var(--hero-sprite-size) * 1.15); height: calc(var(--hero-sprite-size) * 1.15);
+    max-width: none; max-height: none; object-fit: contain;
+  }
+  #batalha #inimigoBatalha[data-size="boss"] {
+    width: calc(var(--hero-sprite-size) * 2); height: calc(var(--hero-sprite-size) * 2);
+    max-width: none; max-height: none; object-fit: contain;
+    margin-inline: calc((100% - var(--hero-sprite-size) * 2) / 2); display: block;
+  }
+}
