@@ -7,18 +7,60 @@ export interface DungeonConfig {
   description: string;
   eliteChance?: number;
   rank?: "boss";
+  introMonsters?: string[];
+  introDepths?: number;
+  bossAfterVictories?: number;
+  bossMonster?: string;
+  bossLevel?: number;
+  hidden?: boolean;
 }
 
 export const DUNGEON_CONFIG: Record<string, DungeonConfig> = {
-  iniciante: { id: "dungeon-orc-1-10", label: "Covil dos Goblins e Orcs", minLevel: 1, maxLevel: 10, monsters: ["goblin", "orc"], description: "Goblins e Orcs em encontros de níveis 1 a 10." },
-  cripta: { id: "dungeon-mutants", label: "Cripta dos Mutantes", minLevel: 1, maxLevel: 10, monsters: ["skeleton-warrior", "mutant-rat"], description: "Esqueletos Guerreiros e Ratos Mutantes em encontros de níveis 1 a 10." },
-  avancada: { id: "dungeon-hobgoblin", label: "Acampamento Hobgoblin", minLevel: 10, maxLevel: 15, monsters: ["hobgoblin"], eliteChance: 0.20, description: "Hobgoblins de níveis 10 a 15. Chance de elite: 20%; mais forte, com drops raros e épicos." },
-  fortaleza: { id: "dungeon-orc-king", label: "Trono do Orc Rei", minLevel: 15, maxLevel: 25, monsters: ["orc-king"], rank: "boss", description: "Orc Rei de níveis 15 a 25. Um equipamento elite garantido: raro (40%) ou épico (60%)." },
+  iniciante: {
+    id: "dungeon-orc-1-10",
+    label: "Covil dos Goblins e Orcs",
+    minLevel: 1,
+    maxLevel: 10,
+    monsters: ["goblin", "orc"],
+    description: "Goblins e Orcs ficam mais fortes a cada profundidade explorada.",
+  },
+  cripta: {
+    id: "dungeon-mutants",
+    label: "Cripta dos Mutantes",
+    minLevel: 1,
+    maxLevel: 10,
+    monsters: ["skeleton-warrior", "mutant-rat"],
+    description: "Esqueletos Guerreiros e Ratos Mutantes ficam mais fortes conforme a exploração avança.",
+  },
+  avancada: {
+    id: "dungeon-orc-fortress",
+    label: "Fortaleza do Orc Rei",
+    minLevel: 10,
+    maxLevel: 18,
+    monsters: ["hobgoblin", "orc"],
+    introMonsters: ["hobgoblin"],
+    introDepths: 2,
+    eliteChance: 0.20,
+    bossAfterVictories: 5,
+    bossMonster: "orc-king",
+    bossLevel: 20,
+    description: "Começa com Hobgoblins. Nas profundezas surgem Orcs e Hobgoblins mais fortes; após cerca de cinco vitórias, o Orc Rei aparece.",
+  },
+  fortaleza: {
+    id: "dungeon-orc-king",
+    label: "Trono do Orc Rei",
+    minLevel: 20,
+    maxLevel: 20,
+    monsters: ["orc-king"],
+    rank: "boss",
+    hidden: true,
+    description: "Entrada legada para o confronto direto com o Orc Rei.",
+  },
 };
 
 export function getDungeonConfig(id: string | null): DungeonConfig | undefined {
   if (id === "dungeon-orc-1-5" || id === "dungeon-random" || id === "dungeon-goblin" || id === "dungeon-orc") return DUNGEON_CONFIG.iniciante;
-  if (id === "dungeon-orc-5-15") return DUNGEON_CONFIG.avancada;
+  if (id === "dungeon-orc-5-15" || id === "dungeon-hobgoblin") return DUNGEON_CONFIG.avancada;
   if (id === "dungeon-mini-boss-orc") return DUNGEON_CONFIG.fortaleza;
   return Object.values(DUNGEON_CONFIG).find(config => config.id === id);
 }
