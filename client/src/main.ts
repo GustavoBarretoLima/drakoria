@@ -2,6 +2,7 @@ import { prepareNextMonster, clearBattleStorage } from "./battle/victoryNavigati
 import { getBattleExitPage } from "./battle/worldMapNavigation.js";
 import { setupBattleArena } from "./assets/battleArena.js";
 import { getDungeonConfig } from "../../shared/src/dungeons/dungeonEncounters.js";
+import { recoverAfterDefeat } from "./battle/defeatRecovery.js";
 import { registerDungeonVictory } from "./battle/dungeonRunClient.js";
 import {
   loadConsumables,
@@ -83,6 +84,7 @@ function getCurrentHeroVitals() {
 }
 
 function persistBattleVitals(state: BattleState): void {
+  if (penalizedBattleId === state.id) return;
   saveHeroVitals({
     hp: state.hero.stats.hp,
     mana: state.hero.stats.mana,
@@ -197,6 +199,7 @@ function applyBattleDefeat(state: BattleState): void {
 
   penalizedBattleId = state.id;
   const result = applyDefeatPenalty();
+  recoverAfterDefeat({ hp: state.hero.stats.hp, mana: state.hero.stats.mana, maxHp: state.hero.stats.maxHp, maxMana: state.hero.stats.maxMana });
   renderDefeatOverlay(result);
 }
 
