@@ -6,10 +6,6 @@ window.addEventListener("DOMContentLoaded", () => {
   btn.addEventListener("click", () => menu.classList.toggle("hidden"));
 });
 
-const DUNGEON_RANDOM_MONSTERS = [
-  "goblin-normal-lvl-1",
-  "orc-normal-lvl-1",
-];
 const INVENTORY_KEY = "drakoriaInventario";
 const INVENTORY_SLOTS = 20;
 
@@ -211,50 +207,6 @@ function venderItemInventario(itemId) {
   abrirInventario();
 }
 
-function abrirDungeon() {
-  const painel = getPainelPraca();
-  if (!painel) return;
-
-  painel.classList.remove("hidden");
-  painel.innerHTML = `
-    <h2>Portão das Dungeons</h2>
-    <p>Goblins e Orcs vagam pelos corredores. Rumores falam de um Senhor da Guerra Orc que aparece em uma rota mais perigosa.</p>
-    <div class="painel-acoes">
-      <button type="button" onclick="entrarDungeonAleatoria()">Dungeon Aleatória</button>
-      <button type="button" onclick="entrarMiniBossOrc()">⚔ Mini-boss Orc</button>
-      <button type="button" onclick="fecharPainelPraca()">Voltar</button>
-    </div>
-  `;
-}
-
-function sortearMonstroDungeon() {
-  const index = Math.floor(Math.random() * DUNGEON_RANDOM_MONSTERS.length);
-  return DUNGEON_RANDOM_MONSTERS[index] || "goblin-normal-lvl-1";
-}
-
-function entrarDungeonAleatoria() {
-  const monsterId = sortearMonstroDungeon();
-  localStorage.setItem("tipoBatalhaAtual", "dungeon-random");
-  localStorage.setItem("monsterIdAtual", monsterId);
-  window.location.href = "batalha.html";
-}
-
-function entrarMiniBossOrc() {
-  localStorage.setItem("tipoBatalhaAtual", "dungeon-mini-boss-orc");
-  localStorage.setItem("monsterIdAtual", "orc-warlord-mini-boss-lvl-1");
-  window.location.href = "batalha.html";
-}
-
-function entrarDungeonGoblin() {
-  entrarDungeonAleatoria();
-}
-
-function entrarDungeonOrc() {
-  localStorage.setItem("tipoBatalhaAtual", "dungeon-orc");
-  localStorage.setItem("monsterIdAtual", "orc-normal-lvl-1");
-  window.location.href = "batalha.html";
-}
-
 function abrirStatus() {
   const painel = getPainelPraca();
   if (!painel) return;
@@ -316,7 +268,7 @@ function abrirMissoes() {
   painel.innerHTML = `
     <h2>Quadro de Missões</h2>
     <div class="missao-card"><h3>O caminho para Drakoria</h3><p>Derrote o Goblin que bloqueia a estrada e prove seu valor diante dos guardas.</p><strong>Status:</strong> ${goblinConcluido ? "Concluída" : "Em andamento"}</div>
-    <div class="missao-card"><h3>Sussurros nas Dungeons</h3><p>Criaturas continuam surgindo além das muralhas. Investigue a dungeon e enfrente o que encontrar.</p><strong>Status:</strong> Disponível</div>
+    <div class="missao-card"><h3>Sussurros nos Arredores</h3><p>Criaturas continuam surgindo além das muralhas. Explore os arredores de Drakoria pelo mapa e enfrente o que encontrar.</p><strong>Status:</strong> Disponível</div>
     <div class="painel-acoes"><button type="button" onclick="fecharPainelPraca()">Fechar</button></div>
   `;
 }
@@ -332,11 +284,6 @@ window.abrirInventario = abrirInventario;
 window.equiparItemInventario = equiparItemInventario;
 window.desequiparSlotInventario = desequiparSlotInventario;
 window.venderItemInventario = venderItemInventario;
-window.abrirDungeon = abrirDungeon;
-window.entrarDungeonAleatoria = entrarDungeonAleatoria;
-window.entrarMiniBossOrc = entrarMiniBossOrc;
-window.entrarDungeonGoblin = entrarDungeonGoblin;
-window.entrarDungeonOrc = entrarDungeonOrc;
 window.abrirStatus = abrirStatus;
 window.abrirLoja = abrirLoja;
 window.abrirMissoes = abrirMissoes;

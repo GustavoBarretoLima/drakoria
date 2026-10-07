@@ -1,4 +1,5 @@
 import { prepareNextMonster, clearBattleStorage } from "./battle/victoryNavigation.js";
+import { getBattleExitPage } from "./battle/worldMapNavigation.js";
 import { registerDungeonVictory } from "./battle/dungeonRunClient.js";
 import {
   loadConsumables,
@@ -153,9 +154,11 @@ function applyVictoryRewards(state: BattleState): void {
         window.location.href = `${import.meta.env.BASE_URL}pages/batalha.html`;
       },
       onReturnToCity: () => {
+        const destination = getBattleExitPage(localStorage);
         clearBattleStorage(localStorage);
-        window.location.href = `${import.meta.env.BASE_URL}pages/praca.html`;
+        window.location.href = `${import.meta.env.BASE_URL}pages/${destination}`;
       },
+      exitLabel: getBattleExitPage(localStorage) === "mapa.html" ? "Voltar ao mapa" : "Retornar à praça",
       onUseHealthPotion: () => {
         const potion = useHealthPotion();
         window.setTimeout(syncPotionButtonsWithStorage, 0);

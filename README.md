@@ -45,14 +45,18 @@ Já implementado:
 - comunicação cliente/servidor com Socket.IO;
 - deploy automático do frontend no GitHub Pages.
 
-### Dungeons disponíveis
+### Exploração pelo mapa
 
-| Dungeon | Níveis dos monstros | Encontros |
+| Local | Níveis dos monstros | Encontros |
 |---|---|---|
-| Covil dos Goblins e Orcs | 1–10 | Goblin e Orc, 50% cada |
-| Cripta dos Mutantes | 1–10 | Esqueleto Guerreiro e Rato Mutante, 50% cada |
-| Acampamento Hobgoblin | 10–15 | Hobgoblin normal 80%, elite 20% |
-| Trono do Orc Rei | 15–25 | Orc Rei boss, equipamento elite garantido |
+| Acampamento Orc | 1–10 | Goblin e Orc, 50% cada |
+| Cemitério Esquecido | 1–10 | Esqueleto Guerreiro |
+| Pântano Corrompido | 1–10 | Rato Mutante |
+| Fortaleza do Rei Orc | 10–15; boss 20 | Hobgoblin normal 80%, elite 20%; Orc Rei após cinco vitórias |
+
+O menu da praça abre `pages/mapa.html`, usando a imagem em `img/mapas/arredores_de_drakoria.png`. Os locais têm botões sobre o mapa e uma lista acessível para telas pequenas. Drakoria retorna à praça. Floresta Sombria e Ruínas da Vigília permanecem sem encontros.
+
+Cada região inicia sua própria exploração e mantém seus monstros ao continuar. HP, mana, inventário e progresso são preservados; sair após a vitória retorna ao mapa. A derrota continua retornando à praça para recuperação. IDs antigos de dungeon continuam disponíveis para compatibilidade com partidas salvas. Demo e backend usam os mesmos IDs de encontros.
 
 O Hobgoblin Elite usa os mesmos GIFs, com 1,6× HP/ataque/defesa e 2× XP/ouro (antes do arredondamento). As definições são compartilhadas entre demo e servidor. As faixas indicam o nível dos encontros; não há bloqueio de entrada por nível do jogador.
 

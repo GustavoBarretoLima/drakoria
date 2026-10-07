@@ -36,6 +36,7 @@ export interface PotionActionResult {
 export interface VictoryActions {
   onNextMonster: () => void;
   onReturnToCity: () => void;
+  exitLabel?: string;
   onUsePotion?: () => PotionActionResult;
   potionCount?: number;
   onUseHealthPotion?: () => PotionActionResult;
@@ -202,7 +203,7 @@ export function renderVictoryRewardOverlay(
     const cityButton = document.createElement("button");
     cityButton.type = "button";
     cityButton.className = "reward-action-secondary";
-    cityButton.textContent = "Sair da dungeon";
+    cityButton.textContent = actions.exitLabel ?? "Sair da dungeon";
     cityButton.addEventListener("click", () => {
       if (chosen) return;
       chosen = true;

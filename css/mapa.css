@@ -1,0 +1,31 @@
+:root { color-scheme: dark; font-family: Georgia, serif; color: #f5e7ce; background: #10171c; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 1680px; margin: auto; padding: 16px; }
+.map-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 12px; }
+h1 { font-size: clamp(1.3rem, 3vw, 2rem); margin: 0 0 6px; }
+p { line-height: 1.5; margin: 8px 0; }
+button, .map-button { font: inherit; color: #f5e7ce; background: #26332e; border: 1px solid #be9b61; border-radius: 6px; padding: 10px 14px; cursor: pointer; text-decoration: none; }
+button:hover, .map-button:hover, button[aria-pressed="true"] { background: #465140; border-color: #ffe1a1; }
+button:focus-visible, a:focus-visible, .map-scroll:focus-visible { outline: 3px solid #ffdd83; outline-offset: 3px; }
+.map-button { flex-shrink: 0; }
+.map-scroll { overflow-x: auto; border: 1px solid #796646; border-radius: 8px; }
+.world-map { position: relative; min-width: 760px; }
+.world-map img { display: block; width: 100%; height: auto; }
+.map-hotspot { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%); background: rgba(24, 30, 25, .93); box-shadow: 0 2px 12px #0009; text-align: center; font-weight: bold; font-size: clamp(.75rem, 1.15vw, 1.05rem); padding: 7px 10px; white-space: nowrap; }
+.map-hotspot span { display: block; font-family: system-ui, sans-serif; font-size: .75rem; font-weight: normal; color: #f5d391; margin-top: 3px; }
+.map-city { color: #ffe2a3; text-decoration: none; border: 1px solid #be9b61; border-radius: 6px; }
+.map-panel { margin-top: 14px; padding: 16px; background: #1b242a; border: 1px solid #796646; border-radius: 8px; }
+.map-panel h2 { margin: 0; font-size: 1.2rem; }
+.region-choices { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+#exploreRegion { background: #425333; min-height: 44px; }
+#mapMessage { color: #ffd698; }
+.map-mobile-hint { display: none; font-size: .85rem; }
+@media (max-width: 760px) {
+  main { padding: 10px; }
+  .map-header { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .map-mobile-hint { display: block; }
+  .region-choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .region-choices button { font-size: .9rem; min-height: 48px; padding: 8px; }
+  .map-panel { padding: 12px; }
+}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Arredores de Drakoria</title>
+    <link rel="stylesheet" href="../css/mapa.css" />
+    <script type="module" src="../client/src/worldMap.ts"></script>
+  </head>
+  <body>
+    <main>
+      <header class="map-header">
+        <div><h1>Arredores de Drakoria</h1><p>Escolha um local no mapa para explorar.</p></div>
+        <a class="map-button" href="praca.html">Retornar à praça</a>
+      </header>
+      <p class="map-mobile-hint">Deslize o mapa para os lados ou escolha um local na lista abaixo.</p>
+      <div class="map-scroll" tabindex="0" aria-label="Mapa dos arredores de Drakoria">
+        <div class="world-map">
+          <img src="../img/mapas/arredores_de_drakoria.png" alt="Mapa de Drakoria, com o Cemitério Esquecido, Pântano Corrompido, Acampamento Orc e Fortaleza do Rei Orc. Floresta Sombria e Ruínas da Vigília aguardam futuras explorações." />
+          <div id="mapLocations"></div>
+          <a class="map-hotspot map-city" href="praca.html" style="--x: 53%; --y: 85%" aria-label="Drakoria — retornar à praça">Drakoria <span>Retornar à praça</span></a>
+        </div>
+      </div>
+      <section class="map-panel" aria-labelledby="regionTitle">
+        <h2 id="regionTitle">Explorar os arredores</h2>
+        <p id="regionDescription">Seu HP e mana são mantidos entre os encontros. Volte à praça e descanse na Taberna quando precisar.</p>
+        <div id="regionChoices" class="region-choices" aria-label="Locais de exploração"></div>
+        <div id="regionDetails" hidden>
+          <p id="regionInhabitants"></p>
+          <p id="regionLevels"></p>
+          <button id="exploreRegion" type="button">Explorar</button>
+        </div>
+        <p id="mapMessage" role="status" aria-live="polite"></p>
+      </section>
+    </main>
+  </body>
+</html>
