@@ -101,6 +101,29 @@ function renderAtbPhase(state: BattleState): void {
     state.turnOwnerId === state.hero.id ? "Ação pronta!" : "Inimigo agindo...";
 }
 
+function syncPotionButtonsWithStorage(): void {
+  const overlay = document.getElementById("battleRewardOverlay");
+  if (!overlay) return;
+
+  const consumables = loadConsumables();
+  const buttons = Array.from(
+    overlay.querySelectorAll<HTMLButtonElement>(".reward-actions button"),
+  );
+
+  const syncButton = (prefix: string, count: number) => {
+    const button = buttons.find((candidate) =>
+      candidate.textContent?.startsWith(prefix),
+    );
+    if (!button) return;
+    button.textContent = `${prefix} (${count})`;
+    button.disabled = count <= 0;
+  };
+
+  syncButton("Usar Poção de HP", consumables.healthPotion);
+  syncButton("Usar Poção de Mana", consumables.manaPotion);
+  syncButton("Usar Poção Restauradora", consumables.restorativePotion);
+}
+
 function applyVictoryRewards(state: BattleState): void {
   if (!state.finished || state.winnerId !== state.hero.id) return;
   if (!state.rewards) return;
@@ -133,11 +156,23 @@ function applyVictoryRewards(state: BattleState): void {
         clearBattleStorage(localStorage);
         window.location.href = `${import.meta.env.BASE_URL}pages/praca.html`;
       },
-      onUseHealthPotion: useHealthPotion,
+      onUseHealthPotion: () => {
+        const potion = useHealthPotion();
+        window.setTimeout(syncPotionButtonsWithStorage, 0);
+        return potion;
+      },
       healthPotionCount: consumables.healthPotion,
-      onUseManaPotion: useManaPotion,
+      onUseManaPotion: () => {
+        const potion = useManaPotion();
+        window.setTimeout(syncPotionButtonsWithStorage, 0);
+        return potion;
+      },
       manaPotionCount: consumables.manaPotion,
-      onUsePotion: useRestorativePotion,
+      onUsePotion: () => {
+        const potion = useRestorativePotion();
+        window.setTimeout(syncPotionButtonsWithStorage, 0);
+        return potion;
+      },
       potionCount: consumables.restorativePotion,
       ...(run ? { depth: run.depth } : {}),
       danger: Boolean(run?.bossPending),
@@ -145,6 +180,8 @@ function applyVictoryRewards(state: BattleState): void {
       vitals,
     },
   );
+
+  window.setTimeout(syncPotionButtonsWithStorage, 0);
 }
 
 function applyBattleDefeat(state: BattleState): void {
