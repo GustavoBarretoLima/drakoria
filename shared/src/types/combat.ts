@@ -52,7 +52,7 @@ export interface BattleRewards {
 export interface BattleEvent {
   actorId: string;
   targetId: string;
-  action: "ATTACK" | "DEFEND" | "CAST_MAGIC";
+  action: "ATTACK" | "DEFEND" | "CAST_MAGIC" | "USE_ITEM";
   damage?: number;
   critical?: boolean;
   dodged?: boolean;
