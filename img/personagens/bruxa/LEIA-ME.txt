@@ -1,0 +1,12 @@
+Drakoria — Bruxa — Subclasse
+
+4 GIFs com fundo transparente; 4 quadros por animacao.
+idle.gif: loop continuo.
+attack.gif: ataque, execucao unica.
+damage.gif: dano, execucao unica.
+death.gif: morte, execucao unica com pausa final.
+
+PNG spritesheet: grade 4 x 4. Linhas: idle, attack, damage, death.
+PNGs individuais preservam o canal alpha completo. GIF usa transparencia binaria.
+Estilo: fantasia sombria, personagem voltado para a direita.
+Criado com a ferramenta integrada de geracao de imagens; quadros montados em GIF.
