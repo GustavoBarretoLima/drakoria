@@ -25,6 +25,7 @@ import {
 } from "./demoMonsters.js";
 
 type BattleListener = (state: BattleState) => void;
+export type DemoConsumableId = "healthPotion" | "manaPotion" | "restorativePotion";
 
 let battleState: BattleState | null = null;
 let listener: BattleListener | null = null;
@@ -126,6 +127,47 @@ export function performDemoAction(action: BattleAction): void {
   emitState();
 
   if (battleState.finished) stopAtbLoop();
+}
+
+export function useDemoConsumable(itemId: DemoConsumableId): boolean {
+  if (!battleState || battleState.finished) return false;
+  if (battleState.turnOwnerId !== battleState.hero.id) return false;
+
+  const hero = { ...battleState.hero, stats: { ...battleState.hero.stats }, atb: 0 };
+  const beforeHp = hero.stats.hp;
+  const beforeMana = hero.stats.mana;
+
+  if (itemId === "healthPotion" || itemId === "restorativePotion") {
+    hero.stats.hp = Math.min(hero.stats.maxHp, hero.stats.hp + 40);
+  }
+  if (itemId === "manaPotion" || itemId === "restorativePotion") {
+    hero.stats.mana = Math.min(hero.stats.maxMana, hero.stats.mana + 20);
+  }
+
+  const recoveredHp = hero.stats.hp - beforeHp;
+  const recoveredMana = hero.stats.mana - beforeMana;
+  if (recoveredHp <= 0 && recoveredMana <= 0) return false;
+
+  const itemName = itemId === "healthPotion"
+    ? "Poção de HP"
+    : itemId === "manaPotion"
+      ? "Poção de Mana"
+      : "Poção Restauradora";
+
+  battleState = {
+    ...battleState,
+    hero,
+    turnOwnerId: null,
+    lastEvent: {
+      actorId: hero.id,
+      targetId: hero.id,
+      action: "DEFEND",
+      special: itemName,
+      message: `${hero.name} usou ${itemName}.${recoveredHp > 0 ? ` +${recoveredHp} HP.` : ""}${recoveredMana > 0 ? ` +${recoveredMana} MP.` : ""}`,
+    },
+  };
+  emitState();
+  return true;
 }
 
 function processEnemyTurn(expectedBattleId: string): void {

@@ -1,0 +1,359 @@
+/* HUD inspirada em JRPGs modernos: timeline superior, comandos laterais e status compactos. */
+#batalha {
+  --jrpg-panel: linear-gradient(180deg, rgba(16, 48, 92, .94), rgba(5, 20, 48, .96));
+  --jrpg-panel-soft: linear-gradient(180deg, rgba(28, 70, 126, .86), rgba(10, 32, 67, .93));
+  --jrpg-edge: rgba(184, 226, 255, .9);
+  --jrpg-inner: rgba(93, 166, 219, .55);
+  --jrpg-gold: #ffe08a;
+  --jrpg-text: #f4f8ff;
+  --jrpg-muted: #b9cbe1;
+}
+
+/* Timeline */
+.battle-timeline {
+  position: fixed;
+  z-index: 1180;
+  top: 54px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, 54vw);
+  min-width: 320px;
+  height: 38px;
+  pointer-events: none;
+}
+
+.battle-timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 17px;
+  height: 4px;
+  border: 1px solid rgba(206, 235, 255, .55);
+  background: linear-gradient(90deg, rgba(4,19,42,.9), rgba(38,121,176,.82));
+  box-shadow: 0 0 8px rgba(0, 151, 255, .28);
+}
+
+.battle-timeline::after {
+  content: "AÇÃO";
+  position: absolute;
+  right: -4px;
+  top: -2px;
+  color: #dff3ff;
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-shadow: 1px 1px 3px #000;
+}
+
+.timeline-marker {
+  position: absolute;
+  top: 4px;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  border: 2px solid #d7edff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 35% 30%, #4fb8ff, #15345d 66%, #07172d);
+  color: #fff;
+  font-weight: 900;
+  font-size: .72rem;
+  box-shadow: 0 0 0 2px rgba(14, 65, 103, .7), 0 2px 8px #0008;
+  transition: left .12s linear, transform .15s ease, box-shadow .15s ease;
+}
+
+.timeline-marker.enemy {
+  background: radial-gradient(circle at 35% 30%, #ff6868, #6f2430 66%, #2b0b11);
+}
+
+.timeline-marker.is-boss {
+  border-color: #ffe08a;
+  background: radial-gradient(circle at 35% 30%, #ffcd5d, #7a3d14 66%, #2d1207);
+}
+
+.timeline-marker.is-ready {
+  transform: scale(1.18);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.85), 0 0 14px rgba(114,204,255,.8);
+}
+
+/* Status deixa de ser um card grande sob o sprite e vira um painel compacto no rodapé. */
+#batalha .heroi-status,
+#batalha .inimigo-status {
+  position: fixed;
+  z-index: 1170;
+  bottom: 18px;
+  width: min(300px, 26vw);
+  min-width: 220px;
+  margin: 0;
+  padding: 9px 11px 10px;
+  border: 1px solid var(--jrpg-edge);
+  border-radius: 3px;
+  background: var(--jrpg-panel-soft);
+  box-shadow: inset 0 0 0 1px var(--jrpg-inner), 0 5px 18px #0008;
+}
+
+#batalha .heroi-status { left: 20px; }
+#batalha .inimigo-status { right: 20px; }
+
+#batalha .status h2 {
+  margin: 0 0 5px;
+  color: #fff;
+  font-size: .88rem;
+  letter-spacing: .02em;
+}
+
+#batalha .heroi-status h2 { color: #f8fbff; }
+#batalha .inimigo-status h2 { color: #ffd5d5; }
+
+#batalha .inimigo:has(.sprite-frame[data-size="boss"]) .inimigo-status {
+  border-color: #f8d475;
+  box-shadow: inset 0 0 0 1px rgba(210,161,55,.65), 0 0 16px rgba(255,184,52,.22), 0 5px 18px #0008;
+}
+
+#batalha .inimigo:has(.sprite-frame[data-size="boss"]) .inimigo-status h2 {
+  color: #ffe08a;
+}
+
+#batalha .status > p {
+  margin: 0 8px 5px 0;
+  font-size: .62rem;
+  color: var(--jrpg-muted);
+}
+
+#batalha .barra {
+  height: 8px;
+  margin: 4px 0;
+  border: 1px solid rgba(215,235,255,.55);
+  border-radius: 0;
+  background: rgba(2, 10, 24, .88);
+}
+
+#batalha .barra > div { border-radius: 0; }
+#batalha .hp span,
+#batalha .mana span {
+  line-height: 8px;
+  font-size: .48rem;
+  left: 5px;
+}
+
+/* Menu lateral semelhante ao ritmo visual de JRPGs modernos. */
+#batalha .battle-command-dock {
+  position: fixed;
+  z-index: 1200;
+  top: 50%;
+  right: 18px;
+  bottom: auto;
+  left: auto;
+  transform: translateY(-40%);
+  width: min(270px, 23vw);
+  padding: 8px;
+  border: 1px solid var(--jrpg-edge);
+  border-radius: 2px;
+  background: var(--jrpg-panel);
+  box-shadow: inset 0 0 0 1px var(--jrpg-inner), 0 8px 24px #0009;
+}
+
+#batalha .battle-command-feedback {
+  display: block;
+  min-height: 0;
+  padding: 0 4px 6px;
+  border-bottom: 1px solid rgba(194,225,247,.25);
+}
+
+#batalha .battle-command-dock #mensagens {
+  margin: 0;
+  color: #dfefff;
+  font-size: .68rem;
+  line-height: 1.25;
+  -webkit-line-clamp: 2;
+}
+
+#batalha .battle-command-dock #indicadorTurno {
+  margin-top: 4px;
+  color: var(--jrpg-gold);
+  font-size: .68rem;
+  text-align: right;
+}
+
+#batalha .battle-command-dock .acoes {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin: 5px 0 0;
+}
+
+#batalha .battle-command-dock .acoes button,
+#batalha .battle-command-dock .battle-item-row,
+#batalha .battle-command-dock .battle-skill-row button {
+  min-height: 34px;
+  padding: 6px 8px 6px 25px;
+  border: 0;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  font-size: .78rem;
+}
+
+#batalha .battle-command-dock .acoes button:hover,
+#batalha .battle-command-dock .acoes button:focus-visible,
+#batalha .battle-command-dock .battle-item-row:hover,
+#batalha .battle-command-dock .battle-item-row:focus-visible {
+  border-left-color: #80d1ff;
+  background: linear-gradient(90deg, rgba(60,151,219,.28), rgba(60,151,219,.04));
+}
+
+#batalha .battle-command-dock .acoes button:hover::before,
+#batalha .battle-command-dock .acoes button:focus-visible::before {
+  content: "◆";
+  left: 8px;
+  font-size: .58rem;
+  color: #8bd8ff;
+}
+
+#batalha .battle-command-dock button:disabled {
+  opacity: .45;
+}
+
+.battle-item-menu {
+  margin-top: 6px;
+}
+
+.battle-item-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(194,225,247,.25);
+}
+
+.battle-item-heading h3 {
+  margin: 0;
+  color: var(--jrpg-gold);
+  font-size: .8rem;
+}
+
+#batalha .battle-command-dock .battle-item-heading button {
+  min-height: 28px;
+  padding: 4px 7px;
+  font-size: .68rem;
+}
+
+.battle-item-list {
+  display: grid;
+  margin-top: 4px;
+}
+
+#batalha .battle-command-dock .battle-item-row {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  cursor: pointer;
+}
+
+.battle-item-row strong { font-size: .76rem; }
+.battle-item-row span { grid-column: 1; color: #b8cce0; font-size: .62rem; }
+.battle-item-row b { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: #eaf6ff; }
+
+/* Libera a arena: sprites continuam esquerda/direita e os cards não empurram a composição. */
+#batalha .campo {
+  width: min(1180px, 88vw);
+  justify-content: space-between;
+  gap: clamp(120px, 25vw, 420px);
+  padding-inline: clamp(20px, 6vw, 90px);
+  box-sizing: border-box;
+}
+
+#batalha .heroi { margin-right: auto; }
+#batalha .inimigo { margin-left: auto; }
+
+@media (max-width: 900px) {
+  .battle-timeline {
+    top: 52px;
+    width: min(82vw, 560px);
+    min-width: 0;
+  }
+
+  #batalha .battle-command-dock {
+    top: auto;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: 8px;
+    transform: none;
+    width: auto;
+    padding: 7px 8px;
+  }
+
+  #batalha .battle-command-dock .acoes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 8px;
+  }
+
+  #batalha .battle-command-dock .acoes button { min-height: 34px; }
+
+  #batalha .heroi-status,
+  #batalha .inimigo-status {
+    bottom: 118px;
+    width: min(43vw, 220px);
+    min-width: 0;
+    padding: 7px 8px;
+  }
+
+  #batalha .heroi-status { left: 8px; }
+  #batalha .inimigo-status { right: 8px; }
+
+  #batalha .campo {
+    width: 100%;
+    gap: 12vw;
+    padding-inline: 3vw;
+  }
+}
+
+@media (max-width: 600px) {
+  .battle-timeline {
+    top: 48px;
+    width: 78vw;
+    height: 32px;
+  }
+
+  .timeline-marker {
+    top: 5px;
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    font-size: .62rem;
+  }
+
+  .battle-timeline::before { top: 16px; }
+
+  #batalha .heroi-status,
+  #batalha .inimigo-status {
+    bottom: 128px;
+    width: 44vw;
+  }
+
+  #batalha .status > p { display: none; }
+  #batalha .status h2 { font-size: .72rem; }
+  #batalha .barra { height: 7px; }
+  #batalha .hp span, #batalha .mana span { line-height: 7px; font-size: .42rem; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .battle-timeline { top: 12px; width: 46vw; }
+  #batalha .heroi-status,
+  #batalha .inimigo-status {
+    bottom: 8px;
+    width: min(205px, 25vw);
+  }
+  #batalha .battle-command-dock {
+    right: 8px;
+    left: auto;
+    bottom: 8px;
+    width: min(310px, 40vw);
+  }
+}
