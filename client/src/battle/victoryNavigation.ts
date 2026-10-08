@@ -45,3 +45,15 @@ export function clearBattleStorage(storage: BattleStorage): void {
     storage.removeItem(key);
   }
 }
+
+/** Only the opening goblin advances the story automatically. Rewards are saved first. */
+export function completeIntroVictory(storage: BattleStorage, state: {
+  finished: boolean; winnerId?: string; hero: { id: string }; enemy: { id: string };
+}): string | undefined {
+  if (!state.finished || state.winnerId !== state.hero.id || state.enemy.id !== "goblin-normal-lvl-1") return undefined;
+  const type = storage.getItem("tipoBatalhaAtual");
+  const intro = type === "intro-goblin" || (!type && !storage.getItem("dungeonAtual") && !storage.getItem("worldRegionAtual"));
+  if (!intro) return undefined;
+  clearBattleStorage(storage);
+  return "caminho-drakoria.html";
+}
