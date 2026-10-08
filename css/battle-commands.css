@@ -146,3 +146,60 @@
     margin-bottom: 10px;
   }
 }
+
+/* Reviewed scale hierarchy: hero < common monster < boss.
+   The visible artwork size is used on every screen so transparent GIF padding
+   cannot make one monster look accidentally much larger or smaller. */
+#batalha {
+  --battle-hero-visible-size: clamp(82px, 24vw, 104px);
+}
+
+#batalha .campo {
+  align-items: end;
+}
+
+#batalha .sprite-frame {
+  --visible-size: var(--battle-hero-visible-size);
+  position: relative;
+  width: 100%;
+  height: var(--visible-size);
+}
+
+#batalha .inimigo .sprite-frame:not([data-size="boss"]) {
+  --visible-size: calc(var(--battle-hero-visible-size) * 1.15);
+}
+
+#batalha .inimigo .sprite-frame[data-size="boss"] {
+  --visible-size: calc(var(--battle-hero-visible-size) * 1.7);
+}
+
+#batalha .sprite-frame #heroiBatalha,
+#batalha .sprite-frame #inimigoBatalha {
+  position: absolute;
+  width: calc(var(--visible-size) * var(--sprite-width, 1));
+  height: calc(var(--visible-size) * var(--sprite-height, 1));
+  max-width: none;
+  max-height: none;
+  object-fit: fill;
+  left: 50%;
+  top: calc(var(--visible-size) * var(--sprite-top, 0) * -1);
+  margin: 0;
+  margin-left: calc(var(--visible-size) * var(--sprite-center, .5) * -1);
+}
+
+@media (min-width: 601px) and (min-height: 501px) {
+  #batalha {
+    --battle-hero-visible-size: clamp(110px, calc((100dvh - 430px) / 2), 180px);
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  #batalha {
+    --battle-hero-visible-size: clamp(58px, 11vh, 72px);
+  }
+
+  #batalha .sprite-frame {
+    transform: translateY(6px);
+    margin-bottom: 6px;
+  }
+}
