@@ -1,0 +1,215 @@
+/* Ajuste de composição inspirado na referência JRPG: comandos à esquerda, status empilhados à direita e combatentes apoiados no chão. */
+#batalha {
+  --hud-right: clamp(10px, 2.2vw, 34px);
+  --hud-bottom: clamp(12px, 2.2vh, 26px);
+}
+
+/* Painel de ações no canto esquerdo no desktop. */
+#batalha .battle-command-dock {
+  left: clamp(12px, 2vw, 30px);
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-38%);
+  width: min(270px, 23vw);
+}
+
+/* Status em coluna no canto inferior direito, como cards de party de JRPG. */
+#batalha .inimigo-status,
+#batalha .heroi-status {
+  left: auto;
+  right: var(--hud-right);
+  width: min(310px, 25vw);
+  min-width: 230px;
+  margin: 0;
+}
+
+#batalha .heroi-status {
+  bottom: var(--hud-bottom);
+}
+
+#batalha .inimigo-status {
+  bottom: calc(var(--hud-bottom) + 104px);
+}
+
+/* Card inimigo mais próximo da leitura da referência: nome no topo e barras finas abaixo. */
+#batalha .inimigo-status {
+  padding: 8px 10px 9px;
+  background: linear-gradient(180deg, rgba(20, 73, 126, .9), rgba(8, 31, 66, .96));
+  border-color: rgba(190, 226, 255, .88);
+  box-shadow: inset 0 0 0 1px rgba(91, 165, 219, .55), 0 6px 20px rgba(0, 0, 0, .58);
+}
+
+#batalha .inimigo-status h2 {
+  color: #f3f8ff;
+  font-size: .86rem;
+  letter-spacing: .035em;
+  margin-bottom: 6px;
+}
+
+#batalha .inimigo-status .barra,
+#batalha .heroi-status .barra {
+  height: 7px;
+  margin: 4px 0;
+}
+
+#batalha .inimigo-status .hp span,
+#batalha .inimigo-status .mana span,
+#batalha .heroi-status .hp span,
+#batalha .heroi-status .mana span {
+  line-height: 7px;
+}
+
+/* O herói fica visualmente mais próximo do canto esquerdo. */
+#batalha .campo {
+  width: 100%;
+  max-width: none;
+  padding-left: clamp(4px, 2vw, 24px);
+  padding-right: clamp(18px, 6vw, 96px);
+  gap: clamp(120px, 30vw, 520px);
+}
+
+#batalha .heroi {
+  margin-left: 0;
+  margin-right: auto;
+  transform: translateX(clamp(-26px, -2vw, -8px));
+}
+
+#batalha .inimigo {
+  margin-left: auto;
+  margin-right: clamp(22px, 6vw, 110px);
+}
+
+/* Desce o conjunto visual do combatente sem mover os cards fixos. */
+#batalha .sprite-frame {
+  transform: translateY(clamp(46px, 6vh, 92px));
+  margin-bottom: 0;
+}
+
+/* Boss continua maior, mas compartilha a mesma linha de chão. */
+#batalha .inimigo .sprite-frame[data-size="boss"] {
+  transform: translateY(clamp(42px, 5.5vh, 84px));
+}
+
+@media (max-width: 900px) {
+  /* Mobile: timeline no topo, arena livre, status empilhados e comandos no rodapé. */
+  #batalha .battle-command-dock {
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    transform: none;
+    width: auto;
+    max-height: 34vh;
+    overflow-y: auto;
+  }
+
+  #batalha .battle-command-dock .acoes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #batalha .heroi-status,
+  #batalha .inimigo-status {
+    right: 8px;
+    left: auto;
+    width: min(52vw, 230px);
+    min-width: 0;
+    padding: 6px 7px;
+  }
+
+  #batalha .heroi-status {
+    bottom: 126px;
+  }
+
+  #batalha .inimigo-status {
+    bottom: 198px;
+  }
+
+  #batalha .status h2 {
+    font-size: .7rem;
+    margin-bottom: 3px;
+  }
+
+  #batalha .status > p {
+    display: none;
+  }
+
+  #batalha .campo {
+    padding-left: 0;
+    padding-right: 2vw;
+    gap: 8vw;
+  }
+
+  #batalha .heroi {
+    transform: translateX(-12px);
+  }
+
+  #batalha .inimigo {
+    margin-right: 0;
+  }
+
+  #batalha .sprite-frame,
+  #batalha .inimigo .sprite-frame[data-size="boss"] {
+    transform: translateY(clamp(54px, 8vh, 96px));
+  }
+}
+
+@media (max-width: 600px) {
+  #batalha .battle-command-dock {
+    max-height: 31vh;
+    padding: 6px 7px;
+  }
+
+  #batalha .battle-command-feedback {
+    padding-bottom: 4px;
+  }
+
+  #batalha .battle-command-dock .acoes button {
+    min-height: 30px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: .74rem;
+  }
+
+  #batalha .heroi-status,
+  #batalha .inimigo-status {
+    width: min(54vw, 220px);
+  }
+
+  #batalha .heroi-status {
+    bottom: 118px;
+  }
+
+  #batalha .inimigo-status {
+    bottom: 184px;
+  }
+
+  #batalha .sprite-frame,
+  #batalha .inimigo .sprite-frame[data-size="boss"] {
+    transform: translateY(clamp(62px, 9vh, 104px));
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  #batalha .battle-command-dock {
+    left: 8px;
+    right: auto;
+    bottom: 8px;
+    width: min(300px, 39vw);
+    max-height: 78vh;
+  }
+
+  #batalha .heroi-status,
+  #batalha .inimigo-status {
+    right: 8px;
+    width: min(210px, 27vw);
+  }
+
+  #batalha .heroi-status { bottom: 8px; }
+  #batalha .inimigo-status { bottom: 76px; }
+
+  #batalha .sprite-frame,
+  #batalha .inimigo .sprite-frame[data-size="boss"] {
+    transform: translateY(18px);
+  }
+}
