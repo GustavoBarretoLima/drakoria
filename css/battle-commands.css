@@ -77,11 +77,16 @@
 }
 @media (max-width: 600px) {
   #batalha #inimigoBatalha:not([data-size="boss"]) { max-width: min(29vw, 105px); max-height: 116px; }
-  #batalha #inimigoBatalha[data-size="boss"] { width: auto; max-width: min(40vw, 160px); max-height: 180px; }
+  #batalha #inimigoBatalha[data-size="boss"] { width: auto; max-width: min(45vw, 180px); max-height: 200px; }
+  #batalha #inimigoBatalha:not([data-size="boss"])[src*="/monstros/goblin"] {
+    max-width: min(23vw, 82px);
+    max-height: 92px;
+  }
 }
 @media (max-height: 500px) and (orientation: landscape) {
   #batalha #inimigoBatalha:not([data-size="boss"]) { max-height: 64px; }
-  #batalha #inimigoBatalha[data-size="boss"] { max-height: 96px; }
+  #batalha #inimigoBatalha[data-size="boss"] { max-height: 108px; }
+  #batalha #inimigoBatalha:not([data-size="boss"])[src*="/monstros/goblin"] { max-height: 56px; }
 }
 @media (max-width: 600px) {
   .battle-command-dock { width: calc(100% - 16px); bottom: max(8px, env(safe-area-inset-bottom)); padding: 8px; }
@@ -100,7 +105,7 @@
   .battle-command-feedback { padding-bottom: 4px; }
   #batalha .battle-command-dock .battle-skill-row button { min-height: 30px; padding-block: 3px; }
   .battle-skill-description { font-size: 0.7rem; }
-  #batalha #heroiBatalha, #batalha #inimigoBatalha, #batalha #inimigoBatalha[src*="/orc_rei/"] { max-height: 96px; }
+  #batalha #heroiBatalha, #batalha #inimigoBatalha, #batalha #inimigoBatalha[src*="/orc_rei/"] { max-height: 108px; }
   #batalha .status { padding-block: 4px; }
   #batalha .status p { display: none; }
   #batalha .status h2 { font-size: 0.8rem; margin-block: 4px; }
@@ -117,7 +122,7 @@
     position: relative; height: var(--visible-size); width: 100%;
   }
   #batalha .inimigo .sprite-frame { --visible-size: calc(var(--hero-sprite-size) * 1.15); }
-  #batalha .inimigo .sprite-frame[data-size="boss"] { --visible-size: calc(var(--hero-sprite-size) * 2); }
+  #batalha .inimigo .sprite-frame[data-size="boss"] { --visible-size: calc(var(--hero-sprite-size) * 2.15); }
   #batalha .sprite-frame #heroiBatalha,
   #batalha .sprite-frame #inimigoBatalha {
     position: absolute;
@@ -126,5 +131,18 @@
     max-width: none; max-height: none; object-fit: fill;
     left: 50%; top: calc(var(--visible-size) * var(--sprite-top, 0) * -1);
     margin: 0; margin-left: calc(var(--visible-size) * var(--sprite-center, .5) * -1);
+  }
+}
+
+/* Keep combatants visually closer to the ground line instead of floating high in the arena. */
+#batalha .sprite-frame {
+  transform: translateY(12px);
+  margin-bottom: 12px;
+}
+
+@media (max-width: 600px) {
+  #batalha .sprite-frame {
+    transform: translateY(10px);
+    margin-bottom: 10px;
   }
 }
