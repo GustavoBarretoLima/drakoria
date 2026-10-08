@@ -206,8 +206,7 @@ function inventoryUxOpen() {
           <span>${label}</span>
           <strong>${current ? inventoryUxEscape(current.item.name) : "Vazio"}</strong>
           ${current ? '<span class="item-equipped-badge">✓ Equipado</span>' : ""}
-          ${current ? inventoryUxRequirementsHtml(current.item) : ""}
-          ${current ? inventoryUxStatsHtml(current.item.stats) : ""}
+          ${current ? `<div class="paper-tooltip" role="tooltip"><div class="paper-tooltip-header"><strong>${inventoryUxEscape(current.item.name)}</strong><span>${inventoryUxEscape(INVENTORY_UX_RARITIES[rarity] || rarity)}</span></div><p>${inventoryUxEscape(current.item.description || "Sem descrição.")}</p>${inventoryUxRequirementsHtml(current.item)}${inventoryUxStatsHtml(current.item.stats)}<small>Selecione para desequipar.</small></div>` : ""}
           ${current ? "<small>Clique para desequipar</small>" : ""}
         </button>
       `;
@@ -215,19 +214,18 @@ function inventoryUxOpen() {
     .join("");
 
   panel.classList.remove("hidden");
-  panel.innerHTML = `
-    <div class="panel-header">
-      <div><span class="panel-kicker">Mochila do aventureiro</span><h2>Inventário</h2></div>
-      <span class="inventory-capacity">${backpack.length}/${INVENTORY_UX_SLOTS}</span>
-    </div>
-    <h3 class="section-title">Equipamentos</h3>
-    <p class="inventory-help">Os bônus de cada equipamento aparecem diretamente no slot.</p>
-    <div class="equipment-grid">${equipmentSlots}</div>
-    <h3 class="section-title">Itens</h3>
-    <p class="inventory-help">Passe o mouse ou selecione um item para comparar com a peça equipada no mesmo slot.</p>
-    <div class="inventory-grid">${itemSlots}</div>
-    <div class="painel-acoes"><button type="button" onclick="fecharPainelPraca()">Fechar</button></div>
-  `;
+  const ficha = window.criarFichaPersonagemJRPG?.() || { profile: "", attributes: "" };
+  document.getElementById("menuPraca")?.classList?.add?.("hidden");
+  panel.innerHTML = `<div class="jrpg-sheet" data-view="inventory">
+    <header class="jrpg-sheet-header"><div><span class="panel-kicker">Mochila do aventureiro</span><h2>Inventário</h2></div>
+      <nav aria-label="Tela do personagem"><button type="button" onclick="abrirStatus()">Status</button><button type="button" onclick="fecharPainelPraca()">Fechar</button></nav></header>
+    <div class="jrpg-sheet-columns">${ficha.profile}${ficha.attributes}
+      <section class="jrpg-loadout"><h3 class="section-title">Equipamentos</h3><p class="inventory-help">Selecione uma peça equipada para desequipar.</p><div class="equipment-grid">${equipmentSlots}</div>
+        <div class="jrpg-backpack-heading"><h3 class="section-title">Mochila</h3><span class="inventory-capacity">${backpack.length}/${INVENTORY_UX_SLOTS}</span></div>
+        <p class="inventory-help">Passe o mouse ou use Tab para comparar com o item equipado no mesmo slot.</p><div class="inventory-grid">${itemSlots}</div>
+      </section>
+    </div></div>`;
+  panel.scrollTop = 0;
 }
 
 function inventoryUxEquip(itemId) {
@@ -335,13 +333,13 @@ function hidePaperTooltipPortal() {
 }
 
 document.addEventListener("mouseover", (event) => {
-  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled");
+  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled, .equipment-slot.occupied");
   if (!slot || slot === paperTooltipActiveSlot) return;
   showPaperTooltipPortal(slot);
 });
 
 document.addEventListener("mouseout", (event) => {
-  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled");
+  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled, .equipment-slot.occupied");
   if (!slot) return;
   if (event.relatedTarget && slot.contains(event.relatedTarget)) return;
   if (slot === paperTooltipActiveSlot && !slot.matches(":focus-within")) {
@@ -350,12 +348,12 @@ document.addEventListener("mouseout", (event) => {
 });
 
 document.addEventListener("focusin", (event) => {
-  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled");
+  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled, .equipment-slot.occupied");
   if (slot) showPaperTooltipPortal(slot);
 });
 
 document.addEventListener("focusout", (event) => {
-  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled");
+  const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled, .equipment-slot.occupied");
   if (!slot) return;
   if (event.relatedTarget && slot.contains(event.relatedTarget)) return;
   if (slot === paperTooltipActiveSlot && !slot.matches(":hover")) {

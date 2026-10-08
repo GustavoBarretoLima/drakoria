@@ -204,67 +204,52 @@ function abrirStatusComProgressao() {
   const painel = document.getElementById("painelPraca");
   if (!painel) return;
 
-  const nome = localStorage.getItem("nomeHeroi") || "Herói";
+  window.hidePaperTooltipPortal?.();
   const classe = normalizarClasseStatus();
   const subclasse = carregarSubclasseStatus(classe);
-  const generoNormalizado = normalizarGeneroStatus();
-  const classeTexto = localStorage.getItem("classeHeroiTexto") || classe;
-  const generoTexto = localStorage.getItem("generoHeroi") || "Masculino";
-  const progresso = window.progressoDrakoria?.carregarProgresso?.() || {
-    nivel: 1,
-    xp: 0,
-    xpParaProximoNivel: 100,
-    ouro: 0,
-  };
   const inventario = carregarInventarioStatus();
-  const stats = calcularStatusPorNivel(classe, progresso.nivel, inventario, subclasse);
-  const paperDoll = criarPaperDollStatus(
-    classe,
-    generoNormalizado,
-    nome,
-    inventario,
-  );
-
+  const progresso = window.progressoDrakoria?.carregarProgresso?.() || { nivel: 1 };
+  const ficha = criarFichaPersonagemJRPG();
+  const equipmentRows = Object.entries(STATUS_SLOT_LABELS).map(([slot, label]) => criarSlotPaperDollStatus(slot, label, inventario)).join("");
+  const skills = getClassSkills(classe).map(skill => `<div class="jrpg-skill-row"><span>${escaparHtmlStatus(skill.name)}</span><small>${progresso.nivel >= skill.unlockLevel ? "Liberada" : `Nível ${skill.unlockLevel}`}</small></div>`).join("");
+  document.getElementById("menuPraca")?.classList?.add?.("hidden");
   painel.classList.remove("hidden");
-  painel.innerHTML = `
-    <div class="panel-header status-header">
-      <div>
-        <span class="panel-kicker">Ficha do aventureiro</span>
-        <h2>${escaparHtmlStatus(nome)}</h2>
-        <p>${escaparHtmlStatus(classeTexto)}${subclasse ? ` • ${escaparHtmlStatus(subclasse.name)}` : ""} • ${escaparHtmlStatus(generoTexto)}</p>
-      </div>
-      <div class="level-badge"><span>Nível</span><strong>${progresso.nivel}</strong></div>
-    </div>
-    <div class="progress-summary">
-      <div><span>EXP</span><strong>${progresso.xp}/${progresso.xpParaProximoNivel}</strong></div>
-      <div><span>Ouro</span><strong>${progresso.ouro}</strong></div>
-    </div>
-    ${subclasse ? `<p class="inventory-help"><strong>${escaparHtmlStatus(subclasse.name)}:</strong> ${escaparHtmlStatus(subclasse.passiveSummary)} ${escaparHtmlStatus(subclasse.role)}.</p>` : '<p class="inventory-help">Nenhuma subclasse ativa. Livros extremamente raros podem cair de bosses.</p>'}
-    ${subclasse ? '<div class="painel-acoes"><button type="button" onclick="abrirArvoreSubclasse()">Subclasse</button></div>' : ""}
-    <p class="inventory-help">Ataque, DEF, DEF M, HP e Mana crescem a cada nível. Speed e crítico sobem em um ritmo mais lento.</p>
-    <h3 class="section-title">Atributos</h3>
-    <div class="status-stats-grid">
-      <div class="status-stat"><span>Vida máxima</span><strong>${stats.maxHp}</strong></div>
-      <div class="status-stat"><span>Mana máxima</span><strong>${stats.maxMana}</strong></div>
-      <div class="status-stat"><span>Ataque</span><strong>${stats.attack}</strong></div>
-      <div class="status-stat"><span>DEF</span><strong>${stats.defense}</strong></div>
-      <div class="status-stat"><span>DEF M</span><strong>${stats.magicDefense}</strong></div>
-      <div class="status-stat"><span>Magia</span><strong>${stats.magicPower}</strong></div>
-      <div class="status-stat"><span>Esquiva</span><strong>${stats.dodgeChance.toFixed(1)}%</strong></div>
-      <div class="status-stat"><span>Crítico</span><strong>${stats.criticalChance}%</strong></div>
-      <div class="status-stat"><span>Dano crítico</span><strong>${stats.criticalDamage}%</strong></div>
-      <div class="status-stat"><span>Speed</span><strong>${stats.speed}</strong></div>
-    </div>
-    <h3 class="section-title">Habilidades da classe</h3>
-    <p class="inventory-help">${getClassSkills(classe).map(skill => `${escaparHtmlStatus(skill.name)} — ${progresso.nivel >= skill.unlockLevel ? "Liberada" : `Nível ${skill.unlockLevel}`}`).join("<br>")}</p>
-    <h3 class="section-title">Equipamentos</h3>
-    ${paperDoll}
-    <div class="painel-acoes">
-      <button type="button" onclick="abrirInventario()">Abrir Inventário</button>
-      <button type="button" onclick="fecharPainelPraca()">Fechar</button>
-    </div>
-  `;
+  painel.innerHTML = `<div class="jrpg-sheet" data-view="status">
+    <header class="jrpg-sheet-header"><div><span class="panel-kicker">Ficha do aventureiro</span><h2>Status</h2></div>
+      <nav aria-label="Tela do personagem"><button type="button" onclick="abrirInventario()">Inventário</button><button type="button" onclick="fecharPainelPraca()">Fechar</button></nav></header>
+    <div class="jrpg-sheet-columns">${ficha.profile}${ficha.attributes}
+      <section class="jrpg-loadout"><h3 class="section-title">Equipamentos</h3><div class="jrpg-equipment-list">${equipmentRows}</div>
+        <h3 class="section-title">Habilidades da classe</h3><div class="jrpg-skill-list">${skills}</div>
+        <div class="jrpg-subclass"><h3 class="section-title">Subclasse</h3>
+        ${subclasse ? `<strong>${escaparHtmlStatus(subclasse.name)}</strong><p>${escaparHtmlStatus(subclasse.passiveSummary)}</p><button type="button" onclick="abrirArvoreSubclasse()">Subclasse</button>` : '<p>Use um livro de subclasse para liberar sua especialização.</p>'}</div>
+      </section>
+    </div></div>`;
   painel.scrollTop = 0;
 }
 
 window.abrirStatus = abrirStatusComProgressao;
+
+/** Shared character columns keep inventory and status on the same build calculation. */
+function criarFichaPersonagemJRPG() {
+  const classe = normalizarClasseStatus();
+  const subclasse = carregarSubclasseStatus(classe);
+  const nome = localStorage.getItem("nomeHeroi") || "Herói";
+  const progresso = window.progressoDrakoria?.carregarProgresso?.() || { nivel: 1, xp: 0, xpParaProximoNivel: 100, ouro: 0 };
+  const stats = calcularStatusPorNivel(classe, progresso.nivel, carregarInventarioStatus(), subclasse);
+  let vitals = {};
+  try { vitals = JSON.parse(localStorage.getItem("drakoriaHeroVitals") || "{}"); } catch {}
+  const resource = (value, max) => Number.isFinite(Number(value)) && value != null ? Math.min(max, Math.max(0, Number(value))) : max;
+  const hp = resource(vitals.hp, stats.maxHp), mana = resource(vitals.mana, stats.maxMana);
+  const baseClass = localStorage.getItem("classeHeroiTexto") || classe.charAt(0).toUpperCase() + classe.slice(1);
+  const profile = `<aside class="jrpg-profile${subclasse?.id === "berserker" ? " jrpg-profile-berserk" : ""}">
+    <div class="jrpg-portrait"><img src="${getImagemHeroiStatus(classe, normalizarGeneroStatus())}" alt="${escaparHtmlStatus(nome)}" /></div>
+    <div class="jrpg-profile-details"><span class="jrpg-level">Nv. ${progresso.nivel}</span><h3>${escaparHtmlStatus(nome)}</h3><p>${escaparHtmlStatus(baseClass)}${subclasse ? ` · ${escaparHtmlStatus(subclasse.name)}` : ""}</p>
+      <div class="jrpg-resource jrpg-hp"><span>HP</span><strong>${hp}/${stats.maxHp}</strong><div><i style="width:${hp / stats.maxHp * 100}%"></i></div></div>
+      <div class="jrpg-resource jrpg-mp"><span>MP</span><strong>${mana}/${stats.maxMana}</strong><div><i style="width:${stats.maxMana ? mana / stats.maxMana * 100 : 0}%"></i></div></div>
+      <dl><div><dt>EXP</dt><dd>${progresso.xp}/${progresso.xpParaProximoNivel ?? 100}</dd></div><div><dt>Ouro</dt><dd>${progresso.ouro}</dd></div></dl>
+    </div></aside>`;
+  const rows = [["Ataque físico", stats.attack], ["Defesa física", stats.defense], ["Poder mágico", stats.magicPower], ["Defesa mágica", stats.magicDefense], ["Vida máxima", stats.maxHp], ["Mana máxima", stats.maxMana], ["Velocidade", stats.speed], ["Chance crítica", `${stats.criticalChance}%`], ["Dano crítico", `${stats.criticalDamage}%`], ["Esquiva", `${stats.dodgeChance.toFixed(1)}%`]];
+  const attributes = `<section class="jrpg-attributes"><h3 class="section-title">Classe</h3><p class="jrpg-role">${escaparHtmlStatus(subclasse?.role || baseClass)}</p><h3 class="section-title">Atributos</h3><dl>${rows.map(([label, value]) => `<div class="jrpg-attribute-row"><dt>${label}</dt><dd>${value}</dd></div>`).join("")}</dl><p class="jrpg-build-note">Inclui nível, equipamentos e passivas aprendidas.</p></section>`;
+  return { profile, attributes };
+}
+window.criarFichaPersonagemJRPG = criarFichaPersonagemJRPG;
