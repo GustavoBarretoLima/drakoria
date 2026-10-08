@@ -202,3 +202,93 @@
   #batalha .heroi-status { bottom: 8px; }
   #batalha .inimigo-status { bottom: 76px; }
 }
+
+/* FF-style enemy readout: no outer card. Name floats above the enemy artwork,
+   while HP/ATB stay as independent thin bars near its feet. */
+#batalha .inimigo-status {
+  display: contents;
+  position: static !important;
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+#batalha #nomeInimigo {
+  position: absolute;
+  z-index: 40;
+  left: 50%;
+  bottom: calc(var(--visible-size) + 14px);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(44vw, 320px);
+  margin: 0;
+  color: #fff;
+  font-size: clamp(.8rem, 1.4vw, 1.05rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: .02em;
+  text-align: center;
+  text-shadow: 0 2px 4px #000, 0 0 6px #000;
+  pointer-events: none;
+}
+
+#batalha .inimigo-status > .barra {
+  position: absolute;
+  z-index: 38;
+  left: 50%;
+  width: min(210px, 84%);
+  max-width: none;
+  height: 6px;
+  margin: 0;
+  transform: translateX(-50%);
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: rgba(3, 13, 28, .72);
+  box-shadow: none !important;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#batalha .inimigo-status > .barra:nth-of-type(1) {
+  bottom: -14px;
+}
+
+#batalha .inimigo-status > .barra:nth-of-type(2) {
+  bottom: -25px;
+}
+
+#batalha .inimigo-status > .barra > div {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+#batalha .inimigo-status .hp span,
+#batalha .inimigo-status .mana span {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  #batalha #nomeInimigo {
+    bottom: calc(var(--visible-size) + 10px);
+    max-width: 46vw;
+    font-size: .82rem;
+  }
+
+  #batalha .inimigo-status > .barra {
+    width: min(42vw, 170px);
+    height: 5px;
+  }
+
+  #batalha .inimigo-status > .barra:nth-of-type(1) {
+    bottom: -11px;
+  }
+
+  #batalha .inimigo-status > .barra:nth-of-type(2) {
+    bottom: -20px;
+  }
+}
