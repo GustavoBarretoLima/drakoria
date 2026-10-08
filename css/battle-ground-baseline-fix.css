@@ -1,0 +1,204 @@
+/* Final grounding pass: one arena baseline for hero/common/boss and a HUD lane that never covers sprites. */
+#batalha {
+  --arena-ground-bottom: clamp(105px, 13dvh, 160px);
+  --hud-stack-right: clamp(10px, 2vw, 28px);
+  --hud-stack-bottom: clamp(14px, 2dvh, 24px);
+}
+
+/* Stop accumulating margin/translate offsets from older layout passes.
+   The combat row itself now owns the vertical position. */
+#batalha .campo {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  bottom: var(--arena-ground-bottom);
+  width: 100%;
+  max-width: none;
+  margin: 0 !important;
+  padding: 0 clamp(22px, 6vw, 110px) 0 clamp(4px, 1.2vw, 18px);
+  box-sizing: border-box;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(120px, 28vw, 500px);
+  pointer-events: none;
+}
+
+#batalha .heroi,
+#batalha .inimigo {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 0;
+}
+
+#batalha .heroi {
+  margin: 0 auto 0 0;
+  transform: translateX(clamp(-30px, -2vw, -10px));
+}
+
+#batalha .inimigo {
+  margin: 0 clamp(12px, 4vw, 70px) 0 auto;
+  transform: none;
+}
+
+/* Every combatant shares the same frame baseline. Bosses are larger only by visible-size,
+   not by a different vertical offset. */
+#batalha .sprite-frame,
+#batalha .inimigo .sprite-frame[data-size="boss"] {
+  transform: none !important;
+  margin: 0 !important;
+  flex: 0 0 auto;
+}
+
+/* Status is a separate HUD stack. It can no longer sit over the hero/enemy artwork. */
+#batalha .heroi-status,
+#batalha .inimigo-status {
+  position: fixed;
+  z-index: 1170;
+  left: auto;
+  right: var(--hud-stack-right);
+  width: min(310px, 25vw);
+  min-width: 230px;
+  margin: 0;
+  pointer-events: auto;
+}
+
+#batalha .heroi-status {
+  bottom: var(--hud-stack-bottom);
+}
+
+#batalha .inimigo-status {
+  bottom: calc(var(--hud-stack-bottom) + 104px);
+}
+
+/* Desktop command panel stays on the left and does not reserve vertical arena space. */
+@media (min-width: 901px) {
+  #batalha .battle-command-dock {
+    left: clamp(12px, 2vw, 30px);
+    right: auto;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-38%);
+  }
+}
+
+/* Portrait/tablet: reserve real lanes for commands and status, then ground sprites just above them. */
+@media (max-width: 900px) {
+  #batalha {
+    --mobile-command-reserve: clamp(176px, 27dvh, 252px);
+    --mobile-status-gap: 68px;
+    --arena-ground-bottom: calc(var(--mobile-command-reserve) + 132px);
+  }
+
+  #batalha .battle-command-dock {
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    transform: none;
+    width: auto;
+    max-height: var(--mobile-command-reserve);
+    overflow-y: auto;
+  }
+
+  #batalha .campo {
+    padding-left: 0;
+    padding-right: 1vw;
+    gap: 7vw;
+  }
+
+  #batalha .heroi {
+    transform: translateX(-14px);
+  }
+
+  #batalha .inimigo {
+    margin-right: 0;
+  }
+
+  #batalha .heroi-status,
+  #batalha .inimigo-status {
+    right: 8px;
+    width: min(50vw, 225px);
+    min-width: 0;
+    padding: 6px 7px;
+  }
+
+  #batalha .heroi-status {
+    bottom: calc(var(--mobile-command-reserve) + 14px);
+  }
+
+  #batalha .inimigo-status {
+    bottom: calc(var(--mobile-command-reserve) + 14px + var(--mobile-status-gap));
+  }
+
+  #batalha .status h2 {
+    font-size: .7rem;
+    margin-bottom: 3px;
+  }
+
+  #batalha .status > p {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  #batalha {
+    --mobile-command-reserve: clamp(168px, 26dvh, 236px);
+    --arena-ground-bottom: calc(var(--mobile-command-reserve) + 118px);
+  }
+
+  #batalha .battle-command-dock {
+    max-height: var(--mobile-command-reserve);
+  }
+
+  #batalha .battle-command-dock .acoes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #batalha .heroi-status,
+  #batalha .inimigo-status {
+    width: min(48vw, 205px);
+  }
+
+  #batalha .heroi-status {
+    bottom: calc(var(--mobile-command-reserve) + 10px);
+  }
+
+  #batalha .inimigo-status {
+    bottom: calc(var(--mobile-command-reserve) + 76px);
+  }
+}
+
+/* Short landscape must stay compact: commands left, status right, shared low baseline. */
+@media (max-height: 500px) and (orientation: landscape) {
+  #batalha {
+    --arena-ground-bottom: 28px;
+  }
+
+  #batalha .campo {
+    left: min(305px, 40vw);
+    right: min(220px, 28vw);
+    width: auto;
+    padding: 0 8px;
+    gap: 18px;
+  }
+
+  #batalha .battle-command-dock {
+    left: 8px;
+    right: auto;
+    bottom: 8px;
+    width: min(300px, 39vw);
+    max-height: 78vh;
+  }
+
+  #batalha .heroi-status,
+  #batalha .inimigo-status {
+    right: 8px;
+    width: min(210px, 27vw);
+  }
+
+  #batalha .heroi-status { bottom: 8px; }
+  #batalha .inimigo-status { bottom: 76px; }
+}
