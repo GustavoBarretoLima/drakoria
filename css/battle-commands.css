@@ -203,3 +203,20 @@
     margin-bottom: 6px;
   }
 }
+
+/* Lower the whole combat row so sprites and status cards sit closer to the arena floor. */
+#batalha .campo {
+  margin-top: clamp(72px, 9dvh, 120px);
+}
+
+@media (min-width: 601px) {
+  #batalha .campo {
+    margin-top: clamp(84px, 10dvh, 140px);
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  #batalha .campo {
+    margin-top: 8px;
+  }
+}
