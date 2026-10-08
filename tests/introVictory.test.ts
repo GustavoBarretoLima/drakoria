@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import vm from "node:vm";
+import { completeIntroVictory } from "../client/src/battle/victoryNavigation.js";
+const saved = new Map<string,string>();
+const storage = { getItem: (key:string) => saved.get(key) ?? null, setItem: (key:string,value:string) => saved.set(key,value), removeItem: (key:string) => saved.delete(key) };
+const window = { location: { href: "" }, addEventListener() {} };
+const context = vm.createContext({ window, localStorage:storage, document:{addEventListener() {} } });
+vm.runInContext(readFileSync("js/intro.js","utf8"),context);
+saved.set("dungeonAtual","dungeon-orc-fortress"); saved.set("monsterIdAtual","orc-king-boss-lvl-55"); saved.set("worldRegionAtual","fortaleza-rei-orc");
+saved.set("drakoriaProgresso",'{"ouro":10}'); saved.set("drakoriaInventario",'{"items":[]}'); saved.set("drakoriaHeroVitals",'{"hp":30}');
+vm.runInContext("iniciarBatalha()",context);
+assert.equal(window.location.href,"batalha.html"); assert.equal(saved.get("tipoBatalhaAtual"),"intro-goblin"); assert.equal(saved.get("monsterIdAtual"),"goblin-normal-lvl-1");
+assert.equal(saved.has("dungeonAtual"),false);
+const win = { finished:true,winnerId:"hero",hero:{id:"hero"},enemy:{id:"goblin-normal-lvl-1"} };
+assert.equal(completeIntroVictory(storage,{...win,finished:false}),undefined);
+assert.equal(completeIntroVictory(storage,{...win,winnerId:"enemy"}),undefined);
+assert.equal(completeIntroVictory(storage,{...win,enemy:{id:"orc-normal-lvl-25"}}),undefined);
+assert.equal(completeIntroVictory(storage,win),"caminho-drakoria.html");
+assert.equal(saved.has("tipoBatalhaAtual"),false); assert.equal(saved.has("monsterIdAtual"),false);
+for (const key of ["drakoriaProgresso","drakoriaInventario","drakoriaHeroVitals"]) assert.ok(saved.has(key));
+saved.set("tipoBatalhaAtual","dungeon-orc-1-10"); assert.equal(completeIntroVictory(storage,win),undefined);
+saved.clear(); assert.equal(completeIntroVictory(storage,win),"caminho-drakoria.html"); // Previously opened intro saves.
+assert.ok(readFileSync("pages/caminho-drakoria.html","utf8").includes("Guarda 1"));
+console.log("Opening goblin: clean encounter setup, win-only guards route, legacy saves, dungeon isolation and save preservation passed.");

@@ -1,4 +1,4 @@
-import { prepareNextMonster, clearBattleStorage } from "./battle/victoryNavigation.js";
+import { prepareNextMonster, clearBattleStorage, completeIntroVictory } from "./battle/victoryNavigation.js";
 import { getBattleExitPage } from "./battle/worldMapNavigation.js";
 import { setupBattleArena } from "./assets/battleArena.js";
 import { getDungeonConfig } from "../../shared/src/dungeons/dungeonEncounters.js";
@@ -150,6 +150,11 @@ function applyVictoryRewards(state: BattleState): void {
   const classBooks = state.rewards.classBooks ?? [];
   addDropsToInventory(drops);
   addSubclassBookDrops(classBooks);
+  const introDestination = completeIntroVictory(localStorage, state);
+  if (introDestination) {
+    window.location.href = `${import.meta.env.BASE_URL}pages/${introDestination}`;
+    return;
+  }
   const run = registerDungeonVictory(state.enemy.id);
   const regionConfig = run ? getDungeonConfig(run.dungeonId) : undefined;
   const vitals = loadHeroVitals(state.hero.stats.maxHp, state.hero.stats.maxMana);

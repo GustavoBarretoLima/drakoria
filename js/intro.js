@@ -107,5 +107,9 @@ function pularDialogos() {
 }
 
 function iniciarBatalha() {
+  // The opening fight must not inherit a previous dungeon encounter.
+  for (const key of ["worldRegionAtual", "dungeonAtual", "dungeonNivelMin", "dungeonNivelMax", "dungeonEncontroTipo", "dungeonEncontroNivel", "dungeonDanger", "drakoriaDungeonRun"]) localStorage.removeItem(key);
+  localStorage.setItem("tipoBatalhaAtual", "intro-goblin");
+  localStorage.setItem("monsterIdAtual", "goblin-normal-lvl-1");
   window.location.href = "batalha.html";
 }
