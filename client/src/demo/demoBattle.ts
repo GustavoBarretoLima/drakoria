@@ -10,6 +10,7 @@ import {
 } from "../../../shared/src/combat/atb.js";
 import type { BattleAction } from "../../../shared/src/combat/actions.js";
 import { applyEquipmentStats } from "../../../shared/src/equipment/equipmentStats.js";
+import { adaptSubclassWeaponDrops } from "../../../shared/src/equipment/assassinWeapons.js";
 import { rollMonsterDrops } from "../../../shared/src/loot/lootTables.js";
 import { rollSubclassBookDrops } from "../../../shared/src/loot/subclassBooks.js";
 import type {
@@ -107,7 +108,7 @@ export function startDemoBattle(
     enemy,
     rewards: {
       ...baseRewards,
-      drops: rollMonsterDrops(monsterId),
+      drops: adaptSubclassWeaponDrops(rollMonsterDrops(monsterId), subclassId),
       ...(classBooks.length > 0 ? { classBooks } : {}),
     },
     revealEnemyStats: hasMonsterInsight(equippedItems, heroLevel),

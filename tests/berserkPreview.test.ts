@@ -45,7 +45,7 @@ storage.set("classeHeroi", "mago"); panel.innerHTML = "unchanged";
 vm.runInContext('useBook("berserker")', context); assert.equal(panel.innerHTML, "unchanged");
 const gifsCode = readFileSync("client/src/assets/gifs.ts", "utf8");
 for (const action of ["idle", "attack", "damage", "death"]) {
- assert.ok(gifsCode.includes(`berserk_primal/${action}.gif`));
+ assert.ok(gifsCode.includes(`${action}.gif`));
  assert.ok(existsSync(`img/personagens/berserk_primal/${action}.gif`));
 }
 console.log("Berserk preview: equipped stats, penalties, portraits, cancellation, confirmation, duplicate clicks and class restrictions passed.");

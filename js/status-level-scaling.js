@@ -1,3 +1,6 @@
+import { SPRITE_BOUNDS } from "../client/src/assets/spriteBounds.ts";
+import { SUBCLASS_SPRITE_FOLDERS } from "../shared/src/classes/subclassSprites.ts";
+import { ensureAssassinEquipment } from "../client/src/inventory/inventoryClient.ts";
 import { createStatsForLevel } from "../shared/src/combat/classStats.ts";
 import { canonicalEquipment, canEquipItem } from "../shared/src/equipment/equipmentRules.ts";
 import { applyEquipmentStats } from "../shared/src/equipment/equipmentStats.ts";
@@ -42,6 +45,7 @@ const STATUS_STAT_LABELS = {
 };
 
 function carregarInventarioStatus() {
+  window.ensureAssassinEquipment?.();
   try {
     const parsed = JSON.parse(localStorage.getItem("drakoriaInventario") || "{}");
     return {
@@ -85,7 +89,9 @@ function escaparHtmlStatus(valor) {
 }
 
 function getImagemHeroiStatus(classe, genero) {
-  if (carregarSubclasseStatus(classe)?.id === "berserker") return "../img/personagens/berserk_primal/idle.gif";
+  const subclasse = carregarSubclasseStatus(classe);
+  if (subclasse && typeof SUBCLASS_SPRITE_FOLDERS !== "undefined") return `../img/personagens/${SUBCLASS_SPRITE_FOLDERS[subclasse.id][genero]}/idle.gif`;
+  if (subclasse?.id === "berserker") return "../img/personagens/berserk_primal/idle.gif";
   const imagens = {
     guerreiro: {
       masculino: "../img/personagens/guerreiro.png",
@@ -109,7 +115,7 @@ function calcularStatusPorNivel(classe, nivel, inventario, subclasse) {
     .map(id => inventario.items.find(entry => entry.item.id === id)?.item)
     .filter(Boolean)
     .map(canonicalEquipment)
-    .filter(item => canEquipItem(item, classe, Number(nivel)));
+    .filter(item => canEquipItem(item, classe, Number(nivel), subclasse?.id));
   const stats = applyEquipmentStats(createStatsForLevel(classe, Number(nivel)), items);
   return applyTreeStats(applySubclassStats(stats, subclasse?.id), subclasse?.id, Number(nivel), getTreeRanks());
 }
@@ -241,8 +247,11 @@ function criarFichaPersonagemJRPG() {
   const resource = (value, max) => Number.isFinite(Number(value)) && value != null ? Math.min(max, Math.max(0, Number(value))) : max;
   const hp = resource(vitals.hp, stats.maxHp), mana = resource(vitals.mana, stats.maxMana);
   const baseClass = localStorage.getItem("classeHeroiTexto") || classe.charAt(0).toUpperCase() + classe.slice(1);
-  const profile = `<aside class="jrpg-profile${subclasse?.id === "berserker" ? " jrpg-profile-berserk" : ""}">
-    <div class="jrpg-portrait"><img src="${getImagemHeroiStatus(classe, normalizarGeneroStatus())}" alt="${escaparHtmlStatus(nome)}" /></div>
+  const portrait = getImagemHeroiStatus(classe, normalizarGeneroStatus());
+  const bounds = typeof SPRITE_BOUNDS !== "undefined" ? SPRITE_BOUNDS[portrait.replace(/^\.\.\//, "")] : undefined;
+  const portraitStyle = bounds ? `style="--sprite-width:${bounds[0]};--sprite-height:${bounds[1]};--sprite-center:${bounds[2]};--sprite-top:${bounds[3]}"` : "";
+  const profile = `<aside class="jrpg-profile${subclasse ? " jrpg-profile-animated" : ""}">
+    <div class="jrpg-portrait" ${portraitStyle}><img src="${portrait}" alt="${escaparHtmlStatus(nome)}" /></div>
     <div class="jrpg-profile-details"><span class="jrpg-level">Nv. ${progresso.nivel}</span><h3>${escaparHtmlStatus(nome)}</h3><p>${escaparHtmlStatus(baseClass)}${subclasse ? ` · ${escaparHtmlStatus(subclasse.name)}` : ""}</p>
       <div class="jrpg-resource jrpg-hp"><span>HP</span><strong>${hp}/${stats.maxHp}</strong><div><i style="width:${hp / stats.maxHp * 100}%"></i></div></div>
       <div class="jrpg-resource jrpg-mp"><span>MP</span><strong>${mana}/${stats.maxMana}</strong><div><i style="width:${stats.maxMana ? mana / stats.maxMana * 100 : 0}%"></i></div></div>
@@ -253,3 +262,5 @@ function criarFichaPersonagemJRPG() {
   return { profile, attributes };
 }
 window.criarFichaPersonagemJRPG = criarFichaPersonagemJRPG;
+
+if (typeof ensureAssassinEquipment === "function") window.ensureAssassinEquipment = ensureAssassinEquipment;

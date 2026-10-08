@@ -7,6 +7,9 @@ import type {
 } from "../../../../shared/src/types/equipment.js";
 import { generateEquipmentCatalog } from "../../../../shared/src/types/equipmentGenerator.js";
 
+import { createAssassinDaggers } from "../../../../shared/src/equipment/assassinWeapons.js";
+import { STARTER_LOOT_ITEMS } from "../../../../shared/src/loot/lootTables.js";
+
 const EQUIPMENT_CATALOG = [...Object.values(DUNGEON_LOOT_ITEMS), ...generateEquipmentCatalog()];
 
 export interface EquipmentFilters {
@@ -45,6 +48,11 @@ export function listEquipments(
 }
 
 export function getEquipmentById(id: string): EquipmentItem | undefined {
+  if (id.startsWith("assassin-")) {
+    const bowId = id.slice(9);
+    const bow = EQUIPMENT_CATALOG.find(item => item.id === bowId) ?? STARTER_LOOT_ITEMS[bowId];
+    if (bow?.slot === "weapon" && bow.allowedClasses.includes("arqueiro")) return createAssassinDaggers(bow);
+  }
   return EQUIPMENT_CATALOG.find((item) => item.id === id);
 }
 

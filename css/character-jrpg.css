@@ -107,3 +107,7 @@ body:has(.jrpg-sheet) .paper-tooltip-portal .inventory-slot-description { displa
 .jrpg-profile-berserk .jrpg-portrait { position: relative; --berserk-size: min(220px, 20vw); }
 .jrpg-profile-berserk .jrpg-portrait img { position: absolute; width: calc(var(--berserk-size) * 2.242991); height: calc(var(--berserk-size) * 1.794393); left: calc(50% - var(--berserk-size) * 1.165888); top: calc(50% - var(--berserk-size) * 1.135514); transform: none; }
 @media (max-width: 520px) { .jrpg-profile-berserk .jrpg-portrait { --berserk-size: 100px; } }
+
+.jrpg-profile-animated .jrpg-portrait { position: relative; --portrait-size: min(220px, 20vw); }
+.jrpg-profile-animated .jrpg-portrait img { position: absolute; max-width: none; width: calc(var(--portrait-size) * var(--sprite-width, 2)); height: calc(var(--portrait-size) * var(--sprite-height, 2)); left: calc(50% - var(--portrait-size) * var(--sprite-center, 1)); top: calc(50% - var(--portrait-size) * (var(--sprite-top, .5) + .5)); object-fit: fill; transform: none; }
+@media (max-width: 520px) { .jrpg-profile-animated .jrpg-portrait { --portrait-size: 100px; } }

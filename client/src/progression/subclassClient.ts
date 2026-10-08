@@ -7,6 +7,8 @@ import type { HeroClass } from "../../../shared/src/types/combat.js";
 import { normalizeTreeRanks, type TreeRanks } from "../../../shared/src/classes/skillTrees.js";
 import { loadProgress } from "./progressionClient.js";
 
+import { ensureAssassinEquipment } from "../inventory/inventoryClient.js";
+
 const SUBCLASS_STORAGE_KEY = "drakoriaSubclassProgress";
 
 export interface SubclassProgressState {
@@ -83,6 +85,7 @@ export function useSubclassBook(
   state.books[subclassId] = count - 1;
   state.activeSubclass = subclassId;
   saveSubclassProgress(state);
+  if (subclassId === "assassin") ensureAssassinEquipment(true);
   return {
     used: true,
     message: `Especialização desbloqueada: ${definition.name}.`,

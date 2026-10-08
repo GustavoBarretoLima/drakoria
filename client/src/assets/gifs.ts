@@ -1,8 +1,10 @@
+import { SUBCLASS_SPRITE_FOLDERS } from "../../../shared/src/classes/subclassSprites.js";
+import { SUBCLASS_DEFINITIONS, type SubclassId } from "../../../shared/src/classes/subclasses.js";
 import type { MonsterSpriteSet } from "../../../shared/src/types/monster.js";
 
 function assetPath(path: string): string {
   const normalizedPath = path.replace(/^\/+/, "");
-  return `${import.meta.env.BASE_URL}${normalizedPath}`;
+  return `${(import.meta.env?.BASE_URL ?? "/")}${normalizedPath}`;
 }
 
 export const gifsHeroi = {
@@ -72,16 +74,13 @@ export function setEnemyGifs(sprites?: MonsterSpriteSet): void {
   gifsGoblin.morte = assetPath(sprites.death ?? sprites.damage);
 }
 
-/** The subclass changes appearance while retaining the warrior combat identity. */
 export function getHeroGifs(className: keyof typeof gifsHeroi, gender: "Masculino" | "Feminino", subclassId?: string) {
   const base = gifsHeroi[className][gender];
-  if (className !== "guerreiro" || subclassId !== "berserker") return { ...base, morte: base.damage };
-  return {
-    ...base,
-    padrao: assetPath("img/personagens/berserk_primal/idle.gif"),
-    defesa: assetPath("img/personagens/berserk_primal/idle.gif"),
-    atk: assetPath("img/personagens/berserk_primal/attack.gif"),
-    damage: assetPath("img/personagens/berserk_primal/damage.gif"),
-    morte: assetPath("img/personagens/berserk_primal/death.gif"),
-  };
+  const id = subclassId as SubclassId;
+  if (!SUBCLASS_DEFINITIONS[id] || SUBCLASS_DEFINITIONS[id].baseClass !== className) return { ...base, morte: base.damage };
+  const folder = SUBCLASS_SPRITE_FOLDERS[id][gender === "Feminino" ? "feminino" : "masculino"];
+  const root = `img/personagens/${folder}`;
+  return { ...base, padrao: assetPath(`${root}/idle.gif`), defesa: assetPath(`${root}/idle.gif`),
+    atk: assetPath(`${root}/attack.gif`), damage: assetPath(`${root}/damage.gif`), morte: assetPath(`${root}/death.gif`),
+    magia: id === "assassin" ? "" : base.magia };
 }

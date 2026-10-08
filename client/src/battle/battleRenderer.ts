@@ -189,7 +189,7 @@ function playBattleEventEffects(state: BattleState) {
     if (lastEvent.action === "ATTACK") {
       heroImg.src = heroAttackGif;
 
-      if (state.hero.className === "guerreiro") {
+      if (state.hero.className === "guerreiro" || state.hero.subclassId === "assassin") {
         dashAttack(heroImg, enemyImg, 620, true);
       }
 
@@ -222,7 +222,7 @@ function playBattleEventEffects(state: BattleState) {
             }, 500);
           }
         },
-        state.hero.className === "guerreiro" ? 320 : 0,
+        state.hero.className === "guerreiro" || state.hero.subclassId === "assassin" ? 320 : 0,
       );
     }
 
