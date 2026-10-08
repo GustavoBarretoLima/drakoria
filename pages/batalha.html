@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../css/reward-overlay.css" />
     <link rel="stylesheet" href="../css/battle-commands.css" />
     <link rel="stylesheet" href="../css/battle-ff-ui.css" />
+    <link rel="stylesheet" href="../css/battle-jrpg-v2.css" />
   </head>
   <body>
     <section id="batalha" style="position: relative">
@@ -47,6 +48,11 @@
         <span style="left: 68%; animation-delay: 0.4s"></span>
         <span style="left: 78%; animation-delay: 2.6s"></span>
         <span style="left: 89%; animation-delay: 1.8s"></span>
+      </div>
+
+      <div id="battleTimeline" class="battle-timeline" aria-label="Ordem de ação">
+        <div id="timelineHero" class="timeline-marker hero" title="Herói">H</div>
+        <div id="timelineEnemy" class="timeline-marker enemy" title="Inimigo">E</div>
       </div>
 
       <div class="campo">
@@ -128,6 +134,7 @@
           <button id="btnAtacar">Atacar</button>
           <button id="btnDefender">Defender</button>
           <button id="btnHabilidades" aria-expanded="false" aria-controls="painelHabilidades" hidden>Habilidades</button>
+          <button id="btnItens" aria-expanded="false" aria-controls="painelItens" hidden>Itens</button>
           <button id="btnFugir">Fugir</button>
         </div>
         <section id="painelHabilidades" class="battle-skill-menu" aria-labelledby="tituloHabilidades" hidden>
@@ -137,6 +144,13 @@
           </header>
           <div id="habilidadesClasse" class="battle-skill-list"></div>
           <p id="descricaoHabilidade" class="battle-skill-description"></p>
+        </section>
+        <section id="painelItens" class="battle-item-menu" aria-labelledby="tituloItens" hidden>
+          <header class="battle-item-heading">
+            <h3 id="tituloItens">Itens</h3>
+            <button id="btnVoltarItens" type="button">◀ Voltar</button>
+          </header>
+          <div id="itensBatalha" class="battle-item-list"></div>
         </section>
       </div>
     </section>
@@ -171,5 +185,6 @@
     </script>
 
     <script type="module" src="/client/src/main.ts"></script>
+    <script type="module" src="/client/src/ui/jrpgBattleHud.ts"></script>
   </body>
 </html>
