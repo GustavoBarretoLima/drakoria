@@ -87,6 +87,7 @@ export function getSkillCooldown(hero: CombatantState, id: SkillId): number {
 
 /** Shared by the UI and engine; the server never trusts client costs or effects. */
 export function getSkillBlockReason(hero: CombatantState, skill: ClassSkill): string | null {
+  if ((hero.skillLockedTurns ?? 0) > 0) return `Quebra-osso: habilidades bloqueadas por ${hero.skillLockedTurns} ação(ões)`;
   if (hero.className !== skill.heroClass) return "Habilidade de outra classe";
   if (skill.subclassId && (hero.subclassId !== skill.subclassId || !normalizeTreeRanks(hero.subclassId, hero.level ?? 1, hero.treeRanks)[skill.id])) return "Habilidade não aprendida na árvore";
   if (normalizeHeroLevel(hero.level ?? 1) < skill.unlockLevel) return `Desbloqueia no nível ${skill.unlockLevel}`;

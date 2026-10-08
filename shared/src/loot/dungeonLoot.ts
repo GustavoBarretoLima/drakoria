@@ -35,7 +35,7 @@ export function createDungeonEquipment(heroClass: HeroClass, slot: EquipmentSlot
 }
 
 export const DUNGEON_LOOT_ITEMS: Record<string, EquipmentItem> = Object.fromEntries(
-  Array.from({ length: 25 }, (_, i) => i + 1).flatMap(level => CLASSES.flatMap(heroClass =>
+  Array.from({ length: 55 }, (_, i) => i + 1).flatMap(level => CLASSES.flatMap(heroClass =>
     DUNGEON_EQUIPMENT_SLOTS.flatMap(slot => (Object.keys(QUALITY) as DungeonRarity[]).map(rarity => {
       const item = createDungeonEquipment(heroClass, slot, level, rarity);
       return [item.id, item] as const;
@@ -53,12 +53,12 @@ export const DUNGEON_DROP_PROFILES: Record<string, DropProfile> = {
 };
 
 export function rollDungeonDrops(monsterId: string): EquipmentDrop[] | undefined {
-  const match = /^(goblin-normal|orc-normal|skeleton-warrior-normal|mutant-rat-normal|hobgoblin-normal|hobgoblin-elite|orc-king-boss|pestilent-spider-normal|cemetery-specter-normal|shadow-wolf-normal|demonic-tree-normal|corruption-hydra-boss|cursed-gravedigger-boss|mutant-wolf-boss)-lvl-(\d+)$/.exec(monsterId);
+  const match = /^(goblin-normal|orc-normal|skeleton-warrior-normal|mutant-rat-normal|hobgoblin-normal|hobgoblin-elite|orc-warlord-boss|orc-king-boss|pestilent-spider-normal|cemetery-specter-normal|shadow-wolf-normal|demonic-tree-normal|corruption-hydra-boss|cursed-gravedigger-boss|mutant-wolf-boss)-lvl-(\d+)$/.exec(monsterId);
   if (!match) return undefined;
   const level = Number(match[2]);
   const type = match[1]!;
   const min = type === "orc-king-boss" ? 15 : type.startsWith("hobgoblin") ? 10 : 1;
-  const max = type === "orc-king-boss" ? 25 : type.startsWith("hobgoblin") ? 15 : 10;
+  const max = 55;
   if (level < min || level > max) return undefined;
   const profile = DUNGEON_DROP_PROFILES[type.endsWith("boss") ? "boss" : type.endsWith("elite") ? "elite" : type.startsWith("hobgoblin") ? "hobgoblin" : "normal"]!;
   if (Math.random() >= profile.chance) return [];

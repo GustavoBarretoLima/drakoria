@@ -10,7 +10,7 @@ const fortress = DUNGEON_CONFIG.avancada!;
 
 let run = createDungeonRun(fortress.id);
 const first = pickDungeonRunEncounter(fortress, run, () => 0);
-assert.equal(first.monsterId, "hobgoblin-elite-lvl-10");
+assert.equal(first.monsterId, "hobgoblin-elite-lvl-35");
 assert.equal(first.danger, false);
 
 for (let index = 0; index < 5; index += 1) {
@@ -22,7 +22,7 @@ assert.equal(run.depth, 6);
 assert.equal(run.bossPending, true);
 
 const boss = pickDungeonRunEncounter(fortress, run, () => 0.5);
-assert.equal(boss.monsterId, "orc-king-boss-lvl-20");
+assert.equal(boss.monsterId, "orc-king-boss-lvl-55");
 assert.equal(boss.rank, "boss");
 assert.equal(boss.danger, true);
 
@@ -33,9 +33,9 @@ assert.equal(run.bossPending, false);
 const starter = DUNGEON_CONFIG.iniciante!;
 let starterRun = createDungeonRun(starter.id);
 const levelOne = pickDungeonRunEncounter(starter, starterRun, () => 0);
-assert.equal(levelOne.level, 1);
+assert.equal(levelOne.level, 25);
 starterRun = { ...starterRun, depth: 5 };
 const deeper = pickDungeonRunEncounter(starter, starterRun, () => 0);
-assert.equal(deeper.level, 5);
+assert.equal(deeper.level, 29);
 
 console.log("dungeonRun.test.ts: ok");

@@ -68,6 +68,7 @@ function createEarlyDungeonMonster(
       attack: Math.floor(baseAttack * multiplier),
       defense: Math.floor(baseDefense * multiplier),
       magicPower: 0,
+      magicDefense: Math.floor((isGoblin ? 1 : 3) * multiplier),
       criticalChance,
       criticalDamage,
     },
@@ -119,7 +120,7 @@ function applySpriteOverrides(monster: MonsterDefinition): MonsterDefinition {
   };
 }
 
-const EARLY_DUNGEON_MONSTERS = Array.from({ length: 14 }, (_, index) => index + 2)
+const EARLY_DUNGEON_MONSTERS = Array.from({ length: 34 }, (_, index) => index + 2)
   .flatMap((level) => [
     createEarlyDungeonMonster("goblin", level),
     createEarlyDungeonMonster("orc", level),
@@ -135,7 +136,7 @@ const GENERATED_CATALOG = generateMonsterCatalog()
         monster.rank === "normal" &&
         (monster.family === "goblin" || monster.family === "orc") &&
         monster.level >= 2 &&
-        monster.level <= 15
+        monster.level <= 35
       ),
   );
 

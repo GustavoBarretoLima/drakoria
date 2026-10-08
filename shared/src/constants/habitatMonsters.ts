@@ -8,15 +8,17 @@ export const HABITAT_MONSTER_PROFILES = {
   "cursed-gravedigger": { name: "Coveiro Maldito", folder: "coveiro_maldito", family: "undead", element: "shadow", rank: "boss", hp: 180, attack: 18, defense: 8, magicPower: 16, xp: 60, gold: 32 },
   "shadow-wolf": { name: "Lobo Sombrio", folder: "lobo_sombrio", family: "beast", element: "shadow", rank: "normal", hp: 75, attack: 11, defense: 3, magicPower: 0, xp: 18, gold: 9 },
   "demonic-tree": { name: "Árvore Demoníaca", folder: "arvore_demoniaca", family: "plant", element: "shadow", rank: "normal", hp: 100, attack: 9, defense: 7, magicPower: 10, xp: 22, gold: 11 },
-  "mutant-wolf": { name: "Lobo Mutante", folder: "lobo_mutante_boss", family: "beast", element: "poison", rank: "boss", hp: 190, attack: 20, defense: 7, magicPower: 0, xp: 65, gold: 34 },
+  "mutant-wolf": { name: "Lobo Mutante", folder: "lobo_mutante_boss", family: "beast", element: "poison", rank: "boss", hp: 190, attack: 20, defense: 7, magicPower: 20, xp: 65, gold: 34 },
 } as const;
+
+const LEVEL_LIMITS = { "corruption-hydra": 25, "pestilent-spider": 20, "cemetery-specter": 10, "cursed-gravedigger": 15, "shadow-wolf": 30, "demonic-tree": 30, "mutant-wolf": 35 } as const;
 
 export function createHabitatMonster(id: string): MonsterDefinition | undefined {
   const match = /^(.+)-(normal|boss)-lvl-(\d+)$/.exec(id);
   if (!match || !Object.hasOwn(HABITAT_MONSTER_PROFILES, match[1]!)) return undefined;
   const profile = HABITAT_MONSTER_PROFILES[match[1] as keyof typeof HABITAT_MONSTER_PROFILES];
   const level = Number(match[3]);
-  if (match[2] !== profile.rank || level < 1 || level > 10) return undefined;
+  if (match[2] !== profile.rank || level < 1 || level > LEVEL_LIMITS[match[1] as keyof typeof LEVEL_LIMITS]) return undefined;
   const multiplier = 1 + (level - 1) * .08;
   const hp = Math.floor(profile.hp * multiplier);
   const defense = Math.floor(profile.defense * multiplier);
@@ -29,4 +31,4 @@ export function createHabitatMonster(id: string): MonsterDefinition | undefined 
 }
 
 export const HABITAT_MONSTERS = Object.entries(HABITAT_MONSTER_PROFILES).flatMap(([id, profile]) =>
-  Array.from({ length: 10 }, (_, index) => createHabitatMonster(`${id}-${profile.rank}-lvl-${index + 1}`)!));
+  Array.from({ length: LEVEL_LIMITS[id as keyof typeof LEVEL_LIMITS] }, (_, index) => createHabitatMonster(`${id}-${profile.rank}-lvl-${index + 1}`)!));

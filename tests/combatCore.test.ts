@@ -91,14 +91,17 @@ try {
   boss.enemy.stats.hp = boss.enemy.stats.maxHp / 2 + 1;
   assert.notEqual(enemyTurn(boss).enemy.phase, 2);
   boss.enemy.stats.hp = boss.enemy.stats.maxHp / 2;
-  const phase = enemyTurn(boss); assert.equal(phase.enemy.phase, 2); assert.equal(phase.lastEvent!.action, "CAST_MAGIC");
+  const phase = enemyTurn(boss); assert.equal(phase.enemy.phase, 2); assert.equal(phase.lastEvent!.action, "ATTACK");
   assert.ok(phase.enemy.stats.magicPower > boss.enemy.stats.magicPower);
   const again = enemyTurn(phase); assert.equal(again.enemy.stats.attack, phase.enemy.stats.attack);
   assert.equal(again.lastEvent!.action, "ATTACK");
+  boss.enemy.stats.hp = Math.floor(boss.enemy.stats.maxHp * .3);
+  const magicPhase = enemyTurn(boss);
+  assert.equal(magicPhase.lastEvent!.action, "CAST_MAGIC");
   const resistant = structuredClone(boss); resistant.hero.stats.magicDefense += 20;
-  assert.equal(enemyTurn(resistant).lastEvent!.damage, phase.lastEvent!.damage! - 10);
+  assert.equal(enemyTurn(resistant).lastEvent!.damage, magicPhase.lastEvent!.damage! - 10);
   const weakMagic = structuredClone(boss); weakMagic.enemy.stats.magicPower = 0;
-  assert.ok(enemyTurn(weakMagic).lastEvent!.damage! < phase.lastEvent!.damage!);
+  assert.ok(enemyTurn(weakMagic).lastEvent!.damage! < magicPhase.lastEvent!.damage!);
   for (const id of ["hobgoblin-elite-lvl-10", "orc-king-boss-lvl-15", "orc-king-boss-lvl-25"]) {
     assert.deepEqual(createDemoMonster(id), createInitialBattleState("mago", id).enemy);
   }

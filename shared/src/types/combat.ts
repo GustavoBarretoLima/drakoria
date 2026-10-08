@@ -40,6 +40,7 @@ export interface CombatantState {
   treeRanks?: TreeRanks;
   ongoingDamage?: { damage: number; turns: number; name: string };
   weakenedTurns?: number;
+  skillLockedTurns?: number;
 }
 
 export interface BattleRewards {

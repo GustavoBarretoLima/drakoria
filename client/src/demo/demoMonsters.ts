@@ -104,7 +104,7 @@ function parseDemoMonster(monsterId: string): CombatantState | null {
   if (normalMatch) {
     const family = normalMatch[1] as "goblin" | "orc";
     const level = Number(normalMatch[2]);
-    if (level >= 1 && level <= 15) {
+    if (level >= 1 && level <= 35) {
       return createScaledDemoMonster(family, level);
     }
   }
@@ -124,7 +124,7 @@ function createScaledRewards(monsterId: string): BattleRewards | null {
   const normalMatch = /^(goblin|orc)-normal-lvl-(\d+)$/.exec(monsterId);
   if (normalMatch) {
     const level = Number(normalMatch[2]);
-    if (level >= 1 && level <= 15) {
+    if (level >= 1 && level <= 35) {
       const multiplier = getEarlyDungeonMultiplier(level);
       return {
         xp: Math.max(1, Math.floor(15 * multiplier)),

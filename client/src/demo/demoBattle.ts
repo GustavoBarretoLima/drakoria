@@ -1,4 +1,4 @@
-import { applyBattleAction as applyHeroAction, applyEnemyTurn } from "../../../shared/src/combat/combatEngine.js";
+import { applyBattleAction as applyHeroAction, applyEnemyTurn, tickHeroDamage } from "../../../shared/src/combat/combatEngine.js";
 import { hasMonsterInsight } from "../../../shared/src/equipment/monsterInsight.js";
 import { createStatsForLevel, normalizeHeroLevel } from "../../../shared/src/combat/classStats.js";
 import { applySubclassStats } from "../../../shared/src/classes/subclasses.js";
@@ -148,6 +148,8 @@ export function useDemoConsumable(itemId: DemoConsumableId): boolean {
   const recoveredMana = hero.stats.mana - beforeMana;
   if (recoveredHp <= 0 && recoveredMana <= 0) return false;
 
+  const statusMessage = tickHeroDamage(hero);
+  hero.skillLockedTurns = Math.max(0, (hero.skillLockedTurns ?? 0) - 1);
   const itemName = itemId === "healthPotion"
     ? "Poção de HP"
     : itemId === "manaPotion"
@@ -157,15 +159,18 @@ export function useDemoConsumable(itemId: DemoConsumableId): boolean {
   battleState = {
     ...battleState,
     hero,
-    turnOwnerId: null,
+    turnOwnerId: hero.isAlive ? null : battleState.enemy.id,
+    finished: !hero.isAlive,
+    ...(!hero.isAlive ? { winnerId: battleState.enemy.id } : {}),
     lastEvent: {
       actorId: hero.id,
       targetId: hero.id,
       action: "DEFEND",
       special: itemName,
-      message: `${hero.name} usou ${itemName}.${recoveredHp > 0 ? ` +${recoveredHp} HP.` : ""}${recoveredMana > 0 ? ` +${recoveredMana} MP.` : ""}`,
+      message: `${statusMessage}${hero.name} usou ${itemName}.${recoveredHp > 0 ? ` +${recoveredHp} HP.` : ""}${recoveredMana > 0 ? ` +${recoveredMana} MP.` : ""}`,
     },
   };
+  if (battleState.finished) stopAtbLoop();
   emitState();
   return true;
 }
