@@ -44,7 +44,7 @@ const fortress = WORLD_REGIONS["fortaleza-rei-orc"].config;
 let run = createDungeonRun(fortress.id);
 for (let i = 0; i < 5; i++) run = recordDungeonVictory(fortress, run, "hobgoblin-normal-lvl-10");
 const boss = pickDungeonRunEncounter(fortress, run);
-assert.equal(boss.monsterId, "orc-king-boss-lvl-20");
+assert.equal(boss.monsterId, "orc-king-boss-lvl-55");
 assert.equal(boss.danger, true);
 assert.ok(getMonsterById(boss.monsterId));
 assert.equal(createDemoMonster(boss.monsterId).id, boss.monsterId);

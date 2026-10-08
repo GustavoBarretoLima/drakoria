@@ -4,6 +4,7 @@ import type {
 } from "../types/combat.js";
 import { isBattleAction, type BattleAction } from "./actions.js";
 import { CLASS_SKILLS, getHeroSkills, getSkill, getSkillBlockReason, getSkillCooldown } from "./classSkills.js";
+import type { CombatantState } from "../types/combat.js";
 import { SUBCLASS_SKILLS } from "../classes/skillTrees.js";
 
 function randomInt(min: number, max: number) {
@@ -71,6 +72,7 @@ export function applyBattleAction(
   if (state.turnOwnerId !== state.hero.id) return state;
   if (!state.hero.isAlive || !state.enemy.isAlive) return state;
 
+  if (action.type === "CAST_MAGIC" && (state.hero.skillLockedTurns ?? 0) > 0) return state;
   const selectedSkill = action.type === "USE_SKILL" ? getHeroSkills(state.hero).find(skill => skill.id === action.skillId) ?? getSkill(action.skillId) : undefined;
   // Rejected skills leave mana, ATB, cooldowns and the current turn untouched.
   if (action.type === "USE_SKILL" && (!selectedSkill || getSkillBlockReason(state.hero, selectedSkill))) return state;
@@ -78,6 +80,10 @@ export function applyBattleAction(
   const hero = { ...state.hero, stats: { ...state.hero.stats }, atb: 0 };
   const enemy = { ...state.enemy, stats: { ...state.enemy.stats } };
 
+  const statusMessage = tickHeroDamage(hero);
+  if (!hero.isAlive) return { ...state, hero, enemy, finished: true, winnerId: enemy.id, turnOwnerId: enemy.id,
+    lastEvent: { actorId: enemy.id, targetId: hero.id, action: "CAST_MAGIC", message: statusMessage } };
+  hero.skillLockedTurns = Math.max(0, (hero.skillLockedTurns ?? 0) - 1);
   let event: BattleEvent;
 
   switch (action.type) {
@@ -239,6 +245,7 @@ export function applyBattleAction(
     }
     if (selectedSkill) hero.skillCooldowns[selectedSkill.id] = selectedSkill.cooldown;
   }
+  event.message = statusMessage + event.message;
   const finished = !enemy.isAlive;
 
   return {
@@ -290,7 +297,12 @@ export function applyEnemyTurn(state: BattleState): BattleState {
   enemy.weakenedTurns = Math.max(0, (enemy.weakenedTurns ?? 0) - 1);
   const cooldown = enemy.specialCooldown ?? 0;
   enemy.specialCooldown = Math.max(0, cooldown - 1);
-  const special = !enemy.charging && cooldown === 0 && Math.random() < (elite ? 0.4 : boss ? 0.45 : 0.25);
+  const regionAbility = enemy.id.startsWith("corruption-hydra-boss-") ? { name: "Névoa Venenosa", effect: "Veneno" }
+    : enemy.id.startsWith("mutant-wolf-boss-") ? { name: "Ferida Dilacerante", effect: "Sangramento" }
+    : enemy.id.startsWith("orc-warlord-boss-") ? { name: "Quebra-osso", effect: "Quebra-osso" }
+    : orcKing ? { name: "Lâmina Sangrenta", effect: "Sangramento" } : undefined;
+  const regionalSpecial = Boolean(regionAbility && enemy.stats.hp <= enemy.stats.maxHp * .3 && cooldown === 0);
+  const special = regionAbility ? regionalSpecial : !enemy.charging && cooldown === 0 && Math.random() < (elite ? 0.4 : boss ? 0.45 : 0.25);
   // Elite telegraphs its armor-piercing strike for a full hero response window.
   if (elite && special) {
     enemy.charging = true;
@@ -300,9 +312,9 @@ export function applyEnemyTurn(state: BattleState): BattleState {
         message: `${prefix}${enemy.name} ergue o escudo e prepara uma estocada perfurante. Defenda-se!` } };
   }
   const ambush = elite && enemy.charging === true;
-  const usesMagic = orcKing ? enemy.phase === 2 && special : special && enemy.stats.magicPower > 0;
-  const ability = ambush ? "Estocada Perfurante" : special ? usesMagic ? "Magia Sombria" : "Golpe Poderoso" : undefined;
-  if (ambush || special) enemy.specialCooldown = boss && enemy.phase === 2 ? 1 : 2;
+  const usesMagic = regionalSpecial || (special && !regionAbility && enemy.stats.magicPower > 0);
+  const ability = regionalSpecial ? regionAbility!.name : ambush ? "Estocada Perfurante" : special ? usesMagic ? "Magia Sombria" : "Golpe Poderoso" : undefined;
+  if (ambush || special) enemy.specialCooldown = regionalSpecial ? 2 : boss && enemy.phase === 2 ? 1 : 2;
   enemy.charging = false;
   const dodged = rollDodge(hero.stats.dodgeChance);
   const critical = !dodged && rollCritical(enemy.stats.criticalChance);
@@ -315,6 +327,10 @@ export function applyEnemyTurn(state: BattleState): BattleState {
   hero.isAlive = hero.stats.hp > 0;
   // A missed hit preserves a defensive stance until an actual hit lands.
   if (!dodged) hero.defending = false;
+  if (regionalSpecial && !dodged && hero.isAlive) {
+    if (regionAbility!.effect === "Quebra-osso") hero.skillLockedTurns = 2;
+    else hero.ongoingDamage = { damage: Math.max(1, Math.floor(enemy.stats.magicPower * .2)), turns: 3, name: regionAbility!.effect };
+  }
   const event: BattleEvent = {
     actorId: enemy.id, targetId: hero.id, action: usesMagic ? "CAST_MAGIC" : "ATTACK",
     damage, critical, dodged,
@@ -322,6 +338,20 @@ export function applyEnemyTurn(state: BattleState): BattleState {
     message: dodged ? `${prefix}${hero.name} esquivou de ${ability ?? "ataque"} de ${enemy.name}.`
       : `${prefix}${critical ? "CRITICO! " : ""}${enemy.name} usou ${ability ?? "ataque básico"} e causou ${damage} de dano.`,
   };
+  if (regionalSpecial && !dodged && hero.isAlive) event.message += regionAbility!.effect === "Quebra-osso"
+    ? " Habilidades bloqueadas por duas ações." : ` ${regionAbility!.effect} por três ações.`;
   return { ...state, hero, enemy, finished: !hero.isAlive,
     ...(!hero.isAlive ? { winnerId: enemy.id } : {}), turnOwnerId: !hero.isAlive ? enemy.id : null, lastEvent: event };
+}
+
+/** Damage effects advance once per accepted hero action, never on rejected commands. */
+export function tickHeroDamage(hero: CombatantState): string {
+  const effect = hero.ongoingDamage;
+  if (!effect || effect.turns <= 0) return "";
+  const damage = Math.min(hero.stats.hp, effect.damage);
+  hero.stats.hp = Math.max(0, hero.stats.hp - damage);
+  hero.isAlive = hero.stats.hp > 0;
+  if (effect.turns > 1) hero.ongoingDamage = { ...effect, turns: effect.turns - 1 };
+  else delete hero.ongoingDamage;
+  return `${effect.name} causou ${damage} de dano. `;
 }

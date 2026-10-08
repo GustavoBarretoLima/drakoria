@@ -55,11 +55,11 @@ Já implementado:
 
 | Local | Níveis dos monstros | Encontros |
 |---|---|---|
-| Acampamento Orc | 1–10 | Goblin e Orc, 50% cada |
-| Cemitério Esquecido | 1–10; boss 10 | Esqueleto Guerreiro e Espectro do Cemitério; boss Coveiro Maldito |
-| Pântano Corrompido | 1–10; boss 10 | Rato Mutante e Aranha Pestilenta; boss Hidra da Corrupção |
-| Floresta Sombria | 1–10; boss 10 | Lobo Sombrio e Árvore Demoníaca; boss Lobo Mutante |
-| Fortaleza do Rei Orc | 10–15; boss 20 | Hobgoblin normal 80%, elite 20%; Orc Rei após cinco vitórias |
+| Acampamento Orc | 25–35; boss 40 | Goblin e Orc; boss Senhor da Guerra Orc |
+| Cemitério Esquecido | 1–10; boss 15 | Esqueleto Guerreiro e Espectro do Cemitério; boss Coveiro Maldito |
+| Pântano Corrompido | 10–20; boss 25 | Rato Mutante e Aranha Pestilenta; boss Hidra da Corrupção |
+| Floresta Sombria | 15–30; boss 35 | Lobo Sombrio e Árvore Demoníaca; boss Lobo Mutante |
+| Fortaleza do Rei Orc | 35–50; boss 55 | Hobgoblin normal 80%, elite 20%; Orc Rei após cinco vitórias |
 
 O menu da praça abre `pages/mapa.html`, usando a imagem em `img/mapas/arredores_de_drakoria.png`. Os locais têm botões sobre o mapa e uma lista acessível para telas pequenas. Drakoria retorna à praça. Ruínas da Vigília permanece sem encontros.
 
@@ -85,7 +85,7 @@ Cada habitat tem sua arena de batalha. No desktop, monstros comuns aparecem um p
 | Brinco | Brinco de Bravura | Brinco de Safira | Brinco do Falcão |
 | Colar | Medalhão do Guardião | Amuleto da Sabedoria | Pingente do Caçador |
 
-Cada peça existe por nível (1–25) e qualidade: Recruta (comum), Veterano (incomum), Elite (raro), Soberano (épico). O nível exigido é exatamente o do monstro derrotado. Armadura de placas e arma corpo a corpo são exclusivas do Guerreiro; Mago usa tecido e cajado; Arqueiro usa couro e arco. Joias também possuem versões específicas por classe. Os nove slots e as três classes têm chances iguais por drop, sem favorecer a classe que derrotou o monstro.
+Cada peça existe por nível (1–55) e qualidade: Recruta (comum), Veterano (incomum), Elite (raro), Soberano (épico). O nível exigido é exatamente o do monstro derrotado. Armadura de placas e arma corpo a corpo são exclusivas do Guerreiro; Mago usa tecido e cajado; Arqueiro usa couro e arco. Joias também possuem versões específicas por classe. Os nove slots e as três classes têm chances iguais por drop, sem favorecer a classe que derrotou o monstro.
 
 | Encontro | Chance de equipamento | Raridade após o drop |
 |---|---|---|
@@ -249,9 +249,9 @@ Inimigos alternam ataques básicos com especiais (25% de chance, dois turnos
 inimigos de cooldown). Hobgoblin Elite tem 40% de chance de preparar uma
 emboscada: ergue o escudo e anuncia o ataque; no próximo turno usa uma estocada
 com 35% de dano extra e ignora metade da defesa. A postura defensiva do herói
-continua eficaz. O Orc Rei tem 45% de chance de especial; aos 50% de vida entra
-uma única vez em fúria (+30% ataque, +25% defesa e +15% poder mágico). Na fase 2
-seu especial vira Magia Sombria e o cooldown cai para um turno inimigo.
+continua eficaz. O Orc Rei entra uma única vez em fúria aos 50% de vida
+(+30% ataque, +25% defesa e +15% poder mágico). Sua magia de sangramento
+é liberada aos 30% de HP, com intervalo de três ações inimigas.
 Especiais inimigas não consomem mana, sendo limitadas pelo cooldown.
 
 O painel da Praça usa os atributos compartilhados e inclui esquiva/crítico;
@@ -343,3 +343,10 @@ As novas ações incluem cura, proteção, drenagem de vida, sacrifício de HP, 
 O desenho foi inspirado na combinação de habilidades e talentos passivos das [especializações de Guild Wars 2](https://help.guildwars2.com/hc/en-us/articles/4417183530387-Using-Elite-Specializations) e nas opções de construção de personagem descritas pela [Blizzard para Diablo IV](https://news.blizzard.com/en-us/article/23938756/make-sanctuary-yoursplay-your-way-in-diablo-iv). Nomes, números e árvores são próprios do Drakoria.
 
 Validação: `npm test`, `npx tsc --noEmit` e `npm run build`. `tests/subclassSkillTrees.test.ts` cobre as nove árvores, 27 habilidades, pré-requisitos, orçamento, livros, persistência, redistribuição, efeitos, vitórias por dano contínuo, paridade demo/backend e botão no status. O teste de habilidades também verifica as novas ações no menu de batalha.
+
+
+### Habilidades dos bosses regionais
+
+Após perderem 70% da vida (HP igual ou inferior a 30% do máximo), os bosses abaixo usam uma magia a cada três ações do inimigo: Hidra da Corrupção aplica Veneno, Lobo Mutante aplica Sangramento, Senhor da Guerra Orc aplica Quebra-osso e Orc Rei aplica Sangramento. O Coveiro Maldito mantém sua IA anterior.
+
+Veneno e Sangramento causam dano nas próximas três ações válidas do jogador. Quebra-osso impede habilidades e magia por duas ações; ataque básico, defesa e itens continuam disponíveis. Comandos rejeitados não avançam os efeitos. Esquivar da magia evita seu efeito. A fase 2 do Orc Rei continua aos 50% de HP, com bônus aplicados uma única vez; a magia de sangramento começa aos 30%.

@@ -21,7 +21,7 @@ for (const monster of DUNGEON_MONSTERS) {
   for (const path of Object.values(monster.sprites)) assert.ok(existsSync(`.${path}`), path);
 }
 assert.equal(new Set(listMonsters().map(m => m.id)).size, listMonsters().length);
-for (const id of ["mutant-rat-normal-lvl-0", "mutant-rat-normal-lvl-11", "skeleton-warrior-normal-lvl-11", "hobgoblin-normal-lvl-9", "hobgoblin-elite-lvl-16", "orc-king-boss-lvl-14", "orc-king-boss-lvl-26"]) assert.equal(createDungeonMonster(id), undefined);
+for (const id of ["mutant-rat-normal-lvl-0", "mutant-rat-normal-lvl-21", "skeleton-warrior-normal-lvl-11", "hobgoblin-normal-lvl-9", "hobgoblin-elite-lvl-51", "orc-king-boss-lvl-14", "orc-king-boss-lvl-56"]) assert.equal(createDungeonMonster(id), undefined);
 for (const level of [10, 15]) {
   const normal = getMonsterById(`hobgoblin-normal-lvl-${level}`)!;
   const elite = getMonsterById(`hobgoblin-elite-lvl-${level}`)!;
@@ -54,7 +54,7 @@ try {
   for (const monster of DUNGEON_MONSTERS) {
     Math.random = () => 0;
     const drops = rollMonsterDrops(monster.id);
-    assert.equal(drops.length, monster.rank === "boss" ? 2 : 1);
+    assert.equal(drops.length, monster.id.startsWith("orc-king-boss-") ? 2 : 1);
     assert.equal(drops[0]!.item.level, monster.level);
     assert.ok(DUNGEON_LOOT_ITEMS[drops[0]!.item.id]);
     Math.random = () => 0.99;
@@ -97,11 +97,11 @@ assert.ok(!panel.innerHTML.includes("Trono do Orc Rei"));
 for (const names of Object.values(DUNGEON_EQUIPMENT_NAMES)) for (const name of Object.values(names)) assert.ok(panel.innerHTML.includes(name));
 
 for (const [key, species, min, max] of [
-  ["iniciante", ["goblin", "orc"], 1, 10],
+  ["iniciante", ["goblin", "orc"], 25, 35],
   ["cemiterio", ["skeleton-warrior", "cemetery-specter"], 1, 10],
-  ["pantano", ["mutant-rat", "pestilent-spider"], 1, 10],
-  ["floresta", ["shadow-wolf", "demonic-tree"], 1, 10],
-  ["avancada", ["hobgoblin"], 10, 15],
+  ["pantano", ["mutant-rat", "pestilent-spider"], 10, 20],
+  ["floresta", ["shadow-wolf", "demonic-tree"], 15, 30],
+  ["avancada", ["hobgoblin"], 35, 50],
 ] as const) {
   for (const random of [0, 0.49, 0.99]) {
     values.delete("drakoriaDungeonRun");
@@ -129,7 +129,7 @@ for (const entry of ["entrarDungeonOrc1a5", "entrarDungeonOrc5a15", "entrarMiniB
 }
 
 const legacy = pickDungeonEncounter(DUNGEON_CONFIG.iniciante!, () => 0);
-assert.ok(legacy.monsterId.startsWith("goblin-normal-lvl-1"));
+assert.ok(legacy.monsterId === "goblin-normal-lvl-25");
 
 Object.defineProperty(globalThis, "localStorage", { value: storage, configurable: true });
 values.set("classeHeroi", "mago"); values.set("drakoriaProgresso", JSON.stringify({ nivel: 25 }));

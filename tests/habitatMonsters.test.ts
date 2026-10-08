@@ -17,7 +17,7 @@ for (const monster of HABITAT_MONSTERS) {
   assert.deepEqual(getDemoMonsterRewards(monster.id), { xp: monster.xpReward, gold: monster.goldReward });
   for (const sprite of Object.values(monster.sprites)) assert.ok(existsSync(`.${sprite}`), sprite);
 }
-for (const id of ["corruption-hydra-normal-lvl-10", "pestilent-spider-boss-lvl-1", "mutant-wolf-boss-lvl-11", "cemetery-specter-normal-lvl-0"]) assert.equal(createHabitatMonster(id), undefined);
+for (const id of ["corruption-hydra-normal-lvl-10", "pestilent-spider-boss-lvl-1", "mutant-wolf-boss-lvl-36", "cemetery-specter-normal-lvl-0"]) assert.equal(createHabitatMonster(id), undefined);
 
 const originalRandom = Math.random;
 try {
@@ -41,11 +41,12 @@ try {
       run = recordDungeonVictory(config, run, encounter.monsterId);
     }
     const boss = pickDungeonRunEncounter(config, run);
-    assert.equal(boss.monsterId, `${config.bossMonster}-boss-lvl-10`);
+    assert.equal(boss.monsterId, `${config.bossMonster}-boss-lvl-${config.bossLevel}`);
     assert.equal(boss.danger, true);
     const state = createInitialBattleState("guerreiro", boss.monsterId);
     state.turnOwnerId = state.enemy.id;
     state.hero.stats.hp = state.hero.stats.maxHp = 10000;
+    state.enemy.stats.hp = Math.floor(state.enemy.stats.maxHp * .3);
     const special = applyEnemyTurn(state);
     assert.ok(special.lastEvent?.special);
     assert.ok(special.enemy.specialCooldown! > 0);
