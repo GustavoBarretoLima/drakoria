@@ -3,6 +3,31 @@ import { loadProgress } from "../progression/progressionClient.js";
 import type { HeroClass } from "../../../shared/src/types/equipment.js";
 import type { EquipmentDrop, EquipmentItem, EquipmentSlot } from "../../../shared/src/types/equipment.js";
 
+import { createAssassinDaggers } from "../../../shared/src/equipment/assassinWeapons.js";
+import { createDungeonEquipment } from "../../../shared/src/loot/dungeonLoot.js";
+import { SUBCLASS_DEFINITIONS, type SubclassId } from "../../../shared/src/classes/subclasses.js";
+
+function inventorySubclass(): SubclassId | undefined {
+  try { const id = JSON.parse(localStorage.getItem("drakoriaSubclassProgress") || "{}").activeSubclass as SubclassId;
+    return SUBCLASS_DEFINITIONS[id]?.baseClass === inventoryHeroClass() ? id : undefined;
+  } catch { return undefined; }
+}
+function reconcileAssassin(inventory: InventoryState, grantStarter = false): boolean {
+  if (inventorySubclass() !== "assassin") return false;
+  const weapon = inventory.items.find(entry => entry.item.id === inventory.equipped.weapon)?.item;
+  if (weapon?.requiredSubclass === "assassin") return false;
+  if (!weapon && !grantStarter) return false;
+  if (weapon && (weapon.slot !== "weapon" || !weapon.allowedClasses.includes("arqueiro"))) return false;
+  const daggers = createAssassinDaggers(weapon ?? createDungeonEquipment("arqueiro", "weapon", 1, "common"));
+  if (!inventory.items.some(entry => entry.item.id === daggers.id)) inventory.items.push({ item: daggers, quantity: 1 });
+  inventory.equipped.weapon = daggers.id;
+  return true;
+}
+export function ensureAssassinEquipment(grantStarter = false): void {
+  const inventory = loadInventory();
+  if (reconcileAssassin(inventory, grantStarter)) saveInventory(inventory);
+}
+
 const INVENTORY_KEY = "drakoriaInventario";
 
 export interface InventoryEntry {
@@ -26,10 +51,12 @@ export function loadInventory(): InventoryState {
 
   try {
     const parsed = JSON.parse(saved) as Partial<InventoryState>;
-    return {
+    const inventory = {
       items: Array.isArray(parsed.items) ? parsed.items.map(entry => ({ ...entry, item: canonicalEquipment(entry.item) })) : [],
       equipped: parsed.equipped ?? {},
     };
+    if (reconcileAssassin(inventory)) saveInventory(inventory);
+    return inventory;
   } catch {
     return cloneInventory(EMPTY_INVENTORY);
   }
@@ -63,7 +90,7 @@ export function addDropsToInventory(drops: EquipmentDrop[] = []): InventoryState
 export function equipItem(itemId: string): InventoryState {
   const inventory = loadInventory();
   const entry = inventory.items.find((candidate) => candidate.item.id === itemId);
-  if (!entry || !canEquipItem(entry.item, inventoryHeroClass(), loadProgress().nivel)) return inventory;
+  if (!entry || !canEquipItem(entry.item, inventoryHeroClass(), loadProgress().nivel, inventorySubclass())) return inventory;
 
   inventory.equipped[entry.item.slot] = itemId;
   saveInventory(inventory);
@@ -81,7 +108,7 @@ export function getEquippedItems(): EquipmentItem[] {
   const inventory = loadInventory();
   const equippedIds = new Set(Object.values(inventory.equipped));
   return inventory.items
-    .filter((entry) => equippedIds.has(entry.item.id) && canEquipItem(entry.item, inventoryHeroClass(), loadProgress().nivel))
+    .filter((entry) => equippedIds.has(entry.item.id) && canEquipItem(entry.item, inventoryHeroClass(), loadProgress().nivel, inventorySubclass()))
     .map((entry) => entry.item);
 }
 

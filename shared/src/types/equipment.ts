@@ -55,6 +55,7 @@ export interface EquipmentItem {
   rarity: EquipmentRarity;
   level: number;
   allowedClasses: Array<HeroClass | "universal">;
+  requiredSubclass?: import("../classes/subclasses.js").SubclassId;
   stats: EquipmentStats;
   uniqueEffect?: UniqueEffect;
   eventType?: EventType;

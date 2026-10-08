@@ -48,6 +48,7 @@ function inventoryUxEscape(value) {
 }
 
 function inventoryUxLoad() {
+  window.ensureAssassinEquipment?.();
   try {
     const parsed = JSON.parse(localStorage.getItem(INVENTORY_UX_KEY) || "{}");
     return {
@@ -82,12 +83,17 @@ function inventoryUxCanEquip(item) {
     : ["universal"];
   const legacyWarriorOnly = ["orc-iron-axe", "orc-iron-chest", "orc-warlord-sword", "orc-warlord-chest", "orc-warlord-gloves", "weapon-universal-legendary-natal-lvl-100"].includes(item.id);
   const universalSlot = ["ring", "earring", "necklace"].includes(item.slot);
-  const classAllowed = legacyWarriorOnly ? heroClass === "guerreiro" : item.id === "goblin-hide-gloves" ? heroClass !== "mago" : allowed.includes(heroClass) || (universalSlot && allowed.includes("universal"));
+  let classAllowed = legacyWarriorOnly ? heroClass === "guerreiro" : item.id === "goblin-hide-gloves" ? heroClass !== "mago" : allowed.includes(heroClass) || (universalSlot && allowed.includes("universal"));
+  let subclass;
+  try { subclass = JSON.parse(localStorage.getItem("drakoriaSubclassProgress") || "{}").activeSubclass; } catch {}
+  if (item.requiredSubclass && (heroClass !== "arqueiro" || subclass !== item.requiredSubclass)) classAllowed = false;
+  if (heroClass === "arqueiro" && subclass === "assassin" && item.slot === "weapon" && item.requiredSubclass !== "assassin") classAllowed = false;
   const levelAllowed = heroLevel >= Math.max(1, Number(item.level || 1));
   return { allowed: classAllowed && levelAllowed, classAllowed, levelAllowed };
 }
 
 function inventoryUxClassesLabel(item) {
+  if (item.requiredSubclass === "assassin") return "Assassino";
   const warriorOnly = ["orc-iron-axe", "orc-iron-chest", "orc-warlord-sword", "orc-warlord-chest", "orc-warlord-gloves", "weapon-universal-legendary-natal-lvl-100"].includes(item.id);
   if (warriorOnly) return "Guerreiro";
   if (item.id === "goblin-hide-gloves") return "Guerreiro, Arqueiro";

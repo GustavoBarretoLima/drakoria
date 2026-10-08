@@ -3,6 +3,7 @@ import { createStatsForLevel, normalizeHeroLevel } from "../../../../shared/src/
 import { applyEquipmentStats } from "../../../../shared/src/equipment/equipmentStats.js";
 import { applySubclassStats, type SubclassId } from "../../../../shared/src/classes/subclasses.js";
 import { applyTreeStats, normalizeTreeRanks } from "../../../../shared/src/classes/skillTrees.js";
+import { adaptSubclassWeaponDrops } from "../../../../shared/src/equipment/assassinWeapons.js";
 import { rollMonsterDrops } from "../../../../shared/src/loot/lootTables.js";
 import { rollSubclassBookDrops } from "../../../../shared/src/loot/subclassBooks.js";
 import type {
@@ -116,7 +117,7 @@ export function createInitialBattleState(
     rewards: {
       xp: monster.xpReward,
       gold: monster.goldReward,
-      drops: rollMonsterDrops(monster.id),
+      drops: adaptSubclassWeaponDrops(rollMonsterDrops(monster.id), subclassId),
       classBooks: rollSubclassBookDrops(monster.id, Math.random, heroName),
     },
     revealEnemyStats: hasMonsterInsight(equippedItems, heroLevel),

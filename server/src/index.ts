@@ -52,6 +52,7 @@ function resolveEquippedItems(
   ids: string[] | undefined,
   heroClass: HeroClass,
   heroLevel: number,
+  subclassId?: SubclassId,
 ): EquipmentItem[] {
   if (!Array.isArray(ids)) return [];
 
@@ -62,7 +63,7 @@ function resolveEquippedItems(
     const item = getEquipmentById(id) ?? STARTER_LOOT_ITEMS[id];
     if (!item || seenSlots.has(item.slot)) continue;
 
-    if (!canEquipItem(item, heroClass, heroLevel)) continue;
+    if (!canEquipItem(item, heroClass, heroLevel, subclassId)) continue;
 
     seenSlots.add(item.slot);
     items.push(item);
@@ -176,6 +177,7 @@ io.on("connection", (socket) => {
         payload.equippedItemIds,
         className,
         heroLevel,
+        subclassId,
       );
 
       try {

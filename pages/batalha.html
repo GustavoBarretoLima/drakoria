@@ -161,22 +161,16 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
 
-    <script>
+    <script type="module">
+      import { getHeroGifs } from "../client/src/assets/gifs.ts";
+      import { getActiveSubclass } from "../client/src/progression/subclassClient.ts";
       const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
       const classeHeroiTexto =
         localStorage.getItem("classeHeroiTexto") || "Classe";
-      const pastasHeroi = {
-        guerreiro: { masculino: "heroi_anime", feminino: "guerreira_anime" },
-        mago: { masculino: "mago_anime", feminino: "maga_anime" },
-        arqueiro: { masculino: "elfo_anime", feminino: "elfa_anime" },
-      };
-      const classe = (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase();
-      const genero = (localStorage.getItem("generoHeroi") || "masculino").toLowerCase();
-      let activeSubclass;
-      try { activeSubclass = JSON.parse(localStorage.getItem("drakoriaSubclassProgress") || "{}").activeSubclass; } catch {}
-      const pasta = classe === "guerreiro" && activeSubclass === "berserker"
-        ? "berserk_primal" : pastasHeroi[classe]?.[genero] || "heroi_anime";
-      const imagemHeroi = `../img/personagens/${pasta}/idle.gif`;
+      const rawClass = (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase();
+      const classe = ["guerreiro", "mago", "arqueiro"].includes(rawClass) ? rawClass : "guerreiro";
+      const genero = (localStorage.getItem("generoHeroi") || "masculino").toLowerCase() === "feminino" ? "Feminino" : "Masculino";
+      const imagemHeroi = getHeroGifs(classe, genero, getActiveSubclass(classe)).padrao;
       localStorage.setItem("imagemHeroi", imagemHeroi);
 
       if (imagemHeroi) {

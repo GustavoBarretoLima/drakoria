@@ -86,6 +86,7 @@ function useBook(subclassId) {
       <p>As passivas da árvore de habilidades são liberadas depois, ao distribuir pontos no botão Subclasse da tela de status.</p>
     </section>
     <p>A escolha é permanente e consome um livro. A escolha não restaura vida ou mana.</p>
+    ${subclassId === "assassin" ? "<p>Seu arco ficará na mochila e adagas equivalentes serão equipadas, preservando nível, raridade e bônus. Sem arma equipada, você receberá adagas iniciais.</p>" : ""}
     <p class="subclass-preview-message" role="alert"></p>
     <div class="painel-acoes"><button type="button" data-preview-cancel>Voltar aos livros</button>
       <button type="button" data-preview-confirm>Usar livro e escolher ${escapeHtml(definition.name)}</button></div>`;
