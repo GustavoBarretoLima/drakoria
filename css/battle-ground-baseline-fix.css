@@ -292,3 +292,49 @@
     bottom: -20px;
   }
 }
+
+/* Position refinement after device testing. */
+@media (min-width: 901px) {
+  /* Shift both combatants deeper into the arena while preserving the shared baseline. */
+  #batalha .campo {
+    padding-left: clamp(70px, 8vw, 150px);
+    padding-right: clamp(6px, 1vw, 18px);
+  }
+
+  #batalha .heroi {
+    transform: translateX(clamp(34px, 4vw, 72px));
+  }
+
+  #batalha .inimigo {
+    margin-right: 0;
+    transform: translateX(clamp(16px, 2vw, 34px));
+  }
+
+  /* Hero status follows the hero instead of remaining detached on the far right. */
+  #batalha .heroi-status {
+    position: absolute;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    top: calc(100% + 18px);
+    transform: translateX(-50%);
+    width: min(260px, 22vw);
+    min-width: 220px;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Keep the hero HUD fully inside the viewport; the previous edge alignment could clip it. */
+  #batalha .heroi-status {
+    left: 14px;
+    right: auto;
+    width: min(58vw, 230px);
+    min-width: 0;
+    transform: none;
+  }
+
+  /* Nudge the hero slightly right so artwork and HUD read as one unit. */
+  #batalha .heroi {
+    transform: translateX(4px);
+  }
+}
