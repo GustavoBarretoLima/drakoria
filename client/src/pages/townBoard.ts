@@ -10,10 +10,10 @@ import { syncCharacterVitals } from "../progression/heroStats.js";
 import { enterWorldRegion } from "../battle/worldMapNavigation.js";
 declare global {interface Window {abrirMissoes:()=>void;abrirLoja:()=>void;fecharPainelPraca?:()=>void;}}
 const esc=(value:string)=>value.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll('"',"&quot;");
-function panel(){const p=document.getElementById("painelPraca");p?.classList.remove("hidden");return p;}
+function panel(){const p=document.getElementById("painelPraca")??document.getElementById("painelGuilda");p?.classList.remove("hidden");return p;}
 export function openQuestBoard(message=""):void{
  const p=panel();if(!p)return;const progress=loadProgress(),quests=loadQuests();
- p.innerHTML=`<section class="town-board"><div class="panel-header"><div><span class="panel-kicker">Guilda dos Aventureiros</span><h2>Quadro de Missões</h2></div><strong>Nível ${progress.nivel}</strong></div><p>Aceite antes de explorar. Entregue recompensas na praça. Bosses conduzem a campanha; contratos de caça e coleta podem ser aceitos novamente após a entrega.</p><p role="status" aria-live="polite">${esc(message)}</p>${Object.entries(WORLD_REGIONS).map(([id,{config}])=>`<section><h3>${config.label} • Nv. ${config.minLevel}–${config.maxLevel}</h3><div class="town-card-grid">${QUESTS.filter(q=>q.region===id).map(q=>{
+ p.innerHTML=`<section class="town-board"><div class="panel-header"><div><span class="panel-kicker">Guilda dos Aventureiros</span><h2>Quadro de Missões</h2></div><strong>Nível ${progress.nivel}</strong></div><p>Aceite antes de explorar. Entregue recompensas na guilda. Bosses conduzem a campanha; contratos de caça e coleta podem ser aceitos novamente após a entrega.</p><p role="status" aria-live="polite">${esc(message)}</p>${Object.entries(WORLD_REGIONS).map(([id,{config}])=>`<section><h3>${config.label} • Nv. ${config.minLevel}–${config.maxLevel}</h3><div class="town-card-grid">${QUESTS.filter(q=>q.region===id).map(q=>{
  const entry=quests.entries[q.id],block=questBlockReason(q,quests,progress.nivel),ready=entry?.status==="active"&&entry.count>=q.target;
  return `<article class="town-card"><span>${q.repeatable?"Contrato repetível":"Campanha • única"}</span><h4>${q.name}</h4><p>${q.description}</p><p><strong>${entry?.status==="active"?`${entry.count}/${q.target}`:entry?.status==="claimed"?"Entregue":"Não aceita"}</strong>${entry?.claims?` • Entregas: ${entry.claims}`:""}</p><p>Recompensa: ${q.xp} XP • ${q.gold} ouro${q.gear?` • Arma épica Nv.${q.gear} da sua classe`:""}</p>${ready?`<button data-claim="${q.id}">Receber recompensa</button>`:entry?.status==="active"?`<button data-explore="${id}">Explorar região</button>`:`<button data-accept="${q.id}" ${block?"disabled":""}>${block??(entry?.claims?"Aceitar novamente":"Aceitar missão")}</button>`}</article>`;
  }).join("")}</div></section>`).join("")}<div class="painel-acoes"><button data-close>Fechar</button></div></section>`;
@@ -34,4 +34,4 @@ export function openPotionShop(message=""):void{
 }
 // Classic city scripts assign their placeholders first; modules replace them after parsing.
 if(typeof window!=="undefined")window.addEventListener("DOMContentLoaded",()=>{window.abrirMissoes=()=>openQuestBoard();window.abrirLoja=()=>openPotionShop();
- const params=new URLSearchParams(window.location.search);if(params.has("loja"))openPotionShop();else if(params.has("guilda")||params.has("missoes"))openQuestBoard();});
+ const params=new URLSearchParams(window.location.search);if(params.has("loja"))openPotionShop();else if(params.has("guilda")||params.has("missoes"))window.location.replace(`${import.meta.env.BASE_URL}pages/estabelecimentos.html#guilda`);});
