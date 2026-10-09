@@ -1,3 +1,4 @@
+import { ART_EQUIPMENT_ITEMS } from "../../../../shared/src/loot/namedMonsterLoot.js";
 import { DUNGEON_LOOT_ITEMS } from "../../../../shared/src/loot/dungeonLoot.js";
 import type {
   EquipmentItem,
@@ -11,7 +12,7 @@ import { createBerserkAxe } from "../../../../shared/src/equipment/berserkWeapon
 import { createAssassinDaggers } from "../../../../shared/src/equipment/assassinWeapons.js";
 import { STARTER_LOOT_ITEMS } from "../../../../shared/src/loot/lootTables.js";
 
-const EQUIPMENT_CATALOG = [...Object.values(DUNGEON_LOOT_ITEMS), ...generateEquipmentCatalog()];
+const EQUIPMENT_CATALOG = [...Object.values(ART_EQUIPMENT_ITEMS), ...Object.values(DUNGEON_LOOT_ITEMS), ...generateEquipmentCatalog()];
 
 export interface EquipmentFilters {
   level?: number;

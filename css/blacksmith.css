@@ -1,0 +1,14 @@
+.blacksmith-shop { box-sizing:border-box; min-height:100dvh; padding:clamp(16px,4vw,48px); background:linear-gradient(#152733ee,#0a1724f2); color:#e7f4ff; font-family:system-ui,sans-serif; }
+.blacksmith-shop header { display:flex; justify-content:space-between; align-items:center; gap:16px; }
+.blacksmith-shop nav { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0; }
+.blacksmith-shop button,.blacksmith-back { border:1px solid #739eb8; background:#1b3a50; color:#eaf6ff; padding:10px 14px; border-radius:6px; cursor:pointer; }
+.blacksmith-shop button[aria-pressed=true] { background:#305a74; border-color:#efd595; }
+.blacksmith-shop button:disabled { opacity:.45; cursor:default; }
+.blacksmith-shop button:focus-visible { outline:3px solid #f4d080; outline-offset:3px; }
+.blacksmith-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:16px; }
+.blacksmith-card { padding:16px; background:#16364c; border:1px solid #5b96c1; border-radius:10px; }
+.blacksmith-card .equipment-art { display:flex; margin:0 auto; width:96px; height:96px; }
+.blacksmith-card .equipment-art img { width:96px; height:96px; }
+.blacksmith-card p { line-height:1.6; font-size:14px; }
+.blacksmith-card button { width:100%; }
+.blacksmith-back { display:inline-block; margin-top:24px; text-decoration:none; }

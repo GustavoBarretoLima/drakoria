@@ -1,0 +1,15 @@
+.equipment-art { position:relative; display:inline-flex; align-items:center; justify-content:center; flex:0 0 56px; width:56px; height:56px; overflow:hidden; border-radius:8px; }
+.equipment-art img { width:56px; height:56px; object-fit:contain; }
+.jrpg-sheet .inventory-slot:has(> .equipment-art) { grid-template-columns:56px minmax(0,1fr) auto; }
+.jrpg-sheet .inventory-slot > .equipment-art { grid-column:1; grid-row:1 / span 4; }
+.jrpg-sheet .inventory-slot:has(> .equipment-art) > .inventory-slot-index { display:none; }
+.jrpg-sheet .rarity-common { background-color:#b9c8d00b; border-left-color:#c4cbd2; }
+.jrpg-sheet .rarity-uncommon { background-color:#3baa6410; border-left-color:#75b88c; }
+.jrpg-sheet .rarity-rare { background-color:#3d9feb15; border-left-color:#64baff; }
+.jrpg-sheet .rarity-epic { background-color:#9b65da18; border-left-color:#b796ef; }
+.jrpg-sheet .rarity-legendary { background-color:#e6b14218; border-left-color:#ffd16e; }
+.jrpg-sheet .rarity-mythic { background:linear-gradient(100deg,#972c3835,#17354bcc); border-left-color:#ee8795; box-shadow:inset 0 0 14px #df72841a; }
+.mythic-art::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.6; background:radial-gradient(circle at 20% 30%,#ffecd2 0 1px,transparent 3px),radial-gradient(circle at 78% 65%,#fff4e0 0 1px,transparent 3px),radial-gradient(circle at 55% 88%,#ffd7d3 0 1px,transparent 3px); animation:mythic-motes 4s ease-in-out infinite alternate; }
+@keyframes mythic-motes { from { transform:translateY(4px); opacity:.2; } to { transform:translateY(-6px); opacity:.7; } }
+@media(prefers-reduced-motion:reduce) { .mythic-art::after { animation:none; opacity:.4; } }
+#painelPraca .jrpg-sheet .rarity-mythic { background:linear-gradient(100deg,#972c3835,#17354bcc); border-left-color:#ee8795; box-shadow:inset 0 0 14px #df72841a; }

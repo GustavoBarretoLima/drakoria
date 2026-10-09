@@ -1,4 +1,4 @@
-import type { EquipmentItem } from "../types/equipment.js";
+import type { EquipmentItem } from "../../../shared/src/types/equipment.js";
 
 export const NOVOS_EQUIPAMENTOS: EquipmentItem[] = [
   {

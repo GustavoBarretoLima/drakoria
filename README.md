@@ -424,3 +424,21 @@ As poções de atributos duram três ações do herói após o uso e não acumul
 Categorias e potências usam como referência as [poções oficiais de Diablo II](https://classic.battle.net/diablo2exp/items/potions.shtml). Os preços são próprios do Drakoria, ajustados à economia existente. A estrutura regional tem como referência os [eventos de Guild Wars 2](https://www.guildwars2.com/en/the-game/dynamic-events/).
 
 Demo e backend compartilham catálogo, validação de estoque e efeitos. O backend recebe o inventário local no setup e desconta itens aceitos por batalha; não há conta ou inventário persistente autenticado no servidor. Missões e compras usam o save local existente. Os testes `potionShop.test.ts` e `regionalQuests.test.ts` cobrem compras, efeitos, duração, recusas, paridade, aceitação, progressão, entregas e duplicações.
+
+### Ferreiro e equipamentos temáticos dos monstros
+
+O ferreiro vende as 27 peças dos conjuntos Leão Rubro, Constelação Arcana e Falcão Verde (nove espaços por classe). São raras de nível 20, a 408 ouro cada; venda rende 102 ouro. Compras vão à mochila, preservam cópias e exigem um espaço livre para uma nova entrada. Restrições de nível/classe continuam na equipagem; armas compradas são adaptadas para Berserk/Assassino quando aplicável.
+
+Os 16 equipamentos de `img/itens/loot_monstros` foram registrados no catálogo compartilhado e no servidor. Cada monstro correspondente tem uma rolagem temática adicional, independente do equipamento genérico e dos livros. Chances por abate seguem a proposta: Goblin/Rato/Hobgoblin 3%; Esqueleto/Orc/Aranha/Espectro/Lobo Sombrio 2%; Árvore 1%; Hobgoblin Elite 6%; Senhor da Guerra 8%; Hidra/Coveiro/Lobo Mutante 3%; Rei Orc tem rolagens separadas de 3% para machado e 2% para medalhão.
+
+O nível e os atributos da peça temática acompanham o nível do monstro (1–55), corrigindo requisitos propostos que impediam drops nas regiões atuais. Após ocorrer o drop, a raridade usa estas chances condicionais:
+
+| Origem | Comum | Raro | Épico | Lendário | Mítico |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Comum | 70% | 22% | 6% | 1,8% | 0,2% |
+| Elite | 35% | 45% | 17% | 2,5% | 0,5% |
+| Boss | 15% | 45% | 30% | 9% | 1% |
+
+Míticos recebem +5 extras de ataque físico, poder mágico nas peças de Mago ou defesa física em acessórios universais, já incluídos nos stats. Descrições explicam o bônus. A mochila e os equipamentos exibem os ícones; raridades têm cores discretas e míticos recebem fundo levemente vermelho e partículas suaves. A animação respeita a preferência de movimento reduzido. Faca exige Assassino, machado do Rei exige Berserk e duas mãos. O servidor reconstrói atributos dos IDs registrados, incluindo variantes de subclasse.
+
+`artEquipment.test.ts` cobre catálogo, imagens, associação de drops, raridades, bônus, validação canônica, subclasses e compras; a suíte completa inclui os drops genéricos e as regras de inventário anteriores.
