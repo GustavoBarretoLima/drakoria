@@ -29,3 +29,8 @@ button:focus-visible, a:focus-visible, .map-scroll:focus-visible { outline: 3px 
   .region-choices button { font-size: .9rem; min-height: 48px; padding: 8px; }
   .map-panel { padding: 12px; }
 }
+
+#regionMissions { padding:12px; margin:12px 0; background:#0c252e99; border:1px solid #796646; border-radius:8px; }
+#regionMissions a { color:#ffe4a5; }
+.expedition-receipt summary { cursor:pointer; color:#ffe4a5; }
+.expedition-receipt p { overflow-wrap:anywhere; }

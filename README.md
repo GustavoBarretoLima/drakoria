@@ -462,3 +462,15 @@ O nível e os atributos da peça temática acompanham o nível do monstro (1–5
 Míticos recebem +5 extras de ataque físico, poder mágico nas peças de Mago ou defesa física em acessórios universais, já incluídos nos stats. Descrições explicam o bônus. A mochila e os equipamentos exibem os ícones; raridades têm cores discretas e míticos recebem fundo levemente vermelho e partículas suaves. A animação respeita a preferência de movimento reduzido. Faca exige Assassino, machado do Rei exige Berserk e duas mãos. O servidor reconstrói atributos dos IDs registrados, incluindo variantes de subclasse.
 
 `artEquipment.test.ts` cobre catálogo, imagens, associação de drops, raridades, bônus, validação canônica, subclasses e compras; a suíte completa inclui os drops genéricos e as regras de inventário anteriores.
+
+### Painel e resumo da expedição
+
+Na batalha, o painel compacto mostra a região e as vitórias até o boss. Abra-o para consultar profundidade, XP e ouro acumulados e a missão acompanhada. Os níveis, encontros, drops e pontos de aparecimento dos bosses continuam os mesmos.
+
+Ao liberar o boss, a tela de vitória pausa a exploração: **Enfrentar o boss** inicia o confronto, **Voltar ao mapa** encerra a expedição, e **Retornar à cidade** leva à praça. Em **Preparação**, todas as nove poções de recuperação podem ser usadas a partir do estoque real da mochila; curativos e bônus continuam exclusivos do combate. Recursos são preservados ao prosseguir. As opções de saída permanecem na barra inferior da preparação.
+
+O resumo acumulado inclui XP, ouro, equipamentos (com raridade/nível) e livros obtidos em combate. Ele não entrega recompensas novamente e rejeita o mesmo identificador de batalha. A entrega de missões da Guilda não entra nesse total. Ao retornar ou sofrer derrota, o último resumo fica disponível no mapa; valores exibidos são ganhos brutos, com penalidades de derrota aplicadas separadamente pelas regras atuais. Uma nova exploração inicia uma contagem nova, mantendo o último recibo até a próxima saída.
+
+No mapa, cada região informa níveis, boss, vitórias necessárias, missões ativas e entregas pendentes, além de um atalho para a Guilda. Saves de expedições anteriores continuam válidos; recompensas acumuladas começam a ser registradas após esta atualização, sem tentar reconstruir drops antigos.
+
+`tests/expedition.test.ts` cobre as cinco regiões, totais e agrupamento de loot, duplicações, preparação de boss, preservação de recursos, arquivamento, derrota, novas expedições e saves antigos. `tests/victoryNavigation.test.ts` também valida a preparação, consumo de poção e exclusividade das ações de saída/continuação. Demo e backend usam o mesmo registro no cliente e as regras compartilhadas de dungeon.
