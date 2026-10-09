@@ -1,7 +1,7 @@
 body.has-city-sidebar { --city-sidebar-width:190px; margin:0; overflow-x:hidden; }
-.city-sidebar { position:fixed; inset:16px auto 16px 12px; z-index:60; box-sizing:border-box; width:calc(var(--city-sidebar-width) - 20px); display:flex; flex-direction:column; gap:8px; padding:12px; overflow-y:auto; border:1px solid #b9a06c; border-radius:10px; background:linear-gradient(160deg,#142b3aee,#0b1825f2); box-shadow:0 8px 24px #0006; font-family:system-ui,sans-serif; }
-.city-sidebar a { display:flex; align-items:center; min-height:44px; box-sizing:border-box; padding:10px; border:1px solid #7191a366; border-radius:6px; color:#eef5fa; background:#28465c80; text-decoration:none; font-size:14px; line-height:1.4; overflow-wrap:anywhere; }
-.city-sidebar a:hover { background:#395c72; border-color:#dac18d; }
+.city-sidebar { position:fixed; inset:16px auto 16px 12px; z-index:60; box-sizing:border-box; width:calc(var(--city-sidebar-width) - 20px); display:flex; flex-direction:column; gap:8px; padding:12px; overflow-y:auto; border:2px solid #d4af37; border-radius:12px; background:rgba(20,20,20,.9); box-shadow:0 0 12px #ffb43759; font-family:"Cinzel",serif; }
+.city-sidebar a { display:flex; align-items:center; min-height:44px; box-sizing:border-box; padding:10px; border:1px solid #d4af37; border-radius:8px; color:#fff; background:linear-gradient(180deg,#444,#222); text-decoration:none; font-size:14px; line-height:1.4; overflow-wrap:anywhere; }
+.city-sidebar a:hover { background:linear-gradient(180deg,#666,#333); color:#ffd700; border-color:#d4af37; }
 .city-sidebar a:focus-visible { outline:3px solid #f0d08b; outline-offset:2px; }
 body.has-city-sidebar #painelPraca { position:fixed; inset:50% auto auto calc(var(--city-sidebar-width) + (100vw - var(--city-sidebar-width)) / 2); transform:translate(-50%,-50%); box-sizing:border-box; width:min(1180px,calc(100vw - var(--city-sidebar-width) - 24px)); max-height:calc(100dvh - 32px); overflow:auto; }
 body.has-city-sidebar .blacksmith-shop, body.has-city-sidebar .taberna-interior { width:calc(100% - var(--city-sidebar-width)); margin-left:var(--city-sidebar-width); }
@@ -16,3 +16,11 @@ body.has-city-sidebar .taberna-interior { left:0; }
   body.has-city-sidebar .blacksmith-shop, body.has-city-sidebar .taberna-interior { padding:12px; }
   body.has-city-sidebar .blacksmith-shop header, body.has-city-sidebar .panel-header { flex-wrap:wrap; }
 }
+.city-window-toolbar { position:sticky; top:0; z-index:50; display:flex; justify-content:flex-end; padding:8px; margin-bottom:12px; border-bottom:1px solid #d4af3766; border-radius:6px; background:#16120ff2; box-shadow:0 4px 12px #0004; }
+.city-window-toolbar button { min-height:44px; padding:8px 18px; border:1px solid #d4af37; border-radius:8px; background:linear-gradient(180deg,#444,#222); color:#fff; font:inherit; cursor:pointer; }
+.city-window-toolbar button:hover { color:#ffd700; background:linear-gradient(180deg,#666,#333); }
+.city-window-toolbar button:focus-visible { outline:3px solid #f0d08b; outline-offset:2px; }
+#painelPraca button[data-close], #painelPraca button[onclick="fecharPainelPraca()"] { display:none; }
+body.has-city-sidebar .taberna-interior { height:100dvh; overflow-y:auto; }
+.city-sidebar a { gap:6px; }
+.city-sidebar a > span { flex:0 0 auto; }
