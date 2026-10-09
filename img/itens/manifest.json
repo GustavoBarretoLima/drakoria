@@ -1,0 +1,66 @@
+[
+  {
+    "id": "goblin-hide-gloves",
+    "icon": "/img/itens/complementares/goblin-hide-gloves.png"
+  },
+  {
+    "id": "goblin-tooth-ring",
+    "icon": "/img/itens/complementares/goblin-tooth-ring.png"
+  },
+  {
+    "id": "goblin-shadow-ring",
+    "icon": "/img/itens/complementares/goblin-shadow-ring.png"
+  },
+  {
+    "id": "orc-iron-axe",
+    "icon": "/img/itens/complementares/orc-iron-axe.png"
+  },
+  {
+    "id": "orc-iron-chest",
+    "icon": "/img/itens/complementares/orc-iron-chest.png"
+  },
+  {
+    "id": "orc-warlord-axe",
+    "icon": "/img/itens/complementares/orc-warlord-axe.png"
+  },
+  {
+    "id": "orc-warlord-sword",
+    "icon": "/img/itens/complementares/orc-warlord-sword.png"
+  },
+  {
+    "id": "orc-warlord-bow",
+    "icon": "/img/itens/complementares/orc-warlord-bow.png"
+  },
+  {
+    "id": "orc-warlord-staff",
+    "icon": "/img/itens/complementares/orc-warlord-staff.png"
+  },
+  {
+    "id": "orc-warlord-chest",
+    "icon": "/img/itens/complementares/orc-warlord-chest.png"
+  },
+  {
+    "id": "orc-warlord-shield",
+    "icon": "/img/itens/complementares/orc-warlord-shield.png"
+  },
+  {
+    "id": "orc-warlord-ring",
+    "icon": "/img/itens/complementares/orc-warlord-ring.png"
+  },
+  {
+    "id": "orc-warlord-gloves",
+    "icon": "/img/itens/complementares/orc-warlord-gloves.png"
+  },
+  {
+    "id": "weapon-universal-legendary-natal-lvl-100",
+    "icon": "/img/itens/complementares/weapon-universal-legendary-natal-lvl-100.png"
+  },
+  {
+    "id": "ring-universal-legendary-pascoa-lvl-100",
+    "icon": "/img/itens/complementares/ring-universal-legendary-pascoa-lvl-100.png"
+  },
+  {
+    "id": "orc-king-eye-of-truth",
+    "icon": "/img/itens/complementares/orc-king-eye-of-truth.png"
+  }
+]

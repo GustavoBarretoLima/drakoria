@@ -3,13 +3,42 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Batalha - Drakoria</title>
-    <script type="module" crossorigin src="/assets/batalha-B9JWgc6K.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="stylesheet" crossorigin href="/assets/batalha-csCH2DMe.css">
+    <title>Batalha - Drakoria</title>
+    <script type="module" crossorigin src="/drakoria/assets/batalha-ix0TQr8j.js"></script>
+    <link rel="modulepreload" crossorigin href="/drakoria/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/drakoria/assets/heroVitals-Bi6d7zM4.js">
+    <link rel="modulepreload" crossorigin href="/drakoria/assets/worldMapNavigation-Dv7bsLTc.js">
+    <link rel="modulepreload" crossorigin href="/drakoria/assets/spriteBounds-NzQTT07P.js">
+    <link rel="modulepreload" crossorigin href="/drakoria/assets/expedition-COszMERk.js">
+    <link rel="modulepreload" crossorigin href="/drakoria/assets/potionIcons-CN3H3oza.js">
+    <link rel="stylesheet" crossorigin href="/drakoria/assets/batalha-7exELcBk.css">
+    <link rel="stylesheet" crossorigin href="/drakoria/assets/responsive-C6lUKH0I.css">
   </head>
   <body>
     <section id="batalha" style="position: relative">
+      <div
+        id="demoModeBanner"
+        hidden
+        style="
+          position: absolute;
+          top: 16px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1000;
+          max-width: min(90vw, 620px);
+          padding: 8px 14px;
+          border: 1px solid rgba(255, 204, 0, 0.65);
+          border-radius: 8px;
+          background: rgba(0, 0, 0, 0.78);
+          color: #ffdd66;
+          font-size: 0.9rem;
+          text-align: center;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.45);
+        "
+      >
+        Modo demo — progresso salvo neste navegador.
+      </div>
+
       <div class="fire-overlay"></div>
       <div class="heat-overlay"></div>
       <div class="embers">
@@ -23,78 +52,115 @@
         <span style="left: 89%; animation-delay: 1.8s"></span>
       </div>
 
+      <div id="battleTimeline" class="battle-timeline" aria-label="Ordem de ação">
+        <div id="timelineHero" class="timeline-marker hero" title="Herói">H</div>
+        <div id="timelineEnemy" class="timeline-marker enemy" title="Inimigo">E</div>
+      </div>
+
       <div class="campo">
-        <!-- Herói -->
         <div class="heroi">
-          <img id="heroiBatalha" src="" alt="Herói" class="heroi-img" />
+          <div class="sprite-frame"><img id="heroiBatalha" src="" alt="Herói" class="heroi-img" /></div>
           <div class="status heroi-status">
             <h2 id="nomeHeroi">Herói</h2>
             <p>Classe: <span id="classeHeroi">Classe</span></p>
+            <p>Nível: <span id="nivelHeroi"></span></p>
             <div class="barra">
               <div id="hpHeroiBar" class="hp" style="width: 100%">
-                <span id="hpHeroiTexto">100/100</span>
+                <span id="hpHeroiTexto">Vida</span>
               </div>
             </div>
             <div class="barra">
               <div id="manaHeroiBar" class="mana" style="width: 100%">
-                <span id="manaHeroiTexto">50/50</span>
+                <span id="manaHeroiTexto">Mana</span>
+              </div>
+            </div>
+            <div class="barra">
+              <div
+                id="atbHeroiBar"
+                class="mana"
+                style="width: 0%; background: linear-gradient(90deg, #d6c46a, #fff2a8)"
+              >
+                <span id="atbHeroiTexto">ATB</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Inimigo -->
         <div class="inimigo">
+          <div class="sprite-frame">
           <img
             id="inimigoBatalha"
-            src="/assets/goblin-C6an_ATQ.png"
-            alt="Goblin Anime"
+            src="/drakoria/assets/goblin-C6an_ATQ.png"
+            alt="Inimigo"
             class="inimigo-img"
           />
+          </div>
           <div class="status inimigo-status">
-            <h2 id="nomeInimigo">Goblin</h2>
+            <h2 id="nomeInimigo">Inimigo</h2>
+            <div id="atributosInimigo" hidden>
+              <p>Visão da Verdade</p>
+              <p>Ataque: <span id="ataqueInimigo"></span></p>
+              <p>Defesa: <span id="defesaInimigo"></span></p>
+              <p>Poder Mágico: <span id="magiaInimigo"></span></p>
+              <p>Esquiva: <span id="esquivaInimigo"></span></p>
+              <p>Defesa Mágica: <span id="defesaMagicaInimigo"></span></p>
+              <p>Velocidade: <span id="velocidadeInimigo"></span></p>
+              <p>Mana: <span id="manaInimigo"></span></p>
+              <p>Chance crítica: <span id="criticoInimigo"></span></p>
+              <p>Dano crítico: <span id="danoCriticoInimigo"></span></p>
+            </div>
             <div class="barra">
               <div id="hpInimigoBar" class="hp" style="width: 100%">
-                <span id="hpInimigoTexto">60/60</span>
+                <span id="hpInimigoTexto">Vida</span>
+              </div>
+            </div>
+            <div class="barra">
+              <div
+                id="atbInimigoBar"
+                class="mana"
+                style="width: 0%; background: linear-gradient(90deg, #d6c46a, #fff2a8)"
+              >
+                <span id="atbInimigoTexto">ATB</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Ações -->
-      <div class="acoes">
-        <button id="btnAtacar">Atacar</button>
-        <button id="btnDefender">Defender</button>
-        <button id="btnMagia">Magia</button>
-        <button id="btnFugir">Fugir</button>
+      <div id="battleCommandDock" class="battle-command-dock">
+        <div class="battle-command-feedback">
+          <div id="mensagens" role="status" aria-live="polite"></div>
+          <div id="indicadorTurno" class="indicador-turno">ATB carregando...</div>
+        </div>
+        <div id="comandosBatalha" class="acoes">
+          <button id="btnAtacar">Atacar</button>
+          <button id="btnDefender">Defender</button>
+          <button id="btnHabilidades" aria-expanded="false" aria-controls="painelHabilidades" hidden>Habilidades</button>
+          <button id="btnItens" aria-expanded="false" aria-controls="painelItens" hidden>Itens</button>
+          <button id="btnFugir">Fugir</button>
+        </div>
+        <section id="painelHabilidades" class="battle-skill-menu" aria-labelledby="tituloHabilidades" hidden>
+          <header class="battle-skill-heading">
+            <h3 id="tituloHabilidades">Habilidades</h3>
+            <button id="btnVoltarHabilidades" type="button">◀ Voltar</button>
+          </header>
+          <div id="habilidadesClasse" class="battle-skill-list"></div>
+          <p id="descricaoHabilidade" class="battle-skill-description"></p>
+        </section>
+        <section id="painelItens" class="battle-item-menu" aria-labelledby="tituloItens" hidden>
+          <header class="battle-item-heading">
+            <h3 id="tituloItens">Itens</h3>
+            <button id="btnVoltarItens" type="button">◀ Voltar</button>
+          </header>
+          <div id="itensBatalha" class="battle-item-list"></div>
+        </section>
       </div>
-
-      <div id="mensagens"></div>
-      <div id="indicadorTurno" class="indicador-turno">Seu turno</div>
     </section>
 
     <div id="praca"></div>
 
-    <!-- Anime.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-
-    <!-- Script para carregar dados do herói -->
-    <script>
-      // Recupera dados do personagem do localStorage
-      const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
-      const classeHeroiTexto =
-        localStorage.getItem("classeHeroiTexto") || "Classe";
-      const imagemHeroi = localStorage.getItem("imagemHeroi");
-
-      // Atualiza elementos da batalha
-      if (imagemHeroi) {
-        document.getElementById("heroiBatalha").src = imagemHeroi;
-      }
-      document.getElementById("nomeHeroi").textContent = nomeHeroi;
-      document.getElementById("classeHeroi").textContent = classeHeroiTexto;
-    </script>
-
-    <!-- Seu script principal -->
+
+
   </body>
 </html>

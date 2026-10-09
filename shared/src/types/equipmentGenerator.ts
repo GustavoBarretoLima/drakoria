@@ -185,7 +185,7 @@ function createEventItems(): EquipmentItem[] {
         description: "Ao atacar, tem chance de causar dano luminoso adicional.",
         trigger: "onAttack",
       },
-      icon: "/img/itens/eventos/natal-lamina-estelar.png",
+      icon: "/img/itens/complementares/weapon-universal-legendary-natal-lvl-100.png",
       sellPrice: 5000,
     },
     {
@@ -210,7 +210,7 @@ function createEventItems(): EquipmentItem[] {
           "Ao receber dano fatal, tem chance de restaurar parte da vida.",
         trigger: "onDamageTaken",
       },
-      icon: "/img/itens/eventos/pascoa-anel-dourado.png",
+      icon: "/img/itens/complementares/ring-universal-legendary-pascoa-lvl-100.png",
       sellPrice: 5000,
     },
   ];
