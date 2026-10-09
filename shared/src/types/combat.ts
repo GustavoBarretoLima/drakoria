@@ -32,6 +32,7 @@ export interface CombatantState {
   atb: number;
   defending: boolean;
   isAlive: boolean;
+  potionBuff?: {stat:"attack"|"defense"|"magicPower"|"speed";amount:number;turns:number};
   phase?: number;
   specialCooldown?: number;
   charging?: boolean;
@@ -70,6 +71,7 @@ export interface BattleEvent {
 }
 
 export interface BattleState {
+  potions?: import("../items/potions.js").PotionInventory;
   id: string;
   hero: CombatantState;
   enemy: CombatantState;

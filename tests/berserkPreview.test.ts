@@ -1,9 +1,10 @@
+import { isTestCharacter } from "../shared/src/testing/testCharacter.js";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 import vm from "node:vm";
 import { createStatsForLevel } from "../shared/src/combat/classStats.js";
 import { applySubclassStats, SUBCLASS_DEFINITIONS, SUBCLASS_IDS } from "../shared/src/classes/subclasses.js";
-import { useSubclassBook } from "../client/src/progression/subclassClient.js";
+import { resetTestCharacterSubclass, useSubclassBook } from "../client/src/progression/subclassClient.js";
 
 const storage = new Map<string, string>();
 const localStorage = { getItem: (key: string) => storage.get(key) ?? null, setItem: (key: string, value: string) => storage.set(key, value) };
@@ -15,9 +16,9 @@ const panel = { innerHTML: "", scrollTop: 99, classList: { remove() {}, add() {}
 const current = createStatsForLevel("guerreiro", 20);
 current.attack += 50; // Preview includes equipped attack, rather than class defaults alone.
 let syncs = 0;
-const context = vm.createContext({ localStorage, window: {}, document: { getElementById: () => panel },
+const context = vm.createContext({ isTestCharacter, localStorage, window: {}, document: { getElementById: () => panel },
   SUBCLASS_DEFINITIONS, SUBCLASS_IDS, applySubclassStats, useSubclassBook, SPRITE_BOUNDS: {},
-  getCurrentHeroStats: () => current, syncCharacterVitals: () => syncs++,
+  resetTestCharacterSubclass, getSubclassPreviewStats: () => current, getCurrentHeroStats: () => current, syncCharacterVitals: () => syncs++,
   getHeroGifs: (_: string, gender: string, id?: string) => ({ padrao: `img/personagens/${id === "berserker" ? "berserk_primal" : gender === "Feminino" ? "guerreira_anime" : "heroi_anime"}/idle.gif` }) });
 const code = readFileSync("js/subclass-books.js", "utf8").replace(/import[\s\S]*?from\s+"[^"]+";/g, "");
 vm.runInContext(code, context);
@@ -50,3 +51,16 @@ for (const action of ["idle", "attack", "damage", "death"]) {
  assert.ok(existsSync(`img/personagens/berserk_primal/${action}.gif`));
 }
 console.log("Berserk preview: equipped stats, penalties, portraits, cancellation, confirmation, duplicate clicks and class restrictions passed.");
+
+seed(); storage.set("nomeHeroi", "Taichou"); storage.set("classeHeroi", "mago");
+vm.runInContext('useBook("berserker")', context);
+assert.ok(panel.innerHTML.includes("classe base será ajustada"));
+handlers["[data-preview-confirm]"]!({currentTarget:{}});
+assert.equal(storage.get("classeHeroi"),"guerreiro");
+assert.ok(panel.innerHTML.includes("data-admin-reset"));
+handlers["[data-admin-reset]"]!();
+assert.equal(JSON.parse(storage.get("drakoriaSubclassProgress")!).activeSubclass,undefined);
+assert.ok(!panel.innerHTML.includes("data-admin-reset"));
+seed(); storage.set("drakoriaSubclassProgress",JSON.stringify({books:{berserker:1},activeSubclass:"paladin"}));
+vm.runInContext('openSubclassBooks()',context);
+assert.ok(!panel.innerHTML.includes("data-admin-reset"));

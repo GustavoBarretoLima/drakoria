@@ -204,6 +204,7 @@ try {
   // Battle setup parity, saved loadouts, resource reset and immutable consumable actions.
   storage.set("drakoriaProgresso", '{"nivel":100}');
   storage.set("drakoriaSubclassProgress", JSON.stringify({ books: {}, activeSubclass: "berserker", berserkTreeVersion: 2, treeRanks: full, equippedSkills: ["berserker-brutal"] }));
+  storage.set("drakoriaConsumables", JSON.stringify({healthPotion:2,manaPotion:0,restorativePotion:0}));
   let demo!: BattleState; subscribeDemoBattle(state => { demo = state; }); startDemoBattle("guerreiro", "goblin-normal-lvl-1", 100);
   const server = createInitialBattleState("guerreiro", "goblin-normal-lvl-1", [axe], 100, { hp: demo.hero.stats.hp, mana: demo.hero.stats.mana }, "berserker", "Heroi", full, ["berserker-brutal"]);
   assert.deepEqual(demo.hero.stats, server.hero.stats); assert.deepEqual(demo.hero.equippedSkills, server.hero.equippedSkills);

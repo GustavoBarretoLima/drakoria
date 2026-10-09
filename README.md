@@ -354,7 +354,11 @@ Veneno e Sangramento causam dano nas próximas três ações válidas do jogador
 
 ### Berserk — Fúria e três caminhos
 
-Despertar é gratuito e conta como 1 ponto nos requisitos. Os 18 nós de habilidades têm grau único e custam 1 ponto: Carnificina, Fúria Primal e Sangue de Ferro exigem 1, 3, 5, 8, 12 e 16 pontos totais por patamar, além do nó anterior do caminho. Só uma final é permitida. Com esses requisitos, a final exige aprender os 15 nós não finais e fica disponível a partir do nível 17. Na cidade, equipam-se até quatro ativas, com espaços vazios permitidos. Passivas aprendidas permanecem aplicadas. A batalha recebe uma cópia da build; demo e backend validam os mesmos requisitos.
+Despertar é gratuito. Os 18 nós de habilidades têm grau único e custam 1 ponto: os caminhos Carnificina, Fúria Primal e Sangue de Ferro progridem independentemente nos níveis 1, 3, 5, 8, 12 e 15, exigindo apenas o nó anterior do mesmo caminho. Não é necessário aprender os outros 15 talentos para escolher uma final: um caminho completo custa seis pontos e sua final exige nível 15. Só uma final é permitida, mas talentos dos demais caminhos podem ser aprendidos. Na cidade, equipam-se até quatro ativas, com espaços vazios permitidos. Passivas aprendidas permanecem aplicadas. A batalha recebe uma cópia da build; demo e backend validam os mesmos requisitos. IDs, custos, efeitos e builds anteriormente válidas são preservados.
+
+Carnificina reúne golpes físicos, sangramento e Executor; seus atributos opcionais são Força Primal e Impacto Selvagem. Fúria Primal reúne geração de Fúria, velocidade, críticos e Avatar; seus atributos são Ritmo da Fúria e Precisão Brutal. Sangue de Ferro reúne resistência, cura, retaliação e Titã; seus atributos são Corpo de Aço e Armadura de Sangue. A primeira linha de atributos exige apenas o despertar e nível 5; a segunda exige nível 20 e rank 2 no atributo anterior. Atributos têm três ranks e compartilham o orçamento de pontos com habilidades.
+
+A revisão segue a identidade de agressão, geração de recurso e sobrevivência em combate descrita no [Berserker oficial de Guild Wars 2](https://www.guildwars2.com/en-gb/news/meet-the-berserker-warriors-elite-specialization/) e no [resumo do combate](https://www.guildwars2.com/en-gb/news/the-berserker-on-points-of-interest-a-summary/), mantendo machado, Fúria, sangramento e alvo único próprios do Drakoria. `tests/berserkPaths.test.ts` verifica os três caminhos sem investimentos obrigatórios fora deles, níveis, finais, saves, habilidades e paridade demo/backend.
 
 Saves antigos recebem todos os pontos de volta, preservando nível, livros, subclasse e recursos atuais. A arma antiga e a mão secundária voltam para a mochila; um machado exclusivo de duas mãos mantém nível, raridade e bônus da arma original. O escudo não contribui. Sem arma, é concedido um machado de nível 1. A migração não duplica machados ao recarregar. Drops de armas de Guerreiro passam a ser machados para Berserk.
 
@@ -369,7 +373,7 @@ Referência visual e especificação: `img/subclass/arvore_berserk/`. `tests/ber
 
 ### Talentos adicionais de atributos
 
-Todas as nove subclasses têm seis novos talentos (54 no total), com três ranks e custo de um ponto por rank. A primeira linha exige nível 5 e a raiz aprendida; a segunda exige nível 20 e rank 2 no talento anterior da mesma coluna. Os IDs, habilidades, investimentos e ranks antigos são preservados. Pontos continuam sendo um por nível; atributos competem com habilidades pelo mesmo orçamento. No Berserk, talentos de atributos não contam para liberar patamares dos caminhos de habilidades, preservando a exigência das finais.
+Todas as nove subclasses têm seis novos talentos (54 no total), com três ranks e custo de um ponto por rank. A primeira linha exige nível 5 e a raiz aprendida; a segunda exige nível 20 e rank 2 no talento anterior da mesma coluna. Os IDs, habilidades, investimentos e ranks antigos são preservados. Pontos continuam sendo um por nível; atributos competem com habilidades pelo mesmo orçamento. No Berserk, cada caminho usa nível e talento anterior, e os atributos da primeira linha exigem somente despertar e nível 5.
 
 | Subclasse | Foco dos novos talentos |
 | --- | --- |
@@ -386,3 +390,37 @@ Todas as nove subclasses têm seis novos talentos (54 no total), com três ranks
 Força corresponde a ataque físico; magia corresponde a `magicPower`. Bônus de ataque/defesa/HP/mana/magia são percentuais sobre o atributo antes da árvore (já com equipamentos e subclasse), somados sem multiplicação entre talentos. Crítico, dano crítico e esquiva usam pontos percentuais. Valores por rank variam entre 1 e 3; cada nó descreve seu limite. Esquiva continua limitada a 50% e chance crítica a 100%. Novos talentos não adicionam habilidades ao menu de combate. Demo, backend e status usam os mesmos dados.
 
 Referências de identidade: [profissões](https://www.guildwars2.com/en/the-game/professions/) e [especializações](https://heartofthorns.guildwars2.com/game/specializations/) oficiais de Guild Wars 2. Os valores e nomes são próprios do Drakoria, adaptados ao combate com alvo único. `tests/attributeTalents.test.ts` cobre ranks, pré-requisitos, aplicação de bônus, orçamento, preservação de saves e paridade demo/backend.
+
+
+### Taichou — troca de especialização para testes
+
+O personagem de teste Taichou (nome sem distinção de maiúsculas e espaços nas extremidades) tem o botão **Resetar subclasse (ADM)** na tela de livros e na árvore. Resetar limpa a especialização, ranks e habilidades equipadas, devolvendo o orçamento de pontos, sem consumir ou devolver livros. Nível, XP, ouro, itens e livros restantes são preservados. Equipamentos exclusivos incompatíveis voltam à mochila e recursos são ajustados sem cura gratuita.
+
+Após resetar, Taichou pode usar qualquer livro que possua, independentemente da classe atual. A classe base é ajustada à especialização para manter atributos, habilidades, animações e regras de equipamento corretos no status, demo e backend. Equipamentos incompatíveis voltam à mochila; Berserk e Assassino mantêm suas regras de machado/adagas, com arma inicial quando necessário. A prévia de outra classe considera a nova base e equipamentos compatíveis. Os demais personagens continuam com escolha permanente e livros restritos à classe.
+
+`tests/taichouSubclassReset.test.ts` valida as nove escolhas, restrição aos demais personagens, consumo de livros, reset, itens míticos preservados, recursos e paridade demo/backend. A permissão continua sendo a identidade local de teste existente, sem autenticação administrativa adicional.
+
+### Missões regionais e loja de poções
+
+A praça oferece 15 missões nas cinco regiões: contratos repetíveis para cinco derrotas e três equipamentos obtidos em drops, além de uma missão única por boss. Aceite antes de lutar; derrotas, drops anteriores e eventos duplicados não contam. A coleta mantém os equipamentos na mochila. Entregue os bosses em ordem para avançar na campanha de missões. Cada entrega concede XP e ouro; bosses também concedem uma arma épica da classe/subclasse no nível regional do boss. A exploração existente continua disponível conforme suas regras atuais.
+
+A loja mostra preço, efeito e estoque de todos os 16 consumíveis:
+
+| Poção | Ouro | Efeito |
+| --- | ---: | --- |
+| HP / HP Média / HP Grande | 5 / 15 / 35 | 40 / 120 / 300 HP |
+| Mana / Mana Média / Mana Grande | 5 / 15 / 35 | 20 / 60 / 150 mana |
+| Restauradora | 10 | 40 HP e 20 mana |
+| Restauradora Superior | 45 | 50% dos máximos de HP e mana |
+| Elixir | 100 | HP e mana completos |
+| Antídoto | 12 | Remove Veneno |
+| Hemostática | 12 | Remove Sangramento |
+| Purificadora | 20 | Remove dano contínuo e Quebra-osso |
+| Força / Defesa / Arcana | 25 cada | +15% ataque / defesa / poder mágico |
+| Agilidade | 35 | +15% velocidade |
+
+As poções de atributos duram três ações do herói após o uso e não acumulam. Usar um item em combate consome o turno. Curas respeitam o máximo, não ressuscitam e não restauram Fúria. Um uso recusado preserva estoque e turno. Curas também podem ser usadas na loja; curativos e bônus são usados no menu Itens da batalha. Poções básicas continuam a 5 ouro e descanso a 20.
+
+Categorias e potências usam como referência as [poções oficiais de Diablo II](https://classic.battle.net/diablo2exp/items/potions.shtml). Os preços são próprios do Drakoria, ajustados à economia existente. A estrutura regional tem como referência os [eventos de Guild Wars 2](https://www.guildwars2.com/en/the-game/dynamic-events/).
+
+Demo e backend compartilham catálogo, validação de estoque e efeitos. O backend recebe o inventário local no setup e desconta itens aceitos por batalha; não há conta ou inventário persistente autenticado no servidor. Missões e compras usam o save local existente. Os testes `potionShop.test.ts` e `regionalQuests.test.ts` cobrem compras, efeitos, duração, recusas, paridade, aceitação, progressão, entregas e duplicações.

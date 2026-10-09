@@ -3,6 +3,7 @@ import type {
   BattleEvent,
 } from "../types/combat.js";
 import { isBattleAction, type BattleAction } from "./actions.js";
+import { tickPotionBuff } from "../items/potions.js";
 import { CLASS_SKILLS, getHeroSkills, getSkill, getSkillBlockReason, getSkillCooldown } from "./classSkills.js";
 import type { CombatantState } from "../types/combat.js";
 import { SUBCLASS_SKILLS } from "../classes/skillTrees.js";
@@ -258,6 +259,7 @@ export function applyBattleAction(
     if (selectedSkill) hero.skillCooldowns[selectedSkill.id] = selectedSkill.cooldown;
   }
   finishBerserkAction(hero, state.hero, selectedSkill?.id, action.type === "ATTACK" && (event.damage ?? 0) > 0);
+  tickPotionBuff(hero);
   event.message = statusMessage + event.message;
   const finished = !enemy.isAlive;
 

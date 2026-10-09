@@ -41,4 +41,4 @@ for (const id of SUBCLASS_IDS) {
 console.log("Attribute talents: nine identities, 54 talents, percentages, point units, ranks/gates, legacy saves, injured resources and demo/server parity passed.");
 
 const early = { "berserker-brutal":1, "berserker-instinct":1, "berserker-iron":1, "berserker-attribute-0":3, "berserker-attribute-1":3, "berserker-attribute-2":3 };
-assert.ok(treeBlockReason("berserker",100,early,SUBCLASS_TREES.berserker.find(node=>node.id === "berserker-wound")!), "Attributes do not bypass Berserk core gates");
+assert.ok(treeBlockReason("berserker",100,early,SUBCLASS_TREES.berserker.find(node=>node.id === "berserker-wound")!), "Attributes do not bypass the previous skill in the path");
