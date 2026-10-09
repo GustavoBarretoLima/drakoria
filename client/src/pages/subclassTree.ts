@@ -34,16 +34,42 @@ export function openSubclassTree(message = "", focusId?: string): void {
   const state = loadSubclassProgress();
   const learnedSkills = nodes.filter(node => node.skill && ranks[node.id]);
   const loadout = id === "berserker" ? `<section class="berserk-loadout"><h3>Habilidades equipadas</h3><p>Escolha até quatro. Passivas aprendidas permanecem aplicadas. A seleção vale para a próxima batalha.</p><div>${Array.from({ length: 4 }, (_, slot) => `<label>Espaço ${slot + 1}<select data-berserk-slot="${slot}" aria-label="Habilidade do espaço ${slot + 1}"><option value="">Vazio</option>${learnedSkills.map(node => `<option value="${node.id}" ${state.equippedSkills?.[slot] === node.id ? "selected" : ""}>${node.name}</option>`).join("")}</select></label>`).join("")}</div></section>` : "";
-  const treeHtml = id === "berserker" ? `<div class="berserk-root"><strong>Despertar Berserk • Concedido</strong><p>1 ponto gratuito contado nos requisitos. Fúria: 0–100, reinicia por batalha. Acerto básico gera 8; dano direto recebido gera 4. Habilidades exigem machado de duas mãos; mão secundária indisponível. Escolha somente uma final.</p></div>${loadout}
-    <details class="berserk-concept"><summary>Ver arte da árvore</summary><img src="${import.meta.env?.BASE_URL ?? "/"}img/subclass/arvore_berserk/arvore_berserk.png" alt="Conceito da árvore Berserk com três caminhos" loading="lazy" /></details>
-    <div class="subclass-tree berserk-tree">${BERSERK_PATHS.map((path, index) => `<section class="berserk-path berserk-path-${index}"><h3>${path}</h3>${nodes.filter(node => node.path === path).map(nodeHtml).join("")}</section>`).join("")}</div>` : `<div class="subclass-tree" aria-label="Árvore de ${definition.name}">${nodes.map(nodeHtml).join("")}</div>`;
+  const selected = nodes.find(node => node.id === focusId) ?? nodes[0]!;
+  const positions = nodes.map((node, index) => id === "berserker"
+    ? { x: 120 + BERSERK_PATHS.indexOf(node.path as typeof BERSERK_PATHS[number]) * 220, y: 115 + ((node.tier ?? 1) - 1) * 112 }
+    : [{ x: 340, y: 115 }, { x: 200, y: 245 }, { x: 480, y: 245 }, { x: 200, y: 375 }, { x: 480, y: 375 }, { x: 340, y: 505 }][index]!);
+  const height = id === "berserker" ? 740 : 600;
+  const icons = ["⚔", "✦", "⬡", "✧", "❖", "♜"];
+  const lines = nodes.flatMap((node, index) => node.requires.map(req => {
+    const parent = nodes.findIndex(candidate => candidate.id === req.id);
+    if (parent < 0) return "";
+    const from = positions[parent]!, to = positions[index]!;
+    return `<path class="${(ranks[req.id] ?? 0) >= req.rank ? "lit" : ""}" d="M ${from.x} ${from.y} V ${(from.y + to.y) / 2} H ${to.x} V ${to.y}" />`;
+  })).join("");
+  const graph = `<div class="skill-map-scroll"><div class="skill-map" style="height:${height}px">
+    <svg viewBox="0 0 680 ${height}" aria-hidden="true" class="skill-links">${lines}</svg>
+    ${id === "berserker" ? BERSERK_PATHS.map((path, index) => `<h3 class="skill-path-title" style="left:${120 + index * 220}px">${path}</h3>`).join("") : ""}
+    ${nodes.map((node, index) => {
+      const rank = ranks[node.id] ?? 0, reason = treeBlockReason(id, level, ranks, node);
+      return `<button type="button" class="skill-orb ${rank ? "learned" : reason ? "locked" : "available"} ${selected.id === node.id ? "selected" : ""} ${node.final || index === nodes.length - 1 ? "final" : ""}" data-select-node="${node.id}" aria-pressed="${selected.id === node.id}" aria-label="${escape(node.name)} — ${rank}/${node.maxRank}${reason ? ` — ${escape(reason)}` : " — disponível"}" style="left:${positions[index]!.x}px;top:${positions[index]!.y}px"><span class="skill-orb-icon" aria-hidden="true">${icons[(node.tier ?? index + 1) % icons.length]}</span><span class="skill-orb-rank">${rank}/${node.maxRank}</span><span class="skill-orb-name">${node.name}</span></button>`;
+    }).join("")}</div></div>`;
+  const treeHtml = `${id === "berserker" ? `<details class="berserk-root"><summary>Despertar Berserk • Concedido</summary><p>1 ponto gratuito nos requisitos. Fúria: 0–100, reinicia por batalha. Acerto básico gera 8; dano direto recebido gera 4. Exige machado de duas mãos. Escolha somente uma final.</p></details>` : ""}
+    <p class="skill-map-legend">Selecione um nó para ver seus efeitos. ◇ Bloqueado • ◇ Disponível • ◆ Aprendido</p>
+    <div class="visual-skill-tree">${graph}<aside class="skill-inspector" aria-label="Detalhes do talento">${nodeHtml(selected, nodes.indexOf(selected))}</aside></div>${loadout}`;
   const previousScroll = panel.scrollTop;
+  const previousMapScroll = panel.querySelector(".skill-map-scroll")?.scrollLeft ?? 0;
   panel.classList.remove("hidden");
   panel.innerHTML = `<div class="panel-header"><div><span class="panel-kicker">Árvore de subclasse</span><h2>${definition.name}</h2><p>${definition.role}</p></div><div class="level-badge"><span>Pontos livres</span><strong>${available}</strong></div></div>
     <p class="inventory-help">1 ponto por nível após o primeiro, incluindo níveis anteriores ao livro. Cada aprendizado ou rank custa 1 ponto. Invista nos talentos de sua preferência e siga os pré-requisitos para liberar novas habilidades.</p>
     <p class="tree-message" role="status" aria-live="polite">${escape(message)}</p>
     ${treeHtml}<div class="painel-acoes"><button id="tree-reset" type="button">Redistribuir pontos</button><button id="tree-back" type="button">Voltar ao status</button></div>
     <p class="inventory-help">Redistribuir devolve todos os pontos gratuitamente. O livro e a subclasse permanecem ativos. Mudanças valem para a próxima batalha; habilidades aprendidas aparecem em Habilidades.</p>`;
+  panel.querySelectorAll<HTMLButtonElement>("[data-select-node]").forEach(button => button.addEventListener("click", () => {
+    const scroll = panel.querySelector(".skill-map-scroll")?.scrollLeft ?? 0;
+    openSubclassTree("", button.dataset.selectNode);
+    const map = panel.querySelector(".skill-map-scroll"); if (map) map.scrollLeft = scroll;
+    panel.querySelector<HTMLButtonElement>(`[data-select-node="${button.dataset.selectNode}"]`)?.focus();
+  }));
   panel.querySelectorAll<HTMLButtonElement>("[data-invest]").forEach(button => button.addEventListener("click", () => {
     const nodeId = button.dataset.invest!;
     const result = investTreePoint(nodeId);
@@ -58,6 +84,8 @@ export function openSubclassTree(message = "", focusId?: string): void {
   panel.querySelector("#tree-reset")?.addEventListener("click", () => { resetTreePoints(); openSubclassTree("Todos os pontos foram devolvidos."); });
   panel.querySelector("#tree-back")?.addEventListener("click", () => window.abrirStatus?.());
   panel.scrollTop = focusId ? previousScroll : 0;
+  const mapScroll = panel.querySelector(".skill-map-scroll");
+  if (focusId && mapScroll) mapScroll.scrollLeft = previousMapScroll;
   if (focusId) {
     const button = document.getElementById(`invest-${focusId}`) as HTMLButtonElement | null;
     if (button && !button.disabled) button.focus();
