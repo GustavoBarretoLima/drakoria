@@ -4,6 +4,44 @@ declare global {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.querySelector<HTMLElement>(".city-sidebar");
+  if (sidebar) {
+    const drawer = document.createElement("div");
+    drawer.className = "city-menu-drawer";
+    const handle = document.createElement("button");
+    handle.type = "button";
+    handle.className = "city-menu-handle";
+    handle.setAttribute("aria-controls", sidebar.id);
+    const setOpen = (open: boolean): void => {
+      drawer.classList.toggle("is-open", open);
+      sidebar.inert = !open;
+      handle.setAttribute("aria-expanded", String(open));
+      handle.setAttribute("aria-label", open ? "Recolher menu da cidade" : "Abrir menu da cidade");
+      handle.textContent = open ? "‹" : "›";
+    };
+    sidebar.before(drawer);
+    drawer.append(sidebar, handle);
+    setOpen(false);
+    drawer.addEventListener("pointerenter", event => {
+      if (event.pointerType === "mouse") setOpen(true);
+    });
+    drawer.addEventListener("pointerleave", event => {
+      if (event.pointerType === "mouse") setOpen(false);
+    });
+    handle.addEventListener("click", () => setOpen(!drawer.classList.contains("is-open")));
+    drawer.addEventListener("focusout", event => {
+      if (!drawer.contains(event.relatedTarget as Node | null)) setOpen(false);
+    });
+    drawer.addEventListener("keydown", event => {
+      if (event.key === "Escape") { setOpen(false); handle.focus(); }
+    });
+    sidebar.addEventListener("click", event => {
+      if ((event.target as Element).closest("a")) { setOpen(false); handle.focus(); }
+    });
+    document.addEventListener("pointerdown", event => {
+      if (!drawer.contains(event.target as Node)) setOpen(false);
+    });
+  }
   // Panels replace their contents when switching tabs, buying or learning a skill.
   // Recreate one sticky close bar without depending on each panel's footer.
   for (const id of ["painelPraca", "taberna", "ferreiro", "guilda"]) {
