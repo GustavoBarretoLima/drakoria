@@ -1,6 +1,8 @@
+import type { ExpeditionRewards } from "./expedition.js";
 import type { DungeonConfig } from "./dungeonEncounters.js";
 
 export interface DungeonRunState {
+  expedition?: ExpeditionRewards;
   dungeonId: string;
   depth: number;
   victories: number;

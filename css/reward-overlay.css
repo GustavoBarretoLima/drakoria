@@ -281,3 +281,12 @@
   font-weight: 400;
   line-height: 1.4;
 }
+
+.reward-expedition { margin:14px 0; padding:12px; border:1px solid #d4af3770; border-radius:8px; background:#15242aaa; color:#e9f1e9; }
+.reward-expedition summary { cursor:pointer; color:#ffe4a5; }
+.reward-expedition p { overflow-wrap:anywhere; }
+
+.reward-preparation { padding:12px 0; color:#ffe4a5; }
+.reward-preparation summary { cursor:pointer; }
+.reward-actions.boss-preparation-actions { position:sticky; bottom:0; z-index:2; padding:10px; background:#17170ff5; border-top:1px solid #d4af3770; }
+.reward-preparation-potions { grid-template-columns:repeat(2,minmax(0,1fr)); }

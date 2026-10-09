@@ -1,3 +1,4 @@
+import { POTIONS,type PotionId } from "../../shared/src/items/potions.js";
 import { renderQuestTracker } from "./ui/questTracker.js";
 import { recordQuestVictory } from "./progression/questClient.js";
 import { prepareNextMonster, clearBattleStorage, completeIntroVictory } from "./battle/victoryNavigation.js";
@@ -7,12 +8,13 @@ import { getDungeonConfig } from "../../shared/src/dungeons/dungeonEncounters.js
 import { applySubclassStats } from "../../shared/src/classes/subclasses.js";
 import { applyTreeStats } from "../../shared/src/classes/skillTrees.js";
 import { recoverAfterDefeat } from "./battle/defeatRecovery.js";
-import { registerDungeonVictory } from "./battle/dungeonRunClient.js";
+import { registerDungeonVictory, archiveDungeonRun } from "./battle/dungeonRunClient.js";
 import {
   loadConsumables,
   loadHeroVitals,
   saveHeroVitals,
   savePotionInventory,
+  useCityPotion,
   useHealthPotion,
   useManaPotion,
   useRestorativePotion,
@@ -159,7 +161,7 @@ function applyVictoryRewards(state: BattleState): void {
     window.location.href = `${import.meta.env.BASE_URL}pages/${introDestination}`;
     return;
   }
-  const run = registerDungeonVictory(state.enemy.id);
+  const run = registerDungeonVictory(state.enemy.id,state.id,state.rewards);
   const regionConfig = run ? getDungeonConfig(run.dungeonId) : undefined;
   const vitals = loadHeroVitals(state.hero.stats.maxHp, state.hero.stats.maxMana);
   const consumables = loadConsumables();
@@ -188,6 +190,7 @@ function applyVictoryRewards(state: BattleState): void {
       },
       onReturnToCity: () => {
         const destination = getBattleExitPage(localStorage);
+        archiveDungeonRun(run?.bossDefeated?"completed":"return");
         clearBattleStorage(localStorage);
         window.location.href = `${import.meta.env.BASE_URL}pages/${destination}`;
       },
@@ -211,6 +214,11 @@ function applyVictoryRewards(state: BattleState): void {
       },
       potionCount: consumables.restorativePotion,
       ...(run ? { depth: run.depth } : {}),
+      ...(run ? {expedition:run.expedition,victories:run.victories,bossAfterVictories:regionConfig?.bossAfterVictories} : {}),
+      ...(run?.bossPending ? {
+        preparationPotions:(Object.keys(POTIONS) as PotionId[]).filter(id=>!("buff" in POTIONS[id]||"cleanse" in POTIONS[id])).map(id=>({label:POTIONS[id].name,count:consumables[id]??0,use:()=>useCityPotion(id)})),
+        onReturnToSquare:()=>{archiveDungeonRun("return");clearBattleStorage(localStorage);window.location.href=`${import.meta.env.BASE_URL}pages/praca.html`;},
+      } : {}),
       danger: Boolean(run?.bossPending),
       bossDefeated: Boolean(run?.bossDefeated),
       ...(regionConfig?.bossName ? { bossName: regionConfig.bossName, regionName: regionConfig.label } : {}),
@@ -228,6 +236,7 @@ function applyBattleDefeat(state: BattleState): void {
   penalizedBattleId = state.id;
   const result = applyDefeatPenalty();
   recoverAfterDefeat({ hp: state.hero.stats.hp, mana: state.hero.stats.mana, maxHp: state.hero.stats.maxHp, maxMana: state.hero.stats.maxMana });
+  archiveDungeonRun("defeat");
   renderDefeatOverlay(result);
 }
 

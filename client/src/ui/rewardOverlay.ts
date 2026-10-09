@@ -1,4 +1,5 @@
 import type { BattleRewards } from "../../../shared/src/types/combat.js";
+import type { ExpeditionRewards } from "../../../shared/src/dungeons/expedition.js";
 import type { EquipmentItem, EquipmentRarity } from "../../../shared/src/types/equipment.js";
 import type {
   DefeatPenaltyResult,
@@ -34,6 +35,11 @@ export interface PotionActionResult {
 }
 
 export interface VictoryActions {
+  expedition?: ExpeditionRewards | undefined;
+  victories?: number;
+  bossAfterVictories?: number | undefined;
+  onReturnToSquare?: () => void;
+  preparationPotions?: {label:string;count:number;use:()=>PotionActionResult}[];
   onNextMonster: () => void;
   onReturnToCity: () => void;
   exitLabel?: string;
@@ -122,6 +128,19 @@ export function renderVictoryRewardOverlay(
   panel.appendChild(progress);
 
   if (actions) {
+    if(actions.expedition){
+      const summary=document.createElement("details");
+      summary.className="reward-expedition";
+      const heading=document.createElement("summary");
+      heading.textContent=`Resumo da expedição • ${actions.expedition.xp} XP • ${actions.expedition.gold} ouro`;
+      const detail=document.createElement("p");
+      detail.textContent=`${actions.regionName??"Dungeon"} • ${actions.victories??0} vitórias • Profundidade ${actions.depth??1}${actions.bossAfterVictories?` • Boss após ${actions.bossAfterVictories} vitórias`:""}`;
+      summary.append(heading,detail);
+      for(const loot of actions.expedition.loot){const row=document.createElement("p");row.textContent=`${loot.quantity}× ${loot.name}`;summary.append(row);}
+      if(!actions.expedition.loot.length){const row=document.createElement("p");row.textContent="Nenhum equipamento ou livro obtido nesta expedição.";summary.append(row);}
+      summary.open=Boolean(actions.bossDefeated);
+      panel.appendChild(summary);
+    }
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     title.id = "battleVictoryTitle";
@@ -130,7 +149,7 @@ export function renderVictoryRewardOverlay(
     if (actions.danger) {
       const danger = document.createElement("div");
       danger.className = "reward-danger";
-      danger.textContent = `⚠ DANGER — Uma presença esmagadora bloqueia o caminho: ${actions.bossName ?? "Orc Rei"}!`;
+      danger.textContent = `⚠ Próximo encontro: ${actions.bossName ?? "Orc Rei"}! Prepare suas poções ou retorne à cidade. O boss só começa quando você escolher enfrentá-lo.`;
       panel.appendChild(danger);
     } else if (actions.bossDefeated) {
       const cleared = document.createElement("div");
@@ -162,6 +181,7 @@ export function renderVictoryRewardOverlay(
       label: string,
       initialCount: number,
       action: (() => PotionActionResult) | undefined,
+      parent: HTMLElement = buttons,
     ) => {
       if (!action) return;
       const button = document.createElement("button");
@@ -183,9 +203,17 @@ export function renderVictoryRewardOverlay(
           potionResult.vitals.maxMana,
         );
       });
-      buttons.appendChild(button);
+      parent.appendChild(button);
     };
 
+    if(actions.preparationPotions){
+      buttons.classList.add("boss-preparation-actions");
+      const preparation=document.createElement("details");preparation.className="reward-preparation";
+      const heading=document.createElement("summary");heading.textContent="Preparação • Poções de recuperação da mochila";
+      const potions=document.createElement("div");potions.className="reward-actions reward-preparation-potions";
+      preparation.append(heading,potions);panel.appendChild(preparation);
+      for(const potion of actions.preparationPotions)addPotionButton(`Usar ${potion.label}`,potion.count,potion.use,potions);
+    } else {
     addPotionButton(
       "Usar Poção de HP",
       actions.healthPotionCount ?? 0,
@@ -201,6 +229,11 @@ export function renderVictoryRewardOverlay(
       actions.potionCount ?? 0,
       actions.onUsePotion,
     );
+    }
+    if(actions.onReturnToSquare){
+      const square=document.createElement("button");square.type="button";square.className="reward-action-secondary";square.textContent="Retornar à cidade";
+      square.addEventListener("click",()=>{if(chosen)return;chosen=true;actions.onReturnToSquare!();});buttons.appendChild(square);
+    }
 
     const cityButton = document.createElement("button");
     cityButton.type = "button";
