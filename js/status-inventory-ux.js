@@ -152,6 +152,8 @@ function inventoryUxComparisonHtml(item, inventory) {
   const use = inventoryUxCanEquip(item);
   return `<div class="paper-tooltip inventory-comparison-source">
     <strong>${inventoryUxEscape(item.name)}</strong>
+    <p>${inventoryUxEscape(item.description || "Sem descrição.")}</p>
+    ${inventoryUxRequirementsHtml(item)}
     <p>Comparação: ${inventoryUxEscape(INVENTORY_UX_SLOT_LABELS[item.slot] || item.slot)}</p>
     <p>Equipado: ${current ? inventoryUxEscape(current.name) : "Slot vazio"}</p>
     ${!use.allowed ? `<p class="inventory-restriction">${use.classAllowed ? `Requer nível ${Math.max(1, Number(item.level || 1))}` : "Classe incompatível"}</p>` : ""}
@@ -175,11 +177,11 @@ function inventoryUxItemSlot(entry, index, inventory) {
   else if (!use.levelAllowed) restriction = `Requer nível ${Math.max(1, Number(item.level || 1))}`;
 
   return `
-    <div tabindex="0" class="inventory-slot filled rarity-${rarity}${use.allowed ? "" : " locked"}${use.classAllowed ? "" : " class-incompatible"}">
+    <div tabindex="0" role="button" aria-label="${inventoryUxEscape(item.name)} — ver detalhes" onclick="verItemMochila('${inventoryUxEscape(item.id)}')" onkeydown="if(event.target===this && (event.key==='Enter'||event.key===' ')){event.preventDefault();this.click()}" class="inventory-slot filled rarity-${rarity}${use.allowed ? "" : " locked"}${use.classAllowed ? "" : " class-incompatible"}">
       <span class="inventory-slot-index">${index + 1}</span>
       ${window.equipmentArt?.(item) || ""}
       <strong>${inventoryUxEscape(item.name)}</strong>
-      ${quantity > 1 ? `<small>x${quantity}</small>` : ""}
+      ${quantity > 1 ? `<small class="backpack-quantity">x${quantity}</small>` : ""}
       <em>${inventoryUxEscape(INVENTORY_UX_RARITIES[rarity] || rarity)}</em>
       ${inventoryUxRequirementsHtml(item)}
       ${inventoryUxStatsHtml(item.stats)}
@@ -232,12 +234,24 @@ function inventoryUxOpen() {
     <div class="jrpg-sheet-columns">${ficha.profile}${ficha.attributes}
       <section class="jrpg-loadout"><h3 class="section-title">Equipamentos</h3><p class="inventory-help">Passe o mouse ou use Tab para ver os atributos. Clique ou toque para abrir os detalhes.</p><div class="equipment-grid" aria-label="Set equipado">${equipmentSlots}</div><div id="equippedItemDetails" class="equipped-item-details" hidden></div>
         <div class="jrpg-backpack-heading"><h3 class="section-title">Mochila</h3><span class="inventory-capacity">${backpack.length}/${INVENTORY_UX_SLOTS}</span></div>
-        <p class="inventory-help">Passe o mouse ou use Tab para comparar com o item equipado no mesmo slot.</p><div class="inventory-grid">${itemSlots}</div>
+        <p class="inventory-help">Passe o mouse ou use Tab para ver informações e comparar. Clique ou toque para equipar ou vender.</p><div class="inventory-grid">${itemSlots}</div><div id="backpackItemDetails" class="equipped-item-details" hidden></div>
         ${window.criarPocoesInventario?.() || ""}
       </section>
     </div></div>`;
   panel.scrollTop = 0;
 }
+
+window.verItemMochila = function(id) {
+  const inventory = inventoryUxLoad();
+  const entry = window.getBackpackEntries(inventory).find(entry => entry.item.id === id);
+  const detail = document.getElementById("backpackItemDetails");
+  if (!entry || !detail) return;
+  hidePaperTooltipPortal();
+  const item = entry.item, use = inventoryUxCanEquip(item);
+  detail.hidden = false;
+  detail.innerHTML = `${inventoryUxComparisonHtml(item, inventory).replace('class="paper-tooltip inventory-comparison-source"','class="backpack-detail-content"')}<button type="button" ${use.allowed ? `onclick="equiparItemInventario('${inventoryUxEscape(id)}')"` : "disabled"}>Equipar</button><button type="button" onclick="venderItemInventario('${inventoryUxEscape(id)}')">Vender ${Number(item.sellPrice || 0)}g</button><button type="button" onclick="this.parentElement.hidden=true">Fechar detalhes</button>`;
+  detail.scrollIntoView?.({block:"nearest",behavior:"smooth"});
+};
 
 window.verEquipamentoInventario = function(slot) {
   const inventory = inventoryUxLoad();
@@ -333,6 +347,8 @@ function positionPaperTooltipPortal(slot) {
 function showPaperTooltipPortal(slot) {
   const detail = document.getElementById("equippedItemDetails");
   if (detail && !detail.hidden && slot.matches(".equipment-slot")) return;
+  const backpackDetail = document.getElementById("backpackItemDetails");
+  if (backpackDetail && !backpackDetail.hidden && slot.matches(".inventory-slot")) return;
   const source = slot.querySelector(".paper-tooltip");
   if (!source) return;
 
@@ -364,6 +380,11 @@ document.addEventListener("mouseover", (event) => {
 });
 
 document.addEventListener("mouseout", (event) => {
+  if (paperTooltipPortal?.contains(event.target)) {
+    if (!paperTooltipPortal.contains(event.relatedTarget) && !paperTooltipActiveSlot?.contains(event.relatedTarget)) hidePaperTooltipPortal();
+    return;
+  }
+  if (paperTooltipPortal?.contains(event.relatedTarget)) return;
   const slot = event.target.closest?.(".paper-slot-filled, .inventory-slot.filled, .equipment-slot.occupied");
   if (!slot) return;
   if (event.relatedTarget && slot.contains(event.relatedTarget)) return;

@@ -144,3 +144,15 @@ body:has(.jrpg-sheet) .paper-tooltip-portal { background:#102d43df; box-shadow:0
 /* Grid tiles must not inherit coordinates or hover translation from the old paper doll. */
 .jrpg-sheet .jrpg-equipment-list .paper-slot:hover,
 .jrpg-sheet .jrpg-equipment-list .paper-slot:focus-visible { inset:auto; transform:none; }
+
+/* Compact backpack: details live in the floating panel or the touch disclosure. */
+.jrpg-sheet .inventory-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+.jrpg-sheet .inventory-slot, .jrpg-sheet .inventory-slot:has(> .equipment-art) { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:0; width:100%; min-height:78px; padding:6px; border:1px solid var(--item-rarity-border,#9bb9cd55); border-radius:7px; background:#15374d40; cursor:pointer; }
+.jrpg-sheet .inventory-slot > strong, .jrpg-sheet .inventory-slot > em, .jrpg-sheet .inventory-slot > .inventory-item-requirements, .jrpg-sheet .inventory-slot > .inventory-item-stats, .jrpg-sheet .inventory-slot > .inventory-restriction, .jrpg-sheet .inventory-slot > .inventory-slot-actions, .jrpg-sheet .inventory-slot > .inventory-slot-description { display:none; }
+.jrpg-sheet .inventory-slot > .equipment-art { grid-area:auto; flex:0 0 56px; }
+.jrpg-sheet .inventory-slot > .backpack-quantity { position:absolute; right:4px; bottom:3px; margin:0; padding:1px 3px; color:#fff; background:#102b40b3; border-radius:3px; }
+.jrpg-sheet .inventory-slot.empty { min-height:78px; cursor:default; }
+.jrpg-sheet .inventory-slot.class-incompatible { background:#752e424d; }
+body:has(.jrpg-sheet) .paper-tooltip-portal { pointer-events:none; max-height:calc(100dvh - 24px); background:#102d43df; text-shadow:0 1px 2px #000; }
+@media(max-width:420px) { .jrpg-sheet .inventory-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; } }
+.jrpg-sheet .inventory-slot > .inventory-slot-description { display:none !important; }
