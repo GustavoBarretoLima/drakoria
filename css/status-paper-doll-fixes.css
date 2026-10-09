@@ -266,3 +266,21 @@ body:has(.subclass-tree) { margin: 0; overflow: hidden; }
 .skill-map-legend { color:#b7d5d8; font-size:.85rem; }
 @media(max-width:1100px) { .visual-skill-tree { grid-template-columns:1fr; }.skill-inspector { position:static; } }
 @media(prefers-reduced-motion:reduce) { .skill-orb { transition:none; } }
+
+/* One blue surface holds the entire tree, including actions and information. */
+.skill-tree-panel { box-sizing:border-box; width:100%; min-width:0; padding:20px; border:1px solid #55868d; border-radius:14px; color:#d9eeee; background:radial-gradient(ellipse at top, #173f47, #081d24 70%); }
+.skill-tree-panel .panel-header { border-color:#446c75; }
+.skill-tree-panel .panel-kicker, .skill-tree-panel h2, .skill-tree-panel h3, .skill-tree-panel .talent-node h3, .skill-tree-panel .berserk-root strong, .skill-tree-panel .berserk-loadout h3 { color:#d1f8ff; }
+.skill-tree-panel .inventory-help, .skill-tree-panel .panel-header p { color:#b9d5db; }
+.skill-tree-panel .level-badge { border-color:#6299a2; background:#102f39; color:#d1f8ff; }
+.skill-tree-panel .level-badge strong { color:#e1ffff; }
+.skill-tree-panel .visual-skill-tree { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+.skill-tree-panel .skill-map-scroll { border:0; border-radius:0; background:transparent; }
+.skill-tree-panel .skill-inspector { position:static; min-width:0; }
+.skill-tree-panel .talent-node, .skill-tree-panel .berserk-root, .skill-tree-panel .berserk-loadout { background:rgba(8,28,36,.65); border-color:#446c75; }
+.skill-tree-panel .talent-node::before { content:none; }
+.skill-tree-panel .tree-message:empty { display:none; }
+.skill-tree-panel button:not(.skill-orb), .skill-tree-panel select { background:#143742; border:1px solid #70a9b2; color:#dffaff; }
+.skill-tree-panel button:not(.skill-orb):hover { background:#215563; }
+.skill-tree-panel .painel-acoes { flex-wrap:wrap; }
+@media(max-width:600px) { .skill-tree-panel { padding:12px; }.skill-tree-panel .panel-header { gap:12px; flex-wrap:wrap; }.skill-tree-panel .talent-footer { flex-wrap:wrap; gap:12px; } }
