@@ -164,19 +164,20 @@ function carregarFerreiro() {
 }
 
 function carregarGuilda() {
-  window.location.replace("praca.html?guilda=1");
+  const guilda = document.getElementById("guilda");
+  guilda.style.display = "block";
+  guilda.innerHTML = '<section class="guilda-interior"><h2>Guilda dos Aventureiros</h2></section>';
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+function carregarInteriorAtual() {
   const hash = window.location.hash.replace("#", "");
-  if (hash === "taberna") {
-    carregarTaberna();
-  } else if (hash === "ferreiro") {
-    carregarFerreiro();
-  } else if (hash === "guilda") {
-    carregarGuilda();
-  }
-});
+  ["taberna", "ferreiro", "guilda"].forEach(id => { document.getElementById(id).style.display = "none"; });
+  if (hash === "taberna") carregarTaberna();
+  else if (hash === "ferreiro") carregarFerreiro();
+  else if (hash === "guilda") carregarGuilda();
+}
+window.addEventListener("DOMContentLoaded", carregarInteriorAtual);
+window.addEventListener("hashchange", carregarInteriorAtual);
 
 function voltarPraca() {
   const praca = document.getElementById("praca");

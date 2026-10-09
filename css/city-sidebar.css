@@ -24,3 +24,12 @@ body.has-city-sidebar .taberna-interior { left:0; }
 body.has-city-sidebar .taberna-interior { height:100dvh; overflow-y:auto; }
 .city-sidebar a { gap:6px; }
 .city-sidebar a > span { flex:0 0 auto; }
+body.has-city-sidebar .guilda-interior { position:fixed; top:0; left:0; width:calc(100% - var(--city-sidebar-width)); height:100dvh; box-sizing:border-box; margin-left:var(--city-sidebar-width); padding:24px; overflow-y:auto; background-image:linear-gradient(#100c0855,#100c0888),url('../img/stages/guilda-anime.png'); }
+.guild-welcome { padding:20px; margin:0 0 24px; border:1px solid #d4af3780; border-radius:10px; background:#17100dd9; text-align:center; }
+.guild-welcome h1 { margin:0 0 12px; color:#ffe4b5; }
+#painelGuilda [data-close] { display:none; }
+@media(max-width:650px) { body.has-city-sidebar .guilda-interior { padding:12px; } .guild-welcome { padding:12px; } .guild-welcome h1 { font-size:22px; } }
+
+body.has-city-sidebar:has(.guilda-interior) { background:#100c08; }
+
+body.has-city-sidebar .guilda-interior button { position:static; bottom:auto; left:auto; transform:none; }

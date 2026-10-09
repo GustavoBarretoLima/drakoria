@@ -6,7 +6,7 @@ declare global {
 window.addEventListener("DOMContentLoaded", () => {
   // Panels replace their contents when switching tabs, buying or learning a skill.
   // Recreate one sticky close bar without depending on each panel's footer.
-  for (const id of ["painelPraca", "taberna", "ferreiro"]) {
+  for (const id of ["painelPraca", "taberna", "ferreiro", "guilda"]) {
     const host = document.getElementById(id);
     if (!host) continue;
     const ensureClose = (): void => {
@@ -32,7 +32,6 @@ window.addEventListener("DOMContentLoaded", () => {
     if (name === "status") window.abrirStatus?.();
     else if (name === "livros") window.abrirLivrosClasse();
     else if (name === "loja") window.abrirLoja();
-    else if (name === "guilda") window.abrirMissoes();
   };
   if (inSquare) {
     document.querySelectorAll<HTMLAnchorElement>("[data-city-panel]").forEach(link => {
