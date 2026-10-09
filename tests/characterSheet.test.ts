@@ -1,3 +1,4 @@
+import { getForgeSet } from "../shared/src/equipment/forgeSets.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
@@ -13,7 +14,7 @@ const inventory = { items: items.map(item => ({ item, quantity: item.slot === "r
 const data: Record<string,string> = { classeHeroi: "guerreiro", nomeHeroi: "<Taichou>", drakoriaInventario: JSON.stringify(inventory), drakoriaHeroVitals: '{"hp":37,"mana":8}', drakoriaSubclassProgress: '{"activeSubclass":"berserker","books":{}}' };
 const panel = { innerHTML: "", classList: { remove() {}, add() {} } };
 const window: any = { addEventListener() {}, progressoDrakoria: { carregarProgresso: () => ({ nivel: 20, xp: 12, xpParaProximoNivel: 500, ouro: 90 }) } };
-const context = vm.createContext({ window, document: { getElementById: () => panel, addEventListener() {} },
+const context = vm.createContext({ getForgeSet, window, document: { getElementById: () => panel, addEventListener() {} },
  localStorage: { getItem: (key: string) => data[key] || null }, createStatsForLevel, applyEquipmentStats, canonicalEquipment, canEquipItem,
  applySubclassStats, SUBCLASS_DEFINITIONS, applyTreeStats, getTreeRanks: () => ({}), getClassSkills: () => [] });
 vm.runInContext(readFileSync("js/status-level-scaling.js", "utf8").replace(/^import .*;\r?\n/gm,""), context);

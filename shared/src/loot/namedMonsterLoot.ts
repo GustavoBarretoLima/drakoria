@@ -1,3 +1,4 @@
+import { FORGE_RECIPES } from "../equipment/crafting.js";
 import { BLACKSMITH_ITEMS, MONSTER_DROP_SOURCES, MONSTER_EQUIPMENT_BASES } from "../equipment/artEquipmentCatalog.js";
 import { EQUIPMENT_RARITY_META } from "../types/equipmentRarity.js";
 import type { EquipmentDrop, EquipmentItem, EquipmentRarity, EquipmentStats } from "../types/equipment.js";
@@ -25,6 +26,7 @@ export function createNamedEquipment(base: EquipmentItem, level: number, rarity:
 
 export const ART_EQUIPMENT_ITEMS: Record<string, EquipmentItem> = Object.fromEntries([
   ...BLACKSMITH_ITEMS.map(item => [item.id, item] as const),
+  ...FORGE_RECIPES.map(recipe => [recipe.item.id, recipe.item] as const),
   ...MONSTER_EQUIPMENT_BASES.flatMap(base => Array.from({ length: 55 }, (_, i) => i + 1)
     .flatMap(level => NAMED_RARITIES.map(rarity => { const item = createNamedEquipment(base, level, rarity); return [item.id, item] as const; }))),
 ]);

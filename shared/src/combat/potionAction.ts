@@ -1,3 +1,4 @@
+import { regenerateForgeSet } from "../equipment/forgeSets.js";
 import type { BattleState } from "../types/combat.js";
 import { POTIONS,applyPotionEffect,isPotionId,normalizePotions,tickPotionBuff } from "../items/potions.js";
 import { tickHeroDamage } from "./combatEngine.js";
@@ -13,8 +14,9 @@ export function applyPotionAction(state:BattleState,id:unknown):BattleState{
  finishBerserkAction(hero,state.hero);hero.skillLockedTurns=Math.max(0,(hero.skillLockedTurns??0)-1);
  if(state.hero.potionBuff)tickPotionBuff(hero);
  hero.atb=0;inventory[id]!--;
+ const recovery=regenerateForgeSet(hero);
  const finished=!hero.isAlive||!enemy.isAlive;
  return {...state,hero,enemy,potions:inventory,finished,turnOwnerId:finished?(hero.isAlive?hero.id:enemy.id):null,
  ...(finished?{winnerId:hero.isAlive?hero.id:enemy.id}:{}),
- lastEvent:{actorId:hero.id,targetId:hero.id,action:"DEFEND",special:POTIONS[id].name,message:`${status}${hero.name} usou ${POTIONS[id].name}.`}};
+ lastEvent:{actorId:hero.id,targetId:hero.id,action:"DEFEND",special:POTIONS[id].name,message:`${status}${hero.name} usou ${POTIONS[id].name}.${recovery}`}};
 }

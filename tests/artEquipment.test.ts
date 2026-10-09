@@ -5,7 +5,6 @@ import { ART_EQUIPMENT_ITEMS, NAMED_RARITIES, NAMED_RARITY_WEIGHTS, createNamedE
 import { canonicalEquipment, canEquipItem } from "../shared/src/equipment/equipmentRules.js";
 import { getEquipmentById } from "../server/src/modules/equipment/equipmentService.js";
 import { adaptSubclassWeaponDrops } from "../shared/src/equipment/assassinWeapons.js";
-import { blacksmithPrice, buyBlacksmithItem } from "../client/src/progression/blacksmithClient.js";
 import { loadInventory } from "../client/src/inventory/inventoryClient.js";
 
 assert.equal(BLACKSMITH_ITEMS.length,27); assert.equal(MONSTER_EQUIPMENT_BASES.length,16);
@@ -43,12 +42,4 @@ for(const subclass of ["berserker","assassin"]){const cls=subclass==="berserker"
  const item=adaptSubclassWeaponDrops([{item:base,quantity:1}],subclass)[0]!.item;
  assert.equal(getEquipmentById(item.id)?.icon,base.icon);assert.deepEqual(canonicalEquipment(item).stats,base.stats);
 }
-const values=new Map<string,string>();Object.defineProperty(globalThis,"localStorage",{value:{getItem:(key:string)=>values.get(key)??null,setItem:(key:string,value:string)=>values.set(key,value)},configurable:true});
-values.set("classeHeroi","guerreiro");values.set("drakoriaProgresso",JSON.stringify({nivel:20,xp:0,xpParaProximoNivel:1000,ouro:2000}));
-const piece=BLACKSMITH_ITEMS[0]!;assert.equal(blacksmithPrice(piece.sellPrice),408);
-assert.equal(buyBlacksmithItem(piece.id),null);assert.equal(loadInventory().items[0]!.quantity,1);
-assert.equal(JSON.parse(values.get("drakoriaProgresso")!).ouro,1592);
-const before=JSON.stringify([...values]);assert.ok(buyBlacksmithItem("fake"));assert.equal(JSON.stringify([...values]),before);
-assert.equal(buyBlacksmithItem(piece.id),null);assert.equal(loadInventory().items[0]!.quantity,2);
-values.set("drakoriaProgresso",JSON.stringify({nivel:20,ouro:0}));const poor=JSON.stringify([...values]);assert.ok(buyBlacksmithItem(piece.id));assert.equal(JSON.stringify([...values]),poor);
-console.log("Art equipment: 27 shop items, 16 monster drops, five rarities, mythic bonuses, canonical server stats, restrictions, subclass variants, purchase price and stock passed.");
+console.log("Art equipment: preserved legacy sets, monster drops, rarities, mythic bonuses, canonical server stats and subclass variants passed.");

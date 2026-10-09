@@ -1,3 +1,4 @@
+import { getForgeSet } from "../shared/src/equipment/forgeSets.js";
 import assert from "node:assert/strict";
 import { SUBCLASS_IDS, SUBCLASS_DEFINITIONS } from "../shared/src/classes/subclasses.js";
 import { SUBCLASS_TREES, applyTreeStats, earnedTreePoints, normalizeTreeRanks, spentTreePoints } from "../shared/src/classes/skillTrees.js";
@@ -32,7 +33,7 @@ try {
     const heroClass = SUBCLASS_DEFINITIONS[id].baseClass;
     const stats = createStatsForLevel(heroClass, 100);
     const boosted = applyTreeStats(stats, id, 100, full);
-    assert.ok(Object.keys(stats).some(key => boosted[key as keyof typeof stats] > stats[key as keyof typeof stats]));
+    assert.ok(Object.keys(stats).some(key => (boosted[key as keyof typeof stats] ?? 0) > (stats[key as keyof typeof stats] ?? 0)));
     assert.ok(boosted.dodgeChance <= 50 && boosted.criticalChance <= 100);
     saved.clear(); saved.set("classeHeroi", heroClass); saved.set("drakoriaProgresso", '{"nivel":100}');
     saved.set("drakoriaSubclassProgress", JSON.stringify({ activeSubclass: id, books: {}, treeRanks: full }));
@@ -118,7 +119,7 @@ try {
   assert.equal(finished.hero.stats.hp, ongoingKill.hero.stats.hp);
   // Status shows the actual button only after a compatible book has activated a subclass.
   const panel = { innerHTML: "", classList: { remove() {} } };
-  const context = vm.createContext({ createStatsForLevel, applyTreeStats, applyEquipmentStats: (stats: unknown) => stats,
+  const context = vm.createContext({ getForgeSet, createStatsForLevel, applyTreeStats, applyEquipmentStats: (stats: unknown) => stats,
     applySubclassStats: (stats: unknown) => stats, canonicalEquipment: (item: unknown) => item, canEquipItem: () => true,
     getTreeRanks, getClassSkills: () => [], SUBCLASS_DEFINITIONS,
     localStorage: globalThis.localStorage, window: { progressoDrakoria: { carregarProgresso: () => ({ nivel: 20, xp: 0, ouro: 0 }) } },
