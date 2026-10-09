@@ -20,7 +20,7 @@ Math.random = () => 0.99;
 try {
   for (const id of SUBCLASS_IDS.filter(id => id !== "berserker")) {
     const tree = SUBCLASS_TREES[id];
-    assert.equal(tree.length, 6);
+    assert.equal(tree.length, 12);
     assert.equal(tree.filter(node => node.skill).length, 3);
     const full = Object.fromEntries(tree.map(node => [node.id, node.maxRank]));
     assert.deepEqual(normalizeTreeRanks(id, 100, full), full);

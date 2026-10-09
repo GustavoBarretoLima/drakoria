@@ -354,7 +354,7 @@ Veneno e Sangramento causam dano nas próximas três ações válidas do jogador
 
 ### Berserk — Fúria e três caminhos
 
-Despertar é gratuito e conta como 1 ponto nos requisitos. Os 18 nós têm grau único e custam 1 ponto: Carnificina, Fúria Primal e Sangue de Ferro exigem 1, 3, 5, 8, 12 e 16 pontos totais por patamar, além do nó anterior do caminho. Só uma final é permitida. Com esses requisitos, a final exige aprender os 15 nós não finais e fica disponível a partir do nível 17. Na cidade, equipam-se até quatro ativas, com espaços vazios permitidos. Passivas aprendidas permanecem aplicadas. A batalha recebe uma cópia da build; demo e backend validam os mesmos requisitos.
+Despertar é gratuito e conta como 1 ponto nos requisitos. Os 18 nós de habilidades têm grau único e custam 1 ponto: Carnificina, Fúria Primal e Sangue de Ferro exigem 1, 3, 5, 8, 12 e 16 pontos totais por patamar, além do nó anterior do caminho. Só uma final é permitida. Com esses requisitos, a final exige aprender os 15 nós não finais e fica disponível a partir do nível 17. Na cidade, equipam-se até quatro ativas, com espaços vazios permitidos. Passivas aprendidas permanecem aplicadas. A batalha recebe uma cópia da build; demo e backend validam os mesmos requisitos.
 
 Saves antigos recebem todos os pontos de volta, preservando nível, livros, subclasse e recursos atuais. A arma antiga e a mão secundária voltam para a mochila; um machado exclusivo de duas mãos mantém nível, raridade e bônus da arma original. O escudo não contribui. Sem arma, é concedido um machado de nível 1. A migração não duplica machados ao recarregar. Drops de armas de Guerreiro passam a ser machados para Berserk.
 
@@ -365,3 +365,24 @@ Tempos são contados por ações aceitas do personagem, inclusive itens, sem exp
 Recargas exigem outras ações: Golpe Brutal 2, Corte Devastador 3, Turbilhão 4, Executor 10, Grito de Guerra 6, Investida 3, Sangue por Sangue 6, Avatar 12 e Titã 12. Corte e Turbilhão atingem o alvo único atual; Turbilhão mantém quatro golpes com esquiva e crítico independentes. Cura por dano desses dois é dividida por três. Cura usa dano efetivo, sem excesso sobre a vida restante. Sangramento renova sem acumular e não causa crítico nem roubo de vida. Recusar a Morte funciona uma vez por batalha, contra dano direto ou contínuo, com proteção até a próxima ação. Empurrões e execuções explícitas ficam para quando essas mecânicas existirem.
 
 Referência visual e especificação: `img/subclass/arvore_berserk/`. `tests/berserkTree.test.ts` cobre os 18 nós, nove ativas, pré-requisitos, finais, equipamentos, migração, Fúria, efeitos e paridade de combate.
+
+
+### Talentos adicionais de atributos
+
+Todas as nove subclasses têm seis novos talentos (54 no total), com três ranks e custo de um ponto por rank. A primeira linha exige nível 5 e a raiz aprendida; a segunda exige nível 20 e rank 2 no talento anterior da mesma coluna. Os IDs, habilidades, investimentos e ranks antigos são preservados. Pontos continuam sendo um por nível; atributos competem com habilidades pelo mesmo orçamento. No Berserk, talentos de atributos não contam para liberar patamares dos caminhos de habilidades, preservando a exigência das finais.
+
+| Subclasse | Foco dos novos talentos |
+| --- | --- |
+| Paladino | Defesa física/mágica, HP, ataque físico e mana |
+| Berserk | Ataque físico, HP, velocidade, dano crítico, defesa e crítico |
+| Espadachim | Ataque físico, defesa, velocidade, dano crítico, HP e esquiva |
+| Necromante | Poder mágico, HP, mana e defesa física/mágica |
+| Bruxo | Poder mágico, mana, defesa mágica, dano crítico, HP e crítico |
+| Elemental | Poder mágico, mana, velocidade, crítico e defesa mágica |
+| Assassino | Ataque físico, esquiva, velocidade, dano crítico, HP e crítico |
+| Caçador | Ataque físico, HP, velocidade, crítico, defesa e esquiva |
+| Elfo Negro | Ataque físico, poder mágico, velocidade, crítico, mana e defesa mágica |
+
+Força corresponde a ataque físico; magia corresponde a `magicPower`. Bônus de ataque/defesa/HP/mana/magia são percentuais sobre o atributo antes da árvore (já com equipamentos e subclasse), somados sem multiplicação entre talentos. Crítico, dano crítico e esquiva usam pontos percentuais. Valores por rank variam entre 1 e 3; cada nó descreve seu limite. Esquiva continua limitada a 50% e chance crítica a 100%. Novos talentos não adicionam habilidades ao menu de combate. Demo, backend e status usam os mesmos dados.
+
+Referências de identidade: [profissões](https://www.guildwars2.com/en/the-game/professions/) e [especializações](https://heartofthorns.guildwars2.com/game/specializations/) oficiais de Guild Wars 2. Os valores e nomes são próprios do Drakoria, adaptados ao combate com alvo único. `tests/attributeTalents.test.ts` cobre ranks, pré-requisitos, aplicação de bônus, orçamento, preservação de saves e paridade demo/backend.

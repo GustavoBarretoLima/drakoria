@@ -25,20 +25,22 @@ export function openSubclassTree(message = "", focusId?: string): void {
     const reason = treeBlockReason(id, level, ranks, node);
     const requirement = node.requires.map(req => `${nodes.find(parent => parent.id === req.id)?.name}: ${req.rank}`).join(" • ");
     return `<article class="talent-node ${rank > 0 ? "learned" : ""} ${node.final ? "berserk-final" : ""} ${id !== "berserker" && (index === 0 || index === 5) ? "tree-wide" : ""}">
-      <span class="talent-kind">${node.final ? "Habilidade final" : node.skill ? "Habilidade ativa" : "Talento passivo"}${id === "berserker" ? ` • Patamar ${node.tier}` : ` • Nível ${node.level}`}</span><h3>${node.name}</h3><p>${node.description}</p>
+      <span class="talent-kind">${node.final ? "Habilidade final" : node.skill ? "Habilidade ativa" : "Talento passivo"}${id === "berserker" && !node.attributeBranch ? ` • Patamar ${node.tier}` : ` • Nível ${node.level}`}</span><h3>${node.name}</h3><p>${node.description}</p>
       ${node.skill ? `<p>${node.skill.furyCost ?? node.skill.manaCost} ${id === "berserker" ? "Fúria" : "mana"} • Recuperação: ${node.skill.cooldown} outras ações</p>` : ""}
       <p class="talent-requires">${requirement ? `Requer ${requirement}` : id === "berserker" ? "Despertar Berserk" : "Raiz da árvore"}${node.requiredPoints ? ` • ${node.requiredPoints} pontos totais, incluindo Despertar` : ""}</p>
-      <div class="talent-footer"><strong>${id === "berserker" ? rank ? "Aprendida" : "1 ponto" : `Rank ${rank}/${node.maxRank}`}</strong><button id="invest-${node.id}" data-invest="${node.id}" type="button" ${reason ? "disabled" : ""}>+1 ponto</button></div>
+      <div class="talent-footer"><strong>${id === "berserker" && !node.attributeBranch ? rank ? "Aprendida" : "1 ponto" : `Rank ${rank}/${node.maxRank}`}</strong><button id="invest-${node.id}" data-invest="${node.id}" type="button" ${reason ? "disabled" : ""}>+1 ponto</button></div>
       <small>${reason ?? "Disponível para aprender ou melhorar"}</small></article>`;
   };
   const state = loadSubclassProgress();
   const learnedSkills = nodes.filter(node => node.skill && ranks[node.id]);
   const loadout = id === "berserker" ? `<section class="berserk-loadout"><h3>Habilidades equipadas</h3><p>Escolha até quatro. Passivas aprendidas permanecem aplicadas. A seleção vale para a próxima batalha.</p><div>${Array.from({ length: 4 }, (_, slot) => `<label>Espaço ${slot + 1}<select data-berserk-slot="${slot}" aria-label="Habilidade do espaço ${slot + 1}"><option value="">Vazio</option>${learnedSkills.map(node => `<option value="${node.id}" ${state.equippedSkills?.[slot] === node.id ? "selected" : ""}>${node.name}</option>`).join("")}</select></label>`).join("")}</div></section>` : "";
   const selected = nodes.find(node => node.id === focusId) ?? nodes[0]!;
-  const positions = nodes.map((node, index) => id === "berserker"
+  const positions = nodes.map((node, index) => node.attributeBranch
+    ? { x: 120 + ((index - (id === "berserker" ? 18 : 6)) % 3) * 220, y: (id === "berserker" ? 820 : 650) + Math.floor((index - (id === "berserker" ? 18 : 6)) / 3) * 130 }
+    : id === "berserker"
     ? { x: 120 + BERSERK_PATHS.indexOf(node.path as typeof BERSERK_PATHS[number]) * 220, y: 115 + ((node.tier ?? 1) - 1) * 112 }
     : [{ x: 340, y: 115 }, { x: 200, y: 245 }, { x: 480, y: 245 }, { x: 200, y: 375 }, { x: 480, y: 375 }, { x: 340, y: 505 }][index]!);
-  const height = id === "berserker" ? 740 : 600;
+  const height = id === "berserker" ? 1060 : 890;
   const icons = ["⚔", "✦", "⬡", "✧", "❖", "♜"];
   const lines = nodes.flatMap((node, index) => node.requires.map(req => {
     const parent = nodes.findIndex(candidate => candidate.id === req.id);
@@ -47,11 +49,12 @@ export function openSubclassTree(message = "", focusId?: string): void {
     return `<path class="${(ranks[req.id] ?? 0) >= req.rank ? "lit" : ""}" d="M ${from.x} ${from.y} V ${(from.y + to.y) / 2} H ${to.x} V ${to.y}" />`;
   })).join("");
   const graph = `<div class="skill-map-scroll"><div class="skill-map" style="height:${height}px">
+    <span class="attribute-map-title" style="top:${id === "berserker" ? 748 : 578}px">Atributos • três ranks por talento</span>
     <svg viewBox="0 0 680 ${height}" aria-hidden="true" class="skill-links">${lines}</svg>
     ${id === "berserker" ? BERSERK_PATHS.map((path, index) => `<h3 class="skill-path-title" style="left:${120 + index * 220}px">${path}</h3>`).join("") : ""}
     ${nodes.map((node, index) => {
       const rank = ranks[node.id] ?? 0, reason = treeBlockReason(id, level, ranks, node);
-      return `<button type="button" class="skill-orb ${rank ? "learned" : reason ? "locked" : "available"} ${selected.id === node.id ? "selected" : ""} ${node.final || index === nodes.length - 1 ? "final" : ""}" data-select-node="${node.id}" aria-pressed="${selected.id === node.id}" aria-label="${escape(node.name)} — ${rank}/${node.maxRank}${reason ? ` — ${escape(reason)}` : " — disponível"}" style="left:${positions[index]!.x}px;top:${positions[index]!.y}px"><span class="skill-orb-icon" aria-hidden="true">${icons[(node.tier ?? index + 1) % icons.length]}</span><span class="skill-orb-rank">${rank}/${node.maxRank}</span><span class="skill-orb-name">${node.name}</span></button>`;
+      return `<button type="button" class="skill-orb ${rank ? "learned" : reason ? "locked" : "available"} ${selected.id === node.id ? "selected" : ""} ${node.final || (id !== "berserker" && index === 5) ? "final" : ""}" data-select-node="${node.id}" aria-pressed="${selected.id === node.id}" aria-label="${escape(node.name)} — ${rank}/${node.maxRank}${reason ? ` — ${escape(reason)}` : " — disponível"}" style="left:${positions[index]!.x}px;top:${positions[index]!.y}px"><span class="skill-orb-icon" aria-hidden="true">${icons[(node.tier ?? index + 1) % icons.length]}</span><span class="skill-orb-rank">${rank}/${node.maxRank}</span><span class="skill-orb-name">${node.name}</span></button>`;
     }).join("")}</div></div>`;
   const treeHtml = `${id === "berserker" ? `<details class="berserk-root"><summary>Despertar Berserk • Concedido</summary><p>1 ponto gratuito nos requisitos. Fúria: 0–100, reinicia por batalha. Acerto básico gera 8; dano direto recebido gera 4. Exige machado de duas mãos. Escolha somente uma final.</p></details>` : ""}
     <p class="skill-map-legend">Selecione um nó para ver seus efeitos. ◇ Bloqueado • ◇ Disponível • ◆ Aprendido</p>

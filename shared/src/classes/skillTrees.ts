@@ -3,12 +3,14 @@ import type { ClassSkill } from "../combat/classSkills.js";
 import type { Stats } from "../types/combat.js";
 import { normalizeHeroLevel } from "../combat/classStats.js";
 
+import { createAttributeTalents } from "./attributeTalents.js";
 import { BERSERK_NODES } from "./berserkTree.js";
 
 export type TreeRanks = Record<string, number>;
 export interface TalentNode {
   id: string; name: string; description: string; maxRank: number; level: number;
   requires: Array<{ id: string; rank: number }>;
+  attributeBranch?: boolean;
   path?: string; tier?: number; requiredPoints?: number; final?: boolean;
   bonus?: Partial<Record<keyof Stats, number>>;
   skill?: ClassSkill;
@@ -27,7 +29,7 @@ const PROFILES: Record<Exclude<SubclassId, "berserker">, Profile> = {
 };
 
 export const SUBCLASS_TREES: Record<SubclassId, TalentNode[]> = Object.fromEntries(SUBCLASS_IDS.map(id => {
-  if (id === "berserker") return [id, BERSERK_NODES];
+  if (id === "berserker") return [id, [...BERSERK_NODES, ...createAttributeTalents(id)]];
   const profile = PROFILES[id];
   const names = ["foundation", "technique", "discipline", "signature", "mastery", "ultimate"];
   const levels = [1, 5, 5, 10, 10, 20];
@@ -49,12 +51,15 @@ export const SUBCLASS_TREES: Record<SubclassId, TalentNode[]> = Object.fromEntri
       effect, powerMultiplier, hits, defenseMultiplier: 1, criticalBonus: id === "assassin" && index === 3 ? 30 : 0 };
     return { id: nodeId, name, description: skill.description, level: levels[index]!, maxRank: 3, requires, skill };
   });
-  return [id, nodes];
+  return [id, [...nodes, ...createAttributeTalents(id)]];
 })) as Record<SubclassId, TalentNode[]>;
 
 export const SUBCLASS_SKILLS = SUBCLASS_IDS.flatMap(id => SUBCLASS_TREES[id].flatMap(node => node.skill ? [node.skill] : []));
 export function earnedTreePoints(level: number): number { return normalizeHeroLevel(level) - 1; }
 export function spentTreePoints(ranks: TreeRanks): number { return Object.values(ranks).reduce((sum, rank) => sum + rank, 0); }
+function coreTreePoints(id: SubclassId, ranks: TreeRanks): number {
+  return SUBCLASS_TREES[id].filter(node => !node.attributeBranch).reduce((sum, node) => sum + (ranks[node.id] ?? 0), 0);
+}
 
 /** Rebuilds a valid allocation; unknown nodes, unmet prerequisites and overspending never grant power. */
 export function normalizeTreeRanks(id: SubclassId | undefined, level: number, raw: unknown): TreeRanks {
@@ -64,7 +69,7 @@ export function normalizeTreeRanks(id: SubclassId | undefined, level: number, ra
     const rank = (raw as TreeRanks)[node.id];
     if (typeof rank !== "number" || !Number.isInteger(rank) || rank <= 0 || rank > node.maxRank || normalizeHeroLevel(level) < node.level) continue;
     if (node.requires.some(req => (result[req.id] ?? 0) < req.rank)) continue;
-    if (node.requiredPoints && spentTreePoints(result) + 1 < node.requiredPoints) continue;
+    if (node.requiredPoints && coreTreePoints(id, result) + 1 < node.requiredPoints) continue;
     if (node.final && SUBCLASS_TREES[id].some(candidate => candidate.final && result[candidate.id])) continue;
     result[node.id] = rank;
   }
@@ -76,7 +81,7 @@ export function treeBlockReason(id: SubclassId, level: number, ranks: TreeRanks,
   if ((ranks[node.id] ?? 0) >= node.maxRank) return "Rank máximo";
   if (normalizeHeroLevel(level) < node.level) return `Requer nível ${node.level}`;
   if (node.final && SUBCLASS_TREES[id].some(candidate => candidate.final && ranks[candidate.id])) return "Apenas uma habilidade final pode ser escolhida";
-  if (node.requiredPoints && spentTreePoints(ranks) + 1 < node.requiredPoints) return `Requer ${node.requiredPoints} pontos na árvore (incluindo Despertar)`;
+  if (node.requiredPoints && coreTreePoints(id, ranks) + 1 < node.requiredPoints) return `Requer ${node.requiredPoints} pontos nos caminhos de habilidades (incluindo Despertar)`;
   const missing = node.requires.find(req => (ranks[req.id] ?? 0) < req.rank);
   if (missing) return `Requer ${SUBCLASS_TREES[id].find(candidate => candidate.id === missing.id)?.name}: rank ${missing.rank}`;
   if (spentTreePoints(ranks) >= earnedTreePoints(level)) return "Sem pontos disponíveis";
