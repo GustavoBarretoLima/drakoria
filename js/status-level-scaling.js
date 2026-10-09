@@ -168,6 +168,7 @@ function criarSlotPaperDollStatus(slot, label, inventario) {
   return `
     <div class="paper-slot paper-slot-${slot} paper-slot-filled paper-rarity-${rarity}" data-slot="${slot}" tabindex="0">
       <span class="paper-slot-label">${label}</span>
+      ${window.equipmentArt?.(item) || ""}
       <strong>${nome}</strong>
       <span class="paper-slot-rarity">${rarityLabel}</span>
       <span class="item-equipped-badge">✓ Equipado</span>

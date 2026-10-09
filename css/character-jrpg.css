@@ -118,3 +118,25 @@ body:has(.jrpg-sheet) .paper-tooltip-portal .inventory-slot-description { displa
 .inventory-potion-row strong { color:#fff; }
 .jrpg-sheet .inventory-potion-row p { text-align:left; color:#b8cfdd; font-size:12px; margin:4px 0 0; overflow-wrap:anywhere; }
 .inventory-potion-row > span { color:#ddf5ff; white-space:nowrap; }
+
+/* A quiet, translucent display keeps the equipped art in focus. */
+#painelPraca:has(.jrpg-sheet[data-view="inventory"]) { background:linear-gradient(115deg,#153e506b,#12243680); box-shadow:0 12px 40px #0006; text-shadow:0 1px 3px #000; }
+.jrpg-sheet[data-view="inventory"] .jrpg-profile { background:radial-gradient(ellipse at 50% 35%,#4d9ba82b,#153b5140 70%); }
+.jrpg-sheet[data-view="inventory"] .jrpg-attributes,
+.jrpg-sheet[data-view="inventory"] .jrpg-loadout { background:#102b404d; }
+.jrpg-sheet .equipment-grid, .jrpg-sheet .jrpg-equipment-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.jrpg-sheet .equipment-slot, .jrpg-sheet .jrpg-equipment-list .paper-slot { position:relative; display:flex; flex-direction:column; flex-wrap:nowrap; justify-content:center; gap:5px; padding:10px 6px; min-width:0; min-height:120px; border:1px solid #9bb9cd55; border-radius:8px; background:#17354b33; text-align:center; }
+.jrpg-sheet .equipment-slot:nth-child(even), .jrpg-sheet .jrpg-equipment-list .paper-slot:nth-child(even) { background:#17354b33; }
+#painelPraca .jrpg-sheet .equipment-slot.rarity-mythic { background:linear-gradient(#972c3826,#17354b33); }
+.jrpg-sheet .equipment-slot > span:first-child, .jrpg-sheet .jrpg-equipment-list .paper-slot-label { flex:0 0 auto; font-size:10px; }
+.jrpg-sheet .equipment-slot > strong, .jrpg-sheet .jrpg-equipment-list .paper-slot > strong { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); min-width:0; }
+.jrpg-sheet .equipment-slot .equipment-art, .jrpg-sheet .jrpg-equipment-list .equipment-art { flex:0 0 64px; width:64px; height:64px; }
+.jrpg-sheet .equipment-slot .equipment-art img, .jrpg-sheet .jrpg-equipment-list .equipment-art img { width:64px; height:64px; }
+.jrpg-sheet .equipment-slot .item-equipped-badge, .jrpg-sheet .jrpg-equipment-list .item-equipped-badge { display:none; }
+.jrpg-sheet .equipment-slot:not(.occupied)::after, .jrpg-sheet .paper-slot-empty::after { content:"◇"; font-size:32px; color:#b7d3e455; }
+.jrpg-sheet .equipped-item-details { margin-top:10px; padding:12px; border:1px solid #9bb9cd66; border-radius:8px; background:#102b40b3; overflow-wrap:anywhere; }
+.jrpg-sheet .equipped-item-details[hidden] { display:none; }
+.jrpg-sheet .equipped-item-details h4 { margin:0 0 8px; }
+.jrpg-sheet .equipped-item-details button { margin:8px 6px 0 0; }
+body:has(.jrpg-sheet) .paper-tooltip-portal { background:#102d43df; box-shadow:0 6px 22px #0006; }
+@media(max-width:420px) { .jrpg-sheet .equipment-grid, .jrpg-sheet .jrpg-equipment-list { gap:6px; } .jrpg-sheet .equipment-slot, .jrpg-sheet .jrpg-equipment-list .paper-slot { min-height:108px; padding:8px 3px; } }

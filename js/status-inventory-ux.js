@@ -212,12 +212,12 @@ function inventoryUxOpen() {
       const current = equipped.find((entry) => entry.slot === slot);
       const rarity = current?.item?.rarity || "common";
       return `
-        <button type="button" class="equipment-slot${current ? ` occupied rarity-${rarity}` : ""}" ${current ? `onclick="desequiparSlotInventario('${slot}')"` : "disabled"}>
+        <button type="button" class="equipment-slot${current ? ` occupied rarity-${rarity}` : ""}" ${current ? `aria-label="${inventoryUxEscape(label + ": " + current.item.name)}" onclick="verEquipamentoInventario('${slot}')"` : "disabled"}>
           <span>${label}</span>
           ${current ? window.equipmentArt?.(current.item) || "" : ""}
           <strong>${current ? inventoryUxEscape(current.item.name) : "Vazio"}</strong>
           ${current ? '<span class="item-equipped-badge">✓ Equipado</span>' : ""}
-          ${current ? `<div class="paper-tooltip" role="tooltip"><div class="paper-tooltip-header"><strong>${inventoryUxEscape(current.item.name)}</strong><span>${inventoryUxEscape(INVENTORY_UX_RARITIES[rarity] || rarity)}</span></div><p>${inventoryUxEscape(current.item.description || "Sem descrição.")}</p>${inventoryUxRequirementsHtml(current.item)}${inventoryUxStatsHtml(current.item.stats)}<small>Selecione para desequipar.</small></div>` : ""}
+          ${current ? `<div class="paper-tooltip" role="tooltip"><div class="paper-tooltip-header"><strong>${inventoryUxEscape(current.item.name)}</strong><span>${inventoryUxEscape(INVENTORY_UX_RARITIES[rarity] || rarity)}</span></div><p>${inventoryUxEscape(current.item.description || "Sem descrição.")}</p>${inventoryUxRequirementsHtml(current.item)}${inventoryUxStatsHtml(current.item.stats)}<small>Clique ou toque para ver detalhes e desequipar.</small></div>` : ""}
           ${current ? "<small>Clique para desequipar</small>" : ""}
         </button>
       `;
@@ -230,7 +230,7 @@ function inventoryUxOpen() {
     <header class="jrpg-sheet-header"><div><span class="panel-kicker">Mochila do aventureiro</span><h2>Inventário</h2></div>
       <nav aria-label="Tela do personagem"><button type="button" onclick="abrirStatus()">Status</button><button type="button" onclick="fecharPainelPraca()">Fechar</button></nav></header>
     <div class="jrpg-sheet-columns">${ficha.profile}${ficha.attributes}
-      <section class="jrpg-loadout"><h3 class="section-title">Equipamentos</h3><p class="inventory-help">Selecione uma peça equipada para desequipar.</p><div class="equipment-grid">${equipmentSlots}</div>
+      <section class="jrpg-loadout"><h3 class="section-title">Equipamentos</h3><p class="inventory-help">Passe o mouse ou use Tab para ver os atributos. Clique ou toque para abrir os detalhes.</p><div class="equipment-grid" aria-label="Set equipado">${equipmentSlots}</div><div id="equippedItemDetails" class="equipped-item-details" hidden></div>
         <div class="jrpg-backpack-heading"><h3 class="section-title">Mochila</h3><span class="inventory-capacity">${backpack.length}/${INVENTORY_UX_SLOTS}</span></div>
         <p class="inventory-help">Passe o mouse ou use Tab para comparar com o item equipado no mesmo slot.</p><div class="inventory-grid">${itemSlots}</div>
         ${window.criarPocoesInventario?.() || ""}
@@ -238,6 +238,18 @@ function inventoryUxOpen() {
     </div></div>`;
   panel.scrollTop = 0;
 }
+
+window.verEquipamentoInventario = function(slot) {
+  const inventory = inventoryUxLoad();
+  const entry = inventoryUxEquippedEntries(inventory).find(entry => entry.slot === slot);
+  const detail = document.getElementById("equippedItemDetails");
+  if (!entry || !detail) return;
+  hidePaperTooltipPortal();
+  const item = entry.item;
+  detail.hidden = false;
+  detail.innerHTML = `<h4>${inventoryUxEscape(item.name)}</h4><p>${inventoryUxEscape(item.description || "Sem descrição.")}</p>${inventoryUxRequirementsHtml(item)}${inventoryUxStatsHtml(item.stats)}<button type="button" onclick="desequiparSlotInventario('${slot}')">Desequipar</button><button type="button" onclick="this.parentElement.hidden=true">Fechar detalhes</button>`;
+  detail.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
+};
 
 function inventoryUxEquip(itemId) {
   const inventory = inventoryUxLoad();
@@ -319,6 +331,8 @@ function positionPaperTooltipPortal(slot) {
 }
 
 function showPaperTooltipPortal(slot) {
+  const detail = document.getElementById("equippedItemDetails");
+  if (detail && !detail.hidden && slot.matches(".equipment-slot")) return;
   const source = slot.querySelector(".paper-tooltip");
   if (!source) return;
 
