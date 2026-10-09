@@ -27,15 +27,15 @@ const paths = [
     ["titan", "Titã Imortal", "Cura 15% da vida máxima e reduz todo dano recebido em 40% por duas ações suas.", 0, 70, 12, 0],
   ],
 ] as const;
-const thresholds = [1, 3, 5, 8, 12, 16];
+export const BERSERK_TIER_LEVELS = [1, 3, 5, 8, 12, 15] as const;
 export const BERSERK_NODES: TalentNode[] = [];
-// Tier order lets global requirements count investments across all three paths.
+// Stable tier order preserves IDs and existing saves; each path progresses independently.
 for (let tier = 0; tier < 6; tier++) for (let path = 0; path < 3; path++) {
   const [suffix, name, description, powerMultiplier, furyCost, cooldown, hits] = paths[path]![tier]!;
   const active = cooldown > 0;
   const id = `berserker-${suffix}`;
-  const skill: ClassSkill | undefined = active ? { id: id as ClassSkill["id"], name, description, heroClass: "guerreiro", subclassId: "berserker", unlockLevel: 1, manaCost: 0, furyCost, cooldown, damageType: "physical", powerMultiplier, hits, defenseMultiplier: 1, criticalBonus: 0, effect: "berserk" } : undefined;
-  BERSERK_NODES.push({ id, name, description, level: 1, maxRank: 1, path: BERSERK_PATHS[path]!, tier: tier + 1, requiredPoints: thresholds[tier]!, final: tier === 5,
+  const skill: ClassSkill | undefined = active ? { id: id as ClassSkill["id"], name, description, heroClass: "guerreiro", subclassId: "berserker", unlockLevel: BERSERK_TIER_LEVELS[tier]!, manaCost: 0, furyCost, cooldown, damageType: "physical", powerMultiplier, hits, defenseMultiplier: 1, criticalBonus: 0, effect: "berserk" } : undefined;
+  BERSERK_NODES.push({ id, name, description, level: BERSERK_TIER_LEVELS[tier]!, maxRank: 1, path: BERSERK_PATHS[path]!, tier: tier + 1, final: tier === 5,
     requires: tier ? [{ id: `berserker-${paths[path]![tier - 1]![0]}`, rank: 1 }] : [],
     ...(suffix === "vigor" ? { bonus: { maxHp: 12 } } : {}), ...(skill ? { skill } : {}) });
 }

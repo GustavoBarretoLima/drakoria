@@ -1,3 +1,4 @@
+import { BERSERK_PATHS } from "./berserkTree.js";
 import type { SubclassId } from "./subclasses.js";
 import type { TalentNode } from "./skillTrees.js";
 import type { Stats } from "../types/combat.js";
@@ -22,7 +23,8 @@ export function createAttributeTalents(id: SubclassId): TalentNode[] {
     const parent = advanced ? `${id}-attribute-${index - 3}` : id === "berserker" ? ["berserker-brutal", "berserker-instinct", "berserker-iron"][index]! : `${id}-foundation`;
     const unit = ["criticalChance", "criticalDamage", "dodgeChance"].includes(stat) ? " pontos percentuais" : "%";
     return { id: `${id}-attribute-${index}`, name, level: advanced ? 20 : 5, maxRank: 3, attributeBranch: true,
-      requires: [{ id: parent, rank: advanced ? 2 : 1 }], bonus: { [stat]: amount },
+      requires: id === "berserker" && !advanced ? [] : [{ id: parent, rank: advanced ? 2 : 1 }],
+      ...(id === "berserker" ? { path: BERSERK_PATHS[[0, 2, 1][index % 3]!] } : {}), bonus: { [stat]: amount },
       description: `+${amount}${unit} de ${labels[stat]} por rank. Máximo: +${amount * 3}${unit}. ${unit === "%" ? "Calculado sobre o atributo antes dos talentos, incluindo equipamentos e subclasse; não multiplica outros talentos." : "Soma direta à chance ou ao multiplicador; respeita os limites do combate."}` };
   });
 }
