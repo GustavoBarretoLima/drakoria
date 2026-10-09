@@ -1,0 +1,17 @@
+﻿Poção,Preço (ouro),Efeito,Ícone
+HP,5,Recupera até 40 HP,icones_256/hp.png
+HP Média,15,Recupera até 120 HP,icones_256/hp_media.png
+HP Grande,35,Recupera até 300 HP,icones_256/hp_grande.png
+Mana,5,Recupera até 20 mana,icones_256/mana.png
+Mana Média,15,Recupera até 60 mana,icones_256/mana_media.png
+Mana Grande,35,Recupera até 150 mana,icones_256/mana_grande.png
+Restauradora,10,Recupera até 40 HP e 20 mana,icones_256/restauradora.png
+Restauradora Superior,45,Recupera 50% do HP e da mana máximos,icones_256/restauradora_superior.png
+Elixir,100,Restaura HP e mana completamente,icones_256/elixir.png
+Antídoto,12,Remove Veneno,icones_256/antidoto.png
+Hemostática,12,Remove Sangramento,icones_256/hemostatica.png
+Purificadora,20,Remove dano contínuo e Quebra-osso,icones_256/purificadora.png
+Força,25,+15% de ataque físico,icones_256/forca.png
+Defesa,25,+15% de defesa física,icones_256/defesa.png
+Arcana,25,+15% de poder mágico,icones_256/arcana.png
+Agilidade,35,+15% de velocidade,icones_256/agilidade.png

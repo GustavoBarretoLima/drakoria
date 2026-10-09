@@ -1,0 +1,210 @@
+[
+  {
+    "id": "hp",
+    "nome": "HP",
+    "preco_ouro": 5,
+    "efeito": "Recupera até 40 HP",
+    "icone": "icones_256/hp.png",
+    "atlas": {
+      "x": 0,
+      "y": 0,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "hp_media",
+    "nome": "HP Média",
+    "preco_ouro": 15,
+    "efeito": "Recupera até 120 HP",
+    "icone": "icones_256/hp_media.png",
+    "atlas": {
+      "x": 256,
+      "y": 0,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "hp_grande",
+    "nome": "HP Grande",
+    "preco_ouro": 35,
+    "efeito": "Recupera até 300 HP",
+    "icone": "icones_256/hp_grande.png",
+    "atlas": {
+      "x": 512,
+      "y": 0,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "mana",
+    "nome": "Mana",
+    "preco_ouro": 5,
+    "efeito": "Recupera até 20 mana",
+    "icone": "icones_256/mana.png",
+    "atlas": {
+      "x": 768,
+      "y": 0,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "mana_media",
+    "nome": "Mana Média",
+    "preco_ouro": 15,
+    "efeito": "Recupera até 60 mana",
+    "icone": "icones_256/mana_media.png",
+    "atlas": {
+      "x": 0,
+      "y": 256,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "mana_grande",
+    "nome": "Mana Grande",
+    "preco_ouro": 35,
+    "efeito": "Recupera até 150 mana",
+    "icone": "icones_256/mana_grande.png",
+    "atlas": {
+      "x": 256,
+      "y": 256,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "restauradora",
+    "nome": "Restauradora",
+    "preco_ouro": 10,
+    "efeito": "Recupera até 40 HP e 20 mana",
+    "icone": "icones_256/restauradora.png",
+    "atlas": {
+      "x": 512,
+      "y": 256,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "restauradora_superior",
+    "nome": "Restauradora Superior",
+    "preco_ouro": 45,
+    "efeito": "Recupera 50% do HP e da mana máximos",
+    "icone": "icones_256/restauradora_superior.png",
+    "atlas": {
+      "x": 768,
+      "y": 256,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "elixir",
+    "nome": "Elixir",
+    "preco_ouro": 100,
+    "efeito": "Restaura HP e mana completamente",
+    "icone": "icones_256/elixir.png",
+    "atlas": {
+      "x": 0,
+      "y": 512,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "antidoto",
+    "nome": "Antídoto",
+    "preco_ouro": 12,
+    "efeito": "Remove Veneno",
+    "icone": "icones_256/antidoto.png",
+    "atlas": {
+      "x": 256,
+      "y": 512,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "hemostatica",
+    "nome": "Hemostática",
+    "preco_ouro": 12,
+    "efeito": "Remove Sangramento",
+    "icone": "icones_256/hemostatica.png",
+    "atlas": {
+      "x": 512,
+      "y": 512,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "purificadora",
+    "nome": "Purificadora",
+    "preco_ouro": 20,
+    "efeito": "Remove dano contínuo e Quebra-osso",
+    "icone": "icones_256/purificadora.png",
+    "atlas": {
+      "x": 768,
+      "y": 512,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "forca",
+    "nome": "Força",
+    "preco_ouro": 25,
+    "efeito": "+15% de ataque físico",
+    "icone": "icones_256/forca.png",
+    "atlas": {
+      "x": 0,
+      "y": 768,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "defesa",
+    "nome": "Defesa",
+    "preco_ouro": 25,
+    "efeito": "+15% de defesa física",
+    "icone": "icones_256/defesa.png",
+    "atlas": {
+      "x": 256,
+      "y": 768,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "arcana",
+    "nome": "Arcana",
+    "preco_ouro": 25,
+    "efeito": "+15% de poder mágico",
+    "icone": "icones_256/arcana.png",
+    "atlas": {
+      "x": 512,
+      "y": 768,
+      "width": 256,
+      "height": 256
+    }
+  },
+  {
+    "id": "agilidade",
+    "nome": "Agilidade",
+    "preco_ouro": 35,
+    "efeito": "+15% de velocidade",
+    "icone": "icones_256/agilidade.png",
+    "atlas": {
+      "x": 768,
+      "y": 768,
+      "width": 256,
+      "height": 256
+    }
+  }
+]
