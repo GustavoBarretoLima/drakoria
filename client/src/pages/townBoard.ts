@@ -1,3 +1,4 @@
+import { POTION_ICONS } from "../ui/potionIcons.js";
 import { QUESTS,questBlockReason } from "../../../shared/src/quests/regionalQuests.js";
 import { WORLD_REGIONS } from "../../../shared/src/dungeons/worldRegions.js";
 import { POTIONS,type PotionId } from "../../../shared/src/items/potions.js";
@@ -25,7 +26,7 @@ export function openPotionShop(message=""):void{
  const p=panel();if(!p)return;const progress=loadProgress(),inventory=loadConsumables();syncCharacterVitals();
  p.innerHTML=`<section class="town-board"><div class="panel-header"><div><span class="panel-kicker">Loja da Praça</span><h2>Poções e suprimentos</h2></div><strong>${progress.ouro} ouro</strong></div><p>Compre uma unidade por vez. Curativos e poções de atributos são usados em combate. Apenas um bônus de poção pode ficar ativo; dura três ações suas, sem acumular. Poções de mana não restauram Fúria.</p><p role="status" aria-live="polite">${esc(message)}</p><div class="town-card-grid">${(Object.keys(POTIONS) as PotionId[]).map(id=>{
  const item=POTIONS[id],count=inventory[id]??0,city=!("buff" in item||"cleanse" in item);
- return `<article class="town-card"><h3>${item.name}</h3><p>${item.detail}</p><p><strong>${item.price} ouro</strong> • Na mochila: ${count}</p><button data-buy="${id}" ${progress.ouro<item.price||count>=9999?"disabled":""}>Comprar • ${item.price} ouro</button>${city?`<button data-drink="${id}" ${count?"":"disabled"}>Usar agora</button>`:"<small>Uso no menu Itens da batalha.</small>"}</article>`;
+ return `<article class="town-card potion-shop-card"><img class="potion-shop-icon" src="${POTION_ICONS[id]}" alt="" width="96" height="96" /><h3>${item.name}</h3><p>${item.detail}</p><p><strong>${item.price} ouro</strong> • Na mochila: ${count}</p><button data-buy="${id}" ${progress.ouro<item.price||count>=9999?"disabled":""}>Comprar • ${item.price} ouro</button>${city?`<button data-drink="${id}" ${count?"":"disabled"}>Usar agora</button>`:"<small>Uso no menu Itens da batalha.</small>"}</article>`;
  }).join("")}</div><div class="painel-acoes"><button data-close>Fechar</button></div></section>`;
  p.querySelectorAll<HTMLButtonElement>("[data-buy]").forEach(b=>b.addEventListener("click",()=>openPotionShop(buyPotion(b.dataset.buy!)??"Poção comprada.")));
  p.querySelectorAll<HTMLButtonElement>("[data-drink]").forEach(b=>b.addEventListener("click",()=>{const result=useCityPotion(b.dataset.drink as PotionId);openPotionShop(result.used?"Recursos recuperados.":"Sem recursos a recuperar; poção preservada.");}));

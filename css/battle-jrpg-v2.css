@@ -357,3 +357,7 @@
     width: min(310px, 40vw);
   }
 }
+#batalha .battle-command-dock .battle-item-row:has(img) { grid-template-columns:40px minmax(0,1fr) auto; }
+.battle-item-row img { grid-column:1; grid-row:1 / span 2; object-fit:contain; }
+.battle-item-row:has(img) strong, .battle-item-row:has(img) span { grid-column:2; }
+.battle-item-row:has(img) b { grid-column:3; }
