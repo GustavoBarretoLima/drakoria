@@ -1,20 +1,7 @@
-import {
-  loadConsumables,
-  useHealthPotion,
-  useManaPotion,
-  useRestorativePotion,
-} from "../battle/heroVitals.js";
-import {
-  isPagesDemoMode,
-  useDemoConsumable,
-  type DemoConsumableId,
-} from "../demo/demoBattle.js";
-
-const itemMeta: Record<DemoConsumableId, { label: string; detail: string }> = {
-  healthPotion: { label: "Poção de HP", detail: "Recupera 40 HP" },
-  manaPotion: { label: "Poção de Mana", detail: "Recupera 20 MP" },
-  restorativePotion: { label: "Poção Restauradora", detail: "Recupera 40 HP e 20 MP" },
-};
+import { loadConsumables } from "../battle/heroVitals.js";
+import { isPagesDemoMode,useDemoConsumable } from "../demo/demoBattle.js";
+import { POTIONS,type PotionId } from "../../../shared/src/items/potions.js";
+import socket from "../network/socket.js";
 
 function numericWidth(id: string): number {
   const element = document.getElementById(id) as HTMLElement | null;
@@ -59,24 +46,10 @@ function closeItemPanel(restoreFocus = false): void {
   if (restoreFocus && !launcher.hidden && !launcher.disabled) launcher.focus();
 }
 
-function usePotion(itemId: DemoConsumableId): void {
-  if (!isPagesDemoMode() || !heroTurnReady()) return;
-
-  const localResult = itemId === "healthPotion"
-    ? useHealthPotion()
-    : itemId === "manaPotion"
-      ? useManaPotion()
-      : useRestorativePotion();
-  if (!localResult.used) return;
-
-  const battleAccepted = useDemoConsumable(itemId);
-  if (!battleAccepted) {
-    // A atualização do combate pode ter chegado entre o clique e o consumo.
-    // O próximo estado persistido sincroniza os recursos novamente.
-    return;
-  }
-  closeItemPanel();
-  updateItemMenu();
+function usePotion(itemId:PotionId):void {
+ if(!heroTurnReady())return;
+ if(isPagesDemoMode()){if(useDemoConsumable(itemId)){closeItemPanel();updateItemMenu();}}
+ else socket.emit("battle:item",itemId,(accepted:boolean)=>{if(accepted){closeItemPanel();updateItemMenu();}});
 }
 
 function updateItemMenu(): void {
@@ -85,16 +58,8 @@ function updateItemMenu(): void {
   if (!launcher || !list) return;
 
   const consumables = loadConsumables();
-  const entries: Array<[DemoConsumableId, number]> = [
-    ["healthPotion", consumables.healthPotion],
-    ["manaPotion", consumables.manaPotion],
-    ["restorativePotion", consumables.restorativePotion],
-  ];
-  const available = entries.filter(([, count]) => count > 0);
-
-  // O backend online ainda não possui inventário autoritativo; por enquanto o
-  // consumo em batalha fica disponível no modo demo publicado no Pages.
-  launcher.hidden = !isPagesDemoMode() || available.length === 0;
+  const available=(Object.keys(POTIONS) as PotionId[]).map(id=>[id,consumables[id]??0] as const).filter(([,count])=>count>0);
+  launcher.hidden=available.length===0;
   launcher.disabled = !heroTurnReady() || launcher.hidden;
   launcher.setAttribute("aria-label", available.length > 0 ? `Itens, ${available.length} tipo(s) disponível(is)` : "Sem itens utilizáveis");
 
@@ -104,7 +69,7 @@ function updateItemMenu(): void {
     button.type = "button";
     button.className = "battle-item-row";
     button.disabled = !heroTurnReady();
-    button.innerHTML = `<strong>${itemMeta[itemId].label}</strong><span>${itemMeta[itemId].detail}</span><b>×${count}</b>`;
+    button.innerHTML = `<strong>${POTIONS[itemId].name}</strong><span>${POTIONS[itemId].detail}</span><b>×${count}</b>`;
     button.addEventListener("click", () => usePotion(itemId));
     list.append(button);
   }

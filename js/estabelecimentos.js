@@ -124,31 +124,8 @@ function descansarTaberna() {
 }
 
 function comprarPocao(tipo) {
-  const progress = loadProgressData();
-  const ouro = Math.max(0, Math.floor(Number(progress.ouro || 0)));
-
-  if (ouro < POTION_PRICE) {
-    renderTavernRestStatus(`Você precisa de ${POTION_PRICE} moedas de ouro para comprar uma poção.`);
-    return;
-  }
-
-  const consumables = loadConsumablesData();
-  if (tipo === "hp") {
-    consumables.healthPotion += 1;
-  } else if (tipo === "mana") {
-    consumables.manaPotion += 1;
-  } else {
-    return;
-  }
-
-  progress.ouro = ouro - POTION_PRICE;
-  localStorage.setItem(DRAKORIA_PROGRESS_KEY, JSON.stringify(progress));
-  saveConsumablesData(consumables);
-  renderTavernRestStatus(
-    tipo === "hp"
-      ? "Você comprou 1 Poção de HP."
-      : "Você comprou 1 Poção de Mana.",
-  );
+ const message=window.comprarPocaoCatalogo?.(tipo === "hp" ? "healthPotion" : tipo === "mana" ? "manaPotion" : tipo);
+ renderTavernRestStatus(message ?? "Poção comprada.");
 }
 
 function carregarTaberna() {
@@ -162,7 +139,7 @@ function carregarTaberna() {
       <button type="button" onclick="descansarTaberna()">🛏️ Descansar — ${TAVERN_REST_COST} ouro</button>
 
       <div class="taberna-loja-pocoes">
-        <h3>🧪 Poções</h3>
+        <h3>🧪 Poções</h3><p><a href="praca.html?loja=1">Ver todas as poções e preços na Loja da Praça</a></p>
         <p>Compre suprimentos para usar entre as batalhas da dungeon.</p>
         <button type="button" onclick="comprarPocao('hp')">❤️ Poção de HP — ${POTION_PRICE} ouro</button>
         <button type="button" onclick="comprarPocao('mana')">💧 Poção de Mana — ${POTION_PRICE} ouro</button>
@@ -191,7 +168,7 @@ function carregarGuilda() {
   document.getElementById("guilda").innerHTML = `
     <div class="guilda-interior">
       <h2>🛡️ Guilda dos Aventureiros</h2>
-      <p>Heróis se reúnem para missões e desafios maiores.</p>
+      <p>Heróis se reúnem para missões e desafios maiores.</p><a href="praca.html?missoes=1">Abrir quadro de missões</a>
       <button class="btn-voltar" onclick="window.location.href='praca.html'">⬅ Voltar à Praça</button>
     </div>
   `;

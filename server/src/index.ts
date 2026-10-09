@@ -1,3 +1,5 @@
+import { applyPotionAction } from "../../shared/src/combat/potionAction.js";
+import { normalizePotions } from "../../shared/src/items/potions.js";
 import { canEquipItem } from "../../shared/src/equipment/equipmentRules.js";
 import { SUBCLASS_DEFINITIONS, type SubclassId } from "../../shared/src/classes/subclasses.js";
 import { createServer } from "node:http";
@@ -164,6 +166,7 @@ io.on("connection", (socket) => {
       heroName?: string;
       treeRanks?: unknown;
       equippedSkills?: unknown;
+      potions?: unknown;
       monsterId?: string;
       equippedItemIds?: string[];
       heroLevel?: number;
@@ -198,6 +201,7 @@ io.on("connection", (socket) => {
           payload.equippedSkills,
         );
 
+        battleState.potions=normalizePotions(payload.potions);
         socket.emit("battle:update", battleState);
         startAtbLoop(socket.id, battleState.id);
       } catch (error) {
@@ -208,6 +212,15 @@ io.on("connection", (socket) => {
       }
     },
   );
+
+  socket.on("battle:item", (id:unknown,callback?:(accepted:boolean)=>void) => {
+    const current=battleManager.get(socket.id);
+    if(!current){callback?.(false);return;}
+    const next=applyPotionAction(current,id);
+    if(next===current){callback?.(false);return;}
+    battleManager.set(socket.id,next);socket.emit("battle:update",next);callback?.(true);
+    if(next.finished)stopAtbLoop(socket.id);
+  });
 
   socket.on("battle:action", (action: unknown) => {
     if (!isBattleAction(action)) return;

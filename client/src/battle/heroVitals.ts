@@ -1,3 +1,5 @@
+import { POTIONS, normalizePotions, applyPotionEffect, type PotionId, type PotionInventory } from "../../../shared/src/items/potions.js";
+import type { CombatantState } from "../../../shared/src/types/combat.js";
 export interface HeroVitals {
   hp: number;
   mana: number;
@@ -5,7 +7,7 @@ export interface HeroVitals {
   maxMana: number;
 }
 
-export interface ConsumablesState {
+export interface ConsumablesState extends PotionInventory {
   restorativePotion: number;
   healthPotion: number;
   manaPotion: number;
@@ -55,17 +57,10 @@ export function loadConsumables(): ConsumablesState {
     return starter;
   }
 
-  try {
-    const parsed = JSON.parse(saved) as Partial<ConsumablesState>;
-    return {
-      restorativePotion: Math.max(0, Math.floor(Number(parsed.restorativePotion ?? 0))),
-      healthPotion: Math.max(0, Math.floor(Number(parsed.healthPotion ?? 0))),
-      manaPotion: Math.max(0, Math.floor(Number(parsed.manaPotion ?? 0))),
-    };
-  } catch {
-    return { restorativePotion: 0, healthPotion: 0, manaPotion: 0 };
-  }
+  try { return {restorativePotion:0,healthPotion:0,manaPotion:0,...normalizePotions(JSON.parse(saved))}; }
+  catch { return {restorativePotion:0,healthPotion:0,manaPotion:0}; }
 }
+export function savePotionInventory(potions:PotionInventory):void { saveConsumables({restorativePotion:0,healthPotion:0,manaPotion:0,...normalizePotions(potions)}); }
 
 function loadStoredVitals(): HeroVitals {
   const savedVitals = localStorage.getItem(VITALS_KEY);
@@ -89,65 +84,20 @@ function saveConsumables(consumables: ConsumablesState): void {
   localStorage.setItem(CONSUMABLES_KEY, JSON.stringify(consumables));
 }
 
-export function useRestorativePotion(): PotionUseResult {
-  const consumables = loadConsumables();
-  const vitals = loadStoredVitals();
-
-  if (
-    consumables.restorativePotion <= 0 ||
-    (vitals.hp >= vitals.maxHp && vitals.mana >= vitals.maxMana)
-  ) {
-    return {
-      used: false,
-      remaining: consumables.restorativePotion,
-      vitals,
-    };
-  }
-
-  vitals.hp = Math.min(vitals.maxHp, vitals.hp + 40);
-  vitals.mana = Math.min(vitals.maxMana, vitals.mana + 20);
-  consumables.restorativePotion -= 1;
-  saveConsumables(consumables);
-  saveHeroVitals(vitals);
-
-  return {
-    used: true,
-    remaining: consumables.restorativePotion,
-    vitals,
-  };
+export function useCityPotion(id:PotionId):PotionUseResult {
+ const consumables=loadConsumables(),vitals=loadStoredVitals();
+ if(!(consumables[id]!>0))return {used:false,remaining:consumables[id]??0,vitals};
+ const definition=POTIONS[id];
+ if("buff" in definition||"cleanse" in definition)return {used:false,remaining:consumables[id]??0,vitals};
+ const hero={isAlive:vitals.hp>0,stats:{hp:vitals.hp,mana:vitals.mana,maxHp:vitals.maxHp,maxMana:vitals.maxMana}} as CombatantState;
+ if(!applyPotionEffect(hero,id))return {used:false,remaining:consumables[id]??0,vitals};
+ vitals.hp=hero.stats.hp;vitals.mana=hero.stats.mana;consumables[id]!--;
+ saveConsumables(consumables);saveHeroVitals(vitals);
+ return {used:true,remaining:consumables[id]??0,vitals};
 }
-
-export function useHealthPotion(): PotionUseResult {
-  const consumables = loadConsumables();
-  const vitals = loadStoredVitals();
-
-  if (consumables.healthPotion <= 0 || vitals.hp >= vitals.maxHp) {
-    return { used: false, remaining: consumables.healthPotion, vitals };
-  }
-
-  vitals.hp = Math.min(vitals.maxHp, vitals.hp + 40);
-  consumables.healthPotion -= 1;
-  saveConsumables(consumables);
-  saveHeroVitals(vitals);
-
-  return { used: true, remaining: consumables.healthPotion, vitals };
-}
-
-export function useManaPotion(): PotionUseResult {
-  const consumables = loadConsumables();
-  const vitals = loadStoredVitals();
-
-  if (consumables.manaPotion <= 0 || vitals.mana >= vitals.maxMana) {
-    return { used: false, remaining: consumables.manaPotion, vitals };
-  }
-
-  vitals.mana = Math.min(vitals.maxMana, vitals.mana + 20);
-  consumables.manaPotion -= 1;
-  saveConsumables(consumables);
-  saveHeroVitals(vitals);
-
-  return { used: true, remaining: consumables.manaPotion, vitals };
-}
+export function useRestorativePotion():PotionUseResult{return useCityPotion("restorativePotion");}
+export function useHealthPotion():PotionUseResult{return useCityPotion("healthPotion");}
+export function useManaPotion():PotionUseResult{return useCityPotion("manaPotion");}
 
 export function clearHeroVitals(): void {
   localStorage.removeItem(VITALS_KEY);
