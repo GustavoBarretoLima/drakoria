@@ -164,14 +164,7 @@ function carregarFerreiro() {
 }
 
 function carregarGuilda() {
-  document.getElementById("guilda").style.display = "block";
-  document.getElementById("guilda").innerHTML = `
-    <div class="guilda-interior">
-      <h2>🛡️ Guilda dos Aventureiros</h2>
-      <p>Heróis se reúnem para missões e desafios maiores.</p><a href="praca.html?missoes=1">Abrir quadro de missões</a>
-      <button class="btn-voltar" onclick="window.location.href='praca.html'">⬅ Voltar à Praça</button>
-    </div>
-  `;
+  window.location.replace("praca.html?guilda=1");
 }
 
 window.addEventListener("DOMContentLoaded", () => {

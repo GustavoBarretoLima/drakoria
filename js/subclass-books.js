@@ -62,7 +62,6 @@ function useBook(subclassId) {
   const definition = SUBCLASS_DEFINITIONS[subclassId];
   const panel = document.getElementById("painelPraca");
   if (!panel || !definition || !(state.books[subclassId] > 0) || state.activeSubclass || (definition.baseClass !== heroClass() && !isTestCharacter(localStorage.getItem("nomeHeroi")))) return;
-  document.getElementById("menuPraca")?.classList.add("hidden");
   const current = getCurrentHeroStats();
   const next = isTestCharacter(localStorage.getItem("nomeHeroi")) && definition.baseClass !== heroClass() ? getSubclassPreviewStats(subclassId) : subclassId === "berserker" && typeof getBerserkPreviewStats === "function" ? getBerserkPreviewStats() : applySubclassStats(current, subclassId);
   const gender = (localStorage.getItem("generoHeroi") || "masculino").toLowerCase() === "feminino" ? "Feminino" : "Masculino";

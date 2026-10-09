@@ -1,0 +1,18 @@
+body.has-city-sidebar { --city-sidebar-width:190px; margin:0; overflow-x:hidden; }
+.city-sidebar { position:fixed; inset:16px auto 16px 12px; z-index:60; box-sizing:border-box; width:calc(var(--city-sidebar-width) - 20px); display:flex; flex-direction:column; gap:8px; padding:12px; overflow-y:auto; border:1px solid #b9a06c; border-radius:10px; background:linear-gradient(160deg,#142b3aee,#0b1825f2); box-shadow:0 8px 24px #0006; font-family:system-ui,sans-serif; }
+.city-sidebar a { display:flex; align-items:center; min-height:44px; box-sizing:border-box; padding:10px; border:1px solid #7191a366; border-radius:6px; color:#eef5fa; background:#28465c80; text-decoration:none; font-size:14px; line-height:1.4; overflow-wrap:anywhere; }
+.city-sidebar a:hover { background:#395c72; border-color:#dac18d; }
+.city-sidebar a:focus-visible { outline:3px solid #f0d08b; outline-offset:2px; }
+body.has-city-sidebar #painelPraca { position:fixed; inset:50% auto auto calc(var(--city-sidebar-width) + (100vw - var(--city-sidebar-width)) / 2); transform:translate(-50%,-50%); box-sizing:border-box; width:min(1180px,calc(100vw - var(--city-sidebar-width) - 24px)); max-height:calc(100dvh - 32px); overflow:auto; }
+body.has-city-sidebar .blacksmith-shop, body.has-city-sidebar .taberna-interior { width:calc(100% - var(--city-sidebar-width)); margin-left:var(--city-sidebar-width); }
+body.has-city-sidebar .taberna-interior { left:0; }
+@media(max-width:650px) {
+  body.has-city-sidebar { --city-sidebar-width:112px; }
+  .city-sidebar { inset:8px auto 8px 6px; width:100px; padding:6px; gap:6px; }
+  .city-sidebar a { padding:8px 6px; font-size:12px; }
+  body.has-city-sidebar #painelPraca { width:calc(100vw - var(--city-sidebar-width) - 12px); max-height:calc(100dvh - 16px); padding:8px; }
+  body.has-city-sidebar .jrpg-sheet-columns { grid-template-columns:minmax(0,1fr); }
+  body.has-city-sidebar .jrpg-profile, body.has-city-sidebar .jrpg-attributes, body.has-city-sidebar .jrpg-loadout { grid-column:1; min-width:0; }
+  body.has-city-sidebar .blacksmith-shop, body.has-city-sidebar .taberna-interior { padding:12px; }
+  body.has-city-sidebar .blacksmith-shop header, body.has-city-sidebar .panel-header { flex-wrap:wrap; }
+}
