@@ -59,11 +59,11 @@ export function openSubclassTree(message = "", focusId?: string): void {
   const previousScroll = panel.scrollTop;
   const previousMapScroll = panel.querySelector(".skill-map-scroll")?.scrollLeft ?? 0;
   panel.classList.remove("hidden");
-  panel.innerHTML = `<div class="panel-header"><div><span class="panel-kicker">Árvore de subclasse</span><h2>${definition.name}</h2><p>${definition.role}</p></div><div class="level-badge"><span>Pontos livres</span><strong>${available}</strong></div></div>
+  panel.innerHTML = `<section class="skill-tree-panel" aria-label="Árvore de habilidades de ${definition.name}"><div class="panel-header"><div><span class="panel-kicker">Árvore de subclasse</span><h2>${definition.name}</h2><p>${definition.role}</p></div><div class="level-badge"><span>Pontos livres</span><strong>${available}</strong></div></div>
     <p class="inventory-help">1 ponto por nível após o primeiro, incluindo níveis anteriores ao livro. Cada aprendizado ou rank custa 1 ponto. Invista nos talentos de sua preferência e siga os pré-requisitos para liberar novas habilidades.</p>
     <p class="tree-message" role="status" aria-live="polite">${escape(message)}</p>
     ${treeHtml}<div class="painel-acoes"><button id="tree-reset" type="button">Redistribuir pontos</button><button id="tree-back" type="button">Voltar ao status</button></div>
-    <p class="inventory-help">Redistribuir devolve todos os pontos gratuitamente. O livro e a subclasse permanecem ativos. Mudanças valem para a próxima batalha; habilidades aprendidas aparecem em Habilidades.</p>`;
+    <p class="inventory-help">Redistribuir devolve todos os pontos gratuitamente. O livro e a subclasse permanecem ativos. Mudanças valem para a próxima batalha; habilidades aprendidas aparecem em Habilidades.</p></section>`;
   panel.querySelectorAll<HTMLButtonElement>("[data-select-node]").forEach(button => button.addEventListener("click", () => {
     const scroll = panel.querySelector(".skill-map-scroll")?.scrollLeft ?? 0;
     openSubclassTree("", button.dataset.selectNode);
