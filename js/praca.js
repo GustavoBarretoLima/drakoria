@@ -1,11 +1,3 @@
-window.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("abrirMenuBtn");
-  const menu = document.getElementById("menuPraca");
-
-  if (!btn || !menu) return;
-  btn.addEventListener("click", () => menu.classList.toggle("hidden"));
-});
-
 const INVENTORY_KEY = "drakoriaInventario";
 const INVENTORY_SLOTS = 20;
 

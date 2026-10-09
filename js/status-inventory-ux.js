@@ -226,7 +226,6 @@ function inventoryUxOpen() {
 
   panel.classList.remove("hidden");
   const ficha = window.criarFichaPersonagemJRPG?.() || { profile: "", attributes: "" };
-  document.getElementById("menuPraca")?.classList?.add?.("hidden");
   panel.innerHTML = `<div class="jrpg-sheet" data-view="inventory">
     <header class="jrpg-sheet-header"><div><span class="panel-kicker">Mochila do aventureiro</span><h2>Inventário</h2></div>
       <nav aria-label="Tela do personagem"><button type="button" onclick="abrirStatus()">Status</button><button type="button" onclick="fecharPainelPraca()">Fechar</button></nav></header>

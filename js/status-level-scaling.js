@@ -221,7 +221,6 @@ function abrirStatusComProgressao() {
   const equipmentRows = Object.entries(STATUS_SLOT_LABELS).map(([slot, label]) => criarSlotPaperDollStatus(slot, label, inventario)).join("");
   const heroSkills = subclasse?.id === "berserker" ? (typeof getHeroSkills === "function" && typeof loadSubclassProgress === "function" ? getHeroSkills({ className: classe, level: progresso.nivel, subclassId: "berserker", treeRanks: getTreeRanks(), equippedSkills: loadSubclassProgress().equippedSkills }) : []) : getClassSkills(classe);
   const skills = heroSkills.map(skill => `<div class="jrpg-skill-row"><span>${escaparHtmlStatus(skill.name)}</span><small>${progresso.nivel >= skill.unlockLevel ? "Liberada" : `Nível ${skill.unlockLevel}`}</small></div>`).join("");
-  document.getElementById("menuPraca")?.classList?.add?.("hidden");
   painel.classList.remove("hidden");
   painel.innerHTML = `<div class="jrpg-sheet" data-view="status">
     <header class="jrpg-sheet-header"><div><span class="panel-kicker">Ficha do aventureiro</span><h2>Status</h2></div>
