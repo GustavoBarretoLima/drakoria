@@ -399,3 +399,28 @@ O personagem de teste Taichou (nome sem distinção de maiúsculas e espaços na
 Após resetar, Taichou pode usar qualquer livro que possua, independentemente da classe atual. A classe base é ajustada à especialização para manter atributos, habilidades, animações e regras de equipamento corretos no status, demo e backend. Equipamentos incompatíveis voltam à mochila; Berserk e Assassino mantêm suas regras de machado/adagas, com arma inicial quando necessário. A prévia de outra classe considera a nova base e equipamentos compatíveis. Os demais personagens continuam com escolha permanente e livros restritos à classe.
 
 `tests/taichouSubclassReset.test.ts` valida as nove escolhas, restrição aos demais personagens, consumo de livros, reset, itens míticos preservados, recursos e paridade demo/backend. A permissão continua sendo a identidade local de teste existente, sem autenticação administrativa adicional.
+
+### Missões regionais e loja de poções
+
+A praça oferece 15 missões nas cinco regiões: contratos repetíveis para cinco derrotas e três equipamentos obtidos em drops, além de uma missão única por boss. Aceite antes de lutar; derrotas, drops anteriores e eventos duplicados não contam. A coleta mantém os equipamentos na mochila. Entregue os bosses em ordem para avançar na campanha de missões. Cada entrega concede XP e ouro; bosses também concedem uma arma épica da classe/subclasse no nível regional do boss. A exploração existente continua disponível conforme suas regras atuais.
+
+A loja mostra preço, efeito e estoque de todos os 16 consumíveis:
+
+| Poção | Ouro | Efeito |
+| --- | ---: | --- |
+| HP / HP Média / HP Grande | 5 / 15 / 35 | 40 / 120 / 300 HP |
+| Mana / Mana Média / Mana Grande | 5 / 15 / 35 | 20 / 60 / 150 mana |
+| Restauradora | 10 | 40 HP e 20 mana |
+| Restauradora Superior | 45 | 50% dos máximos de HP e mana |
+| Elixir | 100 | HP e mana completos |
+| Antídoto | 12 | Remove Veneno |
+| Hemostática | 12 | Remove Sangramento |
+| Purificadora | 20 | Remove dano contínuo e Quebra-osso |
+| Força / Defesa / Arcana | 25 cada | +15% ataque / defesa / poder mágico |
+| Agilidade | 35 | +15% velocidade |
+
+As poções de atributos duram três ações do herói após o uso e não acumulam. Usar um item em combate consome o turno. Curas respeitam o máximo, não ressuscitam e não restauram Fúria. Um uso recusado preserva estoque e turno. Curas também podem ser usadas na loja; curativos e bônus são usados no menu Itens da batalha. Poções básicas continuam a 5 ouro e descanso a 20.
+
+Categorias e potências usam como referência as [poções oficiais de Diablo II](https://classic.battle.net/diablo2exp/items/potions.shtml). Os preços são próprios do Drakoria, ajustados à economia existente. A estrutura regional tem como referência os [eventos de Guild Wars 2](https://www.guildwars2.com/en/the-game/dynamic-events/).
+
+Demo e backend compartilham catálogo, validação de estoque e efeitos. O backend recebe o inventário local no setup e desconta itens aceitos por batalha; não há conta ou inventário persistente autenticado no servidor. Missões e compras usam o save local existente. Os testes `potionShop.test.ts` e `regionalQuests.test.ts` cobrem compras, efeitos, duração, recusas, paridade, aceitação, progressão, entregas e duplicações.

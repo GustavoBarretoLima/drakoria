@@ -82,7 +82,7 @@ export function createInitialBattleState(
   );
 
   return {
-    id: `battle-${Date.now()}`,
+    id: `battle-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     hero: {
       id: "player-1",
       name: heroName,

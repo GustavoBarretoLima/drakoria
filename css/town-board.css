@@ -1,0 +1,14 @@
+.town-board { box-sizing:border-box; padding:20px; border:1px solid #55868d; border-radius:14px; background:linear-gradient(135deg,#143941,#071c23); color:#d6edf0; }
+.town-board h2,.town-board h3,.town-board h4 { color:#d1f8ff; }
+.town-board > section { margin-top:28px; }
+.town-card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:14px; }
+.town-card { min-width:0; padding:16px; border:1px solid #446c75; background:#0c252e; border-radius:10px; }
+.town-card p { line-height:1.6; overflow-wrap:anywhere; }
+.town-card button,.town-board .painel-acoes button { width:100%; margin-top:8px; padding:10px; border:1px solid #73a7ad; border-radius:6px; color:#e9ffff; background:#214550; cursor:pointer; }
+.town-card button:disabled { opacity:.5; cursor:default; }
+.town-card button:focus-visible { outline:3px solid #ffd67e; outline-offset:3px; }
+.town-board .panel-header { flex-wrap:wrap; gap:12px; }
+@media(max-width:600px){.town-board{padding:12px;}}
+/* Keep the catalog and mission board inside the viewport, including panel padding. */
+#painelPraca:has(> .town-board) { box-sizing:border-box; width:min(1000px,calc(100vw - 24px)); padding:12px; max-height:calc(100dvh - 90px); overflow:auto; }
+html:has(.town-board), body:has(.town-board) { margin:0; overflow-x:hidden; }

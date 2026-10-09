@@ -1,3 +1,4 @@
+import { recordQuestVictory } from "./progression/questClient.js";
 import { prepareNextMonster, clearBattleStorage, completeIntroVictory } from "./battle/victoryNavigation.js";
 import { getBattleExitPage } from "./battle/worldMapNavigation.js";
 import { setupBattleArena } from "./assets/battleArena.js";
@@ -10,6 +11,7 @@ import {
   loadConsumables,
   loadHeroVitals,
   saveHeroVitals,
+  savePotionInventory,
   useHealthPotion,
   useManaPotion,
   useRestorativePotion,
@@ -146,6 +148,7 @@ function applyVictoryRewards(state: BattleState): void {
 
   rewardedBattleId = state.id;
   const result = awardBattleRewards(state.rewards);
+  recordQuestVictory(state);
   const drops = state.rewards.drops ?? [];
   const classBooks = state.rewards.classBooks ?? [];
   addDropsToInventory(drops);
@@ -237,9 +240,11 @@ function scheduleDefeatRedirect(): void {
   }, 4200);
 }
 
+let lastPotionSnapshot="";
 function renderState(state: BattleState): void {
   console.log("Novo estado da batalha:", state);
   persistBattleVitals(state);
+  if(state.potions){const snapshot=state.id+JSON.stringify(state.potions);if(snapshot!==lastPotionSnapshot){savePotionInventory(state.potions);lastPotionSnapshot=snapshot;}}
   setEnemyGifs(state.enemy.sprites);
   renderBattle(state);
   renderAtbPhase(state);
@@ -259,6 +264,7 @@ if (demoMode) {
     const vitals = getCurrentHeroVitals();
 
     socket.emit("player:setup", {
+      potions:loadConsumables(),
       heroName: localStorage.getItem("nomeHeroi") || "Heroi",
       treeRanks: loadSubclassProgress().treeRanks,
       equippedSkills: loadSubclassProgress().equippedSkills,
