@@ -12,3 +12,4 @@
 /* Keep the catalog and mission board inside the viewport, including panel padding. */
 #painelPraca:has(> .town-board) { box-sizing:border-box; width:min(1000px,calc(100vw - 24px)); padding:12px; max-height:calc(100dvh - 90px); overflow:auto; }
 html:has(.town-board), body:has(.town-board) { margin:0; overflow-x:hidden; }
+.potion-shop-icon { display:block; width:96px; height:96px; object-fit:contain; margin:0 auto 12px; }

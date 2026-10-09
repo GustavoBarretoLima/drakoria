@@ -1,3 +1,4 @@
+import { POTION_ICONS } from "./potionIcons.js";
 import { loadConsumables } from "../battle/heroVitals.js";
 import { isPagesDemoMode,useDemoConsumable } from "../demo/demoBattle.js";
 import { POTIONS,type PotionId } from "../../../shared/src/items/potions.js";
@@ -69,7 +70,7 @@ function updateItemMenu(): void {
     button.type = "button";
     button.className = "battle-item-row";
     button.disabled = !heroTurnReady();
-    button.innerHTML = `<strong>${POTIONS[itemId].name}</strong><span>${POTIONS[itemId].detail}</span><b>×${count}</b>`;
+    button.innerHTML = `<img src="${POTION_ICONS[itemId]}" alt="" width="40" height="40" /><strong>${POTIONS[itemId].name}</strong><span>${POTIONS[itemId].detail}</span><b>×${count}</b>`;
     button.addEventListener("click", () => usePotion(itemId));
     list.append(button);
   }

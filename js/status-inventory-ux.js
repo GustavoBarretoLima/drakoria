@@ -232,6 +232,7 @@ function inventoryUxOpen() {
       <section class="jrpg-loadout"><h3 class="section-title">Equipamentos</h3><p class="inventory-help">Selecione uma peça equipada para desequipar.</p><div class="equipment-grid">${equipmentSlots}</div>
         <div class="jrpg-backpack-heading"><h3 class="section-title">Mochila</h3><span class="inventory-capacity">${backpack.length}/${INVENTORY_UX_SLOTS}</span></div>
         <p class="inventory-help">Passe o mouse ou use Tab para comparar com o item equipado no mesmo slot.</p><div class="inventory-grid">${itemSlots}</div>
+        ${window.criarPocoesInventario?.() || ""}
       </section>
     </div></div>`;
   panel.scrollTop = 0;
