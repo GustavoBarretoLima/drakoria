@@ -12,3 +12,11 @@
 .blacksmith-card p { line-height:1.6; font-size:14px; }
 .blacksmith-card button { width:100%; }
 .blacksmith-back { display:inline-block; margin-top:24px; text-decoration:none; }
+.blacksmith-card select { display:block; box-sizing:border-box; width:100%; margin:8px 0; padding:10px; border:1px solid #739eb8; border-radius:6px; background:#0d2533; color:#eaf6ff; }
+.forge-review { margin:18px 0; padding:18px; border:1px solid #d4af37; border-radius:10px; background:#17323ddd; }
+.forge-review button { margin:6px; }
+.forge-comparison { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.forge-review p { line-height:1.6; overflow-wrap:anywhere; }
+@media(max-width:650px){.forge-comparison{grid-template-columns:1fr;}.blacksmith-shop header{flex-wrap:wrap;}}
+.forge-review { scroll-margin-top:80px; }
+body.has-city-sidebar:has(.blacksmith-shop) { background:#0a1724; }

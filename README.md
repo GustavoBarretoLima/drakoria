@@ -447,7 +447,20 @@ Demo e backend compartilham catálogo, validação de estoque e efeitos. O backe
 
 ### Ferreiro e equipamentos temáticos dos monstros
 
-O ferreiro vende as 27 peças dos conjuntos Leão Rubro, Constelação Arcana e Falcão Verde (nove espaços por classe). São raras de nível 20, a 408 ouro cada; venda rende 102 ouro. Compras vão à mochila, preservam cópias e exigem um espaço livre para uma nova entrada. Restrições de nível/classe continuam na equipagem; armas compradas são adaptadas para Berserk/Assassino quando aplicável.
+O ferreiro cria equipamentos em vez de vendê-los. Os 27 modelos dos conjuntos Leão Rubro, Constelação Arcana e Falcão Verde são usados em 108 receitas de forja, com as imagens existentes. Equipamentos comprados anteriormente são preservados e continuam canônicos.
+
+| Resultado da forja | Nível | Peça consumida, no mesmo slot/classe | Fragmentos | Ouro |
+| --- | ---: | --- | ---: | ---: |
+| Raro | 10 | Comum ou incomum até Nv.10 | 10 | 60 |
+| Épico | 25 | Raro até Nv.25 | 30 | 250 |
+| Lendário | 40 | Épico até Nv.40 | 80 | 700 |
+| Mítico | 55 | Lendário até Nv.55 | 180 | 1800 |
+
+A forja exige o nível do resultado e nunca falha. Na aba **Desmontar**, uma unidade sobressalente vira fragmentos: comum 2, incomum 3, raro 6, épico 12, lendário 24 ou mítico 48, mais 1 a cada 10 níveis do item. Isso reaproveita drops existentes sem alterar suas chances ou adicionar materiais ao estoque das poções. Fragmentos ficam no depósito da forja, sem ocupar slots da mochila.
+
+Antes de confirmar, a interface mostra custos e atributos da peça utilizada e do resultado. Desmontagem também pede revisão da unidade consumida. Equipados ficam protegidos; uma cópia extra pode ser usada sem remover a equipada. A peça criada vai para a mochila, e falta de espaço ou recursos não consome nada. Receitas respeitam a classe; armas são adaptadas para Berserk e Assassino, e escudos não aparecem para Berserk. Os míticos recebem +5 no atributo principal da classe e o brilho já existente. Os itens criados têm atributos canônicos compartilhados pela demo e pelo backend; a persistência continua no save local existente.
+
+`tests/crafting.test.ts` cobre receitas, progressão, materiais, custos, recusas, itens equipados, cópias extras, mochila cheia, sets antigos e compatibilidade com subclasses/backend.
 
 Os 16 equipamentos de `img/itens/loot_monstros` foram registrados no catálogo compartilhado e no servidor. Cada monstro correspondente tem uma rolagem temática adicional, independente do equipamento genérico e dos livros. Chances por abate seguem a proposta: Goblin/Rato/Hobgoblin 3%; Esqueleto/Orc/Aranha/Espectro/Lobo Sombrio 2%; Árvore 1%; Hobgoblin Elite 6%; Senhor da Guerra 8%; Hidra/Coveiro/Lobo Mutante 3%; Rei Orc tem rolagens separadas de 3% para machado e 2% para medalhão.
 
