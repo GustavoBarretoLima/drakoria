@@ -1,8 +1,11 @@
+import { emptyBerserkState } from "../../../../shared/src/combat/berserkCombat.js";
+import { hasBerserkAxe } from "../../../../shared/src/equipment/berserkWeapons.js";
+import { canEquipItem } from "../../../../shared/src/equipment/equipmentRules.js";
 import { hasMonsterInsight } from "../../../../shared/src/equipment/monsterInsight.js";
 import { createStatsForLevel, normalizeHeroLevel } from "../../../../shared/src/combat/classStats.js";
 import { applyEquipmentStats } from "../../../../shared/src/equipment/equipmentStats.js";
 import { applySubclassStats, type SubclassId } from "../../../../shared/src/classes/subclasses.js";
-import { applyTreeStats, normalizeTreeRanks } from "../../../../shared/src/classes/skillTrees.js";
+import { applyTreeStats, normalizeTreeRanks, normalizeBerserkLoadout } from "../../../../shared/src/classes/skillTrees.js";
 import { adaptSubclassWeaponDrops } from "../../../../shared/src/equipment/assassinWeapons.js";
 import { rollMonsterDrops } from "../../../../shared/src/loot/lootTables.js";
 import { rollSubclassBookDrops } from "../../../../shared/src/loot/subclassBooks.js";
@@ -54,11 +57,13 @@ export function createInitialBattleState(
   subclassId?: SubclassId,
   heroName = "Heroi",
   rawTreeRanks?: unknown,
+  rawEquippedSkills?: unknown,
 ): BattleState {
   const monster = getMonsterById(monsterId);
 
   if (!monster) throw new Error(`Monstro nao encontrado: ${monsterId}`);
 
+  equippedItems = equippedItems.filter(item => canEquipItem(item, heroClass, heroLevel, subclassId));
   const treeRanks = normalizeTreeRanks(subclassId, heroLevel, rawTreeRanks);
   const heroStats = applyTreeStats(applySubclassStats(
     applyEquipmentStats(
@@ -84,6 +89,7 @@ export function createInitialBattleState(
       className: heroClass,
       level: normalizeHeroLevel(heroLevel),
       ...(subclassId ? { subclassId } : {}), treeRanks,
+      ...(subclassId === "berserker" ? { fury: 0, berserk: emptyBerserkState(), hasTwoHandedAxe: hasBerserkAxe(equippedItems), equippedSkills: normalizeBerserkLoadout(heroLevel, treeRanks, rawEquippedSkills) } : {}),
       stats: heroStats,
       atb: 0,
       defending: false,

@@ -270,3 +270,5 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+#batalha #manaHeroiBar.berserk-fury { background: linear-gradient(90deg, #b52512, #ff9e2c); }

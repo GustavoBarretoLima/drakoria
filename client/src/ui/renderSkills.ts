@@ -62,7 +62,7 @@ export function renderSkills(state: BattleState, onUseSkill: (id: SkillId) => vo
   launcher.disabled = state.finished || skills.length === 0;
   if (title && heroClass) {
     const labels = { guerreiro: "Guerreiro", mago: "Mago", arqueiro: "Arqueiro" };
-    title.textContent = `Habilidades — ${labels[heroClass]}`;
+    title.textContent = `Habilidades — ${state.hero.subclassId === "berserker" ? "Berserk" : labels[heroClass]}`;
   }
   if (container.dataset.skillClass !== skillKey) {
     close(false);
@@ -86,13 +86,13 @@ export function renderSkills(state: BattleState, onUseSkill: (id: SkillId) => vo
       const name = document.createElement("strong");
       name.textContent = skill.name;
       const meta = document.createElement("span");
-      meta.textContent = `${skill.manaCost} MP`;
+      meta.textContent = `${skill.furyCost ?? skill.manaCost} ${skill.furyCost !== undefined ? "Fúria" : "MP"}`;
       const status = document.createElement("span");
       status.id = `skill-status-${skill.id}`;
       const description = document.createElement("span");
       description.id = `skill-detail-${skill.id}`;
       description.className = "battle-skill-accessible-detail";
-      description.textContent = `${skill.description} Custo: ${skill.manaCost} mana. Recuperação: ${skill.cooldown} outra(s) ação(ões). Requer nível ${skill.unlockLevel}.`;
+      description.textContent = `${skill.description} Custo: ${skill.furyCost ?? skill.manaCost} ${skill.furyCost !== undefined ? "Fúria" : "mana"}. Recuperação: ${skill.cooldown} outra(s) ação(ões). Requer nível ${skill.unlockLevel}.`;
       button.append(name, meta, status);
       row.append(button, description);
       container.append(row);
@@ -106,11 +106,11 @@ export function renderSkills(state: BattleState, onUseSkill: (id: SkillId) => vo
     const label = state.finished ? "Batalha encerrada" : blocked ?? (isHeroTurn ? "Pronta" : "Aguarde seu turno");
     if (button) {
       button.disabled = !isHeroTurn || blocked !== null;
-      button.title = `${skill.description}\n${skill.manaCost} mana · Recuperação: ${skill.cooldown} ação(ões)\n${label}`;
+      button.title = `${skill.description}\n${skill.furyCost ?? skill.manaCost} ${skill.furyCost !== undefined ? "Fúria" : "mana"} · Recuperação: ${skill.cooldown} ação(ões)\n${label}`;
     }
     if (status) status.textContent = blocked?.startsWith("Desbloqueia") ? `Nv.${skill.unlockLevel}`
       : getSkillCooldown(state.hero, skill.id) > 0 ? `CD ${getSkillCooldown(state.hero, skill.id)}`
-      : blocked ? "Sem MP" : isHeroTurn ? "Pronta" : "Aguarde";
+      : blocked ? state.hero.subclassId === "berserker" ? "Indisponível" : "Sem MP" : isHeroTurn ? "Pronta" : "Aguarde";
   }
   select(container.dataset.selectedSkill ?? "");
   if (state.finished || skills.length === 0) close(false);

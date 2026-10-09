@@ -18,7 +18,7 @@ Object.defineProperty(globalThis, "window", { value: { setInterval: () => 1, cle
 const originalRandom = Math.random;
 Math.random = () => 0.99;
 try {
-  for (const id of SUBCLASS_IDS) {
+  for (const id of SUBCLASS_IDS.filter(id => id !== "berserker")) {
     const tree = SUBCLASS_TREES[id];
     assert.equal(tree.length, 6);
     assert.equal(tree.filter(node => node.skill).length, 3);
@@ -130,4 +130,4 @@ try {
   vm.runInContext("window.abrirStatus()", context);
   assert.ok(!panel.innerHTML.includes('onclick="abrirArvoreSubclasse()"'));
 } finally { Math.random = originalRandom; }
-console.log("subclassSkillTrees.test.ts: nine trees, budgets, prerequisites, book gate, saves, reset, 27 skills, combat effects, demo/backend parity and status passed");
+console.log("subclassSkillTrees.test.ts: eight legacy trees, budgets, prerequisites, book gate, saves, reset, 24 legacy skills, combat effects, demo/backend parity and status passed");

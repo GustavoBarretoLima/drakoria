@@ -19,3 +19,7 @@ export function syncCharacterVitals(): void {
   const stats = getCurrentHeroStats();
   saveHeroVitals(loadHeroVitals(stats.maxHp, stats.maxMana));
 }
+
+export function getBerserkPreviewStats() {
+  return applySubclassStats(applyEquipmentStats(createStatsForLevel("guerreiro", loadProgress().nivel), getEquippedItems().filter(item => item.slot !== "shield")), "berserker");
+}

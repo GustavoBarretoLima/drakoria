@@ -163,6 +163,7 @@ io.on("connection", (socket) => {
       subclassId?: string;
       heroName?: string;
       treeRanks?: unknown;
+      equippedSkills?: unknown;
       monsterId?: string;
       equippedItemIds?: string[];
       heroLevel?: number;
@@ -194,6 +195,7 @@ io.on("connection", (socket) => {
           subclassId,
           typeof payload.heroName === "string" ? payload.heroName.trim().slice(0, 40) : "Heroi",
           payload.treeRanks,
+          payload.equippedSkills,
         );
 
         socket.emit("battle:update", battleState);

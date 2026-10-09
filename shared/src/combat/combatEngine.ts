@@ -7,6 +7,8 @@ import { CLASS_SKILLS, getHeroSkills, getSkill, getSkillBlockReason, getSkillCoo
 import type { CombatantState } from "../types/combat.js";
 import { SUBCLASS_SKILLS } from "../classes/skillTrees.js";
 
+import { performBerserkSkill, berserkDamageMultiplier, berserkCriticalBonus, healBerserkDamage, onBerserkBasicHit, finishBerserkAction, takeBerserkDamage, tickBerserkBleed } from "./berserkCombat.js";
+
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -72,23 +74,29 @@ export function applyBattleAction(
   if (state.turnOwnerId !== state.hero.id) return state;
   if (!state.hero.isAlive || !state.enemy.isAlive) return state;
 
+  if (state.hero.subclassId === "berserker" && action.type === "CAST_MAGIC") return state;
   if (action.type === "CAST_MAGIC" && (state.hero.skillLockedTurns ?? 0) > 0) return state;
   const selectedSkill = action.type === "USE_SKILL" ? getHeroSkills(state.hero).find(skill => skill.id === action.skillId) ?? getSkill(action.skillId) : undefined;
   // Rejected skills leave mana, ATB, cooldowns and the current turn untouched.
   if (action.type === "USE_SKILL" && (!selectedSkill || getSkillBlockReason(state.hero, selectedSkill))) return state;
 
-  const hero = { ...state.hero, stats: { ...state.hero.stats }, atb: 0 };
+  const hero = { ...state.hero, stats: { ...state.hero.stats }, ...(state.hero.berserk ? { berserk: { ...state.hero.berserk } } : {}), atb: 0 };
   const enemy = { ...state.enemy, stats: { ...state.enemy.stats } };
 
-  const statusMessage = tickHeroDamage(hero);
+  const statusMessage = tickHeroDamage(hero) + tickBerserkBleed(enemy);
   if (!hero.isAlive) return { ...state, hero, enemy, finished: true, winnerId: enemy.id, turnOwnerId: enemy.id,
     lastEvent: { actorId: enemy.id, targetId: hero.id, action: "CAST_MAGIC", message: statusMessage } };
+  if (!enemy.isAlive) return { ...state, hero, enemy, finished: true, winnerId: hero.id, turnOwnerId: hero.id, lastEvent: { actorId: hero.id, targetId: enemy.id, action: "ATTACK", message: statusMessage } };
   hero.skillLockedTurns = Math.max(0, (hero.skillLockedTurns ?? 0) - 1);
   let event: BattleEvent;
 
   switch (action.type) {
     case "USE_SKILL": {
       if (!selectedSkill) return state;
+      if (selectedSkill.effect === "berserk") {
+        event = performBerserkSkill(hero, enemy, selectedSkill, { dodge: rollDodge, critical: rollCritical, mitigate: calculateDamageTaken, criticalDamage: applyCriticalDamage });
+        break;
+      }
       hero.stats.mana -= selectedSkill.manaCost;
       let damage = 0;
       let critical = false;
@@ -146,8 +154,8 @@ export function applyBattleAction(
     }
     case "ATTACK": {
       const dodged = rollDodge(enemy.stats.dodgeChance);
-      const critical = !dodged && rollCritical(hero.stats.criticalChance);
-      const rawDamage = randomInt(5, 15) + hero.stats.attack;
+      const critical = !dodged && rollCritical(hero.stats.criticalChance + berserkCriticalBonus(hero));
+      const rawDamage = (randomInt(5, 15) + hero.stats.attack) * berserkDamageMultiplier(hero, true);
       const mitigatedDamage = calculateDamageTaken(
         rawDamage,
         enemy.stats.defense,
@@ -157,6 +165,10 @@ export function applyBattleAction(
         ? applyCriticalDamage(mitigatedDamage, hero.stats.criticalDamage)
         : mitigatedDamage;
 
+      if (hero.subclassId === "berserker" && damage > 0) {
+        healBerserkDamage(hero, Math.min(enemy.stats.hp, damage));
+        onBerserkBasicHit(hero);
+      }
       enemy.stats.hp = Math.max(0, enemy.stats.hp - damage);
       enemy.isAlive = enemy.stats.hp > 0;
       if (!dodged) enemy.defending = false;
@@ -190,7 +202,7 @@ export function applyBattleAction(
         hero.stats.mana -= 10;
 
         const dodged = rollDodge(enemy.stats.dodgeChance);
-        const critical = !dodged && rollCritical(hero.stats.criticalChance);
+        const critical = !dodged && rollCritical(hero.stats.criticalChance + berserkCriticalBonus(hero));
         const rawDamage = randomInt(10, 25) + hero.stats.magicPower;
         const mitigatedDamage = calculateDamageTaken(
           rawDamage,
@@ -245,6 +257,7 @@ export function applyBattleAction(
     }
     if (selectedSkill) hero.skillCooldowns[selectedSkill.id] = selectedSkill.cooldown;
   }
+  finishBerserkAction(hero, state.hero, selectedSkill?.id, action.type === "ATTACK" && (event.damage ?? 0) > 0);
   event.message = statusMessage + event.message;
   const finished = !enemy.isAlive;
 
@@ -268,8 +281,9 @@ export function rollDodge(chance: number): boolean {
 /** One enemy action per ATB turn; cooldown counts subsequent enemy turns. */
 export function applyEnemyTurn(state: BattleState): BattleState {
   if (state.finished || state.turnOwnerId !== state.enemy.id) return state;
-  const hero = { ...state.hero, stats: { ...state.hero.stats } };
+  const hero = { ...state.hero, stats: { ...state.hero.stats }, ...(state.hero.berserk ? { berserk: { ...state.hero.berserk } } : {}) };
   const enemy = { ...state.enemy, stats: { ...state.enemy.stats }, atb: 0 };
+  enemy.slowedTurns = Math.max(0, (enemy.slowedTurns ?? 0) - 1);
   let ongoingMessage = "";
   if (enemy.ongoingDamage && enemy.ongoingDamage.turns > 0) {
     const ongoing = enemy.ongoingDamage;
@@ -322,7 +336,7 @@ export function applyEnemyTurn(state: BattleState): BattleState {
   const rawDamage = (power * (ambush ? 1.35 : special ? 1.15 : 1) + (usesMagic ? 6 : 0)) * (weakened ? 0.8 : 1);
   const defense = usesMagic ? hero.stats.magicDefense : hero.stats.defense * (ambush ? 0.5 : 1);
   const mitigated = calculateDamageTaken(rawDamage, defense, hero.defending);
-  const damage = dodged ? 0 : critical ? applyCriticalDamage(mitigated, enemy.stats.criticalDamage) : mitigated;
+  const damage = dodged ? 0 : takeBerserkDamage(hero, critical ? applyCriticalDamage(mitigated, enemy.stats.criticalDamage) : mitigated, !usesMagic, true);
   hero.stats.hp = Math.max(0, hero.stats.hp - damage);
   hero.isAlive = hero.stats.hp > 0;
   // A missed hit preserves a defensive stance until an actual hit lands.
@@ -348,7 +362,8 @@ export function applyEnemyTurn(state: BattleState): BattleState {
 export function tickHeroDamage(hero: CombatantState): string {
   const effect = hero.ongoingDamage;
   if (!effect || effect.turns <= 0) return "";
-  const damage = Math.min(hero.stats.hp, effect.damage);
+  if (hero.berserk) hero.berserk = { ...hero.berserk };
+  const damage = Math.min(hero.stats.hp, takeBerserkDamage(hero, effect.damage, false, false));
   hero.stats.hp = Math.max(0, hero.stats.hp - damage);
   hero.isAlive = hero.stats.hp > 0;
   if (effect.turns > 1) hero.ongoingDamage = { ...effect, turns: effect.turns - 1 };

@@ -12,6 +12,24 @@ function inventorySubclass(): SubclassId | undefined {
     return SUBCLASS_DEFINITIONS[id]?.baseClass === inventoryHeroClass() ? id : undefined;
   } catch { return undefined; }
 }
+import { createBerserkAxe } from "../../../shared/src/equipment/berserkWeapons.js";
+function reconcileBerserk(inventory: InventoryState, grantStarter = false): boolean {
+  if (inventorySubclass() !== "berserker") return false;
+  let changed = false;
+  if (inventory.equipped.shield) { delete inventory.equipped.shield; changed = true; }
+  const weapon = inventory.items.find(entry => entry.item.id === inventory.equipped.weapon)?.item;
+  if (weapon?.weaponType === "two-handed-axe" || (!weapon && !grantStarter)) return changed;
+  if (weapon && !weapon.allowedClasses.includes("guerreiro")) return changed;
+  const axe = createBerserkAxe(weapon ?? createDungeonEquipment("guerreiro", "weapon", 1, "common"));
+  if (!inventory.items.some(entry => entry.item.id === axe.id)) inventory.items.push({ item: axe, quantity: 1 });
+  inventory.equipped.weapon = axe.id;
+  return true;
+}
+export function ensureBerserkEquipment(grantStarter = false): void {
+  const inventory = loadInventory();
+  if (reconcileBerserk(inventory, grantStarter)) saveInventory(inventory);
+}
+
 function reconcileAssassin(inventory: InventoryState, grantStarter = false): boolean {
   if (inventorySubclass() !== "assassin") return false;
   const weapon = inventory.items.find(entry => entry.item.id === inventory.equipped.weapon)?.item;
@@ -55,7 +73,9 @@ export function loadInventory(): InventoryState {
       items: Array.isArray(parsed.items) ? parsed.items.map(entry => ({ ...entry, item: canonicalEquipment(entry.item) })) : [],
       equipped: parsed.equipped ?? {},
     };
-    if (reconcileAssassin(inventory)) saveInventory(inventory);
+    const assassinChanged = reconcileAssassin(inventory);
+    const berserkChanged = reconcileBerserk(inventory);
+    if (assassinChanged || berserkChanged) saveInventory(inventory);
     return inventory;
   } catch {
     return cloneInventory(EMPTY_INVENTORY);

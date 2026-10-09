@@ -3,18 +3,20 @@ import type { ClassSkill } from "../combat/classSkills.js";
 import type { Stats } from "../types/combat.js";
 import { normalizeHeroLevel } from "../combat/classStats.js";
 
+import { BERSERK_NODES } from "./berserkTree.js";
+
 export type TreeRanks = Record<string, number>;
 export interface TalentNode {
   id: string; name: string; description: string; maxRank: number; level: number;
   requires: Array<{ id: string; rank: number }>;
+  path?: string; tier?: number; requiredPoints?: number; final?: boolean;
   bonus?: Partial<Record<keyof Stats, number>>;
   skill?: ClassSkill;
 }
 type Profile = { talents: [string, keyof Stats, number][]; skills: [string, string, ClassSkill["effect"], number, number, number][] };
 const STAT_NAMES: Partial<Record<keyof Stats, string>> = { maxHp: "vida máxima", maxMana: "mana máxima", attack: "ataque", defense: "defesa", magicDefense: "defesa mágica", magicPower: "poder mágico", speed: "velocidade", criticalChance: "chance crítica", criticalDamage: "dano crítico", dodgeChance: "esquiva" };
-const PROFILES: Record<SubclassId, Profile> = {
+const PROFILES: Record<Exclude<SubclassId, "berserker">, Profile> = {
   paladin: { talents: [["Vitalidade Sagrada", "maxHp", 3], ["Armadura da Fé", "defense", 3], ["Égide Divina", "magicDefense", 3]], skills: [["Luz Restauradora", "Cura 20% da vida máxima (+3% por rank adicional).", "heal", 0, 12, 2], ["Golpe Consagrado", "Ataque físico e postura defensiva.", "guard", 1.3, 12, 2], ["Santuário", "Cura 35% da vida máxima (+3% por rank adicional) e assume postura defensiva.", "healGuard", 0, 24, 4]] },
-  berserker: { talents: [["Força Indomável", "attack", 3], ["Sede de Combate", "criticalChance", 1], ["Fúria Implacável", "criticalDamage", 3]], skills: [["Golpe Temerário", "Ataque poderoso; sacrifica 5% da vida máxima, sem se matar.", "recoil", 1.65, 8, 1], ["Dilacerar", "Abre uma ferida que causa dano por três turnos inimigos.", "bleed", 1.25, 12, 3], ["Execução Furiosa", "Causa 30% mais dano contra alvos com até 30% de vida.", "execute", 2.1, 22, 4]] },
   swordsman: { talents: [["Ritmo da Lâmina", "speed", 2], ["Precisão do Duelista", "criticalChance", 1], ["Passo Evasivo", "dodgeChance", 1]], skills: [["Corte Duplo", "Dois cortes; cada golpe rola esquiva e crítico.", "none", 0.8, 8, 2], ["Riposta", "Ataca e assume postura defensiva para receber o próximo golpe.", "guard", 1.35, 12, 2], ["Dança das Espadas", "Três cortes rápidos com rolagens independentes.", "none", 0.85, 22, 4]] },
   necromancer: { talents: [["Domínio das Almas", "magicPower", 3], ["Reservatório Espiritual", "maxMana", 3], ["Véu dos Mortos", "magicDefense", 3]], skills: [["Drenar Vida", "Recupera 25% do dano causado como vida.", "drain", 1.25, 12, 2], ["Invocar Espírito", "O espírito ataca por três turnos inimigos; não captura almas permanentemente.", "summon", 0.9, 18, 3], ["Legião Espectral", "Invocação mais forte que ataca por três turnos inimigos.", "summon", 1.8, 28, 4]] },
   warlock: { talents: [["Pacto Sombrio", "magicPower", 3], ["Vigor do Pacto", "maxMana", 3], ["Olhar Maldito", "criticalChance", 1]], skills: [["Maldição da Fraqueza", "Ao acertar, reduz em 20% o dano direto inimigo por três turnos.", "weaken", 1.1, 12, 3], ["Chama Profana", "Aplica dano contínuo por três turnos inimigos.", "burn", 1.2, 16, 3], ["Colheita Sombria", "Recupera 25% do dano causado como vida.", "drain", 2, 26, 4]] },
@@ -25,6 +27,7 @@ const PROFILES: Record<SubclassId, Profile> = {
 };
 
 export const SUBCLASS_TREES: Record<SubclassId, TalentNode[]> = Object.fromEntries(SUBCLASS_IDS.map(id => {
+  if (id === "berserker") return [id, BERSERK_NODES];
   const profile = PROFILES[id];
   const names = ["foundation", "technique", "discipline", "signature", "mastery", "ultimate"];
   const levels = [1, 5, 5, 10, 10, 20];
@@ -61,6 +64,8 @@ export function normalizeTreeRanks(id: SubclassId | undefined, level: number, ra
     const rank = (raw as TreeRanks)[node.id];
     if (typeof rank !== "number" || !Number.isInteger(rank) || rank <= 0 || rank > node.maxRank || normalizeHeroLevel(level) < node.level) continue;
     if (node.requires.some(req => (result[req.id] ?? 0) < req.rank)) continue;
+    if (node.requiredPoints && spentTreePoints(result) + 1 < node.requiredPoints) continue;
+    if (node.final && SUBCLASS_TREES[id].some(candidate => candidate.final && result[candidate.id])) continue;
     result[node.id] = rank;
   }
   return spentTreePoints(result) <= earnedTreePoints(level) ? result : {};
@@ -70,6 +75,8 @@ export function treeBlockReason(id: SubclassId, level: number, ranks: TreeRanks,
   if (!SUBCLASS_TREES[id]?.some(candidate => candidate.id === node.id)) return "Talento de outra subclasse";
   if ((ranks[node.id] ?? 0) >= node.maxRank) return "Rank máximo";
   if (normalizeHeroLevel(level) < node.level) return `Requer nível ${node.level}`;
+  if (node.final && SUBCLASS_TREES[id].some(candidate => candidate.final && ranks[candidate.id])) return "Apenas uma habilidade final pode ser escolhida";
+  if (node.requiredPoints && spentTreePoints(ranks) + 1 < node.requiredPoints) return `Requer ${node.requiredPoints} pontos na árvore (incluindo Despertar)`;
   const missing = node.requires.find(req => (ranks[req.id] ?? 0) < req.rank);
   if (missing) return `Requer ${SUBCLASS_TREES[id].find(candidate => candidate.id === missing.id)?.name}: rank ${missing.rank}`;
   if (spentTreePoints(ranks) >= earnedTreePoints(level)) return "Sem pontos disponíveis";
@@ -91,4 +98,15 @@ export function applyTreeStats(stats: Stats, id: SubclassId | undefined, level: 
   next.hp = stats.hp >= stats.maxHp ? next.maxHp : Math.min(next.maxHp, stats.hp);
   next.mana = stats.mana >= stats.maxMana ? next.maxMana : Math.min(next.maxMana, stats.mana);
   return next;
+}
+
+export function normalizeBerserkLoadout(level: number, rawRanks: unknown, rawLoadout?: unknown): string[] {
+  const ranks = normalizeTreeRanks("berserker", level, rawRanks);
+  const learned = BERSERK_NODES.filter(node => node.skill && ranks[node.id]).map(node => node.id);
+  const requested = rawLoadout === undefined ? learned : Array.isArray(rawLoadout) ? rawLoadout : [];
+  const seen = new Set<string>();
+  return requested.slice(0, 4).map(id => {
+    if (typeof id !== "string" || !learned.includes(id) || seen.has(id)) return "";
+    seen.add(id); return id;
+  });
 }

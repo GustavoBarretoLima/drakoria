@@ -55,6 +55,7 @@ export interface EquipmentItem {
   rarity: EquipmentRarity;
   level: number;
   allowedClasses: Array<HeroClass | "universal">;
+  weaponType?: "two-handed-axe";
   requiredSubclass?: import("../classes/subclasses.js").SubclassId;
   stats: EquipmentStats;
   uniqueEffect?: UniqueEffect;

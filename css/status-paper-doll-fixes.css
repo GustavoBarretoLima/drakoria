@@ -221,3 +221,23 @@ body:has(.subclass-tree) { margin: 0; overflow: hidden; }
     max-height: 62vh;
   }
 }
+
+.berserk-root, .berserk-loadout { padding: 16px; margin: 16px 0; border: 1px solid #a86b37; border-radius: 12px; background: #140d0bd9; }
+.berserk-root strong, .berserk-loadout h3 { color: #ffd36a; }
+.berserk-root p, .berserk-loadout p { font-size: .9rem; line-height: 1.6; }
+.berserk-loadout > div { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.berserk-loadout label { display: grid; gap: 8px; color: #ffd36a; }
+.berserk-loadout select { width: 100%; min-width: 0; background: #1c1711; color: #fff1d0; border: 1px solid #8c7040; padding: 10px; border-radius: 6px; }
+.berserk-tree { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+.berserk-path { display: grid; gap: 24px; min-width: 0; }
+.berserk-path > h3 { text-align: center; color: #ffb873; }
+.berserk-path-0 .talent-node { border-color: #994238; }
+.berserk-path-1 .talent-node { border-color: #b27937; }
+.berserk-path-2 .talent-node { border-color: #887b67; }
+.berserk-path .berserk-final { border: 2px solid #e4b85c; }
+.berserk-path .talent-node::before { content: "↓"; }
+.berserk-path .talent-node:first-of-type::before { content: none; }
+.berserk-concept img { display: block; width: 100%; height: auto; margin-top: 12px; }
+.berserk-concept summary { cursor: pointer; color: #ffd36a; }
+@media (max-width: 900px) { .berserk-tree { grid-template-columns: 1fr; }.berserk-loadout > div { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 420px) { .berserk-loadout > div { grid-template-columns: 1fr; } }

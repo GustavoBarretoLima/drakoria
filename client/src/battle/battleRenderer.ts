@@ -91,7 +91,7 @@ function renderButtons(state: BattleState) {
 
   if (btnAtacar) btnAtacar.disabled = !isHeroTurn;
   if (btnDefender) btnDefender.disabled = !isHeroTurn;
-  if (btnMagia) btnMagia.disabled = !isHeroTurn || state.hero.stats.mana < 10;
+  if (btnMagia) { btnMagia.hidden = state.hero.subclassId === "berserker"; btnMagia.disabled = !isHeroTurn || state.hero.stats.mana < 10 || state.hero.subclassId === "berserker"; }
   if (btnFugir) btnFugir.disabled = !isHeroTurn;
 }
 

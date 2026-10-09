@@ -29,9 +29,9 @@ try {
   assert.ok(!rollDungeonDrops("hobgoblin-elite-lvl-15")!.some(drop => drop.item.id === INSIGHT_ACCESSORY.id));
 } finally { Math.random = originalRandom; }
 
-const elements = new Map<string, { textContent: string; style: { width: string }; hidden: boolean }>();
+const elements = new Map<string, { textContent: string; style: { width: string }; hidden: boolean; classList: { toggle: (name: string, active: boolean) => void } }>();
 (globalThis as any).document = { getElementById(id: string) {
-  if (!elements.has(id)) elements.set(id, { textContent: "", style: { width: "" }, hidden: false });
+  if (!elements.has(id)) elements.set(id, { textContent: "", style: { width: "" }, hidden: false, classList: { toggle() {} } });
   return elements.get(id);
 } };
 (globalThis as any).localStorage = { getItem: () => "Aventureiro" };

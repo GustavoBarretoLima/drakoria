@@ -6,7 +6,7 @@ import { applySubclassStats } from "../shared/src/classes/subclasses.js";
 import { getHeroGifs } from "../client/src/assets/gifs.ts";
 import { SPRITE_BOUNDS } from "../client/src/assets/spriteBounds.ts";
 import { useSubclassBook } from "../client/src/progression/subclassClient.ts";
-import { getCurrentHeroStats, syncCharacterVitals } from "../client/src/progression/heroStats.ts";
+import { getCurrentHeroStats, getBerserkPreviewStats, syncCharacterVitals } from "../client/src/progression/heroStats.ts";
 
 const STORAGE_KEY = "drakoriaSubclassProgress";
 const CLASS_LABELS = {
@@ -63,7 +63,7 @@ function useBook(subclassId) {
   if (!panel || !definition || !(state.books[subclassId] > 0) || state.activeSubclass || definition.baseClass !== heroClass()) return;
   document.getElementById("menuPraca")?.classList.add("hidden");
   const current = getCurrentHeroStats();
-  const next = applySubclassStats(current, subclassId);
+  const next = subclassId === "berserker" && typeof getBerserkPreviewStats === "function" ? getBerserkPreviewStats() : applySubclassStats(current, subclassId);
   const gender = (localStorage.getItem("generoHeroi") || "masculino").toLowerCase() === "feminino" ? "Feminino" : "Masculino";
   const rows = PREVIEW_STATS.map(([key, label, percent]) => {
     const delta = next[key] - current[key];
@@ -82,10 +82,11 @@ function useBook(subclassId) {
     </div>
     <section class="subclass-preview-passives"><h3>Passivas ao escolher ${escapeHtml(definition.name)}</h3>
       <p>${escapeHtml(definition.passiveSummary)}</p>
-      ${subclassId === "berserker" ? '<ul><li><strong>Força da fúria:</strong> aumenta o ataque físico em 20%.</li><li><strong>Críticos brutais:</strong> adiciona 20 pontos percentuais ao dano crítico.</li><li><strong>Guarda imprudente:</strong> reduz a defesa física em 10%.</li></ul>' : ""}
+      ${subclassId === "berserker" ? '<ul><li><strong>Força da fúria:</strong> aumenta o ataque físico em 20%.</li><li><strong>Despertar:</strong> libera Fúria e machados de duas mãos. Crítico, cura e resistência vêm da nova árvore.</li><li><strong>Guarda imprudente:</strong> reduz a defesa física em 10%.</li></ul>' : ""}
       <p>As passivas da árvore de habilidades são liberadas depois, ao distribuir pontos no botão Subclasse da tela de status.</p>
     </section>
     <p>A escolha é permanente e consome um livro. A escolha não restaura vida ou mana.</p>
+    ${subclassId === "berserker" ? "<p>A arma atual e a mão secundária ficarão na mochila. Um machado de duas mãos com os bônus da arma atual será equipado; a mão secundária deixa de conceder bônus. Sem arma, você receberá um machado inicial.</p>" : ""}
     ${subclassId === "assassin" ? "<p>Seu arco ficará na mochila e adagas equivalentes serão equipadas, preservando nível, raridade e bônus. Sem arma equipada, você receberá adagas iniciais.</p>" : ""}
     <p class="subclass-preview-message" role="alert"></p>
     <div class="painel-acoes"><button type="button" data-preview-cancel>Voltar aos livros</button>
