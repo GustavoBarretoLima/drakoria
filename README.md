@@ -160,7 +160,7 @@ O desenvolvimento local usa o backend. O modo demo é ativado automaticamente no
 
 Na criação de personagem, use o nome **Taichou** (maiúsculas/minúsculas e espaços nas extremidades são ignorados). Ele começa com nível mínimo 20, vida/mana completas e os nove equipamentos míticos de nível 20 da classe escolhida já equipados. A preparação preserva outros itens e não duplica o set ao ser executada novamente.
 
-Para esse nome, bosses elegíveis para livros de subclasse têm **100% de chance de conceder um livro**, na demo e no backend. A subclasse do livro continua aleatória; monstros comuns e mini-bosses mantêm as regras atuais. Outros personagens continuam com a chance normal de 0,5%. O nome é um atalho de testes, sem autenticação ou permissões administrativas de conta.
+Para esse nome, bosses elegíveis para livros de subclasse têm **100% de chance de conceder um livro**, na demo e no backend. A subclasse do livro continua aleatória; monstros comuns e mini-bosses mantêm as regras atuais. Outros personagens têm chance de **0,5% a 0,9%**, conforme o nível do boss: Cemitério (Nv.15) 0,5%, Pântano (Nv.25) 0,6%, Floresta (Nv.35) 0,7%, Acampamento (Nv.40) 0,75% e Fortaleza (Nv.55) 0,9%. Cada nível acima de 15 acrescenta 0,01 ponto percentual, com teto de 0,9%; bosses antigos abaixo de 15 mantêm 0,5%. A chance é de receber um livro, cuja subclasse é sorteada entre as nove com chances iguais, sem garantia por número de tentativas. Monstros comuns e mini-bosses não dropam livros. O nome é um atalho de testes, sem autenticação ou permissões administrativas de conta.
 
 ### Comandos
 

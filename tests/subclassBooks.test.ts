@@ -8,6 +8,8 @@ import {
 import { createStatsForLevel } from "../shared/src/combat/classStats.js";
 import {
   SUBCLASS_BOOK_DROP_CHANCE,
+  SUBCLASS_BOOK_MAX_DROP_CHANCE,
+  getSubclassBookDropChance,
   isBossMonsterId,
   rollSubclassBookDrops,
 } from "../shared/src/loot/subclassBooks.js";
@@ -18,6 +20,33 @@ import {
 } from "../client/src/progression/subclassClient.js";
 
 assert.equal(SUBCLASS_BOOK_DROP_CHANCE, 0.005);
+assert.equal(SUBCLASS_BOOK_MAX_DROP_CHANCE, 0.009);
+const bossRates = [
+  ["cursed-gravedigger-boss-lvl-15", 0.005],
+  ["corruption-hydra-boss-lvl-25", 0.006],
+  ["mutant-wolf-boss-lvl-35", 0.007],
+  ["orc-warlord-boss-lvl-40", 0.0075],
+  ["orc-king-boss-lvl-55", 0.009],
+] as const;
+for (const [boss, chance] of bossRates) {
+  assert.equal(getSubclassBookDropChance(boss), chance);
+  let calls = 0;
+  assert.equal(rollSubclassBookDrops(boss, () => { calls++; return calls === 1 ? chance - Number.EPSILON : 0; }).length, 1);
+  assert.deepEqual(rollSubclassBookDrops(boss, () => chance), []);
+  assert.deepEqual(rollSubclassBookDrops(boss, () => chance + Number.EPSILON), []);
+  assert.equal(rollSubclassBookDrops(boss, () => 0.999999, "Taichou").length, 1);
+}
+assert.equal(getSubclassBookDropChance("orc-king-boss-lvl-100"), 0.009);
+assert.equal(getSubclassBookDropChance("orc-king-boss-lvl-1"), 0.005);
+for (const id of ["goblin-normal-lvl-1", "orc-warlord-mini-boss-lvl-40", "orc-king-boss-lvl-0", "orc-king-boss-lvl-9999999999999999999", "orc-king-boss-lvl-NaN"]) {
+  assert.equal(getSubclassBookDropChance(id), 0);
+  assert.deepEqual(rollSubclassBookDrops(id, () => { throw new Error("Ineligible monsters must not roll"); }, "Taichou"), []);
+}
+for (let level = 1; level <= 100; level++) {
+  const chance = getSubclassBookDropChance(`orc-king-boss-lvl-${level}`);
+  assert.ok(chance >= 0.005 && chance <= 0.009);
+  assert.ok(chance >= getSubclassBookDropChance(`orc-king-boss-lvl-${Math.max(1, level - 1)}`));
+}
 assert.equal(SUBCLASS_IDS.length, 9);
 assert.equal(listSubclassesForClass("guerreiro").length, 3);
 assert.equal(listSubclassesForClass("mago").length, 3);

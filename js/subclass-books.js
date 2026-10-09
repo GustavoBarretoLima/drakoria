@@ -151,7 +151,7 @@ function openSubclassBooks() {
         <span class="panel-kicker">Conhecimento proibido</span>
         <h2>Livros de Subclasse</h2>
       </div>
-      <span class="subclass-drop-rate">0,5% por boss</span>
+      <span class="subclass-drop-rate">0,5% a 0,9% por boss, conforme o nível</span>
     </div>
     <p class="subclass-book-intro">
       Somente bosses podem derrubar estes livros. O livro sorteado pode pertencer a qualquer uma das nove subclasses.
