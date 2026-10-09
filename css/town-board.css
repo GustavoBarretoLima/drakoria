@@ -13,3 +13,18 @@
 #painelPraca:has(> .town-board) { box-sizing:border-box; width:min(1000px,calc(100vw - 24px)); padding:12px; max-height:calc(100dvh - 90px); overflow:auto; }
 html:has(.town-board), body:has(.town-board) { margin:0; overflow-x:hidden; }
 .potion-shop-icon { display:block; width:96px; height:96px; object-fit:contain; margin:0 auto 12px; }
+.guild-standing { padding:16px; border:1px solid #cfb66d; border-radius:10px; background:#162a30; }
+.guild-standing h3 { margin-top:0; color:#ffe4a5; }
+.guild-standing progress { width:100%; accent-color:#d4af37; }
+.guild-standing button { padding:12px; border:1px solid #d4af37; border-radius:8px; background:#33432c; color:#fff1b8; cursor:pointer; }
+.guild-deliveries { color:#ffe4a5; }
+.town-card.quest-ready { border-color:#d4af37; background:linear-gradient(135deg,#254735,#0c252e); }
+.town-card.quest-ready [data-claim] { border-color:#d4af37; color:#fff0a8; }
+.town-card [data-track][aria-pressed="true"] { border-color:#d4af37; }
+/* Layer translucent surfaces over the Guild interior while keeping text opaque. */
+#painelGuilda .town-board { background:linear-gradient(135deg,#143941a6,#071c2399); text-shadow:0 1px 3px #000; }
+#painelGuilda .guild-standing { background:#162a3073; }
+#painelGuilda .town-card { background:#0c252e80; }
+#painelGuilda .town-card.quest-ready { background:linear-gradient(135deg,#25473599,#0c252e80); }
+.guilda-interior .guild-welcome { background:#17100d99; }
+.guilda-interior .city-window-toolbar { background:#16120fb3; }

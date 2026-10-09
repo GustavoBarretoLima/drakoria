@@ -1,3 +1,4 @@
+import { renderQuestTracker } from "./ui/questTracker.js";
 import { recordQuestVictory } from "./progression/questClient.js";
 import { prepareNextMonster, clearBattleStorage, completeIntroVictory } from "./battle/victoryNavigation.js";
 import { getBattleExitPage } from "./battle/worldMapNavigation.js";
@@ -249,6 +250,7 @@ function renderState(state: BattleState): void {
   renderBattle(state);
   renderAtbPhase(state);
   applyVictoryRewards(state);
+  renderQuestTracker();
   applyBattleDefeat(state);
 
   if (state.finished && state.winnerId !== state.hero.id) {

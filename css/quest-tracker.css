@@ -1,0 +1,5 @@
+.quest-tracker { position:absolute; z-index:20; top:66px; left:12px; max-width:min(300px,calc(100vw - 24px)); box-sizing:border-box; border:1px solid #d4af3777; border-radius:8px; background:#0d171cdd; color:#e5f3ee; padding:8px 12px; font:13px/1.5 sans-serif; }
+.quest-tracker summary { cursor:pointer; color:#ffe4a5; }
+.quest-tracker summary:focus-visible { outline:2px solid #ffe4a5; outline-offset:4px; }
+.quest-tracker p { margin:8px 0 0; }
+@media(max-width:650px) { .quest-tracker { top:100px; max-width:calc(100vw - 24px); padding:6px 10px; font-size:12px; } }
