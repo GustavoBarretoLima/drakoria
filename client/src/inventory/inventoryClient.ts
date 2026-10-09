@@ -146,3 +146,13 @@ function inventoryHeroClass(): HeroClass {
   const heroClass = (localStorage.getItem("classeHeroi") || "guerreiro").toLowerCase();
   return heroClass === "mago" || heroClass === "arqueiro" ? heroClass : "guerreiro";
 }
+
+/** Return incompatible equipped items to the backpack without deleting copies. */
+export function reconcileEquippedItems(): void {
+  const inventory = loadInventory();
+  for (const [slot, id] of Object.entries(inventory.equipped)) {
+    const item = inventory.items.find(entry => entry.item.id === id)?.item;
+    if (!item || !canEquipItem(item, inventoryHeroClass(), loadProgress().nivel, inventorySubclass())) delete inventory.equipped[slot as EquipmentSlot];
+  }
+  saveInventory(inventory);
+}
