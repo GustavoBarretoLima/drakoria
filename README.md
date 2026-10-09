@@ -402,7 +402,27 @@ Após resetar, Taichou pode usar qualquer livro que possua, independentemente da
 
 ### Missões regionais e loja de poções
 
-A praça oferece 15 missões nas cinco regiões: contratos repetíveis para cinco derrotas e três equipamentos obtidos em drops, além de uma missão única por boss. Aceite antes de lutar; derrotas, drops anteriores e eventos duplicados não contam. A coleta mantém os equipamentos na mochila. Entregue os bosses em ordem para avançar na campanha de missões. Cada entrega concede XP e ouro; bosses também concedem uma arma épica da classe/subclasse no nível regional do boss. A exploração existente continua disponível conforme suas regras atuais.
+O interior da Guilda dos Aventureiros oferece 15 missões nas cinco regiões: contratos repetíveis para cinco derrotas e três equipamentos obtidos em drops, além de uma missão única por boss. Aceite antes de lutar; derrotas, drops anteriores e eventos duplicados não contam. A coleta mantém os equipamentos na mochila. Entregue os bosses em ordem para avançar na campanha de missões. Cada entrega concede XP e ouro; bosses também concedem uma arma épica da classe/subclasse no nível regional do boss. A exploração existente continua disponível conforme suas regras atuais.
+
+### Ranks e reputação da Guilda
+
+O aventureiro começa no rank **F**. Contratos novos exigem o rank da região e o nível já previsto; explorar o mapa continua livre pelas regras existentes. Missões aceitas antes desta atualização continuam válidas. A reputação só é recebida ao entregar a missão, junto das recompensas atuais.
+
+| Região dos contratos | Rank exigido | Promoção ao entregar o boss | Reputação de caça / coleta / boss | Reputação total mínima da promoção |
+| --- | --- | --- | --- | ---: |
+| Cemitério Esquecido | F | E — Coveiro Maldito | 10 / 8 / 60 | 60 |
+| Pântano Corrompido | E | D — Hidra da Corrupção | 15 / 12 / 100 | 160 |
+| Floresta Sombria | D | C — Lobo Mutante | 20 / 16 / 140 | 300 |
+| Acampamento Orc | C | B — Senhor da Guerra Orc | 25 / 20 / 180 | 480 |
+| Fortaleza do Rei Orc | B | A — Orc Rei | 30 / 24 / 220 | 700 |
+
+As promoções seguem a campanha: aceite o contrato, derrote o boss regional e entregue na Guilda. Reputação de contratos repetíveis não permite pular bosses. As cinco entregas de boss já fornecem reputação suficiente para promover, sem exigir repetição de contratos. O quadro exibe rank, reputação, próxima promoção e destaca recompensas pendentes.
+
+Use **Acompanhar na exploração** em uma missão ativa. O resumo na batalha mostra a contagem; abra-o para consultar o objetivo. A última missão aceita passa a ser acompanhada, e outra missão ativa assume quando a atual é entregue. O tracker também avisa quando a recompensa está disponível na Guilda.
+
+Rank e reputação são derivados das entregas salvas em `drakoriaQuests`, sem apagar ou reiniciar progresso. Entregas antigas sem contador recebem uma entrega reconhecida; repetir um contrato preserva a reputação anterior. O caminho comum de recompensas mantém o acompanhamento funcionando tanto na demo quanto nas batalhas online; a persistência segue local, sem criar conta autenticada de Guilda no backend.
+
+`tests/guildProgression.test.ts` cobre ranks F–A, promoções, bloqueios, saves antigos, contratos repetidos, derrotas, duplicações e seleção do tracker.
 
 A loja mostra preço, efeito e estoque de todos os 16 consumíveis:
 

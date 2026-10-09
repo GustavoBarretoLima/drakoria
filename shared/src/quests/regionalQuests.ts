@@ -13,13 +13,50 @@ export function normalizeQuests(raw:unknown):QuestProgress{
  const result:QuestProgress={entries:{},seenBattles:[]};if(!raw||typeof raw!=="object")return result;
  const obj=raw as Partial<QuestProgress>;
  for(const quest of QUESTS){const entry=obj.entries?.[quest.id];if(!entry||!(entry.status==="active"||entry.status==="claimed"))continue;
- result.entries[quest.id]={count:Math.min(quest.target,Math.max(0,Number.isFinite(entry.count)?Math.floor(entry.count):0)),status:entry.status,claims:Math.max(0,Number.isFinite(entry.claims)?Math.floor(entry.claims):0)};}
+ result.entries[quest.id]={count:Math.min(quest.target,Math.max(0,Number.isFinite(entry.count)?Math.floor(entry.count):0)),status:entry.status,claims:Math.max(entry.status==="claimed"?1:0,Number.isFinite(entry.claims)?Math.floor(entry.claims):0)};}
  if(Array.isArray(obj.seenBattles))result.seenBattles=[...new Set(obj.seenBattles.filter(id=>typeof id==="string"))];return result;
 }
 export function questBlockReason(q:QuestDefinition,p:QuestProgress,level:number):string|null{
  if(level<q.level)return `Requer nível ${q.level}`;
+ const rank = questRankIndex(q);
+ if(!p.entries[q.id] && guildStanding(p).rankIndex<rank)return `Requer rank ${GUILD_RANKS[rank]!.name}`;
  if(q.requires&&p.entries[q.requires]?.status!=="claimed")return "Entregue a missão do boss da região anterior";
  const entry=p.entries[q.id];if(entry?.status==="active")return "Missão já aceita";if(entry?.status==="claimed"&&!q.repeatable)return "Missão concluída";return null;
+}
+
+export const GUILD_RANKS = [
+ {name:"F",reputation:0}, {name:"E",reputation:60}, {name:"D",reputation:160},
+ {name:"C",reputation:300}, {name:"B",reputation:480}, {name:"A",reputation:700},
+] as const;
+export function questRankIndex(q:QuestDefinition):number {
+ return regions.findIndex(([id])=>id===q.region);
+}
+export function questReputation(q:QuestDefinition):number {
+ const index=questRankIndex(q);
+ return q.kind==="boss"?60+40*index:q.kind==="hunt"?10+5*index:8+4*index;
+}
+/** Derived from delivered contracts, so existing saves keep their earned rank. */
+export function guildStanding(progress:QuestProgress) {
+ const p=normalizeQuests(progress);
+ const reputation=QUESTS.reduce((sum,q)=>{
+  const entry=p.entries[q.id];
+  return sum+questReputation(q)*Math.min(1000000,Math.max(entry?.claims??0,entry?.status==="claimed"?1:0));
+ },0);
+ let rankIndex=0;
+ for(let index=0;index<regions.length;index++){
+  const boss=p.entries[`${regions[index]![0]}-boss`];
+  if(boss?.status!=="claimed"||reputation<GUILD_RANKS[index+1]!.reputation)break;
+  rankIndex=index+1;
+ }
+ const promotion=QUESTS.find(q=>q.kind==="boss"&&questRankIndex(q)===rankIndex);
+ return {rankIndex,rank:GUILD_RANKS[rankIndex]!.name,reputation,next:GUILD_RANKS[rankIndex+1],promotion};
+}
+export function questTracker(progress:QuestProgress,preferredId?:string|null) {
+ const active=QUESTS.filter(q=>progress.entries[q.id]?.status==="active");
+ const quest=active.find(q=>q.id===preferredId)??active[0];
+ if(!quest)return null;
+ const count=progress.entries[quest.id]!.count;
+ return {quest,count,ready:count>=quest.target};
 }
 export function advanceQuestVictory(progress:QuestProgress,battleId:string,monsterId:string,dropCount:number):QuestProgress{
  const next=normalizeQuests(progress);if(!battleId||next.seenBattles.includes(battleId))return next;

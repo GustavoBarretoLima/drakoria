@@ -1,4 +1,4 @@
-import { QUESTS,normalizeQuests,questBlockReason,advanceQuestVictory,type QuestProgress } from "../../../shared/src/quests/regionalQuests.js";
+import { QUESTS,normalizeQuests,questBlockReason,advanceQuestVictory,questTracker,type QuestProgress } from "../../../shared/src/quests/regionalQuests.js";
 import type { BattleState } from "../../../shared/src/types/combat.js";
 import { loadProgress,saveProgress,awardBattleRewards } from "./progressionClient.js";
 import { addDropsToInventory } from "../inventory/inventoryClient.js";
@@ -7,10 +7,14 @@ import { adaptSubclassWeaponDrops } from "../../../shared/src/equipment/assassin
 import { getActiveSubclass } from "./subclassClient.js";
 const KEY="drakoriaQuests";
 export function loadQuests():QuestProgress{try{return normalizeQuests(JSON.parse(localStorage.getItem(KEY)??"{}"));}catch{return normalizeQuests({});}}
+export function trackedQuest(){return questTracker(loadQuests(),localStorage.getItem(`${KEY}.tracked`));}
+export function trackQuest(id:string):void {
+ if(loadQuests().entries[id]?.status==="active")localStorage.setItem(`${KEY}.tracked`,id);
+}
 export function acceptQuest(id:string):string|null{
  const q=QUESTS.find(q=>q.id===id);if(!q)return "Missão desconhecida";
  const p=loadQuests(),reason=questBlockReason(q,p,loadProgress().nivel);if(reason)return reason;
- p.entries[id]={count:0,status:"active",claims:p.entries[id]?.claims??0};localStorage.setItem(KEY,JSON.stringify(p));return null;
+ p.entries[id]={count:0,status:"active",claims:p.entries[id]?.claims??0};localStorage.setItem(KEY,JSON.stringify(p));trackQuest(id);return null;
 }
 export function recordQuestVictory(state:BattleState):void{
  if(!state.finished||state.winnerId!==state.hero.id)return;
