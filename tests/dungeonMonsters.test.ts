@@ -1,3 +1,4 @@
+import { MONSTER_DROP_SOURCES } from "../shared/src/equipment/artEquipmentCatalog.js";
 import { DUNGEON_CONFIG, pickDungeonEncounter } from "../shared/src/dungeons/dungeonEncounters.js";
 import { createDungeonRun, pickDungeonRunEncounter } from "../shared/src/dungeons/dungeonRun.js";
 import assert from "node:assert/strict";
@@ -49,12 +50,13 @@ assert.equal(canEquipItem(STARTER_LOOT_ITEMS["orc-iron-axe"]!, "mago", 25), fals
 assert.equal(canEquipItem(STARTER_LOOT_ITEMS["orc-warlord-sword"]!, "arqueiro", 25), false);
 assert.ok(!listEquipments({ heroClass: "mago", slot: "weapon" }).some(item => /Espada|Machado|Arco/.test(item.name)));
 const originalRandom = Math.random;
-function randomSequence(values: number[]) { let index = 0; Math.random = () => values[index++] ?? 0; }
+function randomSequence(values: number[]) { let index = 0; Math.random = () => values[index++] ?? .999; }
 try {
   for (const monster of DUNGEON_MONSTERS) {
     Math.random = () => 0;
     const drops = rollMonsterDrops(monster.id);
-    assert.equal(drops.length, monster.id.startsWith("orc-king-boss-") ? 2 : 1);
+    const themed = MONSTER_DROP_SOURCES.filter(source => monster.id.startsWith(`${source.monsterBaseId}-lvl-`)).length;
+    assert.equal(drops.length, (monster.id.startsWith("orc-king-boss-") ? 2 : 1) + themed);
     assert.equal(drops[0]!.item.level, monster.level);
     assert.ok(DUNGEON_LOOT_ITEMS[drops[0]!.item.id]);
     Math.random = () => 0.99;

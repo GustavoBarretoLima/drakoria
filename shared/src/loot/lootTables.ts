@@ -1,3 +1,4 @@
+import { rollNamedMonsterDrops } from "./namedMonsterLoot.js";
 import { rollDungeonDrops } from "./dungeonLoot.js";
 import type { EquipmentDrop, EquipmentItem } from "../types/equipment.js";
 
@@ -203,7 +204,7 @@ const LOOT_TABLES: Record<string, MonsterLootTable> = {
 
 export function rollMonsterDrops(monsterId: string): EquipmentDrop[] {
   const dungeonDrops = rollDungeonDrops(monsterId);
-  if (dungeonDrops !== undefined) return dungeonDrops;
+  if (dungeonDrops !== undefined) return [...dungeonDrops, ...rollNamedMonsterDrops(monsterId)];
   const family = monsterId.split("-")[0] ?? "";
   const miniBossTable = monsterId.startsWith("orc-warlord-mini-boss-lvl-")
     ? LOOT_TABLES["orc-warlord-mini-boss"]
