@@ -20,3 +20,9 @@
 @media(max-width:650px){.forge-comparison{grid-template-columns:1fr;}.blacksmith-shop header{flex-wrap:wrap;}}
 .forge-review { scroll-margin-top:80px; }
 body.has-city-sidebar:has(.blacksmith-shop) { background:#0a1724; }
+/* Reveal the workshop behind the forge without fading text or controls. */
+body.has-city-sidebar:has(.blacksmith-shop) { background:linear-gradient(#080d1233,#080d1255),url('../img/stages/ferreiro-anime.png') center/cover fixed; }
+.blacksmith-shop { background:linear-gradient(#15273355,#0a172455); text-shadow:0 1px 3px #000; }
+.blacksmith-card { background:#102b3d88; }
+.forge-review { background:#10263099; }
+.blacksmith-shop .city-window-toolbar { background:#16120fa6; }
