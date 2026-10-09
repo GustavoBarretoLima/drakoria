@@ -21,3 +21,10 @@ html:has(.town-board), body:has(.town-board) { margin:0; overflow-x:hidden; }
 .town-card.quest-ready { border-color:#d4af37; background:linear-gradient(135deg,#254735,#0c252e); }
 .town-card.quest-ready [data-claim] { border-color:#d4af37; color:#fff0a8; }
 .town-card [data-track][aria-pressed="true"] { border-color:#d4af37; }
+/* Layer translucent surfaces over the Guild interior while keeping text opaque. */
+#painelGuilda .town-board { background:linear-gradient(135deg,#143941a6,#071c2399); text-shadow:0 1px 3px #000; }
+#painelGuilda .guild-standing { background:#162a3073; }
+#painelGuilda .town-card { background:#0c252e80; }
+#painelGuilda .town-card.quest-ready { background:linear-gradient(135deg,#25473599,#0c252e80); }
+.guilda-interior .guild-welcome { background:#17100d99; }
+.guilda-interior .city-window-toolbar { background:#16120fb3; }
