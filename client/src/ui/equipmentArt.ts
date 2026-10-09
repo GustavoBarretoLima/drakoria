@@ -1,3 +1,5 @@
+import { canonicalEquipment } from "../../../shared/src/equipment/equipmentRules.js";
+import { classEquipmentIcon } from "../../../shared/src/equipment/equipmentArtPaths.js";
 import type { EquipmentItem } from "../../../shared/src/types/equipment.js";
 
 const icons: Record<string, string> = {
@@ -64,8 +66,11 @@ const icons: Record<string, string> = {
 
 export function equipmentArt(item: EquipmentItem): string {
   // Older saves may still contain paths from before the art folder was consolidated.
-  const path = item.icon.replace("/img/itens/complementares/", "/img/itens/loot_monstros/icones_128/").replace("/img/itens/equipamentos/icones_128/", "/img/itens/loot_monstros/icones_128/");
-  const url = icons[path];
+  const canonical = canonicalEquipment(item);
+  const savedIcon = canonical.icon || "";
+  const path = savedIcon.replace("/img/itens/complementares/", "/img/itens/loot_monstros/icones_128/").replace("/img/itens/equipamentos/icones_128/", "/img/itens/loot_monstros/icones_128/");
+  const cls = canonical.allowedClasses?.find(cls => cls === "guerreiro" || cls === "mago" || cls === "arqueiro") || "universal";
+  const url = icons[path] || icons[classEquipmentIcon(cls, canonical.slot)];
   if (!url) return "";
   return `<span class="equipment-art${item.rarity === "mythic" ? " mythic-art" : ""}" aria-hidden="true"><img src="${url}" alt="" width="56" height="56" /></span>`;
 }

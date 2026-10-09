@@ -1,3 +1,4 @@
+import { equipmentArt } from "../client/src/ui/equipmentArt.js";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { ART_EQUIPMENT_ITEMS } from "../shared/src/loot/namedMonsterLoot.js";
@@ -25,3 +26,13 @@ for(const item of items){
 }
 for(const file of readdirSync("img/itens/loot_monstros/icones_128"))assert.ok(renderer.includes(file),file);
 console.log(`Drop art audit: ${items.length} equipment variants with existing registered images; legacy canonical migration, class slots, events, insight and subclass weapon art covered.`);
+
+// Real saves retain the old generic SVG even after catalog icons are updated.
+for (const item of Object.values(DUNGEON_LOOT_ITEMS)) {
+ const saved = {...item, icon:`/img/itens/${item.slot}.svg`};
+ assert.equal(equipmentArt(saved),equipmentArt(item),item.id);
+ assert.match(equipmentArt(saved), /<img /);
+}
+const legacy = STARTER_LOOT_ITEMS["goblin-hide-gloves"]!;
+assert.equal(equipmentArt({...legacy,icon:""}),equipmentArt(legacy));
+assert.match(equipmentArt({...legacy,id:"legacy-unregistered-gloves",icon:"/img/itens/gloves.svg"}),/<img /);
