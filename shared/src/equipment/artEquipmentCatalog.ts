@@ -15,7 +15,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
     "stats": {
       "attack": 19
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-guerreiro-weapon-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-guerreiro-weapon-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -32,7 +32,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 15,
       "hp": 53
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-guerreiro-armor-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-guerreiro-armor-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -49,7 +49,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 11,
       "hp": 30
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-guerreiro-shield-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-guerreiro-shield-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -66,7 +66,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 8,
       "hp": 30
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-guerreiro-legs-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-guerreiro-legs-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -83,7 +83,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 4,
       "hp": 19
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-guerreiro-boots-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-guerreiro-boots-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -100,7 +100,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "attack": 4,
       "defense": 4
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-guerreiro-gloves-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-guerreiro-gloves-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -117,7 +117,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "hp": 30,
       "attack": 4
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-guerreiro-ring-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-guerreiro-ring-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -134,7 +134,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "hp": 19,
       "criticalDamage": 8
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-guerreiro-earring-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-guerreiro-earring-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -151,7 +151,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "hp": 38,
       "defense": 4
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-guerreiro-necklace-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-guerreiro-necklace-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -168,7 +168,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "magicPower": 19,
       "mana": 30
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-mago-weapon-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-mago-weapon-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -185,7 +185,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 8,
       "mana": 53
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-mago-armor-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-mago-armor-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -202,7 +202,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "magicPower": 4,
       "mana": 30
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-mago-shield-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-mago-shield-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -219,7 +219,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 4,
       "mana": 30
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-mago-legs-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-mago-legs-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -236,7 +236,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 4,
       "mana": 19
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-mago-boots-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-mago-boots-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -253,7 +253,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "magicPower": 4,
       "mana": 15
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-mago-gloves-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-mago-gloves-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -270,7 +270,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "magicPower": 4,
       "mana": 30
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-mago-ring-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-mago-ring-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -287,7 +287,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "mana": 23,
       "criticalDamage": 8
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-mago-earring-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-mago-earring-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -304,7 +304,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "hp": 19,
       "mana": 38
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-mago-necklace-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-mago-necklace-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -321,7 +321,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "attack": 19,
       "criticalDamage": 8
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-arqueiro-weapon-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-arqueiro-weapon-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -338,7 +338,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 11,
       "hp": 30
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-arqueiro-armor-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-arqueiro-armor-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -355,7 +355,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 8,
       "hp": 19
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-arqueiro-shield-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-arqueiro-shield-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -372,7 +372,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "defense": 8,
       "hp": 19
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-arqueiro-legs-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-arqueiro-legs-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -391,7 +391,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "speed": 4,
       "dodgeChance": 8
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-arqueiro-boots-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-arqueiro-boots-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -408,7 +408,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "attack": 8,
       "criticalChance": 4
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-arqueiro-gloves-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-arqueiro-gloves-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -425,7 +425,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "attack": 4,
       "hp": 19
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-arqueiro-ring-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-arqueiro-ring-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -442,7 +442,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "hp": 19,
       "criticalDamage": 8
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-arqueiro-earring-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-arqueiro-earring-rare-lvl-20.png",
     "sellPrice": 102
   },
   {
@@ -459,7 +459,7 @@ export const BLACKSMITH_ITEMS: EquipmentItem[] = [
       "hp": 30,
       "attack": 4
     },
-    "icon": "/img/itens/equipamentos/icones_128/drakoria-arqueiro-necklace-rare-lvl-20.png",
+    "icon": "/img/itens/loot_monstros/icones_128/drakoria-arqueiro-necklace-rare-lvl-20.png",
     "sellPrice": 102
   }
 ];

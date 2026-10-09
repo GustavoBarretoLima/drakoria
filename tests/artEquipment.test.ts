@@ -40,6 +40,6 @@ assert.equal(canEquipItem(axe,"guerreiro",55,"berserker"),true);assert.equal(can
 for(const subclass of ["berserker","assassin"]){const cls=subclass==="berserker"?"guerreiro":"arqueiro";
  const base=BLACKSMITH_ITEMS.find(item=>item.slot==="weapon"&&item.allowedClasses.includes(cls))!;
  const item=adaptSubclassWeaponDrops([{item:base,quantity:1}],subclass)[0]!.item;
- assert.equal(getEquipmentById(item.id)?.icon,base.icon);assert.deepEqual(canonicalEquipment(item).stats,base.stats);
+ assert.equal(getEquipmentById(item.id)?.icon,item.icon);assert.deepEqual(canonicalEquipment(item).stats,base.stats);
 }
 console.log("Art equipment: preserved legacy sets, monster drops, rarities, mythic bonuses, canonical server stats and subclass variants passed.");

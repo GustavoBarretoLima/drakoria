@@ -1,3 +1,4 @@
+import { classEquipmentIcon } from "../equipment/equipmentArtPaths.js";
 import { DUNGEON_EQUIPMENT_NAMES } from "../loot/dungeonLoot.js";
 import type {
   EquipmentItem,
@@ -129,7 +130,7 @@ function createEquipmentItem(
     level,
     allowedClasses: heroClass === "universal" ? ["universal"] : [heroClass],
     stats,
-    icon: `/img/itens/${slot}.svg`,
+    icon: classEquipmentIcon(heroClass, slot),
     sellPrice: Math.floor(levelMultiplier * rarityMeta.powerMultiplier * 10),
   };
 }
@@ -185,7 +186,7 @@ function createEventItems(): EquipmentItem[] {
         description: "Ao atacar, tem chance de causar dano luminoso adicional.",
         trigger: "onAttack",
       },
-      icon: "/img/itens/complementares/weapon-universal-legendary-natal-lvl-100.png",
+      icon: "/img/itens/loot_monstros/icones_128/weapon-universal-legendary-natal-lvl-100.png",
       sellPrice: 5000,
     },
     {
@@ -210,7 +211,7 @@ function createEventItems(): EquipmentItem[] {
           "Ao receber dano fatal, tem chance de restaurar parte da vida.",
         trigger: "onDamageTaken",
       },
-      icon: "/img/itens/complementares/ring-universal-legendary-pascoa-lvl-100.png",
+      icon: "/img/itens/loot_monstros/icones_128/ring-universal-legendary-pascoa-lvl-100.png",
       sellPrice: 5000,
     },
   ];

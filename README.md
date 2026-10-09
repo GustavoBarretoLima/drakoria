@@ -497,3 +497,15 @@ Equipe arma, armadura, pernas, botas, luvas, brinco, colar e anel forjados da me
 - Vento da Forja (Arqueiro): +10% velocidade, +5 pontos de crítico, +3 pontos de esquiva (limite de 50%).
 
 Regeneração ocorre uma vez ao concluir uma ação válida do jogador, inclusive defender. Não ocorre durante ATB, ações recusadas ou turnos inimigos; não revive mortos por dano contínuo. Respeita os limites de HP/mana. Status e mochila mostram progresso e efeito do conjunto; a forja mostra as regras. Demo e backend usam a mesma implementação.
+
+### Imagens dos equipamentos e cobertura de drops
+
+As 59 artes em `img/itens/loot_monstros/icones_128` são registradas pela interface e empacotadas pelo Vite, incluindo a demo GitHub Pages. Os catálogos compartilhados apontam para essa pasta, usada também pelo backend.
+
+- Drops genéricos: todos os nove slots de Guerreiro, Mago e Arqueiro, em todos os níveis/raridades já disponíveis, reutilizam a arte correspondente da classe (27 silhuetas). A arte não concede bônus de conjunto; apenas IDs forjados contam.
+- Drops temáticos: os 16 modelos de Goblin, Esqueleto, Rato, Orc, Hobgoblin, Elite, Senhor da Guerra, Rei Orc, Aranha, Espectro, Lobo Sombrio, Árvore, Hidra, Coveiro e Lobo Mutante mantêm suas imagens próprias e variantes de raridade/nível.
+- Drops legados: os 13 equipamentos de Goblin, Orc e mini-boss possuem artes específicas. O Olho da Verdade também usa sua imagem própria.
+- Berserk usa imagem de machado; Assassino usa imagem de adagas. Armas temáticas que já eram machados/adagas preservam a arte original. Conversão mantém IDs, atributos e regras de uso.
+- As duas artes de eventos (Natal/Páscoa) também estão registradas; isso não habilita novos eventos nem novos drops.
+
+Saves conhecidos são reconstruídos pelo catálogo canônico e recebem as imagens atuais. O renderizador também aceita os caminhos antigos das pastas `equipamentos` e `complementares`. Não foi necessário renomear arquivos ou IDs. Nomes, chances, atributos e requisitos de drop permanecem iguais. `tests/dropEquipmentArt.test.ts` audita a existência e o registro de imagens de todas as variantes dos catálogos, incluindo armas de subclasses.
