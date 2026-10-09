@@ -487,3 +487,13 @@ O resumo acumulado inclui XP, ouro, equipamentos (com raridade/nível) e livros 
 No mapa, cada região informa níveis, boss, vitórias necessárias, missões ativas e entregas pendentes, além de um atalho para a Guilda. Saves de expedições anteriores continuam válidos; recompensas acumuladas começam a ser registradas após esta atualização, sem tentar reconstruir drops antigos.
 
 `tests/expedition.test.ts` cobre as cinco regiões, totais e agrupamento de loot, duplicações, preparação de boss, preservação de recursos, arquivamento, derrota, novas expedições e saves antigos. `tests/victoryNavigation.test.ts` também valida a preparação, consumo de poção e exclusividade das ações de saída/continuação. Demo e backend usam o mesmo registro no cliente e as regras compartilhadas de dungeon.
+
+### Conjuntos da forja
+
+Equipe arma, armadura, pernas, botas, luvas, brinco, colar e anel forjados da mesma classe (8 peças; escudo opcional). Drops e itens da antiga loja não contam. Armas convertidas de Berserk/Assassino contam. A menor raridade define a regeneração do HP máximo: raro 3%, épico 4%, lendário 5%, mítico 6%.
+
+- Bastião da Forja (Guerreiro): +8% ataque e +10% defesa.
+- Chama Arcana (Mago): +12% poder mágico e recuperação de 5% da mana máxima por ação.
+- Vento da Forja (Arqueiro): +10% velocidade, +5 pontos de crítico, +3 pontos de esquiva (limite de 50%).
+
+Regeneração ocorre uma vez ao concluir uma ação válida do jogador, inclusive defender. Não ocorre durante ATB, ações recusadas ou turnos inimigos; não revive mortos por dano contínuo. Respeita os limites de HP/mana. Status e mochila mostram progresso e efeito do conjunto; a forja mostra as regras. Demo e backend usam a mesma implementação.

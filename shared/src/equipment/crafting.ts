@@ -1,3 +1,4 @@
+import { forgeSetDescription, FORGE_SET_NAMES } from "./forgeSets.js";
 import { BLACKSMITH_ITEMS } from "./artEquipmentCatalog.js";
 import { EQUIPMENT_RARITY_META } from "../types/equipmentRarity.js";
 import type { EquipmentItem,EquipmentStats,EquipmentRarity } from "../types/equipment.js";
@@ -15,7 +16,7 @@ export const FORGE_RECIPES:ForgeRecipe[]=FORGE_TIERS.flatMap(tier=>BLACKSMITH_IT
  const bonus=base.allowedClasses.includes("mago")?"magicPower":"attack";
  if(tier.rarity==="mythic")stats[bonus]=(stats[bonus]??0)+5;
  const label=EQUIPMENT_RARITY_META[tier.rarity].label;
- return {fragments:tier.fragments,gold:tier.gold,inputs:tier.inputs,item:{...base,id:`forge-${base.allowedClasses[0]}-${base.slot}-${tier.rarity}-lvl-${tier.level}`,name:`${base.name} · ${label} Nv.${tier.level}`,rarity:tier.rarity,level:tier.level,stats,allowedClasses:[...base.allowedClasses],description:`Forjado com uma peça inferior, fragmentos e ouro. Requer nível ${tier.level}.${tier.rarity==="mythic"?` Bônus mítico: +5 ${bonus==="magicPower"?"poder mágico":"força"}, já incluído nos atributos.`:""}`,sellPrice:Math.max(1,Math.floor(base.sellPrice*scale))}};
+ return {fragments:tier.fragments,gold:tier.gold,inputs:tier.inputs,item:{...base,id:`forge-${base.allowedClasses[0]}-${base.slot}-${tier.rarity}-lvl-${tier.level}`,name:`${base.name} · ${label} Nv.${tier.level}`,rarity:tier.rarity,level:tier.level,stats,allowedClasses:[...base.allowedClasses],description:`Conjunto ${FORGE_SET_NAMES[base.allowedClasses[0] as "guerreiro"|"mago"|"arqueiro"]}: ${forgeSetDescription(base.allowedClasses[0] as "guerreiro"|"mago"|"arqueiro", FORGE_TIERS.indexOf(tier))} Forjado com uma peça inferior, fragmentos e ouro. Requer nível ${tier.level}.${tier.rarity==="mythic"?` Bônus mítico: +5 ${bonus==="magicPower"?"poder mágico":"força"}, já incluído nos atributos.`:""}`,sellPrice:Math.max(1,Math.floor(base.sellPrice*scale))}};
 }));
 export function salvageYield(item:EquipmentItem):number {
  const base={common:2,uncommon:3,rare:6,epic:12,legendary:24,mythic:48}[item.rarity];

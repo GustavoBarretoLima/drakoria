@@ -1,3 +1,4 @@
+import { regenerateForgeSet } from "../equipment/forgeSets.js";
 import type {
   BattleState,
   BattleEvent,
@@ -260,6 +261,7 @@ export function applyBattleAction(
   }
   finishBerserkAction(hero, state.hero, selectedSkill?.id, action.type === "ATTACK" && (event.damage ?? 0) > 0);
   tickPotionBuff(hero);
+  event.message += regenerateForgeSet(hero);
   event.message = statusMessage + event.message;
   const finished = !enemy.isAlive;
 

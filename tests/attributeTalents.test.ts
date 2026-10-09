@@ -22,9 +22,9 @@ for (const id of SUBCLASS_IDS) {
   for (const key of Object.keys(base) as (keyof Stats)[]) {
     if (key === "hp" || key === "mana") continue;
     const flat = ["criticalChance","criticalDamage","dodgeChance"].includes(key);
-    const increase = attributes.reduce((sum,node) => sum + (flat ? (node.bonus?.[key] ?? 0)*3 : Math.floor(base[key]*(node.bonus?.[key] ?? 0)*3/100)),0);
+    const increase = attributes.reduce((sum,node) => sum + (flat ? (node.bonus?.[key] ?? 0)*3 : Math.floor((base[key] ?? 0)*(node.bonus?.[key] ?? 0)*3/100)),0);
     const cap = key === "criticalChance" ? 100 : key === "dodgeChance" ? 50 : Infinity;
-    assert.equal(after[key], Math.min(cap,before[key]+increase), `${id} ${key}`);
+    assert.equal(after[key], Math.min(cap,(before[key] ?? 0)+increase), `${id} ${key}`);
   }
   assert.equal(after.hp,1); assert.equal(after.mana,0);
   assert.deepEqual(normalizeTreeRanks(id,100,{[attributes[3]!.id]:3}),{});

@@ -95,7 +95,7 @@ export function applyTreeStats(stats: Stats, id: SubclassId | undefined, level: 
     for (const [key, amount] of Object.entries(node.bonus ?? {})) {
       const stat = key as keyof Stats;
       const bonus = amount * (ranks[node.id] ?? 0);
-      next[stat] += ["criticalChance", "criticalDamage", "dodgeChance"].includes(stat) ? bonus : Math.floor(stats[stat] * bonus / 100);
+      next[stat] = (next[stat] ?? 0) + (["criticalChance", "criticalDamage", "dodgeChance"].includes(stat) ? bonus : Math.floor((stats[stat] ?? 0) * bonus / 100));
     }
   }
   next.criticalChance = Math.min(100, Math.max(0, next.criticalChance));

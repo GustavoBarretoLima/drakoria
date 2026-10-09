@@ -1,3 +1,4 @@
+import { applyForgeSetStats } from "./forgeSets.js";
 import type { Stats } from "../types/combat.js";
 import type { EquipmentItem } from "../types/equipment.js";
 
@@ -27,6 +28,7 @@ export function applyEquipmentStats(base: Stats, items: EquipmentItem[]): Stats 
     stats.criticalDamage += bonus.criticalDamage ?? 0;
   }
 
+  applyForgeSetStats(stats, items);
   stats.dodgeChance = Number.isFinite(stats.dodgeChance) ? Math.min(50, Math.max(0, stats.dodgeChance)) : 0;
   return stats;
 }

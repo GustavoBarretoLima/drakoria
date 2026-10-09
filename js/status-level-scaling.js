@@ -1,3 +1,4 @@
+import { getForgeSet } from "../shared/src/equipment/forgeSets.ts";
 import { SPRITE_BOUNDS } from "../client/src/assets/spriteBounds.ts";
 import { SUBCLASS_SPRITE_FOLDERS } from "../shared/src/classes/subclassSprites.ts";
 import { ensureAssassinEquipment, ensureBerserkEquipment } from "../client/src/inventory/inventoryClient.ts";
@@ -260,7 +261,11 @@ function criarFichaPersonagemJRPG() {
       <dl><div><dt>EXP</dt><dd>${progresso.xp}/${progresso.xpParaProximoNivel ?? 100}</dd></div><div><dt>Ouro</dt><dd>${progresso.ouro}</dd></div></dl>
     </div></aside>`;
   const rows = [["Ataque físico", stats.attack], ["Defesa física", stats.defense], ["Poder mágico", stats.magicPower], ["Defesa mágica", stats.magicDefense], ["Vida máxima", stats.maxHp], ["Mana máxima", stats.maxMana], ["Velocidade", stats.speed], ["Chance crítica", `${stats.criticalChance}%`], ["Dano crítico", `${stats.criticalDamage}%`], ["Esquiva", `${stats.dodgeChance.toFixed(1)}%`]];
-  const attributes = `<section class="jrpg-attributes"><h3 class="section-title">Classe</h3><p class="jrpg-role">${escaparHtmlStatus(subclasse?.role || baseClass)}</p><h3 class="section-title">Atributos</h3><dl>${rows.map(([label, value]) => `<div class="jrpg-attribute-row"><dt>${label}</dt><dd>${value}</dd></div>`).join("")}</dl><p class="jrpg-build-note">Inclui nível, equipamentos e passivas aprendidas.</p></section>`;
+  const inv = carregarInventarioStatus();
+  const setItems = Object.entries(inv.equipped).map(([slot,id]) => inv.items.find(entry => entry.item.id === id && entry.item.slot === slot)?.item).filter(item => item && canEquipItem(item, classe, Number(progresso.nivel), subclasse?.id));
+  const set = getForgeSet(setItems, classe);
+  const setInfo = `<h3 class="section-title">${escaparHtmlStatus(set.name)} · ${set.count}/8</h3><p class="jrpg-build-note">${set.active ? "Ativo" : "Inativo"} — ${escaparHtmlStatus(set.description)}</p>`;
+  const attributes = `<section class="jrpg-attributes"><h3 class="section-title">Classe</h3><p class="jrpg-role">${escaparHtmlStatus(subclasse?.role || baseClass)}</p><h3 class="section-title">Atributos</h3><dl>${rows.map(([label, value]) => `<div class="jrpg-attribute-row"><dt>${label}</dt><dd>${value}</dd></div>`).join("")}</dl><p class="jrpg-build-note">Inclui nível, equipamentos, conjunto ativo e passivas aprendidas.</p>${setInfo}</section>`;
   return { profile, attributes };
 }
 window.criarFichaPersonagemJRPG = criarFichaPersonagemJRPG;

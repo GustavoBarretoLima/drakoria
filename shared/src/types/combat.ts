@@ -8,6 +8,8 @@ import type { TreeRanks } from "../classes/skillTrees.js";
 export type HeroClass = "guerreiro" | "mago" | "arqueiro";
 
 export interface Stats {
+  forgeHpRegen?: number;
+  forgeManaRegen?: number;
   hp: number;
   maxHp: number;
   mana: number;
