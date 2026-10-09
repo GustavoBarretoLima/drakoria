@@ -284,3 +284,5 @@ body:has(.subclass-tree) { margin: 0; overflow: hidden; }
 .skill-tree-panel button:not(.skill-orb):hover { background:#215563; }
 .skill-tree-panel .painel-acoes { flex-wrap:wrap; }
 @media(max-width:600px) { .skill-tree-panel { padding:12px; }.skill-tree-panel .panel-header { gap:12px; flex-wrap:wrap; }.skill-tree-panel .talent-footer { flex-wrap:wrap; gap:12px; } }
+
+.attribute-map-title { position:absolute; left:0; width:100%; text-align:center; color:#bde7ed; font-size:.9rem; }

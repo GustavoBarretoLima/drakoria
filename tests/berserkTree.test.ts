@@ -18,7 +18,7 @@ import { startDemoBattle, subscribeDemoBattle, performDemoAction, useDemoConsuma
 import type { BattleState } from "../shared/src/types/combat.js";
 import { emptyBerserkState } from "../shared/src/combat/berserkCombat.js";
 
-const tree = SUBCLASS_TREES.berserker;
+const tree = SUBCLASS_TREES.berserker.filter(node => !node.attributeBranch);
 assert.equal(tree.length, 18);
 assert.equal(tree.filter(node => node.skill).length, 9);
 assert.equal(tree.filter(node => node.final).length, 3);
