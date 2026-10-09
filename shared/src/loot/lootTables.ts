@@ -12,7 +12,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 1,
     allowedClasses: ["guerreiro", "arqueiro"],
     stats: { defense: 1, criticalChance: 1 },
-    icon: "/img/itens/complementares/goblin-hide-gloves.png",
+    icon: "/img/itens/loot_monstros/icones_128/goblin-hide-gloves.png",
     sellPrice: 8,
   },
   "goblin-tooth-ring": {
@@ -24,7 +24,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 1,
     allowedClasses: ["universal"],
     stats: { criticalChance: 1, mana: 4 },
-    icon: "/img/itens/complementares/goblin-tooth-ring.png",
+    icon: "/img/itens/loot_monstros/icones_128/goblin-tooth-ring.png",
     sellPrice: 7,
   },
   "goblin-shadow-ring": {
@@ -36,7 +36,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 2,
     allowedClasses: ["mago", "arqueiro"],
     stats: { mana: 10, criticalChance: 3, magicPower: 3 },
-    icon: "/img/itens/complementares/goblin-shadow-ring.png",
+    icon: "/img/itens/loot_monstros/icones_128/goblin-shadow-ring.png",
     sellPrice: 38,
   },
   "orc-iron-axe": {
@@ -48,7 +48,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 1,
     allowedClasses: ["guerreiro"],
     stats: { attack: 9 },
-    icon: "/img/itens/complementares/orc-iron-axe.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-iron-axe.png",
     sellPrice: 18,
   },
   "orc-iron-chest": {
@@ -60,7 +60,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 1,
     allowedClasses: ["guerreiro"],
     stats: { defense: 7, hp: 25 },
-    icon: "/img/itens/complementares/orc-iron-chest.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-iron-chest.png",
     sellPrice: 22,
   },
   "orc-warlord-axe": {
@@ -72,7 +72,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 10,
     allowedClasses: ["guerreiro"],
     stats: { attack: 18, criticalDamage: 12 },
-    icon: "/img/itens/complementares/orc-warlord-axe.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-warlord-axe.png",
     sellPrice: 75,
   },
   "orc-warlord-sword": {
@@ -84,7 +84,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 10,
     allowedClasses: ["guerreiro"],
     stats: { attack: 15, criticalChance: 4, criticalDamage: 8 },
-    icon: "/img/itens/complementares/orc-warlord-sword.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-warlord-sword.png",
     sellPrice: 72,
   },
   "orc-warlord-bow": {
@@ -96,7 +96,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 10,
     allowedClasses: ["arqueiro"],
     stats: { attack: 14, criticalChance: 6, criticalDamage: 6 },
-    icon: "/img/itens/complementares/orc-warlord-bow.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-warlord-bow.png",
     sellPrice: 74,
   },
   "orc-warlord-staff": {
@@ -108,7 +108,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 10,
     allowedClasses: ["mago"],
     stats: { magicPower: 12, mana: 24, criticalChance: 4 },
-    icon: "/img/itens/complementares/orc-warlord-staff.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-warlord-staff.png",
     sellPrice: 78,
   },
   "orc-warlord-chest": {
@@ -120,7 +120,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 10,
     allowedClasses: ["guerreiro"],
     stats: { defense: 12, hp: 55 },
-    icon: "/img/itens/complementares/orc-warlord-chest.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-warlord-chest.png",
     sellPrice: 70,
   },
   "orc-warlord-shield": {
@@ -132,7 +132,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 8,
     allowedClasses: ["guerreiro"],
     stats: { defense: 9, hp: 30 },
-    icon: "/img/itens/complementares/orc-warlord-shield.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-warlord-shield.png",
     sellPrice: 42,
   },
   "orc-warlord-ring": {
@@ -144,7 +144,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 8,
     allowedClasses: ["universal"],
     stats: { criticalChance: 2, hp: 18, mana: 8 },
-    icon: "/img/itens/complementares/orc-warlord-ring.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-warlord-ring.png",
     sellPrice: 40,
   },
   "orc-warlord-gloves": {
@@ -156,7 +156,7 @@ export const STARTER_LOOT_ITEMS: Record<string, EquipmentItem> = {
     level: 8,
     allowedClasses: ["guerreiro"],
     stats: { defense: 5, attack: 3 },
-    icon: "/img/itens/complementares/orc-warlord-gloves.png",
+    icon: "/img/itens/loot_monstros/icones_128/orc-warlord-gloves.png",
     sellPrice: 38,
   },
 };

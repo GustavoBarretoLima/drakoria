@@ -1,3 +1,4 @@
+import { classEquipmentIcon } from "../equipment/equipmentArtPaths.js";
 import { INSIGHT_ACCESSORY } from "../equipment/monsterInsight.js";
 import type { EquipmentDrop, EquipmentItem, EquipmentRarity, EquipmentSlot, EquipmentStats, HeroClass } from "../types/equipment.js";
 
@@ -30,7 +31,7 @@ export function createDungeonEquipment(heroClass: HeroClass, slot: EquipmentSlot
     name: `${DUNGEON_EQUIPMENT_NAMES[heroClass][slot]} ${quality.label} Nv.${level}`,
     description: `${heroClass === "mago" ? "Tecido leve e instrumentos arcanos" : heroClass === "arqueiro" ? "Couro leve e equipamento de tiro" : "Aço e equipamento de combate corpo a corpo"}. Requer nível ${level}.`,
     slot, rarity, level, allowedClasses: [heroClass], stats,
-    icon: `/img/itens/${slot}.svg`, sellPrice: Math.floor((8 + level * 3) * quality.power),
+    icon: classEquipmentIcon(heroClass, slot), sellPrice: Math.floor((8 + level * 3) * quality.power),
   };
 }
 

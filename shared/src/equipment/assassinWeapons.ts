@@ -1,6 +1,7 @@
+import { ASSASSIN_WEAPON_ICON } from "./equipmentArtPaths.js";
 import type { EquipmentItem, EquipmentDrop } from "../types/equipment.js";
 export function createAssassinDaggers(bow: EquipmentItem): EquipmentItem {
-  return { ...bow, id: `assassin-${bow.id}`, name: `Adagas do Assassino · Nv. ${bow.level}`, description: "Adagas exclusivas de Assassino, com os mesmos bônus da arma original.", requiredSubclass: "assassin", stats: { ...bow.stats } };
+  return { ...bow, icon: bow.requiredSubclass === "assassin" ? bow.icon : ASSASSIN_WEAPON_ICON, id: `assassin-${bow.id}`, name: `Adagas do Assassino · Nv. ${bow.level}`, description: "Adagas exclusivas de Assassino, com os mesmos bônus da arma original.", requiredSubclass: "assassin", stats: { ...bow.stats } };
 }
 import { createBerserkAxe } from "./berserkWeapons.js";
 export function adaptSubclassWeaponDrops(drops: EquipmentDrop[], subclassId?: string): EquipmentDrop[] {
