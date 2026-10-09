@@ -1,0 +1,276 @@
+[
+  {
+    "id": "monster-loot-01",
+    "name": "Faca de Sucata",
+    "description": "Equipamento temático obtido de Goblin.",
+    "slot": "weapon",
+    "rarity": "uncommon",
+    "level": 5,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "attack": 8,
+      "criticalDamage": 3
+    },
+    "icon": "/img/itens/monstros/monster-loot-01.png",
+    "sellPrice": 28,
+    "requiredSubclass": "assassin"
+  },
+  {
+    "id": "monster-loot-02",
+    "name": "Espada da Sepultura",
+    "description": "Equipamento temático obtido de Esqueleto Guerreiro.",
+    "slot": "weapon",
+    "rarity": "rare",
+    "level": 10,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "attack": 13
+    },
+    "icon": "/img/itens/monstros/monster-loot-02.png",
+    "sellPrice": 57
+  },
+  {
+    "id": "monster-loot-03",
+    "name": "Brinco da Presa Mutante",
+    "description": "Equipamento temático obtido de Rato Mutante.",
+    "slot": "earring",
+    "rarity": "uncommon",
+    "level": 5,
+    "allowedClasses": [
+      "universal"
+    ],
+    "stats": {
+      "hp": 8,
+      "criticalDamage": 3
+    },
+    "icon": "/img/itens/monstros/monster-loot-03.png",
+    "sellPrice": 28
+  },
+  {
+    "id": "monster-loot-04",
+    "name": "Cutelo do Saqueador",
+    "description": "Equipamento temático obtido de Orc.",
+    "slot": "weapon",
+    "rarity": "rare",
+    "level": 10,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "attack": 13
+    },
+    "icon": "/img/itens/monstros/monster-loot-04.png",
+    "sellPrice": 57
+  },
+  {
+    "id": "monster-loot-05",
+    "name": "Manoplas do Hobgoblin",
+    "description": "Equipamento temático obtido de Hobgoblin.",
+    "slot": "gloves",
+    "rarity": "rare",
+    "level": 10,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "attack": 3,
+      "defense": 3
+    },
+    "icon": "/img/itens/monstros/monster-loot-05.png",
+    "sellPrice": 57
+  },
+  {
+    "id": "monster-loot-06",
+    "name": "Couraça do Carrasco",
+    "description": "Equipamento temático obtido de Hobgoblin Elite.",
+    "slot": "armor",
+    "rarity": "epic",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "defense": 19,
+      "hp": 65
+    },
+    "icon": "/img/itens/monstros/monster-loot-06.png",
+    "sellPrice": 126
+  },
+  {
+    "id": "monster-loot-07",
+    "name": "Escudo do Senhor da Guerra",
+    "description": "Equipamento temático obtido de Senhor da Guerra Orc.",
+    "slot": "shield",
+    "rarity": "epic",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "defense": 14,
+      "hp": 37
+    },
+    "icon": "/img/itens/monstros/monster-loot-07.png",
+    "sellPrice": 126
+  },
+  {
+    "id": "monster-loot-08",
+    "name": "Machado da Coroa Sangrenta",
+    "description": "Equipamento temático obtido de Rei Orc.",
+    "slot": "weapon",
+    "rarity": "legendary",
+    "level": 30,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "attack": 39
+    },
+    "icon": "/img/itens/monstros/monster-loot-08.png",
+    "sellPrice": 274,
+    "requiredSubclass": "berserker",
+    "weaponType": "two-handed-axe"
+  },
+  {
+    "id": "monster-loot-09",
+    "name": "Luvas da Teia Pestilenta",
+    "description": "Equipamento temático obtido de Aranha Pestilenta.",
+    "slot": "gloves",
+    "rarity": "rare",
+    "level": 15,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "attack": 6,
+      "criticalChance": 3
+    },
+    "icon": "/img/itens/monstros/monster-loot-09.png",
+    "sellPrice": 80
+  },
+  {
+    "id": "monster-loot-10",
+    "name": "Anel da Alma Errante",
+    "description": "Equipamento temático obtido de Espectro do Cemitério.",
+    "slot": "ring",
+    "rarity": "rare",
+    "level": 15,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "magicPower": 3,
+      "mana": 25
+    },
+    "icon": "/img/itens/monstros/monster-loot-10.png",
+    "sellPrice": 80
+  },
+  {
+    "id": "monster-loot-11",
+    "name": "Botas do Lobo Sombrio",
+    "description": "Equipamento temático obtido de Lobo Sombrio.",
+    "slot": "boots",
+    "rarity": "rare",
+    "level": 15,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "defense": 3,
+      "hp": 13,
+      "speed": 3,
+      "dodgeChance": 6
+    },
+    "icon": "/img/itens/monstros/monster-loot-11.png",
+    "sellPrice": 80
+  },
+  {
+    "id": "monster-loot-12",
+    "name": "Arco da Raiz Maldita",
+    "description": "Equipamento temático obtido de Árvore Demoníaca.",
+    "slot": "weapon",
+    "rarity": "epic",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "attack": 23,
+      "criticalDamage": 9
+    },
+    "icon": "/img/itens/monstros/monster-loot-12.png",
+    "sellPrice": 126
+  },
+  {
+    "id": "monster-loot-13",
+    "name": "Amuleto das Três Cabeças",
+    "description": "Equipamento temático obtido de Hidra da Corrupção.",
+    "slot": "necklace",
+    "rarity": "legendary",
+    "level": 30,
+    "allowedClasses": [
+      "universal"
+    ],
+    "stats": {
+      "hp": 46,
+      "mana": 26
+    },
+    "icon": "/img/itens/monstros/monster-loot-13.png",
+    "sellPrice": 274
+  },
+  {
+    "id": "monster-loot-14",
+    "name": "Cajado do Último Rito",
+    "description": "Equipamento temático obtido de Coveiro Maldito.",
+    "slot": "weapon",
+    "rarity": "legendary",
+    "level": 30,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "magicPower": 39,
+      "mana": 62
+    },
+    "icon": "/img/itens/monstros/monster-loot-14.png",
+    "sellPrice": 274
+  },
+  {
+    "id": "monster-loot-15",
+    "name": "Gibão da Fera Colossal",
+    "description": "Equipamento temático obtido de Lobo Mutante Gigante.",
+    "slot": "armor",
+    "rarity": "legendary",
+    "level": 30,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "defense": 23,
+      "hp": 62
+    },
+    "icon": "/img/itens/monstros/monster-loot-15.png",
+    "sellPrice": 274
+  },
+  {
+    "id": "monster-loot-16",
+    "name": "Medalhão do Rei Orc",
+    "description": "Equipamento temático obtido de Rei Orc.",
+    "slot": "necklace",
+    "rarity": "legendary",
+    "level": 30,
+    "allowedClasses": [
+      "universal"
+    ],
+    "stats": {
+      "hp": 62,
+      "defense": 8
+    },
+    "icon": "/img/itens/monstros/monster-loot-16.png",
+    "sellPrice": 274
+  }
+]

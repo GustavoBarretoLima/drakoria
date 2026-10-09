@@ -1,0 +1,114 @@
+[
+  {
+    "monsterBaseId": "goblin-normal",
+    "itemId": "monster-loot-01",
+    "chancePerKill": 0.03,
+    "minimumMonsterLevel": 5,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "skeleton-warrior-normal",
+    "itemId": "monster-loot-02",
+    "chancePerKill": 0.02,
+    "minimumMonsterLevel": 10,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "mutant-rat-normal",
+    "itemId": "monster-loot-03",
+    "chancePerKill": 0.03,
+    "minimumMonsterLevel": 5,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "orc-normal",
+    "itemId": "monster-loot-04",
+    "chancePerKill": 0.02,
+    "minimumMonsterLevel": 10,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "hobgoblin-normal",
+    "itemId": "monster-loot-05",
+    "chancePerKill": 0.03,
+    "minimumMonsterLevel": 10,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "hobgoblin-elite",
+    "itemId": "monster-loot-06",
+    "chancePerKill": 0.06,
+    "minimumMonsterLevel": 20,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "orc-warlord-boss",
+    "itemId": "monster-loot-07",
+    "chancePerKill": 0.08,
+    "minimumMonsterLevel": 20,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "orc-king-boss",
+    "itemId": "monster-loot-08",
+    "chancePerKill": 0.03,
+    "minimumMonsterLevel": 30,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "pestilent-spider-normal",
+    "itemId": "monster-loot-09",
+    "chancePerKill": 0.02,
+    "minimumMonsterLevel": 15,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "cemetery-specter-normal",
+    "itemId": "monster-loot-10",
+    "chancePerKill": 0.02,
+    "minimumMonsterLevel": 15,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "shadow-wolf-normal",
+    "itemId": "monster-loot-11",
+    "chancePerKill": 0.02,
+    "minimumMonsterLevel": 15,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "demonic-tree-normal",
+    "itemId": "monster-loot-12",
+    "chancePerKill": 0.01,
+    "minimumMonsterLevel": 20,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "corruption-hydra-boss",
+    "itemId": "monster-loot-13",
+    "chancePerKill": 0.03,
+    "minimumMonsterLevel": 30,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "cursed-gravedigger-boss",
+    "itemId": "monster-loot-14",
+    "chancePerKill": 0.03,
+    "minimumMonsterLevel": 30,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "mutant-wolf-boss",
+    "itemId": "monster-loot-15",
+    "chancePerKill": 0.03,
+    "minimumMonsterLevel": 30,
+    "quantity": 1
+  },
+  {
+    "monsterBaseId": "orc-king-boss",
+    "itemId": "monster-loot-16",
+    "chancePerKill": 0.02,
+    "minimumMonsterLevel": 30,
+    "quantity": 1
+  }
+]

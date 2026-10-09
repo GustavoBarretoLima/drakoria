@@ -1,0 +1,464 @@
+import type { EquipmentItem } from "../types/equipment.js";
+
+export const NOVOS_EQUIPAMENTOS: EquipmentItem[] = [
+  {
+    "id": "drakoria-guerreiro-weapon-rare-lvl-20",
+    "name": "Espada — Leão Rubro",
+    "description": "Peça rara do conjunto Leão Rubro. Requer nível 20.",
+    "slot": "weapon",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "attack": 19
+    },
+    "icon": "/img/itens/novos/drakoria-guerreiro-weapon-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-guerreiro-armor-rare-lvl-20",
+    "name": "Couraça — Leão Rubro",
+    "description": "Peça rara do conjunto Leão Rubro. Requer nível 20.",
+    "slot": "armor",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "defense": 15,
+      "hp": 53
+    },
+    "icon": "/img/itens/novos/drakoria-guerreiro-armor-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-guerreiro-shield-rare-lvl-20",
+    "name": "Escudo — Leão Rubro",
+    "description": "Peça rara do conjunto Leão Rubro. Requer nível 20.",
+    "slot": "shield",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "defense": 11,
+      "hp": 30
+    },
+    "icon": "/img/itens/novos/drakoria-guerreiro-shield-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-guerreiro-legs-rare-lvl-20",
+    "name": "Grevas — Leão Rubro",
+    "description": "Peça rara do conjunto Leão Rubro. Requer nível 20.",
+    "slot": "legs",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "defense": 8,
+      "hp": 30
+    },
+    "icon": "/img/itens/novos/drakoria-guerreiro-legs-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-guerreiro-boots-rare-lvl-20",
+    "name": "Botas — Leão Rubro",
+    "description": "Peça rara do conjunto Leão Rubro. Requer nível 20.",
+    "slot": "boots",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "defense": 4,
+      "hp": 19
+    },
+    "icon": "/img/itens/novos/drakoria-guerreiro-boots-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-guerreiro-gloves-rare-lvl-20",
+    "name": "Manoplas — Leão Rubro",
+    "description": "Peça rara do conjunto Leão Rubro. Requer nível 20.",
+    "slot": "gloves",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "attack": 4,
+      "defense": 4
+    },
+    "icon": "/img/itens/novos/drakoria-guerreiro-gloves-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-guerreiro-ring-rare-lvl-20",
+    "name": "Anel — Leão Rubro",
+    "description": "Peça rara do conjunto Leão Rubro. Requer nível 20.",
+    "slot": "ring",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "hp": 30,
+      "attack": 4
+    },
+    "icon": "/img/itens/novos/drakoria-guerreiro-ring-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-guerreiro-earring-rare-lvl-20",
+    "name": "Brinco — Leão Rubro",
+    "description": "Peça rara do conjunto Leão Rubro. Requer nível 20.",
+    "slot": "earring",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "hp": 19,
+      "criticalDamage": 8
+    },
+    "icon": "/img/itens/novos/drakoria-guerreiro-earring-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-guerreiro-necklace-rare-lvl-20",
+    "name": "Medalhão — Leão Rubro",
+    "description": "Peça rara do conjunto Leão Rubro. Requer nível 20.",
+    "slot": "necklace",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "guerreiro"
+    ],
+    "stats": {
+      "hp": 38,
+      "defense": 4
+    },
+    "icon": "/img/itens/novos/drakoria-guerreiro-necklace-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-mago-weapon-rare-lvl-20",
+    "name": "Cajado — Constelação Arcana",
+    "description": "Peça rara do conjunto Constelação Arcana. Requer nível 20.",
+    "slot": "weapon",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "magicPower": 19,
+      "mana": 30
+    },
+    "icon": "/img/itens/novos/drakoria-mago-weapon-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-mago-armor-rare-lvl-20",
+    "name": "Manto — Constelação Arcana",
+    "description": "Peça rara do conjunto Constelação Arcana. Requer nível 20.",
+    "slot": "armor",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "defense": 8,
+      "mana": 53
+    },
+    "icon": "/img/itens/novos/drakoria-mago-armor-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-mago-shield-rare-lvl-20",
+    "name": "Grimório — Constelação Arcana",
+    "description": "Peça rara do conjunto Constelação Arcana. Requer nível 20.",
+    "slot": "shield",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "magicPower": 4,
+      "mana": 30
+    },
+    "icon": "/img/itens/novos/drakoria-mago-shield-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-mago-legs-rare-lvl-20",
+    "name": "Calças — Constelação Arcana",
+    "description": "Peça rara do conjunto Constelação Arcana. Requer nível 20.",
+    "slot": "legs",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "defense": 4,
+      "mana": 30
+    },
+    "icon": "/img/itens/novos/drakoria-mago-legs-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-mago-boots-rare-lvl-20",
+    "name": "Botas — Constelação Arcana",
+    "description": "Peça rara do conjunto Constelação Arcana. Requer nível 20.",
+    "slot": "boots",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "defense": 4,
+      "mana": 19
+    },
+    "icon": "/img/itens/novos/drakoria-mago-boots-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-mago-gloves-rare-lvl-20",
+    "name": "Luvas — Constelação Arcana",
+    "description": "Peça rara do conjunto Constelação Arcana. Requer nível 20.",
+    "slot": "gloves",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "magicPower": 4,
+      "mana": 15
+    },
+    "icon": "/img/itens/novos/drakoria-mago-gloves-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-mago-ring-rare-lvl-20",
+    "name": "Anel — Constelação Arcana",
+    "description": "Peça rara do conjunto Constelação Arcana. Requer nível 20.",
+    "slot": "ring",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "magicPower": 4,
+      "mana": 30
+    },
+    "icon": "/img/itens/novos/drakoria-mago-ring-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-mago-earring-rare-lvl-20",
+    "name": "Brinco — Constelação Arcana",
+    "description": "Peça rara do conjunto Constelação Arcana. Requer nível 20.",
+    "slot": "earring",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "mana": 23,
+      "criticalDamage": 8
+    },
+    "icon": "/img/itens/novos/drakoria-mago-earring-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-mago-necklace-rare-lvl-20",
+    "name": "Amuleto — Constelação Arcana",
+    "description": "Peça rara do conjunto Constelação Arcana. Requer nível 20.",
+    "slot": "necklace",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "mago"
+    ],
+    "stats": {
+      "hp": 19,
+      "mana": 38
+    },
+    "icon": "/img/itens/novos/drakoria-mago-necklace-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-arqueiro-weapon-rare-lvl-20",
+    "name": "Arco — Falcão Verde",
+    "description": "Peça rara do conjunto Falcão Verde. Requer nível 20.",
+    "slot": "weapon",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "attack": 19,
+      "criticalDamage": 8
+    },
+    "icon": "/img/itens/novos/drakoria-arqueiro-weapon-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-arqueiro-armor-rare-lvl-20",
+    "name": "Gibão — Falcão Verde",
+    "description": "Peça rara do conjunto Falcão Verde. Requer nível 20.",
+    "slot": "armor",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "defense": 11,
+      "hp": 30
+    },
+    "icon": "/img/itens/novos/drakoria-arqueiro-armor-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-arqueiro-shield-rare-lvl-20",
+    "name": "Broquel — Falcão Verde",
+    "description": "Peça rara do conjunto Falcão Verde. Requer nível 20.",
+    "slot": "shield",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "defense": 8,
+      "hp": 19
+    },
+    "icon": "/img/itens/novos/drakoria-arqueiro-shield-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-arqueiro-legs-rare-lvl-20",
+    "name": "Calças — Falcão Verde",
+    "description": "Peça rara do conjunto Falcão Verde. Requer nível 20.",
+    "slot": "legs",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "defense": 8,
+      "hp": 19
+    },
+    "icon": "/img/itens/novos/drakoria-arqueiro-legs-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-arqueiro-boots-rare-lvl-20",
+    "name": "Botas — Falcão Verde",
+    "description": "Peça rara do conjunto Falcão Verde. Requer nível 20.",
+    "slot": "boots",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "defense": 4,
+      "hp": 15,
+      "speed": 4,
+      "dodgeChance": 8
+    },
+    "icon": "/img/itens/novos/drakoria-arqueiro-boots-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-arqueiro-gloves-rare-lvl-20",
+    "name": "Luvas — Falcão Verde",
+    "description": "Peça rara do conjunto Falcão Verde. Requer nível 20.",
+    "slot": "gloves",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "attack": 8,
+      "criticalChance": 4
+    },
+    "icon": "/img/itens/novos/drakoria-arqueiro-gloves-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-arqueiro-ring-rare-lvl-20",
+    "name": "Anel — Falcão Verde",
+    "description": "Peça rara do conjunto Falcão Verde. Requer nível 20.",
+    "slot": "ring",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "attack": 4,
+      "hp": 19
+    },
+    "icon": "/img/itens/novos/drakoria-arqueiro-ring-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-arqueiro-earring-rare-lvl-20",
+    "name": "Brinco — Falcão Verde",
+    "description": "Peça rara do conjunto Falcão Verde. Requer nível 20.",
+    "slot": "earring",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "hp": 19,
+      "criticalDamage": 8
+    },
+    "icon": "/img/itens/novos/drakoria-arqueiro-earring-rare-lvl-20.png",
+    "sellPrice": 102
+  },
+  {
+    "id": "drakoria-arqueiro-necklace-rare-lvl-20",
+    "name": "Pingente — Falcão Verde",
+    "description": "Peça rara do conjunto Falcão Verde. Requer nível 20.",
+    "slot": "necklace",
+    "rarity": "rare",
+    "level": 20,
+    "allowedClasses": [
+      "arqueiro"
+    ],
+    "stats": {
+      "hp": 30,
+      "attack": 4
+    },
+    "icon": "/img/itens/novos/drakoria-arqueiro-necklace-rare-lvl-20.png",
+    "sellPrice": 102
+  }
+];
