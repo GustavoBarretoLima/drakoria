@@ -261,6 +261,7 @@ if (demoMode) {
     socket.emit("player:setup", {
       heroName: localStorage.getItem("nomeHeroi") || "Heroi",
       treeRanks: loadSubclassProgress().treeRanks,
+      equippedSkills: loadSubclassProgress().equippedSkills,
       className: getSelectedHeroClass(),
       subclassId: getActiveSubclass(),
       monsterId: getSelectedMonsterId(),

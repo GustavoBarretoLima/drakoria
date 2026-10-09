@@ -1,5 +1,7 @@
 import type { BattleState } from "../types/combat.js";
 
+import { berserkSpeedMultiplier } from "./berserkCombat.js";
+
 export const ATB_MAX = 100;
 export const ATB_TICK_MS = 100;
 
@@ -12,11 +14,11 @@ export function advanceBattleAtb(state: BattleState): BattleState {
 
   const hero = {
     ...state.hero,
-    atb: Math.min(ATB_MAX, state.hero.atb + calculateAtbGain(state.hero.stats.speed)),
+    atb: Math.min(ATB_MAX, state.hero.atb + calculateAtbGain(state.hero.stats.speed * berserkSpeedMultiplier(state.hero))),
   };
   const enemy = {
     ...state.enemy,
-    atb: Math.min(ATB_MAX, state.enemy.atb + calculateAtbGain(state.enemy.stats.speed)),
+    atb: Math.min(ATB_MAX, state.enemy.atb + calculateAtbGain(state.enemy.stats.speed * ((state.enemy.slowedTurns ?? 0) > 0 ? .6 : 1))),
   };
 
   const heroReady = hero.atb >= ATB_MAX;

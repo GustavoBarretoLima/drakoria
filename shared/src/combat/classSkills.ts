@@ -1,9 +1,10 @@
 import type { CombatantState, HeroClass } from "../types/combat.js";
 import { normalizeHeroLevel } from "./classStats.js";
 import type { SubclassId } from "../classes/subclasses.js";
-import { SUBCLASS_SKILLS, normalizeTreeRanks } from "../classes/skillTrees.js";
+import { SUBCLASS_SKILLS, normalizeTreeRanks, normalizeBerserkLoadout } from "../classes/skillTrees.js";
 
 export type SkillId =
+  | `berserker-${string}`
   | "warrior-cleave" | "warrior-guard" | "warrior-breaker"
   | "mage-bolt" | "mage-frost" | "mage-burst"
   | "archer-aim" | "archer-pierce" | "archer-volley"
@@ -15,6 +16,7 @@ export interface ClassSkill {
   readonly heroClass: HeroClass;
   readonly unlockLevel: number;
   readonly manaCost: number;
+  readonly furyCost?: number;
   /** Number of other accepted hero actions required before reuse. */
   readonly cooldown: number;
   readonly damageType: "physical" | "magic";
@@ -22,7 +24,7 @@ export interface ClassSkill {
   readonly hits: number;
   readonly defenseMultiplier: number;
   readonly criticalBonus: number;
-  readonly effect: "none" | "guard" | "resetAtb" | "heal" | "healGuard" | "drain" | "recoil" | "execute" | "bleed" | "burn" | "summon" | "weaken";
+  readonly effect: "none" | "guard" | "resetAtb" | "heal" | "healGuard" | "drain" | "recoil" | "execute" | "bleed" | "burn" | "summon" | "weaken" | "berserk";
   readonly subclassId?: SubclassId;
   readonly description: string;
 }
@@ -76,6 +78,10 @@ export function getSkill(id: string): ClassSkill | undefined {
 
 export function getHeroSkills(hero: CombatantState): readonly ClassSkill[] {
   const ranks = normalizeTreeRanks(hero.subclassId, hero.level ?? 1, hero.treeRanks);
+  if (hero.subclassId === "berserker" && hero.className === "guerreiro") {
+    const equipped = normalizeBerserkLoadout(hero.level ?? 1, ranks, hero.equippedSkills);
+    return SUBCLASS_SKILLS.filter(skill => skill.subclassId === "berserker" && equipped.includes(skill.id));
+  }
   const skills = [...CLASS_SKILLS.filter(skill => skill.heroClass === hero.className), ...SUBCLASS_SKILLS.filter(skill => skill.subclassId === hero.subclassId && skill.heroClass === hero.className && (ranks[skill.id] ?? 0) > 0)];
   return skills.map(skill => skill.subclassId ? { ...skill, powerMultiplier: skill.powerMultiplier + Math.max(0, (ranks[skill.id] ?? 1) - 1) * 0.1 } : skill);
 }
@@ -91,6 +97,12 @@ export function getSkillBlockReason(hero: CombatantState, skill: ClassSkill): st
   if (hero.className !== skill.heroClass) return "Habilidade de outra classe";
   if (skill.subclassId && (hero.subclassId !== skill.subclassId || !normalizeTreeRanks(hero.subclassId, hero.level ?? 1, hero.treeRanks)[skill.id])) return "Habilidade não aprendida na árvore";
   if (normalizeHeroLevel(hero.level ?? 1) < skill.unlockLevel) return `Desbloqueia no nível ${skill.unlockLevel}`;
+  if (hero.subclassId === "berserker") {
+    if (skill.subclassId !== "berserker") return "Berserk usa as habilidades de sua árvore";
+    if (!hero.hasTwoHandedAxe) return "Equipe um machado de duas mãos";
+    if (!normalizeBerserkLoadout(hero.level ?? 1, hero.treeRanks, hero.equippedSkills).includes(skill.id)) return "Habilidade fora dos quatro espaços";
+    if ((hero.fury ?? 0) < (skill.furyCost ?? 0)) return "Fúria insuficiente";
+  }
   const cooldown = getSkillCooldown(hero, skill.id);
   if (cooldown > 0) return `Recuperação: ${cooldown} ação(ões)`;
   if (!Number.isFinite(hero.stats.mana) || hero.stats.mana < skill.manaCost) return "Mana insuficiente";

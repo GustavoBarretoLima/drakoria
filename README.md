@@ -311,14 +311,14 @@ A continuação desse sistema usa livros de subclasse e árvores de talentos, de
 
 ## Árvores de habilidades das subclasses
 
-Após usar um livro compatível, a tela de **Status** mostra o botão **Subclasse**. Cada uma das nove subclasses tem uma árvore própria com três talentos passivos e três habilidades ativas. As passivas originais da especialização permanecem; os talentos adicionam bônus sobre os atributos já calculados com nível, equipamento e subclasse.
+Após usar um livro compatível, a tela de **Status** mostra o botão **Subclasse**. O Berserk tem 18 nós em três caminhos e nove habilidades ativas. As outras oito subclasses mantêm três talentos passivos e três habilidades ativas. Os talentos adicionam bônus sobre os atributos já calculados com nível, equipamento e subclasse. No Berserk, o antigo bônus automático de dano crítico foi removido; permanecem +20% ATQ e −10% DEF.
 
-O personagem recebe **1 ponto por nível após o primeiro**, incluindo níveis anteriores ao livro. Um personagem de nível 20 tem 19 pontos. Cada rank custa um ponto; talentos passivos têm até cinco ranks e habilidades, três. Não existe saldo de pontos separado no save: os pontos livres são calculados pelo nível menos os ranks válidos investidos. Saves antigos recebem pontos retroativamente e começam com árvore vazia.
+O personagem recebe **1 ponto por nível após o primeiro**, incluindo níveis anteriores ao livro. Um personagem de nível 20 tem 19 pontos. Cada aprendizado ou rank custa um ponto. No Berserk, os nós têm grau único; nas outras subclasses, talentos passivos têm até cinco ranks e habilidades, três. Não existe saldo de pontos separado no save: os pontos livres são calculados pelo nível menos os ranks válidos investidos. Saves antigos recebem pontos retroativamente e começam com árvore vazia.
 
 | Subclasse | Talentos passivos | Novas habilidades |
 |---|---|---|
 | Paladino | Vitalidade Sagrada, Armadura da Fé, Égide Divina | Luz Restauradora, Golpe Consagrado, Santuário |
-| Berserk | Força Indomável, Sede de Combate, Fúria Implacável | Golpe Temerário, Dilacerar, Execução Furiosa |
+| Berserk | Lâmina Voraz, Ferida Profunda, Instinto Selvagem, Fúria Crescente, Êxtase de Batalha, Pele de Ferro, Vigor Indomável, Retaliação, Recusar a Morte | Golpe Brutal, Corte Devastador, Turbilhão Selvagem, Executor, Grito de Guerra, Investida Feral, Avatar da Fúria, Sangue por Sangue, Titã Imortal |
 | Espadachim | Ritmo da Lâmina, Precisão do Duelista, Passo Evasivo | Corte Duplo, Riposta, Dança das Espadas |
 | Necromante | Domínio das Almas, Reservatório Espiritual, Véu dos Mortos | Drenar Vida, Invocar Espírito, Legião Espectral |
 | Bruxo | Pacto Sombrio, Vigor do Pacto, Olhar Maldito | Maldição da Fraqueza, Chama Profana, Colheita Sombria |
@@ -350,3 +350,18 @@ Validação: `npm test`, `npx tsc --noEmit` e `npm run build`. `tests/subclassSk
 Após perderem 70% da vida (HP igual ou inferior a 30% do máximo), os bosses abaixo usam uma magia a cada três ações do inimigo: Hidra da Corrupção aplica Veneno, Lobo Mutante aplica Sangramento, Senhor da Guerra Orc aplica Quebra-osso e Orc Rei aplica Sangramento. O Coveiro Maldito mantém sua IA anterior.
 
 Veneno e Sangramento causam dano nas próximas três ações válidas do jogador. Quebra-osso impede habilidades e magia por duas ações; ataque básico, defesa e itens continuam disponíveis. Comandos rejeitados não avançam os efeitos. Esquivar da magia evita seu efeito. A fase 2 do Orc Rei continua aos 50% de HP, com bônus aplicados uma única vez; a magia de sangramento começa aos 30%.
+
+
+### Berserk — Fúria e três caminhos
+
+Despertar é gratuito e conta como 1 ponto nos requisitos. Os 18 nós têm grau único e custam 1 ponto: Carnificina, Fúria Primal e Sangue de Ferro exigem 1, 3, 5, 8, 12 e 16 pontos totais por patamar, além do nó anterior do caminho. Só uma final é permitida. Com esses requisitos, a final exige aprender os 15 nós não finais e fica disponível a partir do nível 17. Na cidade, equipam-se até quatro ativas, com espaços vazios permitidos. Passivas aprendidas permanecem aplicadas. A batalha recebe uma cópia da build; demo e backend validam os mesmos requisitos.
+
+Saves antigos recebem todos os pontos de volta, preservando nível, livros, subclasse e recursos atuais. A arma antiga e a mão secundária voltam para a mochila; um machado exclusivo de duas mãos mantém nível, raridade e bônus da arma original. O escudo não contribui. Sem arma, é concedido um machado de nível 1. A migração não duplica machados ao recarregar. Drops de armas de Guerreiro passam a ser machados para Berserk.
+
+Fúria inicia em zero por batalha, vai até 100, não persiste e não é recuperada por poções de mana. Acerto básico gera 8; dano direto recebido gera 4 por ação inimiga. Instinto Selvagem aumenta a geração em 20%, mantendo decimais. As nove ativas usam Fúria, e as habilidades antigas de Guerreiro e magia básica ficam indisponíveis. A barra de mana da batalha exibe Fúria.
+
+Tempos são contados por ações aceitas do personagem, inclusive itens, sem expirar durante a escolha no menu. Sangramento dura duas ações, causando 30% do ataque por ação. Grito, Sangue por Sangue e Titã duram duas ações seguintes; Avatar, três. Fúria Crescente e Retaliação expiram em duas ações; Retaliação só rearma após uma ação sua. Investida reduz o ritmo do ATB inimigo em 40% até a próxima ação dele.
+
+Recargas exigem outras ações: Golpe Brutal 2, Corte Devastador 3, Turbilhão 4, Executor 10, Grito de Guerra 6, Investida 3, Sangue por Sangue 6, Avatar 12 e Titã 12. Corte e Turbilhão atingem o alvo único atual; Turbilhão mantém quatro golpes com esquiva e crítico independentes. Cura por dano desses dois é dividida por três. Cura usa dano efetivo, sem excesso sobre a vida restante. Sangramento renova sem acumular e não causa crítico nem roubo de vida. Recusar a Morte funciona uma vez por batalha, contra dano direto ou contínuo, com proteção até a próxima ação. Empurrões e execuções explícitas ficam para quando essas mecânicas existirem.
+
+Referência visual e especificação: `img/subclass/arvore_berserk/`. `tests/berserkTree.test.ts` cobre os 18 nós, nove ativas, pré-requisitos, finais, equipamentos, migração, Fúria, efeitos e paridade de combate.

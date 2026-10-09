@@ -1,12 +1,13 @@
 import { SPRITE_BOUNDS } from "../client/src/assets/spriteBounds.ts";
 import { SUBCLASS_SPRITE_FOLDERS } from "../shared/src/classes/subclassSprites.ts";
-import { ensureAssassinEquipment } from "../client/src/inventory/inventoryClient.ts";
+import { ensureAssassinEquipment, ensureBerserkEquipment } from "../client/src/inventory/inventoryClient.ts";
 import { createStatsForLevel } from "../shared/src/combat/classStats.ts";
 import { canonicalEquipment, canEquipItem } from "../shared/src/equipment/equipmentRules.ts";
 import { applyEquipmentStats } from "../shared/src/equipment/equipmentStats.ts";
-import { getClassSkills } from "../shared/src/combat/classSkills.ts";
+import { getClassSkills, getHeroSkills } from "../shared/src/combat/classSkills.ts";
 import { applySubclassStats, SUBCLASS_DEFINITIONS } from "../shared/src/classes/subclasses.ts";
 import { applyTreeStats } from "../shared/src/classes/skillTrees.ts";
+import { loadSubclassProgress } from "../client/src/progression/subclassClient.ts";
 import { getTreeRanks } from "../client/src/progression/skillTreeClient.ts";
 import "../client/src/pages/subclassTree.ts";
 
@@ -46,6 +47,7 @@ const STATUS_STAT_LABELS = {
 
 function carregarInventarioStatus() {
   window.ensureAssassinEquipment?.();
+  window.ensureBerserkEquipment?.();
   try {
     const parsed = JSON.parse(localStorage.getItem("drakoriaInventario") || "{}");
     return {
@@ -217,7 +219,8 @@ function abrirStatusComProgressao() {
   const progresso = window.progressoDrakoria?.carregarProgresso?.() || { nivel: 1 };
   const ficha = criarFichaPersonagemJRPG();
   const equipmentRows = Object.entries(STATUS_SLOT_LABELS).map(([slot, label]) => criarSlotPaperDollStatus(slot, label, inventario)).join("");
-  const skills = getClassSkills(classe).map(skill => `<div class="jrpg-skill-row"><span>${escaparHtmlStatus(skill.name)}</span><small>${progresso.nivel >= skill.unlockLevel ? "Liberada" : `Nível ${skill.unlockLevel}`}</small></div>`).join("");
+  const heroSkills = subclasse?.id === "berserker" ? (typeof getHeroSkills === "function" && typeof loadSubclassProgress === "function" ? getHeroSkills({ className: classe, level: progresso.nivel, subclassId: "berserker", treeRanks: getTreeRanks(), equippedSkills: loadSubclassProgress().equippedSkills }) : []) : getClassSkills(classe);
+  const skills = heroSkills.map(skill => `<div class="jrpg-skill-row"><span>${escaparHtmlStatus(skill.name)}</span><small>${progresso.nivel >= skill.unlockLevel ? "Liberada" : `Nível ${skill.unlockLevel}`}</small></div>`).join("");
   document.getElementById("menuPraca")?.classList?.add?.("hidden");
   painel.classList.remove("hidden");
   painel.innerHTML = `<div class="jrpg-sheet" data-view="status">
@@ -225,7 +228,7 @@ function abrirStatusComProgressao() {
       <nav aria-label="Tela do personagem"><button type="button" onclick="abrirInventario()">Inventário</button><button type="button" onclick="fecharPainelPraca()">Fechar</button></nav></header>
     <div class="jrpg-sheet-columns">${ficha.profile}${ficha.attributes}
       <section class="jrpg-loadout"><h3 class="section-title">Equipamentos</h3><div class="jrpg-equipment-list">${equipmentRows}</div>
-        <h3 class="section-title">Habilidades da classe</h3><div class="jrpg-skill-list">${skills}</div>
+        <h3 class="section-title">Habilidades da classe</h3><div class="jrpg-skill-list">${skills || (subclasse?.id === "berserker" ? "<p>Aprenda e equipe até quatro habilidades na árvore de subclasse.</p>" : "")}</div>
         <div class="jrpg-subclass"><h3 class="section-title">Subclasse</h3>
         ${subclasse ? `<strong>${escaparHtmlStatus(subclasse.name)}</strong><p>${escaparHtmlStatus(subclasse.passiveSummary)}</p><button type="button" onclick="abrirArvoreSubclasse()">Subclasse</button>` : '<p>Use um livro de subclasse para liberar sua especialização.</p>'}</div>
       </section>
@@ -264,3 +267,5 @@ function criarFichaPersonagemJRPG() {
 window.criarFichaPersonagemJRPG = criarFichaPersonagemJRPG;
 
 if (typeof ensureAssassinEquipment === "function") window.ensureAssassinEquipment = ensureAssassinEquipment;
+
+if (typeof ensureBerserkEquipment === "function") window.ensureBerserkEquipment = ensureBerserkEquipment;

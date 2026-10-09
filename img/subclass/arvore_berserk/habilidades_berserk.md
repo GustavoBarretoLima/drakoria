@@ -2,6 +2,24 @@
 
 Proposta original de habilidades e balanceamento. A imagem é um conceito visual; os tipos, requisitos e efeitos abaixo são a especificação. Aplica-se às versões masculina e feminina.
 
+## Implementação ATB
+
+As seguintes adaptações foram autorizadas pelo autor e são as regras implementadas:
+
+- Despertar gratuito conta como 1 ponto nos requisitos. Os 18 nós custam um ponto cada e têm grau único; apenas uma final é permitida. Para atingir os 16 pontos prévios da final, os 15 nós não finais precisam ser aprendidos. Nível mínimo resultante: 17.
+- Fúria inicia em zero por batalha, não persiste e tem teto 100. Geração: 8 por acerto básico e 4 por ação inimiga com dano direto. Instinto aumenta os ganhos em 20%, mantendo decimais.
+- Até quatro ativas equipadas, com espaços vazios permitidos. Passivas sempre aplicadas. A build é copiada para cada batalha.
+- Machado de duas mãos mantém os bônus da arma substituída. Arma antiga e mão secundária permanecem na mochila; escudo não contribui. Sem arma, recebe machado inicial. Bônus base: +20% ATQ e −10% DEF, removendo o +20 de dano crítico antigo.
+- Durações e recargas avançam por ações aceitas do Berserk, inclusive itens. Sangramento: duas ações, 30% do ataque por ação. Grito, Sangue por Sangue e Titã: duas ações seguintes. Avatar: três. Fúria Crescente e Retaliação: duas ações. Retaliação só rearma após uma ação sua. Investida reduz o ritmo do ATB inimigo em 40% até a próxima ação dele.
+- Recargas em outras ações: Golpe Brutal 2, Corte Devastador 3, Turbilhão 4, Executor 10, Grito de Guerra 6, Investida 3, Sangue por Sangue 6, Avatar 12, Titã 12.
+- Corte e Turbilhão atingem o alvo único atual; Turbilhão mantém quatro golpes. Cura por dano desses dois é dividida por três. Cura não considera dano excedente; sangramento não causa crítico nem roubo de vida.
+- Recusar a Morte: uma vez por batalha, protege de dano fatal direto ou contínuo e concede redução até a próxima ação. Empurrões e execução explícita ficam para quando essas mecânicas existirem.
+- Saves antigos têm os pontos devolvidos, sem consumir livro ou curar o personagem. As demais subclasses preservam as árvores existentes.
+
+## Proposta original — referência de design
+
+Os valores em segundos abaixo são a proposta original. A seção Implementação ATB define as adaptações atuais.
+
 ## Regras
 
 - Despertar Berserk é concedido ao obter a subclasse e libera a árvore.

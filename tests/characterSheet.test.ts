@@ -7,7 +7,8 @@ import { canonicalEquipment, canEquipItem } from "../shared/src/equipment/equipm
 import { applySubclassStats, SUBCLASS_DEFINITIONS } from "../shared/src/classes/subclasses.js";
 import { applyTreeStats } from "../shared/src/classes/skillTrees.js";
 import { getTestCharacterEquipment } from "../shared/src/testing/testCharacter.js";
-const items = getTestCharacterEquipment("guerreiro");
+import { createBerserkAxe } from "../shared/src/equipment/berserkWeapons.js";
+const items = getTestCharacterEquipment("guerreiro").filter(item => item.slot !== "shield").map(item => item.slot === "weapon" ? createBerserkAxe(item) : item);
 const inventory = { items: items.map(item => ({ item, quantity: item.slot === "ring" ? 2 : 1 })), equipped: Object.fromEntries(items.map(item => [item.slot, item.id])) };
 const data: Record<string,string> = { classeHeroi: "guerreiro", nomeHeroi: "<Taichou>", drakoriaInventario: JSON.stringify(inventory), drakoriaHeroVitals: '{"hp":37,"mana":8}', drakoriaSubclassProgress: '{"activeSubclass":"berserker","books":{}}' };
 const panel = { innerHTML: "", classList: { remove() {}, add() {} } };

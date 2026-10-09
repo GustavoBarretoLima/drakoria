@@ -7,6 +7,7 @@ import type {
 } from "../../../../shared/src/types/equipment.js";
 import { generateEquipmentCatalog } from "../../../../shared/src/types/equipmentGenerator.js";
 
+import { createBerserkAxe } from "../../../../shared/src/equipment/berserkWeapons.js";
 import { createAssassinDaggers } from "../../../../shared/src/equipment/assassinWeapons.js";
 import { STARTER_LOOT_ITEMS } from "../../../../shared/src/loot/lootTables.js";
 
@@ -48,6 +49,11 @@ export function listEquipments(
 }
 
 export function getEquipmentById(id: string): EquipmentItem | undefined {
+  if (id.startsWith("berserk-")) {
+    const weaponId = id.slice(8);
+    const weapon = EQUIPMENT_CATALOG.find(item => item.id === weaponId) ?? STARTER_LOOT_ITEMS[weaponId];
+    if (weapon?.slot === "weapon" && weapon.allowedClasses.includes("guerreiro")) return createBerserkAxe(weapon);
+  }
   if (id.startsWith("assassin-")) {
     const bowId = id.slice(9);
     const bow = EQUIPMENT_CATALOG.find(item => item.id === bowId) ?? STARTER_LOOT_ITEMS[bowId];

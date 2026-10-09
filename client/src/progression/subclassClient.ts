@@ -4,10 +4,10 @@ import {
 } from "../../../shared/src/classes/subclasses.js";
 import type { SubclassBookDrop } from "../../../shared/src/loot/subclassBooks.js";
 import type { HeroClass } from "../../../shared/src/types/combat.js";
-import { normalizeTreeRanks, type TreeRanks } from "../../../shared/src/classes/skillTrees.js";
+import { normalizeTreeRanks, normalizeBerserkLoadout, type TreeRanks } from "../../../shared/src/classes/skillTrees.js";
 import { loadProgress } from "./progressionClient.js";
 
-import { ensureAssassinEquipment } from "../inventory/inventoryClient.js";
+import { ensureAssassinEquipment, ensureBerserkEquipment } from "../inventory/inventoryClient.js";
 
 const SUBCLASS_STORAGE_KEY = "drakoriaSubclassProgress";
 
@@ -15,6 +15,8 @@ export interface SubclassProgressState {
   books: Partial<Record<SubclassId, number>>;
   activeSubclass?: SubclassId;
   treeRanks?: TreeRanks;
+  equippedSkills?: string[];
+  berserkTreeVersion?: number;
 }
 
 export interface UseSubclassBookResult {
@@ -27,6 +29,8 @@ function cloneState(state: SubclassProgressState): SubclassProgressState {
   return {
     books: { ...state.books },
     treeRanks: { ...state.treeRanks },
+    ...(state.equippedSkills ? { equippedSkills: [...state.equippedSkills] } : {}),
+    ...(state.berserkTreeVersion ? { berserkTreeVersion: state.berserkTreeVersion } : {}),
     ...(state.activeSubclass ? { activeSubclass: state.activeSubclass } : {}),
   };
 }
@@ -34,7 +38,13 @@ function cloneState(state: SubclassProgressState): SubclassProgressState {
 export function loadSubclassProgress(): SubclassProgressState {
   try {
     const parsed = JSON.parse(localStorage.getItem(SUBCLASS_STORAGE_KEY) || "{}") as Partial<SubclassProgressState>;
+    if (parsed.activeSubclass === "berserker" && parsed.berserkTreeVersion !== 2) {
+      // Old node IDs do not map to the new paths: return every point, retain the book/subclass.
+      parsed.treeRanks = {}; parsed.equippedSkills = []; parsed.berserkTreeVersion = 2;
+      saveSubclassProgress({ ...parsed, books: parsed.books ?? {} });
+    }
     return {
+      ...(parsed.activeSubclass === "berserker" ? { berserkTreeVersion: 2, equippedSkills: normalizeBerserkLoadout(loadProgress().nivel, parsed.treeRanks, parsed.equippedSkills) } : {}),
       books: parsed.books && typeof parsed.books === "object" ? { ...parsed.books } : {},
       treeRanks: normalizeTreeRanks(parsed.activeSubclass, loadProgress().nivel, parsed.treeRanks),
       ...(parsed.activeSubclass && SUBCLASS_DEFINITIONS[parsed.activeSubclass]
@@ -84,8 +94,10 @@ export function useSubclassBook(
 
   state.books[subclassId] = count - 1;
   state.activeSubclass = subclassId;
+  if (subclassId === "berserker") { state.berserkTreeVersion = 2; state.treeRanks = {}; state.equippedSkills = []; }
   saveSubclassProgress(state);
   if (subclassId === "assassin") ensureAssassinEquipment(true);
+  if (subclassId === "berserker") ensureBerserkEquipment(true);
   return {
     used: true,
     message: `Especialização desbloqueada: ${definition.name}.`,

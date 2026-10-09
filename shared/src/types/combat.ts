@@ -38,6 +38,12 @@ export interface CombatantState {
   skillCooldowns?: Partial<Record<SkillId, number>>;
   subclassId?: SubclassId;
   treeRanks?: TreeRanks;
+  equippedSkills?: string[];
+  hasTwoHandedAxe?: boolean;
+  fury?: number;
+  berserk?: { warcry: number; avatar: number; blood: number; titan: number; stacks: number; stackTurns: number; retaliation: number; retaliationCooldown: number; deathWard: boolean; refusedDeath: boolean };
+  berserkBleed?: { damage: number; turns: number };
+  slowedTurns?: number;
   ongoingDamage?: { damage: number; turns: number; name: string };
   weakenedTurns?: number;
   skillLockedTurns?: number;

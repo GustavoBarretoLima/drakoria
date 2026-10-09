@@ -1,8 +1,10 @@
 import { applyBattleAction as applyHeroAction, applyEnemyTurn, tickHeroDamage } from "../../../shared/src/combat/combatEngine.js";
+import { emptyBerserkState, finishBerserkAction, tickBerserkBleed } from "../../../shared/src/combat/berserkCombat.js";
+import { hasBerserkAxe } from "../../../shared/src/equipment/berserkWeapons.js";
 import { hasMonsterInsight } from "../../../shared/src/equipment/monsterInsight.js";
 import { createStatsForLevel, normalizeHeroLevel } from "../../../shared/src/combat/classStats.js";
 import { applySubclassStats } from "../../../shared/src/classes/subclasses.js";
-import { applyTreeStats, normalizeTreeRanks } from "../../../shared/src/classes/skillTrees.js";
+import { applyTreeStats, normalizeTreeRanks, normalizeBerserkLoadout } from "../../../shared/src/classes/skillTrees.js";
 import { loadSubclassProgress } from "../progression/subclassClient.js";
 import {
   advanceBattleAtb,
@@ -100,6 +102,7 @@ export function startDemoBattle(
       className: heroClass,
       level: normalizeHeroLevel(heroLevel),
       ...(subclassId ? { subclassId } : {}), treeRanks,
+      ...(subclassId === "berserker" ? { fury: 0, berserk: emptyBerserkState(), hasTwoHandedAxe: hasBerserkAxe(equippedItems), equippedSkills: normalizeBerserkLoadout(heroLevel, treeRanks, loadSubclassProgress().equippedSkills) } : {}),
       stats: heroStats,
       atb: 0,
       defending: false,
@@ -149,7 +152,10 @@ export function useDemoConsumable(itemId: DemoConsumableId): boolean {
   const recoveredMana = hero.stats.mana - beforeMana;
   if (recoveredHp <= 0 && recoveredMana <= 0) return false;
 
-  const statusMessage = tickHeroDamage(hero);
+  const enemy = { ...battleState.enemy, stats: { ...battleState.enemy.stats } };
+  const statusMessage = tickHeroDamage(hero) + tickBerserkBleed(enemy);
+  hero.skillCooldowns = Object.fromEntries(Object.entries(hero.skillCooldowns ?? {}).map(([id, value]) => [id, Math.max(0, (value ?? 0) - 1)]));
+  finishBerserkAction(hero, battleState.hero);
   hero.skillLockedTurns = Math.max(0, (hero.skillLockedTurns ?? 0) - 1);
   const itemName = itemId === "healthPotion"
     ? "Poção de HP"
@@ -159,10 +165,10 @@ export function useDemoConsumable(itemId: DemoConsumableId): boolean {
 
   battleState = {
     ...battleState,
-    hero,
-    turnOwnerId: hero.isAlive ? null : battleState.enemy.id,
-    finished: !hero.isAlive,
-    ...(!hero.isAlive ? { winnerId: battleState.enemy.id } : {}),
+    hero, enemy,
+    turnOwnerId: !hero.isAlive ? enemy.id : !enemy.isAlive ? hero.id : null,
+    finished: !hero.isAlive || !enemy.isAlive,
+    ...(!hero.isAlive ? { winnerId: enemy.id } : !enemy.isAlive ? { winnerId: hero.id } : {}),
     lastEvent: {
       actorId: hero.id,
       targetId: hero.id,

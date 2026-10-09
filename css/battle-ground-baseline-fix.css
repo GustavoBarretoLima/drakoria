@@ -338,3 +338,6 @@
     transform: translateX(4px);
   }
 }
+
+/* Later grid rules must not reveal commands underneath an open submenu. */
+#batalha .battle-command-dock [hidden] { display: none !important; }

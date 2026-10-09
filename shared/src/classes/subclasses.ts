@@ -41,7 +41,7 @@ export const SUBCLASS_DEFINITIONS: Record<SubclassId, SubclassDefinition> = {
     role: "Dano físico puro",
     description: "Abandona a cautela para causar o maior dano físico possível.",
     mechanics: ["dano físico", "fúria", "alto risco", "execução"],
-    passiveSummary: "+20% ATQ, +20% dano crítico e -10% DEF.",
+    passiveSummary: "+20% ATQ e -10% DEF. Libera Fúria e machados de duas mãos.",
   },
   swordsman: {
     id: "swordsman",
@@ -150,7 +150,6 @@ export function applySubclassStats(stats: Stats, subclassId?: SubclassId): Stats
       break;
     case "berserker":
       next.attack = scale(next.attack, 1.2);
-      next.criticalDamage += 20;
       next.defense = scale(next.defense, 0.9);
       break;
     case "swordsman":
