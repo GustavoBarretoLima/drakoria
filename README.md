@@ -386,3 +386,12 @@ Todas as nove subclasses têm seis novos talentos (54 no total), com três ranks
 Força corresponde a ataque físico; magia corresponde a `magicPower`. Bônus de ataque/defesa/HP/mana/magia são percentuais sobre o atributo antes da árvore (já com equipamentos e subclasse), somados sem multiplicação entre talentos. Crítico, dano crítico e esquiva usam pontos percentuais. Valores por rank variam entre 1 e 3; cada nó descreve seu limite. Esquiva continua limitada a 50% e chance crítica a 100%. Novos talentos não adicionam habilidades ao menu de combate. Demo, backend e status usam os mesmos dados.
 
 Referências de identidade: [profissões](https://www.guildwars2.com/en/the-game/professions/) e [especializações](https://heartofthorns.guildwars2.com/game/specializations/) oficiais de Guild Wars 2. Os valores e nomes são próprios do Drakoria, adaptados ao combate com alvo único. `tests/attributeTalents.test.ts` cobre ranks, pré-requisitos, aplicação de bônus, orçamento, preservação de saves e paridade demo/backend.
+
+
+### Taichou — troca de especialização para testes
+
+O personagem de teste Taichou (nome sem distinção de maiúsculas e espaços nas extremidades) tem o botão **Resetar subclasse (ADM)** na tela de livros e na árvore. Resetar limpa a especialização, ranks e habilidades equipadas, devolvendo o orçamento de pontos, sem consumir ou devolver livros. Nível, XP, ouro, itens e livros restantes são preservados. Equipamentos exclusivos incompatíveis voltam à mochila e recursos são ajustados sem cura gratuita.
+
+Após resetar, Taichou pode usar qualquer livro que possua, independentemente da classe atual. A classe base é ajustada à especialização para manter atributos, habilidades, animações e regras de equipamento corretos no status, demo e backend. Equipamentos incompatíveis voltam à mochila; Berserk e Assassino mantêm suas regras de machado/adagas, com arma inicial quando necessário. A prévia de outra classe considera a nova base e equipamentos compatíveis. Os demais personagens continuam com escolha permanente e livros restritos à classe.
+
+`tests/taichouSubclassReset.test.ts` valida as nove escolhas, restrição aos demais personagens, consumo de livros, reset, itens míticos preservados, recursos e paridade demo/backend. A permissão continua sendo a identidade local de teste existente, sem autenticação administrativa adicional.

@@ -1,7 +1,8 @@
 import { SUBCLASS_DEFINITIONS } from "../../../shared/src/classes/subclasses.js";
 import { SUBCLASS_TREES, earnedTreePoints, spentTreePoints, treeBlockReason } from "../../../shared/src/classes/skillTrees.js";
+import { isTestCharacter } from "../../../shared/src/testing/testCharacter.js";
 import { BERSERK_PATHS } from "../../../shared/src/classes/berserkTree.js";
-import { loadSubclassProgress, getActiveSubclass } from "../progression/subclassClient.js";
+import { loadSubclassProgress, getActiveSubclass, resetTestCharacterSubclass } from "../progression/subclassClient.js";
 import { getTreeRanks, investTreePoint, resetTreePoints, setBerserkSkillSlot } from "../progression/skillTreeClient.js";
 import { loadProgress } from "../progression/progressionClient.js";
 import type { HeroClass } from "../../../shared/src/types/combat.js";
@@ -65,7 +66,7 @@ export function openSubclassTree(message = "", focusId?: string): void {
   panel.innerHTML = `<section class="skill-tree-panel" aria-label="Árvore de habilidades de ${definition.name}"><div class="panel-header"><div><span class="panel-kicker">Árvore de subclasse</span><h2>${definition.name}</h2><p>${definition.role}</p></div><div class="level-badge"><span>Pontos livres</span><strong>${available}</strong></div></div>
     <p class="inventory-help">1 ponto por nível após o primeiro, incluindo níveis anteriores ao livro. Cada aprendizado ou rank custa 1 ponto. Invista nos talentos de sua preferência e siga os pré-requisitos para liberar novas habilidades.</p>
     <p class="tree-message" role="status" aria-live="polite">${escape(message)}</p>
-    ${treeHtml}<div class="painel-acoes"><button id="tree-reset" type="button">Redistribuir pontos</button><button id="tree-back" type="button">Voltar ao status</button></div>
+    ${treeHtml}<div class="painel-acoes"><button id="tree-reset" type="button">Redistribuir pontos</button>${isTestCharacter(localStorage.getItem("nomeHeroi")) ? `<button id="tree-admin-reset" type="button">Resetar subclasse (ADM)</button>` : ""}<button id="tree-back" type="button">Voltar ao status</button></div>
     <p class="inventory-help">Redistribuir devolve todos os pontos gratuitamente. O livro e a subclasse permanecem ativos. Mudanças valem para a próxima batalha; habilidades aprendidas aparecem em Habilidades.</p></section>`;
   panel.querySelectorAll<HTMLButtonElement>("[data-select-node]").forEach(button => button.addEventListener("click", () => {
     const scroll = panel.querySelector(".skill-map-scroll")?.scrollLeft ?? 0;
@@ -85,6 +86,7 @@ export function openSubclassTree(message = "", focusId?: string): void {
     panel.querySelector<HTMLSelectElement>(`[data-berserk-slot="${select.dataset.berserkSlot}"]`)?.focus();
   }));
   panel.querySelector("#tree-reset")?.addEventListener("click", () => { resetTreePoints(); openSubclassTree("Todos os pontos foram devolvidos."); });
+  panel.querySelector("#tree-admin-reset")?.addEventListener("click", () => { if (!resetTestCharacterSubclass()) window.abrirStatus?.(); });
   panel.querySelector("#tree-back")?.addEventListener("click", () => window.abrirStatus?.());
   panel.scrollTop = focusId ? previousScroll : 0;
   const mapScroll = panel.querySelector(".skill-map-scroll");

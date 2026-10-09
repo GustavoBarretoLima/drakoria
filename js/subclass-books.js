@@ -5,8 +5,9 @@ import {
 import { applySubclassStats } from "../shared/src/classes/subclasses.js";
 import { getHeroGifs } from "../client/src/assets/gifs.ts";
 import { SPRITE_BOUNDS } from "../client/src/assets/spriteBounds.ts";
-import { useSubclassBook } from "../client/src/progression/subclassClient.ts";
-import { getCurrentHeroStats, getBerserkPreviewStats, syncCharacterVitals } from "../client/src/progression/heroStats.ts";
+import { isTestCharacter } from "../shared/src/testing/testCharacter.ts";
+import { useSubclassBook, resetTestCharacterSubclass } from "../client/src/progression/subclassClient.ts";
+import { getCurrentHeroStats, getBerserkPreviewStats, getSubclassPreviewStats, syncCharacterVitals } from "../client/src/progression/heroStats.ts";
 
 const STORAGE_KEY = "drakoriaSubclassProgress";
 const CLASS_LABELS = {
@@ -60,10 +61,10 @@ function useBook(subclassId) {
   const state = loadState();
   const definition = SUBCLASS_DEFINITIONS[subclassId];
   const panel = document.getElementById("painelPraca");
-  if (!panel || !definition || !(state.books[subclassId] > 0) || state.activeSubclass || definition.baseClass !== heroClass()) return;
+  if (!panel || !definition || !(state.books[subclassId] > 0) || state.activeSubclass || (definition.baseClass !== heroClass() && !isTestCharacter(localStorage.getItem("nomeHeroi")))) return;
   document.getElementById("menuPraca")?.classList.add("hidden");
   const current = getCurrentHeroStats();
-  const next = subclassId === "berserker" && typeof getBerserkPreviewStats === "function" ? getBerserkPreviewStats() : applySubclassStats(current, subclassId);
+  const next = isTestCharacter(localStorage.getItem("nomeHeroi")) && definition.baseClass !== heroClass() ? getSubclassPreviewStats(subclassId) : subclassId === "berserker" && typeof getBerserkPreviewStats === "function" ? getBerserkPreviewStats() : applySubclassStats(current, subclassId);
   const gender = (localStorage.getItem("generoHeroi") || "masculino").toLowerCase() === "feminino" ? "Feminino" : "Masculino";
   const rows = PREVIEW_STATS.map(([key, label, percent]) => {
     const delta = next[key] - current[key];
@@ -78,14 +79,14 @@ function useBook(subclassId) {
       ${previewPortrait(CLASS_LABELS[heroClass()], getHeroGifs(heroClass(), gender).padrao)}
       <div class="subclass-preview-comparison"><table><caption>Seus atributos com os equipamentos atuais</caption>
         <thead><tr><th>Atributo</th><th>Atual</th><th>Após escolher</th></tr></thead><tbody>${rows}</tbody></table></div>
-      ${previewPortrait(definition.name, getHeroGifs(heroClass(), gender, subclassId).padrao)}
+      ${previewPortrait(definition.name, getHeroGifs(definition.baseClass, gender, subclassId).padrao)}
     </div>
     <section class="subclass-preview-passives"><h3>Passivas ao escolher ${escapeHtml(definition.name)}</h3>
       <p>${escapeHtml(definition.passiveSummary)}</p>
       ${subclassId === "berserker" ? '<ul><li><strong>Força da fúria:</strong> aumenta o ataque físico em 20%.</li><li><strong>Despertar:</strong> libera Fúria e machados de duas mãos. Crítico, cura e resistência vêm da nova árvore.</li><li><strong>Guarda imprudente:</strong> reduz a defesa física em 10%.</li></ul>' : ""}
       <p>As passivas da árvore de habilidades são liberadas depois, ao distribuir pontos no botão Subclasse da tela de status.</p>
     </section>
-    <p>A escolha é permanente e consome um livro. A escolha não restaura vida ou mana.</p>
+    <p>${isTestCharacter(localStorage.getItem("nomeHeroi")) ? "Taichou pode resetar a especialização. A classe base será ajustada ao livro; equipamentos incompatíveis voltam à mochila." : "A escolha é permanente."} Consome um livro e não restaura vida ou mana.</p>
     ${subclassId === "berserker" ? "<p>A arma atual e a mão secundária ficarão na mochila. Um machado de duas mãos com os bônus da arma atual será equipado; a mão secundária deixa de conceder bônus. Sem arma, você receberá um machado inicial.</p>" : ""}
     ${subclassId === "assassin" ? "<p>Seu arco ficará na mochila e adagas equivalentes serão equipadas, preservando nível, raridade e bônus. Sem arma equipada, você receberá adagas iniciais.</p>" : ""}
     <p class="subclass-preview-message" role="alert"></p>
@@ -111,7 +112,7 @@ function bookCard(subclassId, state) {
   const count = Math.max(0, Math.floor(Number(state.books[subclassId] || 0)));
   if (count <= 0) return "";
 
-  const matchesClass = definition.baseClass === heroClass();
+  const matchesClass = definition.baseClass === heroClass() || isTestCharacter(localStorage.getItem("nomeHeroi"));
   const active = state.activeSubclass === subclassId;
   const alreadySpecialized = Boolean(state.activeSubclass && !active);
   const disabled = !matchesClass || alreadySpecialized || active;
@@ -162,6 +163,7 @@ function openSubclassBooks() {
       <span>•</span>
       <strong>Especialização:</strong> ${active ? escapeHtml(active.name) : "Nenhuma"}
     </div>
+    ${active && isTestCharacter(localStorage.getItem("nomeHeroi")) ? `<section class="subclass-current"><p>Teste ADM: resetar devolve pontos e permite escolher qualquer subclasse com um livro. O livro usado não é devolvido.</p><button type="button" data-admin-reset>Resetar subclasse (ADM)</button></section>` : ""}
     ${ownedCards
       ? `<div class="subclass-books-grid">${ownedCards}</div>`
       : '<div class="subclass-empty">Você ainda não encontrou nenhum livro de subclasse.</div>'}
@@ -171,6 +173,10 @@ function openSubclassBooks() {
     <div class="painel-acoes"><button type="button" onclick="fecharPainelPraca()">Fechar</button></div>
   `;
 
+  panel.querySelector("[data-admin-reset]")?.addEventListener("click", () => {
+    const message = resetTestCharacterSubclass();
+    if (!message) openSubclassBooks();
+  });
   panel.querySelectorAll("[data-subclass-book]").forEach((button) => {
     button.addEventListener("click", () => useBook(button.dataset.subclassBook));
   });
