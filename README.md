@@ -354,7 +354,11 @@ Veneno e Sangramento causam dano nas próximas três ações válidas do jogador
 
 ### Berserk — Fúria e três caminhos
 
-Despertar é gratuito e conta como 1 ponto nos requisitos. Os 18 nós de habilidades têm grau único e custam 1 ponto: Carnificina, Fúria Primal e Sangue de Ferro exigem 1, 3, 5, 8, 12 e 16 pontos totais por patamar, além do nó anterior do caminho. Só uma final é permitida. Com esses requisitos, a final exige aprender os 15 nós não finais e fica disponível a partir do nível 17. Na cidade, equipam-se até quatro ativas, com espaços vazios permitidos. Passivas aprendidas permanecem aplicadas. A batalha recebe uma cópia da build; demo e backend validam os mesmos requisitos.
+Despertar é gratuito. Os 18 nós de habilidades têm grau único e custam 1 ponto: os caminhos Carnificina, Fúria Primal e Sangue de Ferro progridem independentemente nos níveis 1, 3, 5, 8, 12 e 15, exigindo apenas o nó anterior do mesmo caminho. Não é necessário aprender os outros 15 talentos para escolher uma final: um caminho completo custa seis pontos e sua final exige nível 15. Só uma final é permitida, mas talentos dos demais caminhos podem ser aprendidos. Na cidade, equipam-se até quatro ativas, com espaços vazios permitidos. Passivas aprendidas permanecem aplicadas. A batalha recebe uma cópia da build; demo e backend validam os mesmos requisitos. IDs, custos, efeitos e builds anteriormente válidas são preservados.
+
+Carnificina reúne golpes físicos, sangramento e Executor; seus atributos opcionais são Força Primal e Impacto Selvagem. Fúria Primal reúne geração de Fúria, velocidade, críticos e Avatar; seus atributos são Ritmo da Fúria e Precisão Brutal. Sangue de Ferro reúne resistência, cura, retaliação e Titã; seus atributos são Corpo de Aço e Armadura de Sangue. A primeira linha de atributos exige apenas o despertar e nível 5; a segunda exige nível 20 e rank 2 no atributo anterior. Atributos têm três ranks e compartilham o orçamento de pontos com habilidades.
+
+A revisão segue a identidade de agressão, geração de recurso e sobrevivência em combate descrita no [Berserker oficial de Guild Wars 2](https://www.guildwars2.com/en-gb/news/meet-the-berserker-warriors-elite-specialization/) e no [resumo do combate](https://www.guildwars2.com/en-gb/news/the-berserker-on-points-of-interest-a-summary/), mantendo machado, Fúria, sangramento e alvo único próprios do Drakoria. `tests/berserkPaths.test.ts` verifica os três caminhos sem investimentos obrigatórios fora deles, níveis, finais, saves, habilidades e paridade demo/backend.
 
 Saves antigos recebem todos os pontos de volta, preservando nível, livros, subclasse e recursos atuais. A arma antiga e a mão secundária voltam para a mochila; um machado exclusivo de duas mãos mantém nível, raridade e bônus da arma original. O escudo não contribui. Sem arma, é concedido um machado de nível 1. A migração não duplica machados ao recarregar. Drops de armas de Guerreiro passam a ser machados para Berserk.
 
@@ -369,7 +373,7 @@ Referência visual e especificação: `img/subclass/arvore_berserk/`. `tests/ber
 
 ### Talentos adicionais de atributos
 
-Todas as nove subclasses têm seis novos talentos (54 no total), com três ranks e custo de um ponto por rank. A primeira linha exige nível 5 e a raiz aprendida; a segunda exige nível 20 e rank 2 no talento anterior da mesma coluna. Os IDs, habilidades, investimentos e ranks antigos são preservados. Pontos continuam sendo um por nível; atributos competem com habilidades pelo mesmo orçamento. No Berserk, talentos de atributos não contam para liberar patamares dos caminhos de habilidades, preservando a exigência das finais.
+Todas as nove subclasses têm seis novos talentos (54 no total), com três ranks e custo de um ponto por rank. A primeira linha exige nível 5 e a raiz aprendida; a segunda exige nível 20 e rank 2 no talento anterior da mesma coluna. Os IDs, habilidades, investimentos e ranks antigos são preservados. Pontos continuam sendo um por nível; atributos competem com habilidades pelo mesmo orçamento. No Berserk, cada caminho usa nível e talento anterior, e os atributos da primeira linha exigem somente despertar e nível 5.
 
 | Subclasse | Foco dos novos talentos |
 | --- | --- |
