@@ -51,7 +51,7 @@ declare global {
     venderItemInventario: (itemId: string) => void;
     abrirStatus: () => void;
     fecharPainelPraca: () => void;
-    criarFichaPersonagemJRPG?: () => { profile: string; attributes: string };
+    criarFichaPersonagemJRPG: () => { profile: string; attributes: string };
     criarPocoesInventario?: () => string;
     inventoryUxClassesLabel?: (item: EquipmentItem) => string;
     hidePaperTooltipPortal?: () => void;
