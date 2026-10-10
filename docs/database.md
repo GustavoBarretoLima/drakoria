@@ -21,7 +21,8 @@ O Compose publica o banco somente em `127.0.0.1:5432`, com volume persistente.
 Compose é administrativa e serve ao desenvolvimento; não é o usuário da
 aplicação em produção. Não apague o volume para atualizar uma base existente.
 
-As migrations são explícitas: o servidor não modifica o schema ao iniciar.
+No desenvolvimento, as migrations são explícitas. No Render staging,
+`server:deploy` executa as migrations antes de iniciar o servidor (veja [Render](render.md)).
 O comando usa `.env`, nunca variáveis `VITE_*`, e não imprime credenciais.
 `DATABASE_SSL=disable` é para o banco local. Em produção, use `NODE_ENV=production`
 e `DATABASE_SSL=verify-full`; se o provedor exigir uma CA própria, configure

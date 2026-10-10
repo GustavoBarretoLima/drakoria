@@ -12,14 +12,17 @@ export function createDatabasePool(env: NodeJS.ProcessEnv = process.env): Pool {
     }
   }
   const mode = env.DATABASE_SSL ?? (env.NODE_ENV === "production" ? "verify-full" : "disable");
-  if (mode !== "disable" && mode !== "verify-full") throw new Error("DATABASE_SSL invalido.");
+  if (!["disable", "verify-full", "render-internal"].includes(mode)) throw new Error("DATABASE_SSL invalido.");
+  if (mode === "render-internal" && (env.RENDER !== "true" || !/^dpg-[a-z0-9]+-[a-z]$/.test(url.hostname))) {
+    throw new Error("Modo privado exige plataforma Render e hostname interno do Postgres.");
+  }
   if (env.NODE_ENV === "production" && mode === "disable") throw new Error("TLS verificado e obrigatorio em producao.");
   const pool = new Pool({
     connectionString: url.toString(),
     max: 10,
     connectionTimeoutMillis: 5000,
     idleTimeoutMillis: 30000,
-    ssl: mode === "disable" ? false : {
+    ssl: mode === "disable" || mode === "render-internal" ? false : {
       rejectUnauthorized: true,
       ...(env.DATABASE_SSL_CA_FILE ? { ca: readFileSync(env.DATABASE_SSL_CA_FILE, "utf8") } : {}),
     },

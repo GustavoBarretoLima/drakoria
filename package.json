@@ -18,7 +18,9 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "test:db": "node --import tsx --test server/tests/*.test.ts",
-    "db:migrate": "node --env-file=.env --import tsx server/src/database/migrateCli.ts"
+    "db:migrate": "node --env-file=.env --import tsx server/src/database/migrateCli.ts",
+    "db:migrate:deploy": "node --import tsx server/src/database/migrateCli.ts",
+    "server:deploy": "npm run db:migrate:deploy && node --import tsx server/src/index.ts"
   },
   "dependencies": {
     "animejs": "^4.4.1",

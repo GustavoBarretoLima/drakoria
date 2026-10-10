@@ -4,13 +4,27 @@ import { BattleManager } from "./modules/combat/battleManager.js";
 import { applyEnemyTurn } from "./modules/combat/combatEngine.js";
 import { advanceBattleAtb, ATB_TICK_MS } from "../../shared/src/combat/atb.js";
 import { registerBattleSocketHandlers } from "./socketHandlers.js";
+import { createDatabasePool } from "./database/pool.js";
+import { createHealthHandler } from "./health.js";
+import { getAllowedOrigins, getServerPort } from "./runtimeConfig.js";
 
-const httpServer = createServer();
+const port = getServerPort(process.env.PORT);
+const allowedOrigins = getAllowedOrigins();
+if (process.env.NODE_ENV === "production" && !process.env.DATABASE_URL) throw new Error("Configure DATABASE_URL.");
+const databasePool = process.env.DATABASE_URL ? createDatabasePool() : undefined;
+if (databasePool) databasePool.options.query_timeout = 3000;
+const health = createHealthHandler(async () => {
+  if (databasePool) await databasePool.query("SELECT 1");
+});
+const httpServer = createServer((request, response) => { void health(request, response); });
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: allowedOrigins,
   },
+  // CORS alone does not protect a websocket handshake. This is an origin
+  // restriction, not user authentication; non-browser clients may omit Origin.
+  allowRequest: (request, callback) => callback(null, !request.headers.origin || allowedOrigins.includes(request.headers.origin)),
 });
 
 const battleManager = new BattleManager();
@@ -77,6 +91,11 @@ io.on("connection", (socket) => {
   registerBattleSocketHandlers(socket, { battleManager, startAtbLoop, stopAtbLoop });
 });
 
-httpServer.listen(3001, () => {
-  console.log("Servidor do Drakoria online na porta 3001");
+httpServer.listen(port, "0.0.0.0", () => {
+  console.log(`Servidor do Drakoria online na porta ${port}`);
+});
+
+process.on("SIGTERM", () => {
+  for (const id of atbIntervals.keys()) stopAtbLoop(id);
+  io.close(() => { void databasePool?.end(); });
 });
