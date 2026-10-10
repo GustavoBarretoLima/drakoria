@@ -1,6 +1,7 @@
-import type { BattleRewards } from "../../../shared/src/types/combat.js";
+import type { BattleRewards, HeroClass } from "../../../shared/src/types/combat.js";
 import type { ExpeditionRewards } from "../../../shared/src/dungeons/expedition.js";
 import type { EquipmentItem, EquipmentRarity } from "../../../shared/src/types/equipment.js";
+import { getClassSkills } from "../../../shared/src/combat/classSkills.js";
 import type {
   DefeatPenaltyResult,
   RewardResult,
@@ -57,6 +58,19 @@ export interface VictoryActions {
   vitals?: PotionActionResult["vitals"];
 }
 
+function normalizeRewardHeroClass(value: string | null): HeroClass {
+  if (value === "mago" || value === "arqueiro") return value;
+  return "guerreiro";
+}
+
+export function getVictoryUnlocks(result: RewardResult, heroClass: HeroClass): string[] {
+  if (result.levelsGained <= 0) return [];
+  const previousLevel = Math.max(1, result.progress.nivel - result.levelsGained);
+  return getClassSkills(heroClass)
+    .filter(skill => skill.unlockLevel > previousLevel && skill.unlockLevel <= result.progress.nivel)
+    .map(skill => `${skill.name} • Habilidade de nível ${skill.unlockLevel}`);
+}
+
 export function renderVictoryRewardOverlay(
   rewards: BattleRewards,
   result: RewardResult,
@@ -75,7 +89,7 @@ export function renderVictoryRewardOverlay(
 
   const title = document.createElement("h2");
   title.className = "reward-title";
-  title.textContent = "Recompensas obtidas";
+  title.textContent = "Resumo da batalha";
 
   const rewardsGrid = document.createElement("div");
   rewardsGrid.className = "reward-grid";
@@ -89,18 +103,39 @@ export function renderVictoryRewardOverlay(
   if (result.levelsGained > 0) {
     const levelUp = document.createElement("div");
     levelUp.className = "reward-level-up";
-    levelUp.textContent = `LEVEL UP! Nível ${result.progress.nivel}`;
+    levelUp.textContent = result.levelsGained > 1
+      ? `LEVEL UP! +${result.levelsGained} níveis • Nível ${result.progress.nivel}`
+      : `LEVEL UP! Nível ${result.progress.nivel}`;
     panel.appendChild(levelUp);
+
+    const heroClass = normalizeRewardHeroClass(
+      typeof localStorage === "undefined" ? null : localStorage.getItem("classeHeroi"),
+    );
+    const unlocks = getVictoryUnlocks(result, heroClass);
+    if (unlocks.length > 0) {
+      const unlockSection = document.createElement("div");
+      unlockSection.className = "reward-drops reward-unlocks";
+      const unlockTitle = document.createElement("h3");
+      unlockTitle.textContent = "Novos desbloqueios";
+      unlockSection.appendChild(unlockTitle);
+      for (const unlock of unlocks) {
+        const row = document.createElement("div");
+        row.className = "reward-drop-item rarity-uncommon";
+        row.textContent = `✦ ${unlock}`;
+        unlockSection.appendChild(row);
+      }
+      panel.appendChild(unlockSection);
+    }
   }
 
+  const dropsSection = document.createElement("div");
+  dropsSection.className = "reward-drops";
+
+  const dropsTitle = document.createElement("h3");
+  dropsTitle.textContent = "Loot obtido";
+  dropsSection.appendChild(dropsTitle);
+
   if (drops.length > 0) {
-    const dropsSection = document.createElement("div");
-    dropsSection.className = "reward-drops";
-
-    const dropsTitle = document.createElement("h3");
-    dropsTitle.textContent = "Drops";
-    dropsSection.appendChild(dropsTitle);
-
     for (const drop of drops) {
       const dropLine = document.createElement("div");
       dropLine.className = `reward-drop-item${drop.rarity ? ` rarity-${drop.rarity}` : ""}`;
@@ -118,13 +153,21 @@ export function renderVictoryRewardOverlay(
       }
       dropsSection.appendChild(dropLine);
     }
-
-    panel.appendChild(dropsSection);
+  } else {
+    const emptyLoot = document.createElement("div");
+    emptyLoot.className = "reward-drop-item reward-drop-empty";
+    emptyLoot.textContent = "Nenhum item obtido nesta batalha.";
+    dropsSection.appendChild(emptyLoot);
   }
+
+  panel.appendChild(dropsSection);
 
   const progress = document.createElement("div");
   progress.className = "reward-progress";
-  progress.textContent = `Nível ${result.progress.nivel} • XP ${result.progress.xp}/${result.progress.xpParaProximoNivel} • Ouro total ${result.progress.ouro}`;
+  const xpPercent = result.progress.xpParaProximoNivel > 0
+    ? Math.min(100, Math.max(0, Math.round(result.progress.xp / result.progress.xpParaProximoNivel * 100)))
+    : 0;
+  progress.textContent = `Nível ${result.progress.nivel} • XP ${result.progress.xp}/${result.progress.xpParaProximoNivel} (${xpPercent}%) • Ouro total ${result.progress.ouro}`;
   panel.appendChild(progress);
 
   if (actions) {
