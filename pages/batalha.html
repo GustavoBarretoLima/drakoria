@@ -54,7 +54,7 @@
       </div>
 
       <div class="campo">
-        <div class="heroi">
+        <div class="heroi" style="margin-left: 10px">
           <div class="sprite-frame"><img id="heroiBatalha" src="" alt="Herói" class="heroi-img" /></div>
           <div class="status heroi-status">
             <h2 id="nomeHeroi">Herói</h2>
@@ -82,7 +82,7 @@
           </div>
         </div>
 
-        <div class="inimigo">
+        <div class="inimigo" style="width: var(--enemy-visible-size)">
           <div class="sprite-frame">
           <img
             id="inimigoBatalha"
@@ -106,7 +106,11 @@
               <p>Dano crítico: <span id="danoCriticoInimigo"></span></p>
             </div>
             <div class="barra">
-              <div id="hpInimigoBar" class="hp" style="width: 100%">
+              <div
+                id="hpInimigoBar"
+                class="hp"
+                style="width: 100%; background: linear-gradient(90deg, #d63344, #ff6673)"
+              >
                 <span id="hpInimigoTexto">Vida</span>
               </div>
             </div>
