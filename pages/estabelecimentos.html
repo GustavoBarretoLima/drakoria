@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Drakoria - Estabelecimentos</title>
     <link rel="stylesheet" href="../css/estabelecimentos.css" />
-    <script src="../js/estabelecimentos.js"></script>
-    <script type="module" src="../client/src/pages/tavernShop.ts"></script>
     <script type="module" src="../client/src/pages/blacksmith.ts"></script>
     <link rel="stylesheet" href="../css/equipment-art.css" />
     <link rel="stylesheet" href="../css/blacksmith.css" />
-      <link rel="stylesheet" href="../css/city-sidebar.css" />
+    <link rel="stylesheet" href="../css/city-sidebar.css" />
     <script type="module" src="../client/src/pages/guild.ts"></script>
     <link rel="stylesheet" href="../css/town-board.css" />
+    <script type="module" src="../client/src/pages/establishments.ts"></script>
     <script type="module" src="../client/src/pages/cityNavigation.ts"></script>
   </head>
   <body class="has-city-sidebar">
@@ -25,11 +24,13 @@
       <a href="estabelecimentos.html#ferreiro"><span aria-hidden="true">⚒️</span>Ferreiro</a>
       <a href="estabelecimentos.html#guilda"><span aria-hidden="true">🛡️</span>Guilda</a>
     </nav>
-    <!-- Praça principal -->
+
     <div id="praca" class="drakoria-praca fade">
       <div
         class="hotspot taberna"
-        onclick="carregarTaberna()"
+        data-establishment-target="taberna"
+        role="button"
+        tabindex="0"
         data-tooltip="🍺 Entrar na Taberna"
       >
         <span class="icon">🍺</span>
@@ -37,7 +38,9 @@
 
       <div
         class="hotspot ferreiro"
-        onclick="carregarFerreiro()"
+        data-establishment-target="ferreiro"
+        role="button"
+        tabindex="0"
         data-tooltip="⚒️ Ir ao Ferreiro"
       >
         <span class="icon">⚒️</span>
@@ -45,14 +48,15 @@
 
       <div
         class="hotspot guilda"
-        onclick="carregarGuilda()"
+        data-establishment-target="guilda"
+        role="button"
+        tabindex="0"
         data-tooltip="🛡️ Guilda dos Aventureiros"
       >
         <span class="icon">🛡️</span>
       </div>
     </div>
 
-    <!-- Interiores -->
     <div id="taberna" style="display: none"></div>
     <div id="ferreiro" style="display: none"></div>
     <div id="guilda" style="display: none"></div>
