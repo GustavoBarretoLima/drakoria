@@ -1,4 +1,6 @@
-/* Layout base */
+/* Base visual da tela de batalha.
+   Layout da HUD, combatentes, status e comandos vivem em battle-hud.css. */
+
 body {
   margin: 0;
   padding: 0;
@@ -9,46 +11,34 @@ body {
   color: #fff;
 }
 
-/* Campo de batalha */
 #batalha {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   min-height: 100vh;
   padding: 20px;
   box-sizing: border-box;
-  position: relative;
-  overflow: visible;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-/* Fundo */
-#batalha::before {
+/* Arena */
+#batalha::before,
+#batalha::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
+}
+
+#batalha::before {
   background-image: var(--battle-arena, url("../img/stages/arena-fogo.png"));
   background-size: cover;
   background-position: center;
   z-index: -2;
 }
 
-#batalha[data-arena="cemiterio-esquecido"] { --battle-arena: url("../img/stages/cemiterio_esquecido.png"); }
-#batalha[data-arena="pantano-corrompido"] { --battle-arena: url("../img/stages/pantano_corrompido.png"); }
-#batalha[data-arena="acampamento-orc"] { --battle-arena: url("../img/stages/acampamento_orc.png"); }
-#batalha[data-arena="fortaleza-rei-orc"] { --battle-arena: url("../img/stages/fortaleza_rei_orc.png"); }
-#batalha[data-arena="floresta-sombria"] { --battle-arena: url("../img/stages/floresta_sombria.png"); }
-#batalha[data-arena="ruinas-da-vigilia"] { --battle-arena: url("../img/stages/ruinas_da_vigilia.png"); }
 #batalha::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   background: radial-gradient(
     circle,
     rgba(255, 100, 0, 0.3) 2px,
@@ -58,489 +48,54 @@ body {
   z-index: -1;
 }
 
-.campo {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex-wrap: nowrap;
-  gap: 350px;
-  margin-top: 100px;
+#batalha[data-arena="cemiterio-esquecido"] {
+  --battle-arena: url("../img/stages/cemiterio_esquecido.png");
 }
 
-/* Cards do herói e inimigo */
-.heroi,
-.inimigo {
-  flex: 1 1 250px;
-  max-width: 280px;
-  text-align: center;
-  overflow: visible; /* ✅ permite que o guerreiro deslize fora do card */
-  position: relative; /* garante que o z-index funcione */
-  z-index: 10; /* mantém o guerreiro acima dos outros elementos */
+#batalha[data-arena="pantano-corrompido"] {
+  --battle-arena: url("../img/stages/pantano_corrompido.png");
 }
 
-.heroi img,
-.inimigo img {
-  width: 40%;
-  height: auto;
-  max-height: 300px; /* 🔹 reduz altura máxima */
-  border-radius: 10px;
-  object-fit: contain; /* mantém proporção */
-  position: relative; /* permite que translate funcione corretamente */
-  z-index: 10; /* garante que fique acima dos cards */
+#batalha[data-arena="acampamento-orc"] {
+  --battle-arena: url("../img/stages/acampamento_orc.png");
 }
 
-/* 🧱 Status geral */
-.status {
-  background: rgba(0, 0, 0, 0.7);
-  border: 2px solid #444;
-  border-radius: 10px;
-  padding: 10px 20px;
-  margin-top: 10px;
-  width: 200px;
-  text-align: center;
-  box-shadow: 0 0 10px #ffcc00;
+#batalha[data-arena="fortaleza-rei-orc"] {
+  --battle-arena: url("../img/stages/fortaleza_rei_orc.png");
 }
 
-/* 🏹 Herói e inimigo */
-.heroi-status h2 {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #ffcc00;
-  text-shadow: 2px 2px 4px #000;
+#batalha[data-arena="floresta-sombria"] {
+  --battle-arena: url("../img/stages/floresta_sombria.png");
 }
 
-.inimigo-status h2 {
-  font-size: 1.4rem;
-  font-weight: bold;
-  color: #ff4444;
-  text-shadow: 2px 2px 4px #000;
+#batalha[data-arena="ruinas-da-vigilia"] {
+  --battle-arena: url("../img/stages/ruinas_da_vigilia.png");
 }
 
-/* 🔋 Barras de HP e Mana */
-.barra {
-  position: relative;
-  width: 100%;
-  max-width: 180px;
-  height: 20px;
-  background: #222;
-  border: 2px solid #555;
-  border-radius: 8px;
-  overflow: hidden;
-  margin: 6px auto;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
-}
-
-/* HP */
-.hp {
-  background: linear-gradient(90deg, #ff5555, #cc0000);
-  height: 100%;
-  border-radius: 8px;
-  box-shadow: 0 0 8px #ff0000;
-  transition: width 0.4s ease-in-out;
-  width: 100%; /* 🔹 garante que fique full quando for 100% */
-}
-
-/* Mana */
-.mana {
-  background: linear-gradient(90deg, #33aaff, #0055ff);
-  height: 100%;
-  border-radius: 8px;
-  box-shadow: 0 0 8px #0077ff;
-  transition: width 0.4s ease-in-out;
-  width: 100%; /* 🔹 garante que fique full quando for 100% */
-}
-
-/* Texto dentro das barras */
-.hp span,
-.mana span {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.85em;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 0 0 4px #000;
-  line-height: 20px;
-}
-
-/* Botões */
-.acoes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
-  justify-content: center;
-  max-width: 600px;
-}
-.acoes button {
-  background: #ff4444;
-  border: none;
-  border-radius: 8px;
-  padding: 12px 18px;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    background 0.3s;
-  flex: 1 1 120px;
-}
-.acoes button:hover {
-  transform: scale(1.05);
-  background: #ff6600;
-}
-.acoes button:disabled {
-  background: #555;
-  color: #aaa;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Mensagens e turno */
-#mensagens {
-  margin-top: 20px;
-  font-size: 1rem;
-  font-style: italic;
-  text-shadow: 2px 2px 4px #000;
-  text-align: center;
-}
-.indicador-turno {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #ffcc00;
-  text-shadow: 2px 2px 4px #000;
-  margin-top: 10px;
-  text-align: center;
-  transition:
-    color 0.3s ease,
-    transform 0.3s ease;
-}
-.indicador-turno.inimigo {
-  color: #ff4444;
-  transform: scale(1.1);
-}
-.goblin-derrotado {
-  position: relative;
-  text-align: center;
-}
-
-.goblin-dead {
-  display: block;
-  margin: 0 auto;
-  max-width: 50%; /* imagem mais compacta */
-  height: auto;
-  animation: zoomInDead 1.2s ease forwards;
-}
-
-@keyframes zoomInDead {
-  from {
-    transform: scale(0.85);
-    opacity: 0.5;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.texto-final {
-  position: absolute;
-  bottom: 15%;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #fff;
-  font-size: 1.4em;
-  text-align: center;
-  text-shadow:
-    0 0 8px #ff0000,
-    2px 2px 4px #000;
-  animation: pulsarBrilho 1.5s infinite alternate;
-}
-
-@keyframes pulsarBrilho {
-  from {
-    text-shadow:
-      0 0 6px #ff0000,
-      2px 2px 4px #000;
-  }
-  to {
-    text-shadow:
-      0 0 14px #ff4444,
-      2px 2px 6px #000;
-  }
-}
-
-@keyframes fogoParticulas {
-  0% {
-    background-position: 0 0;
-    opacity: 0.6;
-  }
-  50% {
-    background-position: 100px 200px;
-    opacity: 0.9;
-  }
-  100% {
-    background-position: 0 400px;
-    opacity: 0.6;
-  }
-}
-
-.texto-cena {
-  position: absolute;
-  top: 38%; /* acima dos olhos do dragão */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80%;
-  text-align: center;
-  color: #fff;
-  font-size: 1.3em;
-  line-height: 1.6em;
-  text-shadow:
-    0 0 10px #ff6600,
-    2px 2px 6px #000;
-  animation: pulsarBrilho 1.5s infinite alternate;
-}
-@keyframes pulsarBrilho {
-  from {
-    text-shadow:
-      0 0 8px #ff6600,
-      2px 2px 4px #000;
-  }
-  to {
-    text-shadow:
-      0 0 16px #ffaa33,
-      2px 2px 6px #000;
-  }
-}
-
-.fala {
-  color: #fff;
-  font-size: 1.2em;
-  margin: 1rem 0;
-  text-shadow:
-    0 0 8px #00bfff,
-    2px 2px 4px #000;
-  animation: pulsarDialogo 1.5s infinite alternate;
-}
-
-@keyframes pulsarDialogo {
-  from {
-    text-shadow:
-      0 0 6px #00bfff,
-      2px 2px 4px #000;
-  }
-  to {
-    text-shadow:
-      0 0 14px #66d9ff,
-      2px 2px 6px #000;
-  }
-}
-.btn-continuar {
-  margin-top: 1.5rem; /* espaçamento abaixo da frase */
-  background: linear-gradient(90deg, #ff6600, #ffaa33);
-  border: none;
-  color: #fff;
-  font-size: 1.2em;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  box-shadow: 0 0 10px #ff6600;
-  animation: pulsarBotao 1.5s infinite alternate;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-@keyframes pulsarBrilho {
-  from {
-    text-shadow:
-      0 0 8px #ff6600,
-      2px 2px 4px #000;
-  }
-  to {
-    text-shadow:
-      0 0 16px #ffaa33,
-      2px 2px 6px #000;
-  }
-}
-
-@keyframes pulsarBotao {
-  from {
-    box-shadow: 0 0 8px #ff6600;
-  }
-  to {
-    box-shadow: 0 0 20px #ffaa33;
-  }
-}
-
-.btn-continuar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px #ffcc66;
-}
-
-.drakoria-cidade {
-  position: fixed; /* ocupa toda a tela e ignora margens externas */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: url("../img/stages/drakoria-cidade.png") no-repeat center center;
-  background-size: cover;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* centraliza verticalmente */
-  align-items: center; /* centraliza horizontalmente */
-  text-align: center; /* centraliza o texto */
-  color: #fff;
-  padding: 0; /* remove espaçamento lateral */
-  margin: 0; /* remove margens automáticas */
-  box-sizing: border-box;
-}
-
-.drakoria-cidade p {
-  padding: 1rem 2rem;
-  border-radius: 10px;
-  margin: 0.5rem 0;
-  font-size: 1.3em;
-  line-height: 1.6em;
-  color: #0e0d0d;
-  font-weight: bold;
-  text-shadow: 0 0 8px rgba(248, 247, 247, 0.8); /* sombra escura para contraste */
-  animation: pulsarTexto 2.5s infinite ease-in-out;
-}
-
-/* Efeito pulsante */
-@keyframes pulsarTexto {
-  0% {
-    color: #ffcc00;
-    text-shadow: 0 0 8px rgba(248, 247, 247, 0.8);
-  }
-  50% {
-    color: #ffd700;
-    text-shadow: 0 0 16px rgba(255, 215, 0, 0.9);
-  }
-  100% {
-    color: #ffcc00;
-    text-shadow: 0 0 8px rgba(248, 247, 247, 0.8);
-  }
-}
-
-.texto-drakoria {
-  background: rgba(0, 0, 0, 0.5);
-  padding: 1.5rem;
-  border-radius: 10px;
-  width: 80%;
-  font-size: 1.2em;
-  line-height: 1.6em;
-  text-shadow:
-    0 0 8px #ffaa33,
-    2px 2px 4px #000;
-}
-
-.fala-cidade {
-  margin: 1rem 0;
-  animation: fadeInFalaCidade 0.5s ease forwards;
-}
-
-@keyframes fadeInFalaCidade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.drakoria-praca {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: url("../img/stages/drakoria-praca.png") no-repeat center center;
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  color: #fff;
-  text-align: center;
-  opacity: 0; /* começa invisível para o fade-in */
-}
-
-.menu-drakoria {
-  background: rgba(0, 0, 0, 0.6);
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 0 20px #ffaa33;
-  animation: fadeInMenu 1.5s ease forwards;
-}
-
-@keyframes fadeInMenu {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.btn-local {
-  background: linear-gradient(90deg, #ff6600, #ffaa33);
-  border: none;
-  color: #fff;
-  font-size: 1.2em;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  margin: 0.5rem;
-  box-shadow: 0 0 10px #ff6600;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.btn-local:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px #ffcc66;
-}
-
-#batalha {
-  overflow: hidden;
-}
-
-.fire-overlay,
-.heat-overlay,
-.embers {
+/* Efeitos atmosféricos da arena */
+#batalha .fire-overlay,
+#batalha .heat-overlay,
+#batalha .embers {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
 
-.fire-overlay {
+#batalha .fire-overlay {
   z-index: 1;
   background:
     radial-gradient(circle at 8% 20%, rgba(255, 130, 0, 0.22), transparent 10%),
     radial-gradient(circle at 16% 45%, rgba(255, 80, 0, 0.18), transparent 12%),
     radial-gradient(circle at 35% 83%, rgba(255, 120, 0, 0.2), transparent 14%),
     radial-gradient(circle at 63% 45%, rgba(255, 95, 0, 0.18), transparent 10%),
-    radial-gradient(
-      circle at 82% 24%,
-      rgba(255, 140, 0, 0.22),
-      transparent 12%
-    ),
+    radial-gradient(circle at 82% 24%, rgba(255, 140, 0, 0.22), transparent 12%),
     radial-gradient(circle at 91% 61%, rgba(255, 70, 0, 0.2), transparent 13%);
   mix-blend-mode: screen;
   opacity: 0.95;
   animation: fireFlicker 1.8s infinite alternate ease-in-out;
 }
 
-.heat-overlay {
+#batalha .heat-overlay {
   z-index: 2;
   background: linear-gradient(
     90deg,
@@ -553,11 +108,11 @@ body {
   animation: heatWave 3.5s infinite linear;
 }
 
-.embers {
+#batalha .embers {
   z-index: 3;
 }
 
-.embers span {
+#batalha .embers span {
   position: absolute;
   bottom: -20px;
   width: 4px;
@@ -571,13 +126,13 @@ body {
   animation: emberRise 4.5s infinite ease-out;
 }
 
-.embers span:nth-child(2n) {
+#batalha .embers span:nth-child(2n) {
   width: 3px;
   height: 3px;
   animation-duration: 5.5s;
 }
 
-.embers span:nth-child(3n) {
+#batalha .embers span:nth-child(3n) {
   width: 5px;
   height: 5px;
   animation-duration: 3.8s;
@@ -589,19 +144,16 @@ body {
     transform: scale(1) translateY(0);
     filter: brightness(1);
   }
-
   35% {
     opacity: 0.75;
     transform: scale(1.02) translateY(-4px);
     filter: brightness(1.25);
   }
-
   70% {
     opacity: 0.55;
     transform: scale(0.99) translateY(2px);
     filter: brightness(0.95);
   }
-
   100% {
     opacity: 0.85;
     transform: scale(1.03) translateY(-6px);
@@ -610,16 +162,12 @@ body {
 }
 
 @keyframes heatWave {
-  0% {
-    transform: translateX(-8%) skewX(-4deg);
-  }
-
-  50% {
-    transform: translateX(8%) skewX(4deg);
-  }
-
+  0%,
   100% {
     transform: translateX(-8%) skewX(-4deg);
+  }
+  50% {
+    transform: translateX(8%) skewX(4deg);
   }
 }
 
@@ -628,138 +176,14 @@ body {
     transform: translateY(0) translateX(0) scale(0.4);
     opacity: 0;
   }
-
   10% {
     opacity: 1;
   }
-
   60% {
     opacity: 0.9;
   }
-
   100% {
     transform: translateY(-110vh) translateX(40px) scale(1);
     opacity: 0;
-  }
-}
-.campo,
-.acoes,
-#mensagens,
-#indicadorTurno,
-.status {
-  position: relative;
-  z-index: 5;
-}
-
-/* ---------------- RESPONSIVIDADE ---------------- */
-
-/* Tablets */
-@media (max-width: 1024px) {
-  .campo {
-    gap: 80px; /* reduz espaço entre herói e inimigo */
-    margin-top: 60px; /* menos margem superior */
-  }
-  .heroi img,
-  .inimigo img {
-    width: 180px; /* imagens menores */
-    max-height: 220px;
-  }
-  .status {
-    width: 160px; /* status mais compacto */
-  }
-}
-
-/* Smartphones */
-@media (max-width: 600px) {
-  body {
-    overflow-y: auto; /* ativa rolagem vertical */
-    overflow-x: hidden; /* evita rolagem lateral */
-  }
-
-  #batalha {
-    min-height: auto; /* libera altura dinâmica */
-    padding-bottom: 40px; /* espaço extra para rolagem */
-  }
-}
-
-@media (max-width: 600px) {
-  .campo {
-    flex-direction: row; /* lado a lado */
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px; /* espaço menor */
-    margin-top: 40px;
-  }
-
-  .heroi,
-  .inimigo {
-    flex: 1;
-    max-width: 48%; /* cada card ocupa metade da tela */
-    margin: 0 2px;
-  }
-
-  .heroi img,
-  .inimigo img {
-    width: 100%;
-    max-height: 180px; /* altura menor */
-  }
-
-  .status {
-    font-size: 12px;
-    width: 140px; /* status mais compacto */
-  }
-
-  .barra {
-    height: 12px;
-    max-width: 120px;
-  }
-
-  .acoes {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 12px;
-  }
-
-  .acoes button {
-    flex: 1 1 45%;
-    font-size: 12px;
-    padding: 6px;
-  }
-
-  #mensagens {
-    font-size: 13px;
-    margin-top: 8px;
-  }
-
-  #indicadorTurno {
-    font-size: 13px;
-    margin-top: 6px;
-  }
-}
-
-/* Telas muito pequenas (até 400px) */
-@media (max-width: 400px) {
-  .campo {
-    flex-direction: column; /* herói e inimigo em cima/baixo */
-    gap: 30px;
-    margin-top: 20px;
-  }
-
-  .heroi,
-  .inimigo {
-    max-width: 90%;
-  }
-
-  .heroi img,
-  .inimigo img {
-    max-height: 160px;
-  }
-
-  .acoes button {
-    flex: 1 1 100%; /* botões ocupam largura total */
-    font-size: 12px;
-    padding: 8px;
   }
 }
