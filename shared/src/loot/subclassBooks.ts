@@ -3,7 +3,6 @@ import {
   SUBCLASS_IDS,
   type SubclassId,
 } from "../classes/subclasses.js";
-import { isTestCharacter } from "../testing/testCharacter.js";
 
 // Base chance remains compatible with legacy bosses below level 15.
 export const SUBCLASS_BOOK_DROP_CHANCE = 0.005;
@@ -33,13 +32,11 @@ export function isBossMonsterId(monsterId: string): boolean {
 export function rollSubclassBookDrops(
   monsterId: string,
   random: () => number = Math.random,
-  heroName?: string,
 ): SubclassBookDrop[] {
   if (!isBossMonsterId(monsterId)) return [];
   const normalChance = getSubclassBookDropChance(monsterId);
   if (normalChance === 0) return [];
-  const chance = isTestCharacter(heroName) ? 1 : normalChance;
-  if (random() >= chance) return [];
+  if (random() >= normalChance) return [];
 
   const index = Math.min(
     SUBCLASS_IDS.length - 1,
