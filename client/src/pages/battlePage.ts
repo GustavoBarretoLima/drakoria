@@ -14,6 +14,7 @@ export function setupBattlePage() {
   });
 
   btnFugir?.addEventListener("click", () => {
-    console.log("Fuga ainda nao implementada.");
+    const message = document.getElementById("mensagens");
+    if (message) message.textContent = "Fuga ainda não está disponível.";
   });
 }
