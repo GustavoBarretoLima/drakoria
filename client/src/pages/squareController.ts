@@ -33,10 +33,10 @@ declare global {
     equiparItemInventario: (itemId: string) => void;
     desequiparSlotInventario: (slot: EquipmentSlot) => void;
     venderItemInventario: (itemId: string) => void;
-    abrirStatus: () => void;
+    abrirStatus?: () => void;
     abrirLoja: () => void;
     abrirMissoes: () => void;
-    fecharPainelPraca: () => void;
+    fecharPainelPraca?: () => void;
   }
 }
 
@@ -78,8 +78,8 @@ function equipState(item: EquipmentItem): { allowed: boolean; classAllowed: bool
   const level = loadProgress().nivel;
   const subclass = getActiveSubclass(cls);
   const levelAllowed = level >= item.level;
-  const allowed = canEquipItem(item, cls, level, subclass);
-  return { allowed, classAllowed: allowed || !levelAllowed, levelAllowed };
+  const classAllowed = canEquipItem(item, cls, Math.max(level, item.level), subclass);
+  return { allowed: classAllowed && levelAllowed, classAllowed, levelAllowed };
 }
 
 function inventorySlot(entry: InventoryEntry | undefined, index: number): string {
