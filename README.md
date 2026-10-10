@@ -9,7 +9,7 @@
 
 **Drakoria** é um RPG online para navegador em desenvolvimento, com combate em tempo real baseado em ATB, classes distintas, progressão de personagem, loot, equipamentos, dungeons e monstros com níveis diferentes.
 
-> 🎮 O GitHub Pages é uma **demo local**, com progresso no navegador. O [portal de contas](https://drakoria-staging-api.onrender.com/login) oferece login por Google ou email/senha e acesso à primeira região online por turnos, com progresso salvo no PostgreSQL.
+> 🎮 O GitHub Pages é uma **demo local**, com progresso no navegador. O [portal de contas](https://drakoria-staging-api.onrender.com/login) oferece login por Google ou email/senha e acesso às cinco regiões do mapa online por turnos, com progresso salvo no PostgreSQL.
 
 O fluxo online usa o estado do personagem no servidor e persiste batalhas,
 XP, ouro e equipamentos. Consulte [o guia online](docs/online-game.md).
