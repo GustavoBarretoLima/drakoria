@@ -25,6 +25,27 @@ local é enviado ou importado; a demo do GitHub Pages continua separada.
   registro de concessão em uma única transação. Não há endpoint de grant ou
   envio de resultado/recompensa pelo navegador.
 
+## Interface visual
+
+A arena reutiliza `floresta_sombria.png`, sprites das três classes e do goblin,
+e ícones de equipamentos do repositório. Os arquivos são servidos na própria
+origem em `/game-assets/` por uma lista exata de arquivos públicos; caminhos
+arbitrários, travessia de diretórios e URLs externas não são aceitos. Assets
+recebem MIME explícito, nosniff, cache de um dia e CORP same-origin. CSP da
+página permite imagens somente da origem.
+
+HP, mana, XP, equipamentos e resultado continuam vindos do snapshot do
+servidor. Após uma ação aceita, a tela mostra ataque/defesa e as perdas líquidas
+de HP naquele turno. Os efeitos são uma apresentação resumida do turno, não
+um registro individual de cada golpe; o histórico textual permanece disponível.
+Recarregar ou retomar a mesma revisão não reproduz ações nem entrega bens.
+
+A arena adapta controles e tamanho dos personagens em telas pequenas. A opção
+Reduzir movimento usa PNGs estáticos, desativa os efeitos e respeita a
+preferência do sistema por movimento reduzido. Falhas em imagens ocultam a arte
+sem remover as barras, nomes ou comandos. A conta atualmente não guarda gênero
+ou aparência; esta etapa usa os sprites base masculinos de cada classe.
+
 ## Concorrência e recuperação
 
 Migration 003 adiciona recursos, slot equipado e `online_battles`. O registro de

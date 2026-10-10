@@ -1,14 +1,25 @@
 <!doctype html>
 <html lang="pt-BR">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Jogar online — Drakoria</title><link rel="stylesheet" href="/play.css"><script src="/play.js" defer></script></head>
+<title>Jogar online — Drakoria</title><link rel="stylesheet" href="/play.css"><script src="/play.js" type="module"></script></head>
 <body><main>
 <header><div><p class="eyebrow">DRAKORIA · ONLINE</p><h1>Estrada dos Goblins</h1><p>Seu personagem, suas conquistas.</p></div><a href="/login">Minha conta →</a></header>
 <p id="message" role="status" aria-live="polite">Carregando seu personagem…</p>
 <section id="game" hidden>
-<div class="overview"><section class="panel"><h2 id="hero-name"></h2><p id="hero-info"></p><div class="resources"><span id="hp"></span><span id="mana"></span></div><p id="progress"></p></section>
+<div class="overview"><section class="panel"><h2 id="hero-name"></h2><p id="hero-info"></p><div class="resources"><span id="hp"></span><span id="mana"></span></div><div class="xp-track"><label for="xp-bar">Experiência</label><progress id="xp-bar" value="0" max="100"></progress></div><p id="progress"></p></section>
 <section class="panel camp"><h2>Acampamento</h2><p>Descanse entre encontros para recuperar HP e mana. O descanso é gratuito nesta etapa de testes.</p><div class="actions"><button id="start" class="primary">Encontrar um goblin</button><button id="rest">Descansar</button><button id="refresh">Atualizar progresso</button></div></section></div>
-<section class="panel" id="battle-panel" hidden><div class="battle-heading"><h2 id="enemy-name"></h2><p id="battle-status"></p></div><p id="enemy-hp"></p><div id="battle-actions" class="actions"></div><p id="rewards"></p><h3>Últimos acontecimentos</h3><ol id="battle-log" aria-live="polite"></ol></section>
+<section class="panel battle-panel" id="battle-panel" hidden>
+<div class="battle-heading"><div><p class="eyebrow">ENCONTRO ONLINE</p><h2 id="enemy-name"></h2></div><label class="motion-choice"><input type="checkbox" id="reduce-motion"> Reduzir movimento</label></div>
+<p id="battle-status" role="status"></p>
+<div class="battle-scene" id="battle-scene" aria-label="Arena de combate na floresta">
+<div class="arena-tag">Estrada dos Goblins</div>
+<div class="combatant hero" id="hero-fighter"><div class="fighter-label"><strong id="arena-hero-name"></strong><span id="arena-hero-health"></span><progress id="hero-health-bar" value="1" max="1" aria-label="HP do personagem"></progress></div><div class="sprite-window"><img id="hero-sprite" alt="" width="480" height="320"><span id="hero-impact" class="impact" aria-hidden="true"></span></div></div>
+<div class="combatant enemy" id="enemy-fighter"><div class="fighter-label"><strong id="arena-enemy-name"></strong><span id="enemy-hp"></span><progress id="enemy-health-bar" value="1" max="1" aria-label="HP do inimigo"></progress></div><div class="sprite-window"><img id="enemy-sprite" alt="" width="220" height="220"><span id="enemy-impact" class="impact" aria-hidden="true"></span></div></div>
+<div id="battle-outcome" class="battle-outcome" hidden></div>
+</div>
+<div class="command-heading" id="command-heading"><h3>Seu turno</h3><span>Escolha sua próxima ação</span></div><div id="battle-actions" class="actions"></div>
+<p id="rewards"></p><details class="battle-history"><summary>Últimos acontecimentos</summary><ol id="battle-log"></ol></details>
+</section>
 <section class="panel"><h2>Inventário</h2><p class="muted">Cada equipamento pertence ao seu personagem. Troque equipamentos no acampamento.</p><ul id="inventory"></ul></section>
 </section>
 <footer>Teste online por turnos · Personagem, batalha e recompensas ficam salvos no servidor. Esta primeira região tem goblins até nível 10. A demo local usa outro progresso. <a href="https://gustavobarretolima.github.io/drakoria/">Voltar ao Reino</a></footer>
