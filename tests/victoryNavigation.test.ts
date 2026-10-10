@@ -68,20 +68,23 @@ const newButtons = all(body).filter(el => el.type === "button");
 newButtons[1]!.click(); newButtons[0]!.click(); assert.equal(city, 1); assert.equal(next, 1);
 renderVictoryRewardOverlay({ xp: 50, gold: 20 }, result, [], { onNextMonster: () => next++, onReturnToCity: () => city++, danger: true, bossName: "Hidra da Corrupção", regionName: "Pântano Corrompido", exitLabel: "Voltar ao mapa" });
 assert.ok(all(body).some(el => el.textContent.includes("Hidra da Corrupção")));
-assert.ok(all(body).some(el => el.textContent === "Enfrentar Hidra da Corrupção"));
+assert.ok(all(body).some(el => el.textContent === "Preparar e enfrentar Hidra da Corrupção"));
 renderVictoryRewardOverlay({ xp: 50, gold: 20 }, result, [], { onNextMonster: () => next++, onReturnToCity: () => city++, bossDefeated: true, bossName: "Lobo Mutante", regionName: "Floresta Sombria", exitLabel: "Voltar ao mapa" });
 assert.ok(all(body).some(el => el.textContent.includes("Floresta Sombria: Lobo Mutante foi derrotado")));
-assert.deepEqual(all(body).filter(el => el.type === "button").map(el => el.textContent), ["Voltar ao mapa"]);
-console.log("Passed: victory buttons, keyboard focus, single action, all dungeon continuations, elite odds, legacy/story fallback and rewards/inventory preservation.");
+assert.deepEqual(all(body).filter(el => el.type === "button").map(el => el.textContent), ["Concluir expedição"]);
+console.log("Passed: victory buttons, keyboard focus, single action, contextual dungeon actions, elite odds, legacy/story fallback and rewards/inventory preservation.");
 
 let prepared=0;let square=0;
 renderVictoryRewardOverlay({xp:1,gold:1},result,[],{
  onNextMonster:()=>next++,onReturnToCity:()=>city++,onReturnToSquare:()=>square++,danger:true,bossName:"Coveiro Maldito",
- expedition:{xp:80,gold:40,loot:[{name:"Espada",quantity:2}],battles:[]},victories:5,depth:6,
+ expedition:{xp:80,gold:40,loot:[{name:"Espada",quantity:2}],battles:[]},victories:5,depth:6,bossAfterVictories:5,
  preparationPotions:[{label:"Elixir",count:1,use:()=>{prepared++;return {used:true,remaining:0,vitals:{hp:100,mana:50,maxHp:100,maxMana:50}};}}],
 });
 const prep=all(body).find(el=>el.textContent==="Usar Elixir (1)")!;prep.click();assert.equal(prepared,1);assert.equal(prep.textContent,"Usar Elixir (0)");assert.equal(prep.disabled,true);
 assert.ok(all(body).some(el=>el.textContent.includes("80 XP • 40 ouro")));
+assert.ok(all(body).some(el=>el.textContent==="Loot acumulado da expedição"));
 assert.ok(all(body).some(el=>el.textContent==="2× Espada"));
+assert.ok(all(body).some(el=>el.textContent==="Boss disponível"));
+const progressBar=all(body).find(el=>el.attributes.get("role")==="progressbar")!;assert.equal(progressBar.attributes.get("aria-valuenow"),"100");
 all(body).find(el=>el.textContent==="Retornar à cidade")!.click();
-all(body).find(el=>el.textContent==="Enfrentar Coveiro Maldito")!.click();assert.equal(square,1);assert.equal(next,1);
+all(body).find(el=>el.textContent==="Preparar e enfrentar Coveiro Maldito")!.click();assert.equal(square,1);assert.equal(next,1);

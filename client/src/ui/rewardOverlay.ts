@@ -40,7 +40,7 @@ export interface VictoryActions {
   victories?: number;
   bossAfterVictories?: number | undefined;
   onReturnToSquare?: () => void;
-  preparationPotions?: {label:string;count:number;use:()=>PotionActionResult}[];
+  preparationPotions?: { label: string; count: number; use: () => PotionActionResult }[];
   onNextMonster: () => void;
   onReturnToCity: () => void;
   exitLabel?: string;
@@ -58,6 +58,12 @@ export interface VictoryActions {
   vitals?: PotionActionResult["vitals"];
 }
 
+export interface ExpeditionProgressView {
+  percent: number;
+  label: string;
+  detail: string;
+}
+
 function normalizeRewardHeroClass(value: string | null): HeroClass {
   if (value === "mago" || value === "arqueiro") return value;
   return "guerreiro";
@@ -69,6 +75,43 @@ export function getVictoryUnlocks(result: RewardResult, heroClass: HeroClass): s
   return getClassSkills(heroClass)
     .filter(skill => skill.unlockLevel > previousLevel && skill.unlockLevel <= result.progress.nivel)
     .map(skill => `${skill.name} • Habilidade de nível ${skill.unlockLevel}`);
+}
+
+export function getExpeditionProgressView(actions: VictoryActions): ExpeditionProgressView | null {
+  if (!actions.expedition) return null;
+
+  if (actions.bossDefeated) {
+    return {
+      percent: 100,
+      label: "Expedição concluída",
+      detail: `${actions.bossName ?? "Boss"} derrotado`,
+    };
+  }
+
+  if (actions.danger) {
+    return {
+      percent: 100,
+      label: "Boss disponível",
+      detail: `Próximo encontro: ${actions.bossName ?? "Boss"}`,
+    };
+  }
+
+  const victories = Math.max(0, actions.victories ?? 0);
+  const target = Math.max(1, actions.bossAfterVictories ?? victories + 1);
+  const percent = actions.bossAfterVictories
+    ? Math.min(100, Math.round(victories / target * 100))
+    : Math.min(95, victories * 10);
+  const remaining = actions.bossAfterVictories
+    ? Math.max(0, target - victories)
+    : null;
+
+  return {
+    percent,
+    label: "Exploração em andamento",
+    detail: remaining === null
+      ? `Profundidade ${actions.depth ?? 1}`
+      : `${victories}/${target} vitórias • ${remaining} até o boss`,
+  };
 }
 
 export function renderVictoryRewardOverlay(
@@ -132,7 +175,7 @@ export function renderVictoryRewardOverlay(
   dropsSection.className = "reward-drops";
 
   const dropsTitle = document.createElement("h3");
-  dropsTitle.textContent = "Loot obtido";
+  dropsTitle.textContent = "Loot desta batalha";
   dropsSection.appendChild(dropsTitle);
 
   if (drops.length > 0) {
@@ -171,19 +214,59 @@ export function renderVictoryRewardOverlay(
   panel.appendChild(progress);
 
   if (actions) {
-    if(actions.expedition){
-      const summary=document.createElement("details");
-      summary.className="reward-expedition";
-      const heading=document.createElement("summary");
-      heading.textContent=`Resumo da expedição • ${actions.expedition.xp} XP • ${actions.expedition.gold} ouro`;
-      const detail=document.createElement("p");
-      detail.textContent=`${actions.regionName??"Dungeon"} • ${actions.victories??0} vitórias • Profundidade ${actions.depth??1}${actions.bossAfterVictories?` • Boss após ${actions.bossAfterVictories} vitórias`:""}`;
-      summary.append(heading,detail);
-      for(const loot of actions.expedition.loot){const row=document.createElement("p");row.textContent=`${loot.quantity}× ${loot.name}`;summary.append(row);}
-      if(!actions.expedition.loot.length){const row=document.createElement("p");row.textContent="Nenhum equipamento ou livro obtido nesta expedição.";summary.append(row);}
-      summary.open=Boolean(actions.bossDefeated);
+    const expeditionProgress = getExpeditionProgressView(actions);
+    if (actions.expedition && expeditionProgress) {
+      const progressCard = document.createElement("section");
+      progressCard.className = `reward-expedition-progress${actions.danger ? " is-boss-ready" : ""}${actions.bossDefeated ? " is-complete" : ""}`;
+
+      const heading = document.createElement("div");
+      heading.className = "reward-expedition-progress-heading";
+      const state = document.createElement("strong");
+      state.textContent = expeditionProgress.label;
+      const percent = document.createElement("span");
+      percent.textContent = `${expeditionProgress.percent}%`;
+      heading.append(state, percent);
+
+      const track = document.createElement("div");
+      track.className = "reward-expedition-progress-track";
+      track.setAttribute("role", "progressbar");
+      track.setAttribute("aria-valuemin", "0");
+      track.setAttribute("aria-valuemax", "100");
+      track.setAttribute("aria-valuenow", String(expeditionProgress.percent));
+      const fill = document.createElement("div");
+      fill.className = "reward-expedition-progress-fill";
+      fill.setAttribute("style", `width:${expeditionProgress.percent}%`);
+      track.appendChild(fill);
+
+      const detail = document.createElement("p");
+      detail.textContent = expeditionProgress.detail;
+      progressCard.append(heading, track, detail);
+      panel.appendChild(progressCard);
+
+      const summary = document.createElement("details");
+      summary.className = "reward-expedition";
+      const summaryHeading = document.createElement("summary");
+      summaryHeading.textContent = `Expedição acumulada • ${actions.expedition.xp} XP • ${actions.expedition.gold} ouro`;
+      const regionDetail = document.createElement("p");
+      regionDetail.textContent = `${actions.regionName ?? "Dungeon"} • ${actions.victories ?? 0} vitórias • Profundidade ${actions.depth ?? 1}`;
+      const lootHeading = document.createElement("strong");
+      lootHeading.className = "reward-expedition-loot-title";
+      lootHeading.textContent = "Loot acumulado da expedição";
+      summary.append(summaryHeading, regionDetail, lootHeading);
+      for (const loot of actions.expedition.loot) {
+        const row = document.createElement("p");
+        row.textContent = `${loot.quantity}× ${loot.name}`;
+        summary.append(row);
+      }
+      if (!actions.expedition.loot.length) {
+        const row = document.createElement("p");
+        row.textContent = "Nenhum equipamento ou livro obtido nesta expedição.";
+        summary.append(row);
+      }
+      summary.open = Boolean(actions.bossDefeated);
       panel.appendChild(summary);
     }
+
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     title.id = "battleVictoryTitle";
@@ -192,12 +275,12 @@ export function renderVictoryRewardOverlay(
     if (actions.danger) {
       const danger = document.createElement("div");
       danger.className = "reward-danger";
-      danger.textContent = `⚠ Próximo encontro: ${actions.bossName ?? "Orc Rei"}! Prepare suas poções ou retorne à cidade. O boss só começa quando você escolher enfrentá-lo.`;
+      danger.textContent = `⚠ ${actions.bossName ?? "Boss"} está à frente. Recupere seus recursos antes de iniciar o confronto.`;
       panel.appendChild(danger);
     } else if (actions.bossDefeated) {
       const cleared = document.createElement("div");
       cleared.className = "reward-level-up";
-      cleared.textContent = `${actions.regionName ?? "Fortaleza do Rei Orc"}: ${actions.bossName ?? "Orc Rei"} foi derrotado. Exploração concluída!`;
+      cleared.textContent = `${actions.regionName ?? "Dungeon"}: ${actions.bossName ?? "Boss"} foi derrotado. Expedição concluída!`;
       panel.appendChild(cleared);
     } else if (actions.depth !== undefined) {
       const depth = document.createElement("div");
@@ -249,39 +332,56 @@ export function renderVictoryRewardOverlay(
       parent.appendChild(button);
     };
 
-    if(actions.preparationPotions){
+    if (actions.preparationPotions) {
       buttons.classList.add("boss-preparation-actions");
-      const preparation=document.createElement("details");preparation.className="reward-preparation";
-      const heading=document.createElement("summary");heading.textContent="Preparação • Poções de recuperação da mochila";
-      const potions=document.createElement("div");potions.className="reward-actions reward-preparation-potions";
-      preparation.append(heading,potions);panel.appendChild(preparation);
-      for(const potion of actions.preparationPotions)addPotionButton(`Usar ${potion.label}`,potion.count,potion.use,potions);
+      const preparation = document.createElement("details");
+      preparation.className = "reward-preparation";
+      const heading = document.createElement("summary");
+      heading.textContent = "Preparação para o boss • Poções da mochila";
+      const potions = document.createElement("div");
+      potions.className = "reward-actions reward-preparation-potions";
+      preparation.append(heading, potions);
+      panel.appendChild(preparation);
+      for (const potion of actions.preparationPotions) {
+        addPotionButton(`Usar ${potion.label}`, potion.count, potion.use, potions);
+      }
     } else {
-    addPotionButton(
-      "Usar Poção de HP",
-      actions.healthPotionCount ?? 0,
-      actions.onUseHealthPotion,
-    );
-    addPotionButton(
-      "Usar Poção de Mana",
-      actions.manaPotionCount ?? 0,
-      actions.onUseManaPotion,
-    );
-    addPotionButton(
-      "Usar Poção Restauradora",
-      actions.potionCount ?? 0,
-      actions.onUsePotion,
-    );
+      addPotionButton(
+        "Usar Poção de HP",
+        actions.healthPotionCount ?? 0,
+        actions.onUseHealthPotion,
+      );
+      addPotionButton(
+        "Usar Poção de Mana",
+        actions.manaPotionCount ?? 0,
+        actions.onUseManaPotion,
+      );
+      addPotionButton(
+        "Usar Poção Restauradora",
+        actions.potionCount ?? 0,
+        actions.onUsePotion,
+      );
     }
-    if(actions.onReturnToSquare){
-      const square=document.createElement("button");square.type="button";square.className="reward-action-secondary";square.textContent="Retornar à cidade";
-      square.addEventListener("click",()=>{if(chosen)return;chosen=true;actions.onReturnToSquare!();});buttons.appendChild(square);
+
+    if (actions.onReturnToSquare) {
+      const square = document.createElement("button");
+      square.type = "button";
+      square.className = "reward-action-secondary";
+      square.textContent = "Retornar à cidade";
+      square.addEventListener("click", () => {
+        if (chosen) return;
+        chosen = true;
+        actions.onReturnToSquare!();
+      });
+      buttons.appendChild(square);
     }
 
     const cityButton = document.createElement("button");
     cityButton.type = "button";
     cityButton.className = "reward-action-secondary";
-    cityButton.textContent = actions.exitLabel ?? "Sair da dungeon";
+    cityButton.textContent = actions.bossDefeated
+      ? "Concluir expedição"
+      : actions.exitLabel ?? "Sair da dungeon";
     cityButton.addEventListener("click", () => {
       if (chosen) return;
       chosen = true;
@@ -295,7 +395,7 @@ export function renderVictoryRewardOverlay(
       nextButton = document.createElement("button");
       nextButton.type = "button";
       nextButton.textContent = actions.danger
-        ? `Enfrentar ${actions.bossName ?? "Orc Rei"}`
+        ? `Preparar e enfrentar ${actions.bossName ?? "Boss"}`
         : "Continuar explorando";
       nextButton.addEventListener("click", () => {
         if (chosen) return;
