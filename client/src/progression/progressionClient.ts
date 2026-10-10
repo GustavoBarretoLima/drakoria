@@ -1,17 +1,9 @@
 import type { BattleRewards } from "../../../shared/src/types/combat.js";
+import { applyProgressRewards, isSaveRecord, normalizeProgress, type PlayerProgress } from "../../../shared/src/progression/playerProgress.js";
+
+export type { PlayerProgress } from "../../../shared/src/progression/playerProgress.js";
 
 const PROGRESS_KEY = "drakoriaProgresso";
-
-export interface PlayerProgress {
-  goblinInicialDerrotado: boolean;
-  entrouEmDrakoria: boolean;
-  dungeonsLiberadas: string[];
-  missoesConcluidas: string[];
-  nivel: number;
-  xp: number;
-  xpParaProximoNivel: number;
-  ouro: number;
-}
 
 export interface RewardResult {
   progress: PlayerProgress;
@@ -24,59 +16,29 @@ export interface DefeatPenaltyResult {
   goldLost: number;
 }
 
-const DEFAULT_PROGRESS: PlayerProgress = {
-  goblinInicialDerrotado: false,
-  entrouEmDrakoria: false,
-  dungeonsLiberadas: ["goblin"],
-  missoesConcluidas: [],
-  nivel: 1,
-  xp: 0,
-  xpParaProximoNivel: 100,
-  ouro: 0,
-};
-
 export function loadProgress(): PlayerProgress {
   const saved = localStorage.getItem(PROGRESS_KEY);
-
-  if (!saved) {
-    saveProgress(DEFAULT_PROGRESS);
-    return cloneDefaultProgress();
-  }
-
+  let parsed: unknown;
   try {
-    const parsed = JSON.parse(saved) as Partial<PlayerProgress>;
-    return {
-      ...cloneDefaultProgress(),
-      ...parsed,
-      dungeonsLiberadas: parsed.dungeonsLiberadas ?? ["goblin"],
-      missoesConcluidas: parsed.missoesConcluidas ?? [],
-    };
+    parsed = saved ? JSON.parse(saved) : undefined;
   } catch {
-    saveProgress(DEFAULT_PROGRESS);
-    return cloneDefaultProgress();
+    parsed = undefined;
   }
+  const progress = normalizeProgress(parsed);
+  // Reading a valid old save must not rewrite it while rendering a panel or
+  // checking a rejected action. Repairs are persisted on the next real save.
+  if (!saved || !isSaveRecord(parsed)) saveProgress(progress);
+  return progress;
 }
 
 export function awardBattleRewards(rewards: BattleRewards): RewardResult {
-  const progress = loadProgress();
-  const startingLevel = progress.nivel;
-
-  progress.ouro += Math.max(0, Math.floor(rewards.gold));
-  progress.xp += Math.max(0, Math.floor(rewards.xp));
-
-  while (progress.xp >= progress.xpParaProximoNivel) {
-    progress.xp -= progress.xpParaProximoNivel;
-    progress.nivel += 1;
-    progress.xpParaProximoNivel = Math.floor(
-      progress.xpParaProximoNivel * 1.25,
-    );
-  }
-
+  const startingProgress = loadProgress();
+  const progress = applyProgressRewards(startingProgress, rewards?.gold, rewards?.xp);
   saveProgress(progress);
 
   return {
     progress,
-    levelsGained: progress.nivel - startingLevel,
+    levelsGained: progress.nivel - startingProgress.nivel,
   };
 }
 
@@ -95,13 +57,5 @@ export function applyDefeatPenalty(): DefeatPenaltyResult {
 }
 
 export function saveProgress(progress: PlayerProgress): void {
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
-}
-
-function cloneDefaultProgress(): PlayerProgress {
-  return {
-    ...DEFAULT_PROGRESS,
-    dungeonsLiberadas: [...DEFAULT_PROGRESS.dungeonsLiberadas],
-    missoesConcluidas: [...DEFAULT_PROGRESS.missoesConcluidas],
-  };
+  localStorage.setItem(PROGRESS_KEY, JSON.stringify(normalizeProgress(progress)));
 }
