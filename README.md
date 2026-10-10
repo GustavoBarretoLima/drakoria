@@ -16,6 +16,10 @@ autenticação ou save persistente por conta. A [revisão da fronteira de confia
 do Socket.IO](docs/socket-trust-boundary.md) descreve as validações atuais e as
 etapas para persistir o progresso no servidor.
 
+A [base PostgreSQL](docs/database.md) já define contas, sessões, personagens e
+cópias identificadas de equipamentos. Consulte o guia para subir o banco local
+e aplicar migrations; a integração com login e progresso online é a próxima etapa.
+
 ## 🎮 Jogar
 
 Acesse a versão publicada:
