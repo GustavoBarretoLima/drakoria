@@ -1,6 +1,5 @@
-import "./batalha.js"; // nome correto do arquivo
+const btnEntrar = document.getElementById("btnEntrar");
 
-// Adiciona o evento ao botão
-document.getElementById("btnEntrar").addEventListener("click", () => {
+btnEntrar?.addEventListener("click", () => {
   window.location.href = "pages/login.html";
 });
