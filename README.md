@@ -11,6 +11,11 @@
 
 > 🎮 A versão publicada no GitHub Pages roda em **modo demo local**, sem depender do backend para a batalha. Progressão, inventário e equipamentos da demo ficam salvos no `localStorage` do navegador. O modo online autoritativo continua dependendo do backend Socket.IO.
 
+O modo online ainda recebe dados de personagem do navegador e não possui
+autenticação ou save persistente por conta. A [revisão da fronteira de confiança
+do Socket.IO](docs/socket-trust-boundary.md) descreve as validações atuais e as
+etapas para persistir o progresso no servidor.
+
 ## 🎮 Jogar
 
 Acesse a versão publicada:

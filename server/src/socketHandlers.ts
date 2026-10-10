@@ -111,6 +111,10 @@ export function registerBattleSocketHandlers(
         socket.emit("battle:error", { message: "Dados invalidos para iniciar a batalha." });
         return;
       }
+      if (battleManager.get(socket.id)?.finished === false) {
+        socket.emit("battle:error", { message: "Ja existe uma batalha em andamento para este jogador." });
+        return;
+      }
       const className = normalizeHeroClass(payload.className);
       const subclassId = normalizeSubclass(payload.subclassId, className);
       const heroLevel = normalizeHeroLevel(Number(payload.heroLevel ?? 1));

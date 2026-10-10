@@ -3,6 +3,7 @@ import { test } from "node:test";
 import type { Socket } from "socket.io";
 import { BattleManager } from "../server/src/modules/combat/battleManager.js";
 import { registerBattleSocketHandlers } from "../server/src/socketHandlers.js";
+import { isPlayerSetupPayload } from "../server/src/socketValidation.js";
 
 function harness() {
   const handlers = new Map<string, (...args: unknown[]) => void>();
@@ -49,6 +50,77 @@ test("invalid setup payloads cannot replace a battle or start its timer", () => 
     assert.equal(h.emitted.at(-1)?.event, "battle:error");
   }
   assert.equal(h.started.length, 1);
+});
+
+test("setup rejects out-of-domain fields before creating any battle", () => {
+  for (const payload of [
+    { className: null }, { className: "admin" }, { subclassId: "constructor" },
+    { subclassId: "unknown" }, { className: "mago", subclassId: "berserker" },
+    { heroName: "x".repeat(161) }, { heroLevel: 0 }, { heroLevel: 101 }, { heroLevel: 1.5 },
+    { currentHp: -1 }, { currentMana: -1 }, { currentHp: Number.MAX_VALUE },
+    { equippedSkills: Array(5).fill("") }, { equippedSkills: [null] },
+    { treeRanks: Object.fromEntries(Array.from({ length: 100 }, (_, i) => [`node-${i}`, 1])) },
+    { treeRanks: { node: -1 } }, { treeRanks: { node: 1.5 } },
+    { treeRanks: { node: Number.MAX_SAFE_INTEGER } }, { treeRanks: { ["x".repeat(161)]: 1 } },
+    { potions: { healthPotion: 10000 } }, { potions: { healthPotion: -1 } },
+    { potions: { healthPotion: 0.5 } }, { potions: { inventedPotion: 1 } },
+  ]) {
+    const h = harness();
+    assert.equal(isPlayerSetupPayload(payload), false, JSON.stringify(payload));
+    h.send("player:setup", payload);
+    assert.equal(h.battleManager.has(h.id), false);
+    assert.equal(h.started.length, 0);
+    assert.equal(h.emitted.at(-1)?.event, "battle:error");
+  }
+});
+
+test("repeated setup cannot reset an active battle, spent potions or its timer", () => {
+  const h = harness();
+  const payload = { currentHp: 10, potions: { healthPotion: 2 } };
+  h.send("player:setup", payload);
+  const initial = h.battleManager.get(h.id)!;
+  initial.turnOwnerId = initial.hero.id;
+  h.send("battle:item", "healthPotion");
+  const current = h.battleManager.get(h.id)!;
+  assert.equal(current.potions?.healthPotion, 1);
+  const snapshot = JSON.stringify(current);
+  for (const repeated of [payload, { className: "mago", heroLevel: 100, currentHp: 9999, potions: { healthPotion: 9999 } }]) {
+    h.send("player:setup", repeated);
+    assert.equal(h.battleManager.get(h.id), current);
+    assert.equal(JSON.stringify(current), snapshot);
+    assert.equal(h.emitted.at(-1)?.event, "battle:error");
+  }
+  assert.equal(h.started.length, 1);
+  assert.equal(h.stopped.length, 0);
+  // Once the encounter is finished, the existing client can request the next.
+  current.finished = true;
+  h.send("player:setup", { className: "mago", monsterId: "goblin-normal-lvl-1" });
+  assert.notEqual(h.battleManager.get(h.id), current);
+  assert.equal(h.started.length, 2);
+  assert.equal(h.emitted.at(-1)?.event, "battle:update");
+});
+
+test("bounded valid setup retains defaults, zero resources and empty Berserk slots", () => {
+  for (const heroLevel of [1, 100]) {
+    const h = harness();
+    h.send("player:setup", { heroLevel, currentHp: 0, currentMana: 0, potions: { healthPotion: 9999, manaPotion: 0 } });
+    const battle = h.battleManager.get(h.id)!;
+    assert.ok(battle);
+    assert.equal(battle.hero.className, "guerreiro");
+    assert.equal(battle.hero.stats.hp, 0);
+    assert.equal(battle.hero.stats.mana, 0);
+    assert.equal(battle.potions?.healthPotion, 9999);
+  }
+  const h = harness();
+  h.send("player:setup", {
+    className: "guerreiro", subclassId: "berserker", heroLevel: 25,
+    treeRanks: { "berserker-brutal": 1 }, equippedSkills: ["", "", "", ""],
+  });
+  const battle = h.battleManager.get(h.id)!;
+  assert.ok(battle);
+  assert.equal(battle.hero.subclassId, "berserker");
+  assert.equal(battle.hero.treeRanks?.["berserker-brutal"], 1);
+  assert.deepEqual(battle.hero.equippedSkills, ["", "", "", ""]);
 });
 
 test("catalogue events handle missing and non-function acknowledgements", () => {
