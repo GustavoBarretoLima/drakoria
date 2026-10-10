@@ -290,3 +290,71 @@
 .reward-preparation summary { cursor:pointer; }
 .reward-actions.boss-preparation-actions { position:sticky; bottom:0; z-index:2; padding:10px; background:#17170ff5; border-top:1px solid #d4af3770; }
 .reward-preparation-potions { grid-template-columns:repeat(2,minmax(0,1fr)); }
+
+.reward-expedition-progress {
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid rgba(139, 211, 255, 0.38);
+  border-radius: 10px;
+  background: rgba(18, 43, 62, 0.72);
+  text-align: left;
+}
+
+.reward-expedition-progress-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #dff4ff;
+  font-size: 0.88rem;
+}
+
+.reward-expedition-progress-heading span {
+  color: #8bd3ff;
+  font-weight: 800;
+}
+
+.reward-expedition-progress-track {
+  height: 8px;
+  margin-top: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(213, 239, 255, 0.24);
+  background: rgba(2, 13, 25, 0.78);
+}
+
+.reward-expedition-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3f9fe0, #8bd3ff);
+  transition: width 240ms ease;
+}
+
+.reward-expedition-progress p {
+  margin: 8px 0 0;
+  color: #c9dbe6;
+  font-size: 0.8rem;
+}
+
+.reward-expedition-progress.is-boss-ready {
+  border-color: rgba(255, 104, 104, 0.72);
+  background: rgba(89, 22, 25, 0.5);
+}
+
+.reward-expedition-progress.is-boss-ready .reward-expedition-progress-fill {
+  background: linear-gradient(90deg, #d34646, #ff8b73);
+}
+
+.reward-expedition-progress.is-complete {
+  border-color: rgba(126, 249, 157, 0.62);
+  background: rgba(22, 74, 39, 0.42);
+}
+
+.reward-expedition-progress.is-complete .reward-expedition-progress-fill {
+  background: linear-gradient(90deg, #45b968, #a5ffb7);
+}
+
+.reward-expedition-loot-title {
+  display: block;
+  margin-top: 10px;
+  color: #ffe4a5;
+  font-size: 0.82rem;
+}
