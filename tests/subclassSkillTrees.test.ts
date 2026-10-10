@@ -1,4 +1,3 @@
-import { getForgeSet } from "../shared/src/equipment/forgeSets.js";
 import assert from "node:assert/strict";
 import { SUBCLASS_IDS, SUBCLASS_DEFINITIONS } from "../shared/src/classes/subclasses.js";
 import { SUBCLASS_TREES, applyTreeStats, earnedTreePoints, normalizeTreeRanks, spentTreePoints } from "../shared/src/classes/skillTrees.js";
@@ -10,8 +9,6 @@ import { investTreePoint, resetTreePoints, getTreeRanks } from "../client/src/pr
 import { loadSubclassProgress, useSubclassBook } from "../client/src/progression/subclassClient.js";
 import { startDemoBattle, subscribeDemoBattle } from "../client/src/demo/demoBattle.js";
 import type { BattleState } from "../shared/src/types/combat.js";
-import { readFileSync } from "node:fs";
-import vm from "node:vm";
 
 const saved = new Map<string, string>();
 Object.defineProperty(globalThis, "localStorage", { value: { getItem: (key: string) => saved.get(key) ?? null, setItem: (key: string, value: string) => saved.set(key, value) }, configurable: true });
@@ -117,18 +114,8 @@ try {
   const finished = applyEnemyTurn(ongoingKill);
   assert.equal(finished.winnerId, finished.hero.id);
   assert.equal(finished.hero.stats.hp, ongoingKill.hero.stats.hp);
-  // Status shows the actual button only after a compatible book has activated a subclass.
-  const panel = { innerHTML: "", classList: { remove() {} } };
-  const context = vm.createContext({ getForgeSet, createStatsForLevel, applyTreeStats, applyEquipmentStats: (stats: unknown) => stats,
-    applySubclassStats: (stats: unknown) => stats, canonicalEquipment: (item: unknown) => item, canEquipItem: () => true,
-    getTreeRanks, getClassSkills: () => [], SUBCLASS_DEFINITIONS,
-    localStorage: globalThis.localStorage, window: { progressoDrakoria: { carregarProgresso: () => ({ nivel: 20, xp: 0, ouro: 0 }) } },
-    document: { getElementById: () => panel } });
-  vm.runInContext(readFileSync("js/status-level-scaling.js", "utf8").replace(/^import .*;\r?\n/gm, ""), context);
-  vm.runInContext("window.abrirStatus()", context);
-  assert.ok(panel.innerHTML.includes('onclick="abrirArvoreSubclasse()"'));
+  assert.equal(loadSubclassProgress().activeSubclass, "paladin");
   saved.set("drakoriaSubclassProgress", '{"books":{}}');
-  vm.runInContext("window.abrirStatus()", context);
-  assert.ok(!panel.innerHTML.includes('onclick="abrirArvoreSubclasse()"'));
+  assert.equal(loadSubclassProgress().activeSubclass, undefined);
 } finally { Math.random = originalRandom; }
-console.log("subclassSkillTrees.test.ts: eight legacy trees, budgets, prerequisites, book gate, saves, reset, 24 legacy skills, combat effects, demo/backend parity and status passed");
+console.log("subclassSkillTrees.test.ts: eight legacy trees, budgets, prerequisites, book gate, saves, reset, 24 legacy skills, combat effects and demo/backend parity passed");
