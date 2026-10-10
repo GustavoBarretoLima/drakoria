@@ -182,6 +182,8 @@ npx tsx tests/inventoryBackpack.test.ts
 
 O frontend é publicado automaticamente no GitHub Pages por GitHub Actions sempre que há atualização na branch `main`.
 
+O workflow executa instalação, verificação de tipos, testes e build antes da publicação. PRs destinados à `main` passam pelas mesmas verificações, sem publicar o site. O upload e o deploy só ocorrem na `main`, após todas as verificações passarem; a execução manual em outra branch apenas valida o projeto.
+
 URL:
 
 **https://gustavobarretolima.github.io/drakoria/**
