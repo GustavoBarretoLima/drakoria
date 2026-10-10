@@ -1,14 +1,15 @@
 # Render staging
 
 O `render.yaml` configura somente o backend de testes; a demo publicada continua
-com seu comportamento atual. Login, saves online e pagamentos Pix ainda não
-estão conectados ao banco.
+com seu comportamento atual. O portal `/login` oferece cadastro, login e
+criação de personagem no banco. Saves de combate online e pagamentos Pix ainda
+não estão conectados.
 
 ## Recursos
 
 - Workspace: Gustavo Barreto's Workspace (`tea-cspp9al6l47c73cu3odg`).
 - Banco existente: `drakoria-staging-db`, PostgreSQL 18, Virginia, plano Free.
-- Serviço previsto: `drakoria-staging-api`, Node.js 20, Virginia, plano Free.
+- Serviço: `drakoria-staging-api`, Node.js 20, Virginia, plano Free.
 - O banco gratuito criado em 10/10/2026 expira em 09/11/2026. Não é uma base
   para produção ou transações financeiras. O serviço gratuito pode hibernar.
 
@@ -47,5 +48,6 @@ e estado Live. `GET /healthz` deve responder 200 com `{"status":"ok"}` e
 verifica acesso ao banco. Falhas retornam 503 sem detalhes de conexão. Não
 execute a suíte `test:db` neste banco; ela pertence ao ambiente isolado da CI.
 
-Quando o backend estiver Live, a próxima etapa é implementar autenticação e
-persistência autoritativa antes de ligar o cliente online.
+Acesse `/login` no backend para testar a conta. Configure `GOOGLE_CLIENT_ID`
+para ativar Google, conforme [Autenticação](authentication.md). A próxima etapa
+é persistência autoritativa de combate antes de ligar o cliente online.
