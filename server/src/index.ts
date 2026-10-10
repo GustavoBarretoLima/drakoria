@@ -1,32 +1,9 @@
-import { applyPotionAction } from "../../shared/src/combat/potionAction.js";
-import { normalizePotions } from "../../shared/src/items/potions.js";
-import { canEquipItem } from "../../shared/src/equipment/equipmentRules.js";
-import { SUBCLASS_DEFINITIONS, type SubclassId } from "../../shared/src/classes/subclasses.js";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import { BattleManager } from "./modules/combat/battleManager.js";
-import {
-  applyBattleAction,
-  applyEnemyTurn,
-} from "./modules/combat/combatEngine.js";
-import {
-  advanceBattleAtb,
-  ATB_TICK_MS,
-} from "../../shared/src/combat/atb.js";
-import { normalizeHeroLevel } from "../../shared/src/combat/classStats.js";
-import { isBattleAction } from "../../shared/src/combat/actions.js";
-import { STARTER_LOOT_ITEMS } from "../../shared/src/loot/lootTables.js";
-import type { HeroClass } from "../../shared/src/types/combat.js";
-import type { EquipmentItem } from "../../shared/src/types/equipment.js";
-import {
-  getEquipmentById,
-  listEquipments,
-} from "./modules/equipment/equipmentService.js";
-import {
-  getMonsterById,
-  getRandomMonster,
-  listMonsters,
-} from "./modules/monsters/monsterService.js";
+import { applyEnemyTurn } from "./modules/combat/combatEngine.js";
+import { advanceBattleAtb, ATB_TICK_MS } from "../../shared/src/combat/atb.js";
+import { registerBattleSocketHandlers } from "./socketHandlers.js";
 
 const httpServer = createServer();
 
@@ -38,41 +15,6 @@ const io = new Server(httpServer, {
 
 const battleManager = new BattleManager();
 const atbIntervals = new Map<string, NodeJS.Timeout>();
-
-function normalizeHeroClass(className?: string): HeroClass {
-  if (className === "mago" || className === "arqueiro") return className;
-  return "guerreiro";
-}
-
-function normalizeSubclass(subclassId: unknown, heroClass: HeroClass): SubclassId | undefined {
-  if (typeof subclassId !== "string") return undefined;
-  const id = subclassId as SubclassId;
-  return SUBCLASS_DEFINITIONS[id]?.baseClass === heroClass ? id : undefined;
-}
-
-function resolveEquippedItems(
-  ids: string[] | undefined,
-  heroClass: HeroClass,
-  heroLevel: number,
-  subclassId?: SubclassId,
-): EquipmentItem[] {
-  if (!Array.isArray(ids)) return [];
-
-  const seenSlots = new Set<string>();
-  const items: EquipmentItem[] = [];
-
-  for (const id of ids.slice(0, 9)) {
-    const item = getEquipmentById(id) ?? STARTER_LOOT_ITEMS[id];
-    if (!item || seenSlots.has(item.slot)) continue;
-
-    if (!canEquipItem(item, heroClass, heroLevel, subclassId)) continue;
-
-    seenSlots.add(item.slot);
-    items.push(item);
-  }
-
-  return items;
-}
 
 function stopAtbLoop(playerId: string) {
   const interval = atbIntervals.get(playerId);
@@ -132,122 +74,7 @@ function startAtbLoop(playerId: string, expectedBattleId: string) {
 io.on("connection", (socket) => {
   socket.join(socket.id);
   console.log(`Jogador conectado: ${socket.id}`);
-
-  socket.on("monsters:list", (filters, callback) => {
-    const monsters = listMonsters(filters ?? {});
-    callback?.(monsters);
-  });
-
-  socket.on("monsters:get", (monsterId, callback) => {
-    const monster = getMonsterById(monsterId);
-    callback?.(monster ?? null);
-  });
-
-  socket.on("monsters:random", (filters, callback) => {
-    const monster = getRandomMonster(filters ?? {});
-    callback?.(monster ?? null);
-  });
-
-  socket.on("request:equipmentList", (filters, callback) => {
-    const items = listEquipments(filters ?? {});
-    callback(items);
-  });
-
-  socket.on("equipments:get", (id, callback) => {
-    const item = getEquipmentById(id);
-    callback?.(item ?? null);
-  });
-
-  socket.on(
-    "player:setup",
-    (payload: {
-      className?: string;
-      subclassId?: string;
-      heroName?: string;
-      treeRanks?: unknown;
-      equippedSkills?: unknown;
-      potions?: unknown;
-      monsterId?: string;
-      equippedItemIds?: string[];
-      heroLevel?: number;
-      currentHp?: number;
-      currentMana?: number;
-    }) => {
-      const className = normalizeHeroClass(payload.className);
-      const subclassId = normalizeSubclass(payload.subclassId, className);
-      const heroLevel = normalizeHeroLevel(Number(payload.heroLevel ?? 1));
-      const monsterId = payload.monsterId || "goblin-normal-lvl-1";
-      const equippedItems = resolveEquippedItems(
-        payload.equippedItemIds,
-        className,
-        heroLevel,
-        subclassId,
-      );
-
-      try {
-        const battleState = battleManager.create(
-          socket.id,
-          className,
-          monsterId,
-          equippedItems,
-          heroLevel,
-          {
-            ...(Number.isFinite(payload.currentHp) ? { hp: Number(payload.currentHp) } : {}),
-            ...(Number.isFinite(payload.currentMana) ? { mana: Number(payload.currentMana) } : {}),
-          },
-          subclassId,
-          typeof payload.heroName === "string" ? payload.heroName.trim().slice(0, 40) : "Heroi",
-          payload.treeRanks,
-          payload.equippedSkills,
-        );
-
-        battleState.potions=normalizePotions(payload.potions);
-        socket.emit("battle:update", battleState);
-        startAtbLoop(socket.id, battleState.id);
-      } catch (error) {
-        console.error("Falha ao criar batalha:", error);
-        socket.emit("battle:error", {
-          message: "Nao foi possivel iniciar a batalha.",
-        });
-      }
-    },
-  );
-
-  socket.on("battle:item", (id:unknown,callback?:(accepted:boolean)=>void) => {
-    const current=battleManager.get(socket.id);
-    if(!current){callback?.(false);return;}
-    const next=applyPotionAction(current,id);
-    if(next===current){callback?.(false);return;}
-    battleManager.set(socket.id,next);socket.emit("battle:update",next);callback?.(true);
-    if(next.finished)stopAtbLoop(socket.id);
-  });
-
-  socket.on("battle:action", (action: unknown) => {
-    if (!isBattleAction(action)) return;
-    const currentBattle = battleManager.get(socket.id);
-
-    if (!currentBattle) {
-      socket.emit("battle:error", {
-        message: "Nenhuma batalha ativa para este jogador.",
-      });
-      return;
-    }
-
-    const nextBattleState = applyBattleAction(currentBattle, action);
-
-    if (nextBattleState === currentBattle) return;
-
-    battleManager.set(socket.id, nextBattleState);
-    socket.emit("battle:update", nextBattleState);
-
-    if (nextBattleState.finished) stopAtbLoop(socket.id);
-  });
-
-  socket.on("disconnect", () => {
-    stopAtbLoop(socket.id);
-    battleManager.remove(socket.id);
-    console.log(`Jogador desconectado: ${socket.id}`);
-  });
+  registerBattleSocketHandlers(socket, { battleManager, startAtbLoop, stopAtbLoop });
 });
 
 httpServer.listen(3001, () => {
