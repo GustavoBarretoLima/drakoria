@@ -1,0 +1,549 @@
+/* Unified battle HUD stylesheet.
+   Replaces the layered battle-commands / FF / JRPG / layout-fix / baseline-fix stack.
+   Goal: one source of truth for battle positioning, status, commands and responsive rules. */
+
+#batalha {
+  --hud-panel-top: rgba(20, 48, 110, .97);
+  --hud-panel-bottom: rgba(5, 16, 54, .98);
+  --hud-panel-edge: #eef4ff;
+  --hud-panel-inner: #7087c5;
+  --hud-gold: #ffe27a;
+  --hud-text: #fff;
+  --hud-muted: #cbd7f4;
+  --arena-ground-bottom: clamp(105px, 13dvh, 160px);
+  --battle-hero-visible-size: clamp(82px, 24vw, 104px);
+  padding-bottom: calc(150px + env(safe-area-inset-bottom));
+}
+
+/* Timeline */
+.battle-timeline {
+  position: fixed;
+  z-index: 1180;
+  top: 54px;
+  left: 50%;
+  width: min(680px, 54vw);
+  min-width: 320px;
+  height: 38px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.battle-timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 17px;
+  height: 4px;
+  border: 1px solid rgba(206, 235, 255, .55);
+  background: linear-gradient(90deg, rgba(4,19,42,.9), rgba(38,121,176,.82));
+  box-shadow: 0 0 8px rgba(0, 151, 255, .28);
+}
+
+.battle-timeline::after {
+  content: "AÇÃO";
+  position: absolute;
+  top: -2px;
+  right: -4px;
+  color: #dff3ff;
+  font-size: .62rem;
+  letter-spacing: .12em;
+  text-shadow: 1px 1px 3px #000;
+}
+
+.timeline-marker {
+  position: absolute;
+  top: 4px;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #d7edff;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4fb8ff, #15345d 66%, #07172d);
+  color: #fff;
+  font-weight: 900;
+  font-size: .72rem;
+  box-shadow: 0 0 0 2px rgba(14, 65, 103, .7), 0 2px 8px #0008;
+  transition: left .12s linear, transform .15s ease, box-shadow .15s ease;
+}
+
+.timeline-marker.enemy { background: radial-gradient(circle at 35% 30%, #ff6868, #6f2430 66%, #2b0b11); }
+.timeline-marker.is-boss { border-color: #ffe08a; background: radial-gradient(circle at 35% 30%, #ffcd5d, #7a3d14 66%, #2d1207); }
+.timeline-marker.is-ready { transform: scale(1.18); box-shadow: 0 0 0 2px rgba(255,255,255,.85), 0 0 14px rgba(114,204,255,.8); }
+
+/* Arena and combatants */
+#batalha .campo {
+  position: absolute;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  bottom: var(--arena-ground-bottom);
+  width: 100%;
+  max-width: none;
+  margin: 0 !important;
+  padding: 0 clamp(6px, 1vw, 18px) 0 clamp(70px, 8vw, 150px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: clamp(120px, 28vw, 500px);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+#batalha .heroi,
+#batalha .inimigo {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 0;
+  position: relative;
+  overflow: visible;
+}
+
+#batalha .heroi {
+  margin: 0 auto 0 0;
+  transform: translateX(clamp(34px, 4vw, 72px));
+}
+
+#batalha .inimigo {
+  margin: 0 0 0 auto;
+  transform: translateX(clamp(16px, 2vw, 34px));
+}
+
+#batalha .sprite-frame {
+  --visible-size: var(--battle-hero-visible-size);
+  position: relative;
+  width: 100%;
+  height: var(--visible-size);
+  flex: 0 0 auto;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+#batalha .inimigo .sprite-frame:not([data-size="boss"]) { --visible-size: calc(var(--battle-hero-visible-size) * 1.15); }
+#batalha .inimigo .sprite-frame[data-size="boss"] { --visible-size: calc(var(--battle-hero-visible-size) * 1.7); }
+
+#batalha .sprite-frame #heroiBatalha,
+#batalha .sprite-frame #inimigoBatalha {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--visible-size) * var(--sprite-top, 0) * -1);
+  width: calc(var(--visible-size) * var(--sprite-width, 1));
+  height: calc(var(--visible-size) * var(--sprite-height, 1));
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  margin-left: calc(var(--visible-size) * var(--sprite-center, .5) * -1);
+  object-fit: fill;
+  border-radius: 0;
+}
+
+/* Hero status: stays associated with the hero on desktop. */
+#batalha .heroi-status {
+  position: absolute;
+  z-index: 1170;
+  top: calc(100% + 18px);
+  bottom: auto;
+  left: 50%;
+  right: auto;
+  width: min(260px, 22vw);
+  min-width: 220px;
+  margin: 0;
+  padding: 8px 10px 9px;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+  border: 1px solid rgba(184, 226, 255, .9);
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(42, 105, 160, .9), rgba(10, 36, 72, .94));
+  box-shadow: inset 0 0 0 1px rgba(93, 166, 219, .55), 0 5px 18px #0008;
+  color: var(--hud-text);
+  text-align: left;
+  pointer-events: auto;
+}
+
+#batalha .heroi-status h2 {
+  margin: 0 0 4px;
+  color: #f8fbff;
+  font-size: .82rem;
+  line-height: 1.1;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 2px 2px #000;
+}
+
+#batalha .heroi-status > p {
+  display: inline-block;
+  margin: 0 8px 5px 0;
+  color: var(--hud-muted);
+  font-size: .62rem;
+}
+
+#batalha .heroi-status .barra {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  height: 7px;
+  margin: 4px 0;
+  overflow: hidden;
+  border: 1px solid rgba(203, 233, 255, .45);
+  border-radius: 0;
+  background: rgba(2, 10, 24, .88);
+  box-shadow: inset 0 1px 4px rgba(0,0,0,.85);
+}
+
+#batalha .heroi-status .barra > div { height: 100%; border-radius: 0; box-shadow: none; }
+#batalha .heroi-status .hp { background: linear-gradient(90deg, #d63344, #ff6673); }
+#batalha #manaHeroiBar { background: linear-gradient(90deg, #2867c7, #63a8ff); }
+#batalha #manaHeroiBar.berserk-fury { background: linear-gradient(90deg, #b52512, #ff9e2c); }
+#batalha .heroi-status .hp span,
+#batalha .heroi-status .mana span {
+  position: absolute;
+  top: 0;
+  left: 5px;
+  transform: none;
+  line-height: 7px;
+  font-size: .48rem;
+  color: #fff;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 2px #000;
+}
+
+/* Enemy readout: no card, name above sprite, HP/ATB floating under it. */
+#batalha .inimigo-status {
+  display: contents;
+  position: static !important;
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+#batalha #nomeInimigo {
+  position: absolute;
+  z-index: 40;
+  left: 50%;
+  bottom: calc(var(--visible-size) + 14px);
+  width: max-content;
+  max-width: min(44vw, 320px);
+  margin: 0;
+  transform: translateX(-50%);
+  color: #fff;
+  font-size: clamp(.8rem, 1.4vw, 1.05rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: .02em;
+  text-align: center;
+  text-shadow: 0 2px 4px #000, 0 0 6px #000;
+  pointer-events: none;
+}
+
+#batalha .inimigo:has(.sprite-frame[data-size="boss"]) #nomeInimigo { color: #ffe08a; }
+
+#batalha .inimigo-status > .barra {
+  position: absolute;
+  z-index: 38;
+  left: 50%;
+  width: min(210px, 84%);
+  max-width: none;
+  height: 6px;
+  margin: 0;
+  transform: translateX(-50%);
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: rgba(3, 13, 28, .72);
+  box-shadow: none !important;
+  pointer-events: none;
+}
+
+#batalha .inimigo-status > .barra:nth-of-type(1) { bottom: -14px; }
+#batalha .inimigo-status > .barra:nth-of-type(2) { bottom: -25px; }
+#batalha .inimigo-status > .barra > div { height: 100%; border-radius: 0 !important; box-shadow: none !important; }
+#batalha .inimigo-status .hp span,
+#batalha .inimigo-status .mana span { display: none; }
+#batalha #atributosInimigo { display: none; }
+
+/* Command dock */
+#batalha .battle-command-dock {
+  position: fixed;
+  z-index: 1200;
+  top: 50%;
+  left: clamp(12px, 2vw, 30px);
+  right: auto;
+  bottom: auto;
+  width: min(270px, 23vw);
+  padding: 8px;
+  transform: translateY(-38%);
+  box-sizing: border-box;
+  color: #fff;
+  border: 1px solid rgba(184, 226, 255, .9);
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(16, 48, 92, .94), rgba(5, 20, 48, .96));
+  box-shadow: inset 0 0 0 1px rgba(93, 166, 219, .55), 0 8px 24px #0009;
+}
+
+#batalha .battle-command-feedback {
+  display: block;
+  min-height: 0;
+  padding: 0 4px 6px;
+  border-bottom: 1px solid rgba(194,225,247,.25);
+}
+
+#batalha .battle-command-dock #mensagens {
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  color: #dfefff;
+  font-size: .68rem;
+  font-style: normal;
+  line-height: 1.25;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#batalha .battle-command-dock #indicadorTurno {
+  width: auto;
+  margin: 4px 0 0;
+  color: var(--hud-gold);
+  font-size: .68rem;
+  text-align: right;
+}
+
+#batalha .battle-command-dock .acoes {
+  position: static;
+  display: grid;
+  grid-template-columns: 1fr;
+  width: 100%;
+  max-width: none;
+  margin: 5px 0 0;
+  padding: 0;
+  gap: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+#batalha .battle-command-dock [hidden] { display: none !important; }
+
+#batalha .battle-command-dock .acoes button,
+#batalha .battle-command-dock .battle-item-row,
+#batalha .battle-command-dock .battle-skill-row button {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 8px 6px 25px;
+  border: 0;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 700;
+  text-shadow: 1px 2px 2px #000;
+  cursor: pointer;
+}
+
+#batalha .battle-command-dock .acoes button:hover,
+#batalha .battle-command-dock .acoes button:focus-visible,
+#batalha .battle-command-dock .battle-item-row:hover,
+#batalha .battle-command-dock .battle-item-row:focus-visible,
+#batalha .battle-command-dock .battle-skill-row button:hover,
+#batalha .battle-command-dock .battle-skill-row button:focus-visible {
+  border-left-color: #80d1ff;
+  background: linear-gradient(90deg, rgba(60,151,219,.28), rgba(60,151,219,.04));
+}
+
+#batalha .battle-command-dock .acoes button:hover::before,
+#batalha .battle-command-dock .acoes button:focus-visible::before {
+  content: "◆";
+  position: absolute;
+  left: 8px;
+  color: #8bd8ff;
+  font-size: .58rem;
+}
+
+#batalha .battle-command-dock button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+#batalha .battle-command-dock button:disabled { color: #8d9ab8; opacity: .6; cursor: default; }
+
+/* Skill submenu */
+.battle-skill-menu { max-height: min(245px, calc(100dvh - 100px)); margin-top: 6px; overflow-y: auto; overscroll-behavior: contain; }
+.battle-skill-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(194,225,247,.25); }
+.battle-skill-heading h3 { margin: 0; color: var(--hud-gold); font-size: .8rem; }
+#batalha .battle-command-dock .battle-skill-heading button { min-height: 28px; padding: 4px 7px; font-size: .68rem; }
+.battle-skill-list { display: grid; gap: 1px; margin-top: 4px; }
+#batalha .battle-command-dock .battle-skill-row button { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 8px; }
+.battle-skill-row button strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.battle-skill-row button span { font-size: .68rem; font-weight: normal; white-space: nowrap; }
+.battle-skill-row button[data-selected="true"]::before { content: "▶"; position: absolute; left: 7px; color: #fff; font-size: .7rem; }
+.battle-skill-description { margin: 6px 0 0; padding: 6px 0 0; border-top: 1px solid rgba(194,225,247,.25); color: #e3eaff; font-size: .72rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.battle-skill-accessible-detail { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Item submenu */
+.battle-item-menu { margin-top: 6px; }
+.battle-item-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(194,225,247,.25); }
+.battle-item-heading h3 { margin: 0; color: var(--hud-gold); font-size: .8rem; }
+#batalha .battle-command-dock .battle-item-heading button { min-height: 28px; padding: 4px 7px; font-size: .68rem; }
+.battle-item-list { display: grid; margin-top: 4px; }
+#batalha .battle-command-dock .battle-item-row { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; }
+#batalha .battle-command-dock .battle-item-row:has(img) { grid-template-columns: 40px minmax(0, 1fr) auto; }
+.battle-item-row img { grid-column: 1; grid-row: 1 / span 2; object-fit: contain; }
+.battle-item-row strong { font-size: .76rem; }
+.battle-item-row span { grid-column: 1; color: #b8cce0; font-size: .62rem; font-weight: normal; }
+.battle-item-row:has(img) strong,
+.battle-item-row:has(img) span { grid-column: 2; }
+.battle-item-row b { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: #eaf6ff; }
+.battle-item-row:has(img) b { grid-column: 3; }
+
+/* Tablet / portrait */
+@media (max-width: 900px) {
+  #batalha {
+    --mobile-command-reserve: clamp(176px, 27dvh, 252px);
+    --arena-ground-bottom: calc(var(--mobile-command-reserve) + 132px);
+  }
+
+  .battle-timeline { top: 52px; width: min(82vw, 560px); min-width: 0; }
+
+  #batalha .campo {
+    padding-left: 0;
+    padding-right: 1vw;
+    gap: 7vw;
+  }
+
+  #batalha .heroi { transform: translateX(4px); }
+  #batalha .inimigo { margin-right: 0; transform: none; }
+
+  #batalha .heroi-status {
+    position: fixed;
+    top: auto;
+    left: 14px;
+    right: auto;
+    bottom: calc(var(--mobile-command-reserve) + 14px);
+    width: min(58vw, 230px);
+    min-width: 0;
+    transform: none;
+    padding: 6px 7px;
+  }
+
+  #batalha .heroi-status > p { display: none; }
+
+  #batalha .battle-command-dock {
+    top: auto;
+    left: 8px;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    width: auto;
+    max-height: var(--mobile-command-reserve);
+    transform: none;
+    overflow-y: auto;
+  }
+
+  #batalha .battle-command-dock .acoes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 6px;
+  }
+}
+
+/* Narrow phones */
+@media (max-width: 600px) {
+  #batalha {
+    --mobile-command-reserve: clamp(168px, 26dvh, 236px);
+    --arena-ground-bottom: calc(var(--mobile-command-reserve) + 118px);
+    --battle-hero-visible-size: clamp(82px, 24vw, 104px);
+  }
+
+  .battle-timeline { top: 48px; width: 78vw; height: 32px; }
+  .timeline-marker { top: 5px; width: 24px; height: 24px; margin-left: -12px; font-size: .62rem; }
+  .battle-timeline::before { top: 16px; }
+
+  #batalha .campo { gap: 4vw; }
+
+  #batalha #nomeInimigo {
+    bottom: calc(var(--visible-size) + 10px);
+    max-width: 46vw;
+    font-size: .82rem;
+  }
+
+  #batalha .inimigo-status > .barra { width: min(42vw, 170px); height: 5px; }
+  #batalha .inimigo-status > .barra:nth-of-type(1) { bottom: -11px; }
+  #batalha .inimigo-status > .barra:nth-of-type(2) { bottom: -20px; }
+
+  #batalha .heroi-status {
+    bottom: calc(var(--mobile-command-reserve) + 10px);
+    width: min(58vw, 230px);
+  }
+
+  #batalha .heroi-status h2 { font-size: .7rem; margin-bottom: 3px; }
+  #batalha .heroi-status .barra { height: 6px; margin: 2px 0; }
+  #batalha .heroi-status .hp span,
+  #batalha .heroi-status .mana span { line-height: 6px; font-size: .4rem; }
+
+  #batalha .battle-command-dock { max-height: var(--mobile-command-reserve); padding: 6px 7px; }
+  #batalha .battle-command-feedback { padding-bottom: 4px; }
+  #batalha .battle-command-dock .acoes button { min-height: 30px; padding-top: 4px; padding-bottom: 4px; font-size: .74rem; }
+  #batalha .battle-command-dock #mensagens { max-height: 2.5em; overflow: hidden; }
+}
+
+/* Short landscape */
+@media (max-height: 500px) and (orientation: landscape) {
+  #batalha {
+    --arena-ground-bottom: 28px;
+    --battle-hero-visible-size: clamp(58px, 11vh, 72px);
+  }
+
+  .battle-timeline { top: 12px; width: 46vw; }
+
+  #batalha .campo {
+    left: min(305px, 40vw);
+    right: min(220px, 28vw);
+    width: auto;
+    padding: 0 8px;
+    gap: 18px;
+  }
+
+  #batalha .heroi { transform: none; }
+  #batalha .inimigo { transform: none; }
+
+  #batalha .heroi-status {
+    position: fixed;
+    top: auto;
+    left: auto;
+    right: 8px;
+    bottom: 8px;
+    width: min(210px, 27vw);
+    min-width: 0;
+    transform: none;
+  }
+
+  #batalha .battle-command-dock {
+    top: auto;
+    left: 8px;
+    right: auto;
+    bottom: 8px;
+    width: min(300px, 39vw);
+    max-height: 78vh;
+    transform: none;
+  }
+
+  #batalha .battle-command-dock .acoes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 601px) and (min-height: 501px) {
+  #batalha { --battle-hero-visible-size: clamp(110px, calc((100dvh - 430px) / 2), 180px); }
+}
