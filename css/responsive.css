@@ -86,7 +86,8 @@ input {
   height: auto;
 }
 
-/* Batalha */
+/* Casca responsiva da página de batalha.
+   Layout de HUD, combatentes, barras e comandos pertence a battle-hud.css. */
 body:has(#batalha) {
   overflow-x: hidden;
   overflow-y: auto;
@@ -102,52 +103,6 @@ body:has(#batalha) {
 
 #demoModeBanner {
   width: min(620px, calc(100% - 24px));
-}
-
-#batalha .campo {
-  width: min(900px, 100%);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  justify-content: stretch;
-  align-items: start;
-  gap: clamp(12px, 5vw, 80px);
-  margin-top: clamp(78px, 12vh, 110px);
-}
-
-#batalha .heroi,
-#batalha .inimigo {
-  width: 100%;
-  min-width: 0;
-  max-width: 320px;
-  justify-self: center;
-}
-
-#batalha .heroi img,
-#batalha .inimigo img {
-  width: clamp(78px, 18vw, 140px);
-  max-height: min(30vh, 220px);
-  object-fit: contain;
-}
-
-#batalha .status {
-  width: 100%;
-  max-width: 230px;
-  margin-inline: auto;
-  padding: 10px clamp(8px, 2vw, 18px);
-}
-
-#batalha .barra {
-  width: 100%;
-}
-
-#batalha .acoes {
-  width: min(600px, 100%);
-}
-
-#mensagens,
-#indicadorTurno {
-  width: min(700px, 100%);
-  overflow-wrap: anywhere;
 }
 
 @media (max-width: 768px) {
@@ -242,36 +197,6 @@ body:has(#batalha) {
     justify-content: flex-start;
     padding-top: 8px;
   }
-
-  #batalha .campo {
-    gap: clamp(10px, 3vw, 28px);
-  }
-
-  #batalha .status {
-    padding: 9px 8px;
-  }
-
-  #batalha .status h2 {
-    margin-block: 6px;
-    font-size: clamp(1rem, 4.4vw, 1.25rem);
-  }
-
-  #batalha .status p {
-    margin-block: 6px;
-    font-size: clamp(0.76rem, 3vw, 0.95rem);
-  }
-
-  #batalha .acoes {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  #batalha .acoes button {
-    min-width: 0;
-    min-height: 46px;
-    padding: 11px 8px;
-  }
 }
 
 @media (max-width: 600px) {
@@ -299,101 +224,6 @@ body:has(#batalha) {
     font-size: 0.72rem !important;
     line-height: 1.25;
   }
-
-  #batalha .campo {
-    width: 100%;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin-top: 0;
-    align-items: end;
-  }
-
-  #batalha .heroi,
-  #batalha .inimigo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 6px;
-    max-width: none;
-  }
-
-  #batalha .heroi img,
-  #batalha .inimigo img {
-    width: min(31vw, 118px);
-    max-height: 132px;
-    margin: 0 auto;
-  }
-
-  #batalha .status {
-    width: 100%;
-    max-width: none;
-    min-height: 0;
-    margin: 0;
-    padding: 6px 6px 7px;
-    border-radius: 10px;
-    box-shadow: 0 0 6px rgba(255, 204, 0, 0.6);
-  }
-
-  #batalha .status h2 {
-    margin: 1px 0 4px;
-    font-size: clamp(0.95rem, 4.4vw, 1.1rem);
-    line-height: 1.1;
-  }
-
-  #batalha .status p {
-    margin: 3px 0;
-    font-size: clamp(0.68rem, 2.8vw, 0.82rem);
-    line-height: 1.2;
-  }
-
-  #batalha .barra {
-    height: 16px;
-    margin: 4px auto;
-    border-width: 1px;
-  }
-
-  #batalha .hp span,
-  #batalha .mana span {
-    font-size: 0.68rem;
-    line-height: 16px;
-  }
-
-  #mensagens {
-    margin-top: 8px;
-    min-height: 22px;
-    font-size: 0.82rem;
-    line-height: 1.25;
-  }
-
-  #indicadorTurno {
-    margin-top: 4px;
-    font-size: 0.95rem;
-  }
-
-  #batalha .acoes {
-    position: fixed;
-    left: 8px;
-    right: 8px;
-    bottom: max(8px, env(safe-area-inset-bottom));
-    z-index: 1200;
-    width: auto;
-    margin: 0;
-    padding: 7px;
-    gap: 7px;
-    border: 1px solid rgba(255, 204, 0, 0.45);
-    border-radius: 12px;
-    background: rgba(12, 6, 2, 0.88);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.35);
-  }
-
-  #batalha .acoes button {
-    min-height: 42px;
-    padding: 8px 6px;
-    font-size: 0.82rem;
-    border-radius: 8px;
-  }
 }
 
 @media (max-width: 420px) {
@@ -412,50 +242,11 @@ body:has(#batalha) {
     width: 100%;
     padding-inline: 8px;
   }
-
-  #batalha .heroi img,
-  #batalha .inimigo img {
-    width: min(29vw, 105px);
-    max-height: 116px;
-  }
-
-  #batalha .status {
-    padding: 5px 4px 6px;
-  }
-
-  #batalha .status h2 {
-    font-size: 0.9rem;
-  }
-
-  #batalha .status p {
-    font-size: 0.66rem;
-  }
-
-  #mensagens {
-    font-size: 0.78rem;
-  }
-
-  #indicadorTurno {
-    font-size: 0.9rem;
-  }
 }
 
 @media (max-height: 700px) and (orientation: landscape) {
   #batalha {
     justify-content: flex-start;
-  }
-
-  #batalha .campo {
-    margin-top: 0;
-  }
-
-  #batalha .heroi img,
-  #batalha .inimigo img {
-    max-height: 96px;
-  }
-
-  #batalha .status p {
-    margin-block: 3px;
   }
 }
 
@@ -467,30 +258,5 @@ body:has(#batalha) {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-/* Sprites maiores no desktop; mantém as regras atuais de mobile. */
-@media (min-width: 769px) {
-  #batalha .campo {
-    width: min(1100px, 100%);
-  }
-
-  #batalha .heroi,
-  #batalha .inimigo {
-    max-width: 440px;
-  }
-
-  #batalha #heroiBatalha,
-  #batalha #inimigoBatalha {
-    width: clamp(260px, 27vw, 340px);
-    max-width: 100%;
-    height: auto;
-    max-height: none;
-    object-fit: contain;
-  }
-
-  #batalha #inimigoBatalha[src*="/orc_rei/"] {
-    width: clamp(330px, 35vw, 440px);
   }
 }
