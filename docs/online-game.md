@@ -18,8 +18,10 @@ local é enviado ou importado; a demo do GitHub Pages continua separada.
   Após cinco vitórias, o próximo encontro é o chefe da região. É possível
   descansar/equipar antes dele. Sua derrota encerra a expedição; vencer o chefe
   conclui a expedição. Encerrar entre batalhas permite escolher outra região.
-- Missões de Guilda, poções, livros/subclasses, forja, comércio e Pix ainda
-  aguardam suas etapas de integração ao banco; seus sistemas locais continuam.
+- As 15 missões de Guilda já usam o banco: aceitação, objetivos após vitória,
+  entregas, promoção e arma épica. Consulte [Guilda online](online-guild.md).
+- Poções, livros/subclasses, forja, comércio e Pix ainda aguardam suas etapas
+  de integração ao banco; seus sistemas locais continuam.
 - Combate online por turnos. As regras compartilhadas de ATB determinam a
   ordem; o servidor avança turnos inimigos até a próxima ação do herói. O
   relógio do navegador não participa. Esta tela não é o combate em tempo real
@@ -102,6 +104,8 @@ expiração; não deve guardar bens com valor financeiro.
 | GET | /game/state | Nenhuma; conta vem da sessão |
 | POST | /game/start | requestId UUID, regionId, version string, expeditionId UUID somente para continuar |
 | POST | /game/action | battleId UUID, revision inteiro, action {type[, skillId]} |
+| POST | /game/quests/accept | requestId UUID, questId do catálogo, version string |
+| POST | /game/quests/claim | requestId UUID, questId do catálogo, version string |
 | POST | /game/retreat | version string, expeditionId UUID |
 | POST | /game/rest | version string |
 | POST | /game/equip | version string, instanceId UUID |
