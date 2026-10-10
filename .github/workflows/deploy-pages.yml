@@ -19,6 +19,20 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: drakoria_test
+          POSTGRES_PASSWORD: ci-test-only
+          POSTGRES_DB: drakoria_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U drakoria_test -d drakoria_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,6 +51,12 @@ jobs:
 
       - name: Tests
         run: npm test
+
+      - name: PostgreSQL integration tests
+        env:
+          TEST_DATABASE_URL: postgresql://drakoria_test:ci-test-only@localhost:5432/drakoria_test
+          DATABASE_SSL: disable
+        run: npm run test:db
 
       - name: Build
         run: npm run build

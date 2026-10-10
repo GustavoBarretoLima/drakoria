@@ -5,6 +5,7 @@
   "type": "module",
   "devDependencies": {
     "@types/node": "^26.0.1",
+    "@types/pg": "^8.23.1",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vite": "^6.4.2"
@@ -15,10 +16,13 @@
     "preview": "vite preview",
     "server": "tsx server/src/index.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts"
+    "test": "tsx --test tests/*.test.ts",
+    "test:db": "node --import tsx --test server/tests/*.test.ts",
+    "db:migrate": "node --env-file=.env --import tsx server/src/database/migrateCli.ts"
   },
   "dependencies": {
     "animejs": "^4.4.1",
+    "pg": "^8.23.1",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3"
   }
