@@ -110,6 +110,7 @@ As quantidades salvas representam todas as cópias possuídas, incluindo a equip
 | `js` | Código legado e integrações da Praça ainda em migração gradual |
 | `img` | Imagens, sprites e recursos visuais |
 | `audio` | Áudios e efeitos sonoros |
+| [`tools/sprite-generator`](tools/sprite-generator/README.md) | Ferramenta opcional de sprites; instalação própria com `npm ci` |
 
 ## 🧩 Tecnologias
 

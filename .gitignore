@@ -1,7 +1,7 @@
-# Dependências
+# Dependências (raiz e ferramentas, incluindo tools/sprite-generator)
 node_modules/
 
-# Builds e cache
+# Builds e cache (em qualquer diretório; inclui o executável da ferramenta)
 dist/
 .vite/
 coverage/
