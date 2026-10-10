@@ -12,7 +12,8 @@
 > 🎮 O GitHub Pages é uma **demo local**, com progresso no navegador. O [portal de contas](https://drakoria-staging-api.onrender.com/login) oferece login por Google ou email/senha e acesso às cinco regiões do mapa online por turnos, com progresso salvo no PostgreSQL.
 
 O fluxo online usa o estado do personagem no servidor e persiste batalhas,
-XP, ouro e equipamentos. Consulte [o guia online](docs/online-game.md).
+XP, ouro, equipamentos e missões da Guilda. Consulte [o guia online](docs/online-game.md)
+e [a Guilda online](docs/online-guild.md).
 Os handlers Socket.IO de desenvolvimento ainda recebem setup local e ficam
 bloqueados em produção; veja [a fronteira de confiança](docs/socket-trust-boundary.md).
 

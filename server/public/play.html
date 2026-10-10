@@ -8,6 +8,8 @@
 <section id="game" hidden>
 <div class="overview"><section class="panel"><h2 id="hero-name"></h2><p id="hero-info"></p><div class="resources"><span id="hp"></span><span id="mana"></span></div><div class="xp-track"><label for="xp-bar">Experiência</label><progress id="xp-bar" value="0" max="100"></progress></div><p id="progress"></p></section>
 <section class="panel camp"><h2>Acampamento</h2><p>Descanse entre encontros para recuperar HP e mana. O descanso é gratuito nesta etapa de testes.</p><div class="actions"><button id="start" class="primary" hidden>Próximo encontro</button><button id="retreat" hidden>Encerrar expedição</button><button id="rest">Descansar</button><button id="refresh">Atualizar progresso</button></div></section></div>
+<nav class="game-nav" aria-label="Áreas do jogo"><a href="#guild-panel">Guilda</a><a href="#map-heading">Mapa</a></nav>
+<section class="panel guild-panel" id="guild-panel" aria-labelledby="guild-heading"><p class="eyebrow">CONTRATOS E PROMOÇÕES</p><h2 id="guild-heading">Guilda de Drakoria</h2><p id="guild-standing"></p><p id="guild-promotion" class="muted"></p><p class="muted">Aceite e entregue missões entre batalhas. Os objetivos contam apenas após a aceitação; equipamentos coletados continuam com você.</p><p id="guild-receipt" role="status"></p><h3>Missões em andamento</h3><ul id="quest-tracker"></ul><details id="guild-contracts"><summary>Consultar contratos da Guilda</summary><label for="guild-region">Região</label><select id="guild-region"></select><div id="guild-quests" class="guild-quests"></div></details></section>
 <section class="panel map-panel" aria-labelledby="map-heading"><p class="eyebrow">SEU MUNDO</p><h2 id="map-heading">Mapa dos arredores</h2><p class="muted">Escolha uma região para explorar. As faixas indicam o nível dos monstros; regiões mais difíceis continuam acessíveis.</p>
 <div class="map-scroll"><div class="world-map"><img src="/game-assets/world-map.png" alt="Mapa dos arredores de Drakoria, com cemitério, pântano, floresta, acampamento orc e fortaleza" width="1672" height="941"><div id="map-hotspots"></div><span class="map-city">Drakoria</span></div></div>
 <div id="regions" class="region-list"></div>
@@ -22,7 +24,7 @@
 <div class="combatant enemy" id="enemy-fighter"><div class="fighter-label"><strong id="arena-enemy-name"></strong><span id="enemy-hp"></span><progress id="enemy-health-bar" value="1" max="1" aria-label="HP do inimigo"></progress></div><div class="sprite-window"><img id="enemy-sprite" alt="" width="220" height="220"><span id="enemy-impact" class="impact" aria-hidden="true"></span></div></div>
 <div id="battle-outcome" class="battle-outcome" hidden></div>
 </div>
-<div class="command-heading" id="command-heading"><h3>Seu turno</h3><span>Escolha sua próxima ação</span></div><div id="battle-actions" class="actions"></div>
+<ul id="battle-quests" class="battle-quests" aria-label="Missões em andamento"></ul><div class="command-heading" id="command-heading"><h3>Seu turno</h3><span>Escolha sua próxima ação</span></div><div id="battle-actions" class="actions"></div>
 <p id="rewards"></p><details class="battle-history"><summary>Últimos acontecimentos</summary><ol id="battle-log"></ol></details>
 </section>
 <section class="panel"><h2>Inventário</h2><p class="muted">Cada equipamento pertence ao seu personagem. Troque equipamentos no acampamento.</p><ul id="inventory"></ul></section>

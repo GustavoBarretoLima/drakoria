@@ -1,6 +1,6 @@
 import { createBattleVisuals, equipmentIcon } from '/play-visuals.js';
 const el = id => document.getElementById(id);
-let snapshot, busy = false, pendingStart;
+let snapshot, busy = false, pendingStart, pendingQuest, guildRegion = 'cemiterio-esquecido';
 const visuals = createBattleVisuals();
 async function api(path, body) {
   const response = await fetch(path, { credentials: 'same-origin', cache: 'no-store',
@@ -31,6 +31,7 @@ function render() {
   el('start').disabled = busy || (!fighting && (!exploring || c.stats.hp <= 0));
   el('retreat').disabled = busy || fighting;
   renderMap(fighting, exploring);
+  renderGuild(fighting);
   el('rest').disabled = busy || fighting;
   el('refresh').disabled = busy;
   el('battle-panel').hidden = !b;
@@ -74,6 +75,43 @@ function render() {
     info.append(text); li.append(info, button('Equipar', async () => { snapshot = await api('/game/equip', { version: c.version, instanceId: entry.instanceId }); }, busy || fighting || entry.equipped || !entry.canEquip));
     el('inventory').append(li);
   }
+}
+function renderGuild(fighting) {
+  const guild = snapshot.guild;
+  if (!guild) return;
+  const standing = guild.standing;
+  el('guild-standing').textContent = `Rank ${standing.rank} · ${standing.reputation} de reputação`;
+  el('guild-promotion').textContent = standing.next ? `Próximo rank: ${standing.next.name} · ${standing.next.reputation} de reputação e entrega de ${standing.promotion.name}.` : 'Todas as promoções da campanha foram concluídas.';
+  const receipt = guild.lastDelivery;
+  el('guild-receipt').textContent = receipt ? `Última entrega: ${receipt.name} · ${receipt.xp} XP, ${receipt.gold} ouro e +${receipt.reputation} reputação${receipt.equipment ? ` · ${receipt.equipment}` : ''}.` : '';
+  const active = guild.quests.filter(quest => quest.entry?.status === 'active');
+  for (const id of ['quest-tracker', 'battle-quests']) {
+    el(id).replaceChildren(...active.map(quest => { const li = document.createElement('li'); li.textContent = `${quest.name}: ${quest.entry.count}/${quest.target}${quest.ready ? ' · Pronta para entregar na Guilda' : ''}`; return li; }));
+  }
+  if (!active.length) { const li = document.createElement('li'); li.textContent = 'Nenhuma missão aceita. Consulte os contratos abaixo.'; el('quest-tracker').append(li); }
+  el('guild-region').replaceChildren(...snapshot.regions.map(region => { const option = document.createElement('option'); option.value = region.id; option.textContent = region.label; return option; }));
+  el('guild-region').value = guildRegion;
+  el('guild-quests').replaceChildren();
+  for (const quest of guild.quests.filter(quest => quest.region === guildRegion)) {
+    const card = document.createElement('article'), heading = document.createElement('h3'), requirements = document.createElement('p'), description = document.createElement('p'), progress = document.createElement('p'), reward = document.createElement('p');
+    heading.textContent = quest.name;
+    requirements.textContent = `Rank ${quest.requiredRank} · Nível ${quest.level} · ${quest.repeatable ? 'Repetível' : 'Promoção única'}`;
+    description.textContent = quest.description; description.className = 'muted';
+    progress.textContent = quest.entry ? `${quest.entry.status === 'active' ? `${quest.entry.count}/${quest.target}` : 'Entregue'} · Entregas: ${quest.entry.claims}` : 'Ainda não aceita';
+    reward.textContent = `${quest.xp} XP · ${quest.gold} ouro · +${quest.reputation} reputação${quest.gear ? ` · Arma épica da sua classe Nv.${quest.gear}` : ''}`;
+    const operation = quest.ready ? 'claim' : 'accept';
+    const label = quest.ready ? `Entregar ${quest.name}` : quest.entry?.status === 'active' ? 'Missão em andamento' : quest.blocked || `${quest.entry?.claims ? 'Aceitar novamente' : 'Aceitar'}: ${quest.name}`;
+    const command = button(label, () => guildCommand(quest.id, operation), busy || fighting || (!quest.ready && !!quest.blocked));
+    if (fighting) command.title = 'Conclua a batalha antes de aceitar ou entregar missões.';
+    card.append(heading, requirements, description, progress, reward, command); card.classList.toggle('quest-ready', quest.ready);
+    el('guild-quests').append(card);
+  }
+}
+async function guildCommand(questId, operation) {
+  if (!pendingQuest || pendingQuest.questId !== questId || pendingQuest.operation !== operation) pendingQuest = { questId, operation, requestId: crypto.randomUUID(), version: snapshot.character.version };
+  const { operation: command, ...body } = pendingQuest;
+  try { snapshot = await api(`/game/quests/${command}`, body); pendingQuest = undefined; }
+  catch (error) { if (error.status === 400 || error.status === 409) pendingQuest = undefined; throw error; }
 }
 function renderMap(fighting, exploring) {
   const { regions = [], expedition, character } = snapshot;
@@ -123,6 +161,7 @@ el('start').addEventListener('click', () => {
   void run(() => startExpedition(snapshot.expedition.regionId, snapshot.expedition.id));
 });
 el('retreat').addEventListener('click', () => void run(async () => { snapshot = await api('/game/retreat', { version: snapshot.character.version, expeditionId: snapshot.expedition.id }); }));
+el('guild-region').addEventListener('change', event => { guildRegion = event.target.value; renderGuild(!!snapshot.battle && !snapshot.battle.state.finished); });
 el('rest').addEventListener('click', () => void run(async () => { snapshot = await api('/game/rest', { version: snapshot.character.version }); }));
 el('refresh').addEventListener('click', () => void run(async () => { snapshot = await api('/game/state'); }));
 void run(async () => { snapshot = await api('/game/state'); });

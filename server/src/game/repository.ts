@@ -10,6 +10,7 @@ import type { HeroClass, BattleState } from '../../../shared/src/types/combat.js
 import type { BattleAction } from '../../../shared/src/combat/actions.js';
 import type { DungeonRunState } from '../../../shared/src/dungeons/dungeonRun.js';
 import { onlineRegions, regionConfig, newExpedition, nextEncounter, settleExpedition } from './world.js';
+import { guildSnapshot, advanceGuildVictory, questCommand } from './guild.js';
 import { enemyPresentation } from './assets.js';
 import { characterStats, itemDefinition, playTurn, readyForHero } from './rules.js';
 
@@ -52,7 +53,7 @@ export class GameRepository {
     const expedition = await this.expedition(client, character.id);
     const battleRun = current?.expedition_id ? (await client.query<Expedition>('SELECT * FROM online_expeditions WHERE id = $1 AND character_id = $2', [current.expedition_id, character.id])).rows[0] : null;
     const progress = normalizeProgress({ nivel: character.level, xp: character.xp, ouro: character.gold });
-    return { regions: onlineRegions, expedition: expedition ? { id: expedition.id, regionId: expedition.region_id, state: expedition.state, status: expedition.status } : null, character: { id: character.id, name: character.name, heroClass: character.hero_class, level: character.level,
+    return { guild: await guildSnapshot(client, character.id, character.level), regions: onlineRegions, expedition: expedition ? { id: expedition.id, regionId: expedition.region_id, state: expedition.state, status: expedition.status } : null, character: { id: character.id, name: character.name, heroClass: character.hero_class, level: character.level,
       xp: Number(character.xp), gold: Number(character.gold), version: character.version, xpToNextLevel: progress.xpParaProximoNivel, stats },
       inventory: inventory.map(entry => ({ instanceId: entry.id, equipped: !!entry.equipped_slot, canEquip: entry.canEquip, definition: entry.item })),
       battle: current ? { regionId: battleRun?.region_id ?? null, presentation: enemyPresentation(current.state.enemy.id), id: current.id, revision: current.revision, messages: current.messages,
@@ -70,6 +71,7 @@ export class GameRepository {
         const rewards = state.rewards!;
         const progress = applyProgressRewards({ nivel: character.level, xp: character.xp, ouro: character.gold }, rewards.gold, rewards.xp);
         character.level = progress.nivel; character.xp = String(progress.xp); character.gold = String(progress.ouro);
+        await advanceGuildVictory(client, character.id, state);
         let index = 0;
         for (const drop of rewards.drops ?? []) {
           itemDefinition(drop.item.id);
@@ -140,6 +142,17 @@ export class GameRepository {
       if (!battle || battle.finished || battle.revision !== revision) throw new AuthError(409, 'A batalha mudou. Atualize para continuar.');
       battle.state = playTurn(battle.state, action, battle.messages); battle.revision++;
       return this.saveBattle(client, character, battle);
+    });
+  }
+  async quest(accountId: string, requestId: string, questId: string, version: string, operation: 'accept' | 'claim') {
+    return inTransaction(this.pool, async client => {
+      const character = await this.character(client, accountId);
+      const battle = await this.latest(client, character.id);
+      const changed = await questCommand(client, character, requestId, questId, version, operation, !!battle && !battle.finished);
+      if (!changed) return this.snapshot(client, character);
+      const saved = await client.query<Character>('UPDATE characters SET level = $2, xp = $3, gold = $4, version = version + 1 WHERE id = $1 RETURNING *',
+        [character.id, character.level, character.xp, character.gold]);
+      return this.snapshot(client, saved.rows[0]!);
     });
   }
   async retreat(accountId: string, version: string, expeditionId: string) {

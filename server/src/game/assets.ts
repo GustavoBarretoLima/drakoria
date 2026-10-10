@@ -18,6 +18,7 @@ for (const [heroClass, folder] of [['guerreiro', 'heroi_anime'], ['mago', 'mago_
   gameAssets.set(`/game-assets/${heroClass}-static.png`, `img/personagens/${folder}/idle_00.png`);
   gameAssets.set(`/game-assets/${heroClass}-death.png`, `img/personagens/${folder}/death_03.png`);
 }
+gameAssets.set('/game-assets/guild.png', 'img/stages/guilda-anime.png');
 gameAssets.set('/game-assets/world-map.png', 'img/mapas/arredores_de_drakoria.png');
 for (const stage of ['cemiterio_esquecido', 'pantano_corrompido', 'floresta_sombria', 'acampamento_orc', 'fortaleza_rei_orc']) {
   gameAssets.set(`/game-assets/stages/${stage}.png`, `img/stages/${stage}.png`);
