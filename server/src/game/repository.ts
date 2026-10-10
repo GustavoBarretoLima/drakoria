@@ -8,6 +8,9 @@ import { canEquipItem } from '../../../shared/src/equipment/equipmentRules.js';
 import { getHeroSkills, getSkillBlockReason } from '../../../shared/src/combat/classSkills.js';
 import type { HeroClass, BattleState } from '../../../shared/src/types/combat.js';
 import type { BattleAction } from '../../../shared/src/combat/actions.js';
+import type { DungeonRunState } from '../../../shared/src/dungeons/dungeonRun.js';
+import { onlineRegions, regionConfig, newExpedition, nextEncounter, settleExpedition } from './world.js';
+import { enemyPresentation } from './assets.js';
 import { characterStats, itemDefinition, playTurn, readyForHero } from './rules.js';
 
 interface Character {
@@ -15,7 +18,8 @@ interface Character {
   current_hp: number | null; current_mana: number | null;
 }
 interface Item { id: string; definition_id: string; equipped_slot: string | null; }
-interface Battle { id: string; state: BattleState; messages: string[]; revision: number; finished: boolean; settled: boolean; }
+interface Expedition { id: string; region_id: string; state: DungeonRunState; status: string; }
+interface Battle { expedition_id?: string | null; id: string; state: BattleState; messages: string[]; revision: number; finished: boolean; settled: boolean; }
 
 export class GameRepository {
   constructor(private readonly pool: Pool) {}
@@ -35,17 +39,23 @@ export class GameRepository {
     const result = await client.query<Battle>('SELECT * FROM online_battles WHERE character_id = $1 ORDER BY created_at DESC, id DESC LIMIT 1', [characterId]);
     return result.rows[0] ?? null;
   }
+  private async expedition(client: PoolClient, characterId: string): Promise<Expedition | null> {
+    const result = await client.query<Expedition>('SELECT * FROM online_expeditions WHERE character_id = $1 ORDER BY created_at DESC, id DESC LIMIT 1', [characterId]);
+    return result.rows[0] ?? null;
+  }
   private async snapshot(client: PoolClient, character: Character, battle?: Battle | null) {
     const inventory = await this.items(client, character);
     const stats = characterStats(character.hero_class, character.level, inventory.filter(item => item.equipped_slot).map(item => item.item));
     stats.hp = Math.min(stats.maxHp, character.current_hp ?? stats.maxHp);
     stats.mana = Math.min(stats.maxMana, character.current_mana ?? stats.maxMana);
     const current = battle === undefined ? await this.latest(client, character.id) : battle;
+    const expedition = await this.expedition(client, character.id);
+    const battleRun = current?.expedition_id ? (await client.query<Expedition>('SELECT * FROM online_expeditions WHERE id = $1 AND character_id = $2', [current.expedition_id, character.id])).rows[0] : null;
     const progress = normalizeProgress({ nivel: character.level, xp: character.xp, ouro: character.gold });
-    return { character: { id: character.id, name: character.name, heroClass: character.hero_class, level: character.level,
+    return { regions: onlineRegions, expedition: expedition ? { id: expedition.id, regionId: expedition.region_id, state: expedition.state, status: expedition.status } : null, character: { id: character.id, name: character.name, heroClass: character.hero_class, level: character.level,
       xp: Number(character.xp), gold: Number(character.gold), version: character.version, xpToNextLevel: progress.xpParaProximoNivel, stats },
       inventory: inventory.map(entry => ({ instanceId: entry.id, equipped: !!entry.equipped_slot, canEquip: entry.canEquip, definition: entry.item })),
-      battle: current ? { id: current.id, revision: current.revision, messages: current.messages,
+      battle: current ? { regionId: battleRun?.region_id ?? null, presentation: enemyPresentation(current.state.enemy.id), id: current.id, revision: current.revision, messages: current.messages,
         state: { ...current.state, rewards: current.settled && current.state.winnerId === current.state.hero.id ? current.state.rewards : undefined },
         skills: getHeroSkills(current.state.hero).filter(skill => (current.state.hero.level ?? 1) >= skill.unlockLevel)
           .map(skill => ({ id: skill.id, name: skill.name, manaCost: skill.manaCost, blocked: getSkillBlockReason(current.state.hero, skill) })) } : null };
@@ -73,6 +83,12 @@ export class GameRepository {
           }
         }
       }
+      if (battle.expedition_id) {
+        const run = (await client.query<Expedition>('SELECT * FROM online_expeditions WHERE id = $1 AND character_id = $2', [battle.expedition_id, character.id])).rows[0]!;
+        if (run.status !== 'active') throw new AuthError(409, 'A expedição já terminou.');
+        const result = settleExpedition(run.region_id, run.state, state);
+        await client.query('UPDATE online_expeditions SET state = $2, status = $3, updated_at = now() WHERE id = $1', [run.id, JSON.stringify(result.state), result.status]);
+      }
       battle.settled = true;
     }
     character.current_hp = state.hero.stats.hp; character.current_mana = state.hero.stats.mana;
@@ -83,26 +99,36 @@ export class GameRepository {
       [battle.id, JSON.stringify(state), JSON.stringify(battle.messages), battle.revision, battle.finished, battle.settled]);
     return this.snapshot(client, saved.rows[0]!, battle);
   }
-  async start(accountId: string, requestId: string) {
+  async start(accountId: string, requestId: string, regionId: string, version: string, expeditionId?: string) {
     return inTransaction(this.pool, async client => {
       const character = await this.character(client, accountId);
       const previous = await client.query<Battle>('SELECT * FROM online_battles WHERE character_id = $1 AND start_request_id = $2', [character.id, requestId]);
-      if (previous.rows[0]) return this.snapshot(client, character, previous.rows[0]);
+      if (previous.rows[0]) return this.snapshot(client, character);
       const current = await this.latest(client, character.id);
       if (current && !current.finished) return this.snapshot(client, character, current);
+      if (character.version !== version) throw new AuthError(409, 'O personagem mudou. Atualize para continuar.');
+      regionConfig(regionId);
+      let run = await this.expedition(client, character.id);
+      if (run?.status === 'active') {
+        if (run.id !== expeditionId || run.region_id !== regionId) throw new AuthError(409, 'Continue ou encerre sua expedição atual.');
+      } else {
+        if (expeditionId) throw new AuthError(409, 'Esta expedição já terminou.');
+        run = { id: randomUUID(), region_id: regionId, state: newExpedition(regionId), status: 'active' };
+        await client.query('INSERT INTO online_expeditions (id, character_id, region_id, state) VALUES ($1, $2, $3, $4)', [run.id, character.id, regionId, JSON.stringify(run.state)]);
+      }
       const items = await this.items(client, character);
       const stats = characterStats(character.hero_class, character.level, items.filter(item => item.equipped_slot).map(item => item.item));
       if ((character.current_hp ?? stats.maxHp) <= 0) throw new AuthError(409, 'Descanse antes de iniciar outra batalha.');
-      // First online region: only normal goblins, up to level 10. No client-selected boss or level.
-      const state = createInitialBattleState(character.hero_class, `goblin-normal-lvl-${Math.min(character.level, 10)}`,
+      const encounter = nextEncounter(regionId, run.state);
+      const state = createInitialBattleState(character.hero_class, encounter.monsterId,
         items.filter(item => item.equipped_slot).map(item => item.item), character.level,
         { hp: character.current_hp ?? stats.maxHp, mana: character.current_mana ?? stats.maxMana }, undefined, character.name);
       state.id = randomUUID(); state.hero.id = character.id;
       // Subclass books/unlocks are deferred until their server inventory exists.
       state.rewards!.classBooks = [];
-      const battle: Battle = { id: state.id, state, messages: ['O encontro começou.'], revision: 0, finished: false, settled: false };
+      const battle: Battle = { expedition_id: run.id, id: state.id, state, messages: ['O encontro começou.'], revision: 0, finished: false, settled: false };
       battle.state = readyForHero(state, battle.messages);
-      await client.query('INSERT INTO online_battles (id, character_id, start_request_id, state) VALUES ($1, $2, $3, $4)', [battle.id, character.id, requestId, JSON.stringify(battle.state)]);
+      await client.query('INSERT INTO online_battles (id, character_id, start_request_id, state, expedition_id) VALUES ($1, $2, $3, $4, $5)', [battle.id, character.id, requestId, JSON.stringify(battle.state), run.id]);
       return this.saveBattle(client, character, battle);
     });
   }
@@ -114,6 +140,18 @@ export class GameRepository {
       if (!battle || battle.finished || battle.revision !== revision) throw new AuthError(409, 'A batalha mudou. Atualize para continuar.');
       battle.state = playTurn(battle.state, action, battle.messages); battle.revision++;
       return this.saveBattle(client, character, battle);
+    });
+  }
+  async retreat(accountId: string, version: string, expeditionId: string) {
+    return inTransaction(this.pool, async client => {
+      const character = await this.character(client, accountId);
+      if (character.version !== version) throw new AuthError(409, 'O personagem mudou. Atualize para continuar.');
+      const battle = await this.latest(client, character.id);
+      if (battle && !battle.finished) throw new AuthError(409, 'Conclua a batalha antes de retornar ao mapa.');
+      const result = await client.query("UPDATE online_expeditions SET status = 'retreated', updated_at = now() WHERE id = $1 AND character_id = $2 AND status = 'active'", [expeditionId, character.id]);
+      if (!result.rowCount) throw new AuthError(409, 'Esta expedição já terminou.');
+      const saved = await client.query<Character>('UPDATE characters SET version = version + 1 WHERE id = $1 RETURNING *', [character.id]);
+      return this.snapshot(client, saved.rows[0]!);
     });
   }
   async camp(accountId: string, version: string, instanceId?: string) {

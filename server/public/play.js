@@ -25,7 +25,12 @@ function render() {
   el('mana').textContent = `Mana ${c.stats.mana} / ${c.stats.maxMana}`;
   el('xp-bar').max = c.xpToNextLevel; el('xp-bar').value = c.xp;
   el('progress').textContent = `${c.xp} / ${c.xpToNextLevel} XP · ${c.gold} ouro`;
-  el('start').disabled = busy || fighting || c.stats.hp <= 0;
+  const expedition = snapshot.expedition, exploring = expedition?.status === 'active';
+  el('start').hidden = !exploring && !fighting; el('retreat').hidden = !exploring;
+  el('start').textContent = fighting ? 'Ir para batalha' : expedition?.state.bossPending ? 'Enfrentar o chefe' : 'Próximo encontro';
+  el('start').disabled = busy || (!fighting && (!exploring || c.stats.hp <= 0));
+  el('retreat').disabled = busy || fighting;
+  renderMap(fighting, exploring);
   el('rest').disabled = busy || fighting;
   el('refresh').disabled = busy;
   el('battle-panel').hidden = !b;
@@ -57,7 +62,7 @@ function render() {
     el('battle-log').scrollTop = el('battle-log').scrollHeight;
   }
   el('inventory').replaceChildren();
-  if (!inventory.length) { const li = document.createElement('li'); li.textContent = 'Nenhum equipamento ainda. Goblins podem deixar itens após a vitória.'; el('inventory').append(li); }
+  if (!inventory.length) { const li = document.createElement('li'); li.textContent = 'Nenhum equipamento ainda. Monstros podem deixar itens após a vitória.'; el('inventory').append(li); }
   for (const entry of inventory) {
     const li = document.createElement('li'), text = document.createElement('div'), details = document.createElement('small');
     text.textContent = entry.definition.name;
@@ -70,6 +75,39 @@ function render() {
     el('inventory').append(li);
   }
 }
+function renderMap(fighting, exploring) {
+  const { regions = [], expedition, character } = snapshot;
+  el('regions').replaceChildren(); el('map-hotspots').replaceChildren();
+  for (const region of regions) {
+    const disabled = busy || fighting || exploring || character.stats.hp <= 0;
+    const explore = () => startExpedition(region.id);
+    const hotspot = button(`${region.label} · Nv.${region.minLevel}–${region.maxLevel}`, explore, disabled);
+    hotspot.className = 'map-hotspot'; hotspot.dataset.region = region.id; hotspot.title = region.inhabitants;
+    el('map-hotspots').append(hotspot);
+    const card = document.createElement('article'), heading = document.createElement('h3'), levels = document.createElement('p'), monsters = document.createElement('p');
+    heading.textContent = region.label;
+    levels.textContent = `Monstros Nv.${region.minLevel}–${region.maxLevel} · ${region.bossName} Nv.${region.bossLevel}`;
+    monsters.textContent = region.inhabitants; monsters.className = 'muted';
+    card.append(heading, levels, monsters, button(`Explorar ${region.label}`, explore, disabled)); el('regions').append(card);
+  }
+  el('expedition').hidden = !expedition;
+  if (expedition) {
+    const region = regions.find(region => region.id === expedition.regionId);
+    const statuses = { active: 'Em andamento', completed: 'Chefe derrotado', defeated: 'Encerrada por derrota', retreated: 'Retorno ao mapa' };
+    el('expedition-title').textContent = `${region?.label || 'Expedição'} · ${statuses[expedition.status] || expedition.status}`;
+    el('expedition-progress').textContent = `${expedition.state.victories} vitórias · Profundidade ${expedition.state.depth}${expedition.state.bossPending && exploring ? ` · Próximo encontro: ${region.bossName} Nv.${region.bossLevel}. Prepare-se no acampamento.` : ''}`;
+    const rewards = expedition.state.expedition;
+    el('expedition-rewards').textContent = `Recebido nesta expedição: ${rewards?.xp || 0} XP e ${rewards?.gold || 0} ouro.`;
+    el('expedition-loot').replaceChildren(...(rewards?.loot || []).map(item => { const li = document.createElement('li'); li.textContent = `${item.quantity}× ${item.name}`; return li; }));
+  }
+}
+async function startExpedition(regionId, expeditionId) {
+  if (!pendingStart || pendingStart.regionId !== regionId || pendingStart.expeditionId !== expeditionId) {
+    pendingStart = { requestId: crypto.randomUUID(), regionId, version: snapshot.character.version, ...(expeditionId ? { expeditionId } : {}) };
+  }
+  try { snapshot = await api('/game/start', pendingStart); pendingStart = undefined; render(); el('battle-panel').scrollIntoView({ block: 'start' }); }
+  catch (error) { if (error.status === 400 || error.status === 409) pendingStart = undefined; throw error; }
+}
 async function run(work) {
   if (busy) return;
   busy = true; render(); el('message').textContent = 'Salvando…';
@@ -80,10 +118,11 @@ async function run(work) {
     el('message').textContent = error.message;
   } finally { busy = false; render(); }
 }
-el('start').addEventListener('click', () => void run(async () => {
-  pendingStart ??= crypto.randomUUID();
-  snapshot = await api('/game/start', { requestId: pendingStart }); pendingStart = undefined;
-}));
+el('start').addEventListener('click', () => {
+  if (snapshot.battle && !snapshot.battle.state.finished) { el('battle-panel').scrollIntoView({ block: 'start' }); return; }
+  void run(() => startExpedition(snapshot.expedition.regionId, snapshot.expedition.id));
+});
+el('retreat').addEventListener('click', () => void run(async () => { snapshot = await api('/game/retreat', { version: snapshot.character.version, expeditionId: snapshot.expedition.id }); }));
 el('rest').addEventListener('click', () => void run(async () => { snapshot = await api('/game/rest', { version: snapshot.character.version }); }));
 el('refresh').addEventListener('click', () => void run(async () => { snapshot = await api('/game/state'); }));
 void run(async () => { snapshot = await api('/game/state'); });

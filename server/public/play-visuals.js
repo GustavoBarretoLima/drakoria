@@ -9,7 +9,7 @@ export function isNewTurn(previous, next) {
 export function createBattleVisuals() {
   const el = id => document.getElementById(id);
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
-  let state, heroClass = 'guerreiro';
+  let state, presentation, heroClass = 'guerreiro';
   const preloaded = new Set();
   const toggle = el('reduce-motion');
   toggle.checked = preference.matches;
@@ -17,8 +17,8 @@ export function createBattleVisuals() {
   function sprite(side, pose = 'idle') {
     if (!state) return;
     const dead = !state[side].isAlive;
-    const prefix = side === 'hero' ? heroClass : 'goblin';
-    const source = reduced()
+    const prefix = heroClass;
+    const source = side === 'enemy' && presentation ? presentation[reduced() ? dead ? 'staticDeath' : 'static' : dead ? 'death' : pose] : reduced()
       ? `/game-assets/${prefix}-${dead ? 'death' : 'static'}.png`
       : side === 'enemy' && dead ? '/game-assets/goblin-death.png'
       : `/game-assets/${prefix}-${dead ? 'death' : pose}.gif`;
@@ -34,11 +34,17 @@ export function createBattleVisuals() {
   }
   function render(snapshot) {
     if (!snapshot.battle) return;
-    state = snapshot.battle.state; heroClass = snapshot.character.heroClass;
+    state = snapshot.battle.state; presentation = snapshot.battle.presentation;
+    el('enemy-fighter').dataset.sprite = presentation?.idle?.match(/\/monsters\/([a-z_]+)\//)?.[1] || '';
+    heroClass = snapshot.character.heroClass;
+    el('battle-scene').dataset.region = snapshot.battle.regionId || '';
+    const region = snapshot.regions?.find(region => region.id === snapshot.battle.regionId);
+    el('arena-region').textContent = region?.label || 'Encontro online';
+    el('battle-scene').setAttribute('aria-label', `Arena de combate: ${region?.label || 'encontro online'}`);
     el('battle-scene').classList.toggle('motion-reduced', reduced());
     if (!reduced() && !preloaded.has(heroClass)) {
       preloaded.add(heroClass);
-      for (const name of [`${heroClass}-attack`, `${heroClass}-damage`, `${heroClass}-death`, 'goblin-attack', 'goblin-damage']) { const img = new Image(); img.src = `/game-assets/${name}.gif`; }
+      for (const name of [`${heroClass}-attack`, `${heroClass}-damage`, `${heroClass}-death`]) { const img = new Image(); img.src = `/game-assets/${name}.gif`; }
     }
     el('arena-hero-name').textContent = state.hero.name;
     el('arena-enemy-name').textContent = state.enemy.name;

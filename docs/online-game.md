@@ -1,4 +1,4 @@
-# Primeira região online
+# Mapa e expedições online
 
 Entre em `/login`, crie seu personagem e use **Jogar online** (`/play`). A tela
 fica na origem do backend para usar a sessão HttpOnly existente. Nada do save
@@ -8,9 +8,18 @@ local é enviado ou importado; a demo do GitHub Pages continua separada.
 
 - Guerreiro, Mago e Arqueiro usam nome, classe, nível, XP, ouro, equipamentos e
   recursos do PostgreSQL. O nome Taichou não concede privilégios.
-- Primeira região: goblins normais no nível do personagem, limitado a 10.
-  O servidor escolhe o encontro; bosses, outras regiões, missões, poções,
-  livros/subclasses, forja, comércio e Pix não estão habilitados aqui.
+- As cinco regiões de `WORLD_REGIONS` usam as configurações existentes:
+  Cemitério (1–10, chefe 15), Pântano (10–20, chefe 25), Floresta (15–30,
+  chefe 35), Acampamento Orc (25–35, chefe 40) e Fortaleza (35–50, chefe 55).
+  As faixas são níveis dos monstros, não bloqueios de acesso. O mapa original
+  permite explorar qualquer região povoada com HP positivo; essa regra continua.
+- O servidor usa `pickDungeonRunEncounter`: profundidade aumenta os níveis,
+  preserva os dois encontros iniciais da Fortaleza e a chance de Hobgoblin Elite.
+  Após cinco vitórias, o próximo encontro é o chefe da região. É possível
+  descansar/equipar antes dele. Sua derrota encerra a expedição; vencer o chefe
+  conclui a expedição. Encerrar entre batalhas permite escolher outra região.
+- Missões de Guilda, poções, livros/subclasses, forja, comércio e Pix ainda
+  aguardam suas etapas de integração ao banco; seus sistemas locais continuam.
 - Combate online por turnos. As regras compartilhadas de ATB determinam a
   ordem; o servidor avança turnos inimigos até a próxima ação do herói. O
   relógio do navegador não participa. Esta tela não é o combate em tempo real
@@ -20,15 +29,17 @@ local é enviado ou importado; a demo do GitHub Pages continua separada.
 - HP e mana persistem. Descanso gratuito no acampamento recupera ambos,
   inclusive após derrota. Descanso e troca de equipamentos exigem batalha
   encerrada e versão atual do personagem. Derrota não entrega recompensas nem
-  aplica perda de ouro nesta primeira região.
+  aplica perda de ouro nesta etapa de testes.
 - Vitória salva XP, ouro, subida de nível, cada cópia de equipamento e seu
   registro de concessão em uma única transação. Não há endpoint de grant ou
   envio de resultado/recompensa pelo navegador.
 
 ## Interface visual
 
-A arena reutiliza `floresta_sombria.png`, sprites das três classes e do goblin,
-e ícones de equipamentos do repositório. Os arquivos são servidos na própria
+A interface reutiliza `arredores_de_drakoria.png`, as posições das cinco regiões,
+os cenários e sprites de todos os seus monstros/chefes, as três classes e os
+ícones de equipamentos. Os limites visíveis dos sprites usam as medidas do
+renderizador original. Os arquivos são servidos na própria
 origem em `/game-assets/` por uma lista exata de arquivos públicos; caminhos
 arbitrários, travessia de diretórios e URLs externas não são aceitos. Assets
 recebem MIME explícito, nosniff, cache de um dia e CORP same-origin. CSP da
@@ -53,9 +64,18 @@ batalha contém o estado calculado no servidor, revisão, últimas 30 mensagens 
 marcador de liquidação. As recompensas planejadas não aparecem na resposta
 até uma vitória já liquidada. Cada item usa operação `battle:UUID:drop:index`.
 
+Migration 004 adiciona `online_expeditions`, com região, profundidade, vitórias,
+chefe pendente/derrotado, resumo recebido e status. Um índice permite somente
+uma expedição ativa por personagem; a FK composta liga a batalha à expedição
+da mesma conta. Vitórias e recompensas atualizam batalha, personagem e
+expedição na mesma transação. O resumo é informativo, não tem resgate adicional.
+Batalhas antigas de goblin continuam salvas e podem ser concluídas, sem crédito
+na nova expedição. Nenhum personagem, mapa ou definição existente é removido.
+
 Todas as leituras e comandos usam transação com lock do personagem da conta.
 Um índice parcial permite só uma batalha ativa e outro só um equipamento por
-slot. Inícios concorrentes retomam a batalha ativa; `requestId` permite repetir
+slot. Inícios concorrentes retomam a batalha ativa; novos encontros exigem versão
+atual, região válida e ID da expedição ativa quando houver; `requestId` permite repetir
 um início sem criar outro encontro. Ações exigem UUID da batalha pertencente à
 conta e revisão atual. Duas abas/reenvios aceitam só uma ação por revisão; as
 outras recebem 409. Descanso/equipar exigem versão atual; posse, classe e nível
@@ -80,8 +100,9 @@ expiração; não deve guardar bens com valor financeiro.
 | Método | Rota | Entrada |
 | --- | --- | --- |
 | GET | /game/state | Nenhuma; conta vem da sessão |
-| POST | /game/start | requestId UUID |
+| POST | /game/start | requestId UUID, regionId, version string, expeditionId UUID somente para continuar |
 | POST | /game/action | battleId UUID, revision inteiro, action {type[, skillId]} |
+| POST | /game/retreat | version string, expeditionId UUID |
 | POST | /game/rest | version string |
 | POST | /game/equip | version string, instanceId UUID |
 
@@ -93,6 +114,11 @@ usa schema isolado em PostgreSQL real para isolamento de contas, inícios e
 ações concorrentes, liquidação única, persistência com nova instância do
 repositório, descanso/equipamento, rollback de falha de auditoria, sessão
 revogada e bloqueio de atributos/accountId adulterados via HTTP.
+
+Os testes também cobrem os cinco catálogos completos, a preparação/conclusão
+do chefe, o retorno ao mapa, acesso por nível e rollback do progresso da expedição.
+O CI Chromium verifica o mapa, escolha de região, artes regionais, chefes,
+movimento reduzido e telas desktop/mobile sob a CSP real.
 
 Teste manual após deploy: Google → personagem → Jogar online → concluir
 batalha → atualizar/fechar/entrar novamente → verificar XP/ouro/inventário.

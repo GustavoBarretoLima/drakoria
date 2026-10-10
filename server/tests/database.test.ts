@@ -20,7 +20,7 @@ test("PostgreSQL migrations, account isolation, constraints and atomic item gran
   try {
     await t.test("concurrent migrators serialize and repeat cleanly", async () => {
       const results = await Promise.all([migrateDatabase(scopedPool), migrateDatabase(scopedPool)]);
-      assert.equal(results.flat().length, 3);
+      assert.equal(results.flat().length, 4);
       assert.deepEqual(await migrateDatabase(scopedPool), []);
     });
     const a = await repo.createAccountCharacter(" A@example.test ", hash, "Alice", "guerreiro");

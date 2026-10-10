@@ -1,4 +1,5 @@
 import { readFile } from 'node:fs/promises';
+import { getMonsterById } from '../modules/monsters/monsterService.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 
 // Exact public allowlist: no URL-derived filesystem path or repository browsing.
@@ -16,6 +17,32 @@ for (const [heroClass, folder] of [['guerreiro', 'heroi_anime'], ['mago', 'mago_
   }
   gameAssets.set(`/game-assets/${heroClass}-static.png`, `img/personagens/${folder}/idle_00.png`);
   gameAssets.set(`/game-assets/${heroClass}-death.png`, `img/personagens/${folder}/death_03.png`);
+}
+gameAssets.set('/game-assets/world-map.png', 'img/mapas/arredores_de_drakoria.png');
+for (const stage of ['cemiterio_esquecido', 'pantano_corrompido', 'floresta_sombria', 'acampamento_orc', 'fortaleza_rei_orc']) {
+  gameAssets.set(`/game-assets/stages/${stage}.png`, `img/stages/${stage}.png`);
+}
+const monsterFolders = ['esqueleto_guerreiro', 'espectro_cemiterio', 'coveiro_maldito', 'rato_mutante', 'aranha_pestilenta', 'hidra_corrupcao', 'lobo_sombrio', 'arvore_demoniaca', 'lobo_mutante_boss', 'orc', 'hobgoblin', 'orc_rei'];
+for (const folder of monsterFolders) {
+  for (const pose of ['idle', 'attack', 'damage', 'death']) {
+    gameAssets.set(`/game-assets/monsters/${folder}/${pose}.gif`, `img/monstros/${folder}/${pose}.gif`);
+  }
+  gameAssets.set(`/game-assets/monsters/${folder}/static.png`, `img/monstros/${folder}/idle_00.png`);
+  gameAssets.set(`/game-assets/monsters/${folder}/death.png`, `img/monstros/${folder}/death_03.png`);
+}
+export function enemyPresentation(monsterId: string) {
+  const monster = getMonsterById(monsterId);
+  const result: Record<string, string> = {};
+  if (monster?.sprites?.idle === '/img/monstros/goblin.gif') {
+    for (const pose of ['idle', 'attack', 'damage']) result[pose] = `/game-assets/goblin-${pose}.gif`;
+    result.death = '/game-assets/goblin-death.png'; result.static = '/game-assets/goblin-static.png'; result.staticDeath = result.death;
+  } else {
+    const folder = monsterFolders.find(folder => monster?.sprites?.idle === `/img/monstros/${folder}/idle.gif`);
+    if (!folder) throw new Error('Arte de monstro online ausente.');
+    for (const pose of ['idle', 'attack', 'damage', 'death']) result[pose] = `/game-assets/monsters/${folder}/${pose}.gif`;
+    result.static = `/game-assets/monsters/${folder}/static.png`; result.staticDeath = `/game-assets/monsters/${folder}/death.png`;
+  }
+  return result;
 }
 // Equipment icons are added from the checked-in list below.
 gameAssets.set('/game-assets/items/drakoria-arqueiro-armor-rare-lvl-20.png', 'img/itens/loot_monstros/icones_128/drakoria-arqueiro-armor-rare-lvl-20.png');

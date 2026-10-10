@@ -5,6 +5,7 @@ import { AuthError, cookieName, readCookie } from '../auth/security.js';
 import { readJson } from '../auth/http.js';
 import type { GameRepository } from './repository.js';
 import { serveGameAsset } from './assets.js';
+import { regionConfig } from './world.js';
 import { onlyFields, parseAction, uuid } from './rules.js';
 
 interface Dependencies { auth: AuthRepository; game: GameRepository; origin: string; production: boolean; }
@@ -14,7 +15,7 @@ const files = new Map([
   ['/play-visuals.js', ['play-visuals.js', 'text/javascript; charset=utf-8']],
   ['/play.css', ['play.css', 'text/css; charset=utf-8']],
 ]);
-const routes = ['/game/state', '/game/start', '/game/action', '/game/rest', '/game/equip'];
+const routes = ['/game/state', '/game/start', '/game/action', '/game/rest', '/game/equip', '/game/retreat'];
 function send(response: ServerResponse, status: number, data: unknown) {
   response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); response.end(JSON.stringify(data));
 }
@@ -48,13 +49,19 @@ export function createGameHandler(deps: Dependencies) {
       if (path === '/game/state') { send(response, 200, await deps.game.load(account.id)); return true; }
       const body = await readJson(request);
       if (path === '/game/start') {
-        onlyFields(body, ['requestId']);
+        onlyFields(body, ['requestId', 'regionId', 'version', 'expeditionId']);
+        if (typeof body.regionId !== 'string' || typeof body.version !== 'string' || !/^\d{1,19}$/.test(body.version) || (body.expeditionId !== undefined && !uuid(body.expeditionId))) throw new AuthError(400, 'Expedição inválida.');
+        regionConfig(body.regionId);
         if (!uuid(body.requestId)) throw new AuthError(400, 'Identificador inválido.');
-        send(response, 200, await deps.game.start(account.id, body.requestId));
+        send(response, 200, await deps.game.start(account.id, body.requestId, body.regionId, body.version, body.expeditionId as string | undefined));
       } else if (path === '/game/action') {
         onlyFields(body, ['battleId', 'revision', 'action']);
         if (!uuid(body.battleId) || !Number.isSafeInteger(body.revision) || Number(body.revision) < 0 || Number(body.revision) > 2147483646) throw new AuthError(400, 'Turno inválido.');
         send(response, 200, await deps.game.action(account.id, body.battleId, Number(body.revision), parseAction(body.action)));
+      } else if (path === '/game/retreat') {
+        onlyFields(body, ['version', 'expeditionId']);
+        if (!uuid(body.expeditionId) || typeof body.version !== 'string' || !/^\d{1,19}$/.test(body.version)) throw new AuthError(400, 'Expedição inválida.');
+        send(response, 200, await deps.game.retreat(account.id, body.version, body.expeditionId));
       } else {
         onlyFields(body, path === '/game/equip' ? ['version', 'instanceId'] : ['version']);
         if (typeof body.version !== 'string' || !/^\d{1,19}$/.test(body.version)) throw new AuthError(400, 'Versão inválida.');
