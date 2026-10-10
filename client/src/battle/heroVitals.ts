@@ -1,5 +1,6 @@
 import { POTIONS, normalizePotions, applyPotionEffect, type PotionId, type PotionInventory } from "../../../shared/src/items/potions.js";
 import type { CombatantState } from "../../../shared/src/types/combat.js";
+import { isSaveRecord, saveInteger } from "../../../shared/src/progression/playerProgress.js";
 export interface HeroVitals {
   hp: number;
   mana: number;
@@ -22,27 +23,33 @@ export interface PotionUseResult {
 const VITALS_KEY = "drakoriaHeroVitals";
 const CONSUMABLES_KEY = "drakoriaConsumables";
 
+function normalizeVitals(value: unknown, maxHp: number, maxMana: number): HeroVitals {
+  const parsed = isSaveRecord(value) ? value : {};
+  return {
+    hp: saveInteger(parsed.hp, maxHp, 0, maxHp),
+    mana: saveInteger(parsed.mana, maxMana, 0, maxMana),
+    maxHp,
+    maxMana,
+  };
+}
+
 export function loadHeroVitals(maxHp: number, maxMana: number): HeroVitals {
+  maxHp = saveInteger(maxHp, 1, 1);
+  maxMana = saveInteger(maxMana, 0);
   const saved = localStorage.getItem(VITALS_KEY);
   if (!saved) return { hp: maxHp, mana: maxMana, maxHp, maxMana };
 
   try {
-    const parsed = JSON.parse(saved) as Partial<HeroVitals>;
-    const hp = Math.min(maxHp, Math.max(0, Math.floor(Number(parsed.hp ?? maxHp))));
-    const mana = Math.min(maxMana, Math.max(0, Math.floor(Number(parsed.mana ?? maxMana))));
-    return { hp, mana, maxHp, maxMana };
+    return normalizeVitals(JSON.parse(saved), maxHp, maxMana);
   } catch {
     return { hp: maxHp, mana: maxMana, maxHp, maxMana };
   }
 }
 
 export function saveHeroVitals(vitals: HeroVitals): void {
-  localStorage.setItem(VITALS_KEY, JSON.stringify({
-    hp: Math.min(vitals.maxHp, Math.max(0, Math.floor(vitals.hp))),
-    mana: Math.min(vitals.maxMana, Math.max(0, Math.floor(vitals.mana))),
-    maxHp: Math.max(1, Math.floor(vitals.maxHp)),
-    maxMana: Math.max(0, Math.floor(vitals.maxMana)),
-  }));
+  localStorage.setItem(VITALS_KEY, JSON.stringify(normalizeVitals(
+    vitals, saveInteger(vitals.maxHp, 1, 1), saveInteger(vitals.maxMana, 0),
+  )));
 }
 
 export function loadConsumables(): ConsumablesState {
@@ -68,13 +75,9 @@ function loadStoredVitals(): HeroVitals {
   if (!savedVitals) return fallback;
 
   try {
-    const parsed = JSON.parse(savedVitals) as HeroVitals;
-    return {
-      hp: Math.max(0, Math.floor(parsed.hp)),
-      mana: Math.max(0, Math.floor(parsed.mana)),
-      maxHp: Math.max(1, Math.floor(parsed.maxHp)),
-      maxMana: Math.max(0, Math.floor(parsed.maxMana)),
-    };
+    const parsed: unknown = JSON.parse(savedVitals);
+    if (!isSaveRecord(parsed)) return fallback;
+    return normalizeVitals(parsed, saveInteger(parsed.maxHp, 1, 1), saveInteger(parsed.maxMana, 0));
   } catch {
     return fallback;
   }

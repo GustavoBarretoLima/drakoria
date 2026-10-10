@@ -29,7 +29,7 @@ Já implementado:
 - menu de habilidades compacto, inspirado em Final Fantasy, com descrições e retorno aos comandos da batalha;
 - IA inimiga com ataques básicos, especiais e cooldowns; Hobgoblin Elite prepara emboscadas e Orc Rei muda de fase aos 50% de vida;
 - progressão de atributos por nível;
-- XP, níveis e ouro;
+- XP, níveis até 100 e ouro;
 - overlay de vitória com recompensas e drops;
 - overlay de derrota com penalidade de **5% da XP atual** e até **200 de ouro**;
 - retorno automático para a Praça após derrota com 30% da vida máxima, mantendo a mana restante e permitindo continuar sem ouro; saves antigos com zero HP também recuperam essa vida ao entrar na praça;
@@ -225,6 +225,8 @@ O GitHub Pages continua hospedando apenas arquivos estáticos. Para multiplayer,
 A base atual é híbrida: funcionalidades novas estão sendo implementadas principalmente em TypeScript, enquanto partes da Praça e de sistemas antigos ainda utilizam JavaScript legado. A migração está sendo feita gradualmente para evitar reescritas grandes de uma vez.
 
 A versão demo usa `localStorage`, portanto o progresso pode ser alterado manualmente pelo navegador. Persistência segura e propriedade autoritativa de itens ainda fazem parte das próximas etapas do backend.
+
+O carregamento valida os campos de progresso, HP e mana. Saves antigos com campos ausentes continuam compatíveis; limites de XP inválidos são recuperados pela curva do nível salvo, e valores válidos são preservados. O cliente TypeScript e a API legada da Praça usam o mesmo cálculo de recompensas, com nível máximo 100. No limite, XP e ouro continuam acumulando até o maior inteiro seguro. Ler um save válido não o regrava; campos recuperados são persistidos na próxima gravação.
 
 ## 🧙 Autor
 
