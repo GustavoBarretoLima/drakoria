@@ -252,7 +252,6 @@ function scheduleDefeatRedirect(): void {
 
 let lastPotionSnapshot="";
 function renderState(state: BattleState): void {
-  console.log("Novo estado da batalha:", state);
   persistBattleVitals(state);
   if(state.potions){const snapshot=state.id+JSON.stringify(state.potions);if(snapshot!==lastPotionSnapshot){savePotionInventory(state.potions);lastPotionSnapshot=snapshot;}}
   setEnemyGifs(state.enemy.sprites);
@@ -271,7 +270,6 @@ if (demoMode) {
   subscribeDemoBattle(renderState);
 } else {
   socket.on("connect", () => {
-    console.log("Cliente conectado ao servidor:", socket.id);
     const vitals = getCurrentHeroVitals();
 
     socket.emit("player:setup", {
