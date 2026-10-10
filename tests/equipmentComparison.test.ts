@@ -52,6 +52,7 @@ function item(
     sellPrice: 10,
     allowedClasses: classes,
     stats,
+    icon: "/img/itens/loot_monstros/icones_128/orc-iron-axe.png",
   };
 }
 

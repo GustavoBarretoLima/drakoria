@@ -166,7 +166,7 @@ Para esse nome, bosses elegíveis para livros de subclasse têm **100% de chance
 
 ```bash
 npm test
-npx tsc --noEmit
+npm run typecheck
 npm run build
 ```
 
