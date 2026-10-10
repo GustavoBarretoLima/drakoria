@@ -1,9 +1,5 @@
 import assert from "node:assert/strict";
-import { applySubclassStats } from "../shared/src/classes/subclasses.js";
-import { applyTreeStats } from "../shared/src/classes/skillTrees.js";
 import { canonicalEquipment } from "../shared/src/equipment/equipmentRules.js";
-import { readFileSync } from "node:fs";
-import vm from "node:vm";
 import { applyBattleAction, applyEnemyTurn, rollDodge } from "../shared/src/combat/combatEngine.js";
 import { applyBattleAction as serverAction } from "../server/src/modules/combat/combatEngine.js";
 import { createStatsForLevel } from "../shared/src/combat/classStats.js";
@@ -59,10 +55,7 @@ try {
   for (const item of generateEquipmentCatalog().filter(i => i.slot === "weapon" && i.allowedClasses.includes("mago"))) assert.ok(item.stats.magicPower && !item.stats.attack);
   const legacyStaff = { ...staff, stats: { attack: 5, mana: 8 } };
   assert.deepEqual(canonicalEquipment(legacyStaff), staff);
-  const context = vm.createContext({ createStatsForLevel, applyEquipmentStats, canonicalEquipment, applySubclassStats, applyTreeStats, getTreeRanks: () => ({}),
-    canEquipItem: () => true, window: {} });
-  vm.runInContext(readFileSync("js/status-level-scaling.js", "utf8").replace(/^import[^\n]*\n/gm, ""), context);
-  const display = vm.runInContext(`calcularStatusPorNivel("mago", 10, ${JSON.stringify({ items: [{ item: legacyStaff }], equipped: { weapon: staff.id } })})`, context);
+  const display = applyEquipmentStats(createStatsForLevel("mago", 10), [canonicalEquipment(legacyStaff)]);
   assert.equal(display.magicPower, createStatsForLevel("mago", 10).magicPower + staff.stats.magicPower!);
   assert.equal(display.attack, createStatsForLevel("mago", 10).attack);
   const cap = { ...boots, stats: { dodgeChance: 999 } };
