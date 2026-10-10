@@ -18,3 +18,14 @@ test("database config uses verified TLS in production and explicit local develop
   assert.equal(local.options.ssl, false);
   await Promise.all([production.end(), local.end()]);
 });
+
+test("private Render database mode cannot disable TLS on public or local hosts", async () => {
+  const url = "postgresql://dpg-test-a/game";
+  assert.throws(() => createDatabasePool({ DATABASE_URL: url, DATABASE_SSL: "render-internal" }));
+  for (const host of ["localhost", "example.com", "dpg-test-a.virginia-postgres.render.com"]) {
+    assert.throws(() => createDatabasePool({ DATABASE_URL: `postgresql://${host}/game`, DATABASE_SSL: "render-internal", RENDER: "true", NODE_ENV: "production" }));
+  }
+  const pool = createDatabasePool({ DATABASE_URL: url, DATABASE_SSL: "render-internal", RENDER: "true", NODE_ENV: "production" });
+  assert.equal(pool.options.ssl, false);
+  await pool.end();
+});

@@ -1,0 +1,26 @@
+# Staging only. Free Postgres expires after 30 days; no real-money transactions.
+# References the existing private database in the same workspace.
+services:
+  - type: web
+    name: drakoria-staging-api
+    runtime: node
+    plan: free
+    region: virginia
+    branch: main
+    autoDeployTrigger: checksPass
+    buildCommand: npm ci --include=dev && npm run typecheck
+    startCommand: npm run server:deploy
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: "20.20.2"
+      - key: NODE_ENV
+        value: production
+      - key: ALLOWED_ORIGINS
+        value: https://gustavobarretolima.github.io
+      - key: DATABASE_URL
+        fromDatabase:
+          name: drakoria-staging-db
+          property: connectionString
+      - key: DATABASE_SSL
+        value: render-internal
