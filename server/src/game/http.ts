@@ -1,3 +1,4 @@
+import { parseTavernCommand } from './tavern.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import type { AuthRepository } from '../auth/repository.js';
@@ -17,7 +18,7 @@ const files = new Map([
   ['/play-visuals.js', ['play-visuals.js', 'text/javascript; charset=utf-8']],
   ['/play.css', ['play.css', 'text/css; charset=utf-8']],
 ]);
-const routes = ['/game/state', '/game/start', '/game/action', '/game/rest', '/game/equip', '/game/retreat', '/game/quests/accept', '/game/quests/claim', ...['use-book', 'invest', 'reset', 'skill-slot'].map(operation => `/game/specialization/${operation}`)];
+const routes = ['/game/state', '/game/start', '/game/action', '/game/rest', '/game/equip', '/game/retreat', '/game/quests/accept', '/game/quests/claim', '/game/tavern/buy', '/game/tavern/use', ...['use-book', 'invest', 'reset', 'skill-slot'].map(operation => `/game/specialization/${operation}`)];
 function send(response: ServerResponse, status: number, data: unknown) {
   response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); response.end(JSON.stringify(data));
 }
@@ -60,6 +61,9 @@ export function createGameHandler(deps: Dependencies) {
         onlyFields(body, ['battleId', 'revision', 'action']);
         if (!uuid(body.battleId) || !Number.isSafeInteger(body.revision) || Number(body.revision) < 0 || Number(body.revision) > 2147483646) throw new AuthError(400, 'Turno inválido.');
         send(response, 200, await deps.game.action(account.id, body.battleId, Number(body.revision), parseAction(body.action)));
+      } else if (path === '/game/rest' || path.startsWith('/game/tavern/')) {
+        const command = parseTavernCommand(path === '/game/rest' ? 'rest' : path.slice('/game/tavern/'.length), body);
+        send(response, 200, await deps.game.tavern(account.id, body.requestId as string, body.version as string, command));
       } else if (path.startsWith('/game/specialization/')) {
         const command = parseSpecializationCommand(path.slice('/game/specialization/'.length), body);
         send(response, 200, await deps.game.specialize(account.id, body.requestId as string, body.version as string, command));

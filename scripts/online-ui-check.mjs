@@ -1,3 +1,5 @@
+import { tavernSnapshot } from '../server/src/game/tavern.ts';
+import { POTIONS, applyPotionEffect } from '../shared/src/items/potions.ts';
 import { SUBCLASS_DEFINITIONS, SUBCLASS_IDS, listSubclassesForClass } from '../shared/src/classes/subclasses.ts';
 import { SUBCLASS_TREES, normalizeTreeRanks, normalizeBerserkLoadout, earnedTreePoints, spentTreePoints, treeBlockReason } from '../shared/src/classes/skillTrees.ts';
 import { getHeroSkills, getSkillBlockReason } from '../shared/src/combat/classSkills.ts';
@@ -15,7 +17,7 @@ const root = process.cwd();
 const output = process.env.ONLINE_UI_OUTPUT ?? '/tmp/drakoria-ui';
 await fs.mkdir(output, { recursive: true });
 const browser = await playwright.launch({ headless:true });
-let snapshot, actions = 0, starts = 0, questCommands = 0, specializationCommands = 0, guildProgress = normalizeQuests({});
+let snapshot, actions = 0, starts = 0, questCommands = 0, specializationCommands = 0, tavernCommands = 0, interruptPurchase = false, guildProgress = normalizeQuests({});
 function guildFixture(level = 1, lastDelivery = null) {
  return {standing:guildStanding(guildProgress),lastDelivery,quests:QUESTS.map(q=>({...q,entry:guildProgress.entries[q.id]??null,reputation:questReputation(q),requiredRank:GUILD_RANKS[questRankIndex(q)].name,blocked:questBlockReason(q,guildProgress,level),ready:guildProgress.entries[q.id]?.status==='active'&&guildProgress.entries[q.id].count>=q.target}))};
 }
@@ -23,10 +25,12 @@ function profileFixture(heroClass, level, id, rawRanks = {}, rawLoadout = [], bo
  const ranks = normalizeTreeRanks(id,level,rawRanks);
  return {active:id?SUBCLASS_DEFINITIONS[id]:null,subclasses:listSubclassesForClass(heroClass),books,points:earnedTreePoints(level)-spentTreePoints(ranks),nodes:id?SUBCLASS_TREES[id].map(node=>({...node,rank:ranks[node.id]||0,blocked:treeBlockReason(id,level,ranks,node)})):[],loadout:id==='berserker'?normalizeBerserkLoadout(level,ranks,rawLoadout):[],slotChoices:id==='berserker'?SUBCLASS_TREES[id].filter(n=>n.skill&&ranks[n.id]).map(n=>({id:n.id,name:n.name})):[]};
 }
+function tavernFixture(character, inventory = {}) { return tavernSnapshot({...character,gold:String(character.gold),potion_inventory:inventory},character.stats); }
+const tavernRequests = [], tavernReceipts = new Map();
 function fixture(heroClass = 'guerreiro', regionId = 'cemiterio-esquecido', monsterId = 'skeleton-warrior-normal-lvl-1', level = 1, subclassId, ranks = {}, loadout = []) {
  const weapons = subclassId === 'berserker' ? [itemDefinition('berserk-dungeon-weapon-guerreiro-common-lvl-1')] : [];
  const messages = []; const state = readyForHero(createInitialBattleState(heroClass, monsterId, weapons, level, {}, subclassId, 'Taichou', ranks, loadout), messages);
- return { specialization:profileFixture(heroClass,level,subclassId,ranks,loadout), guild:guildFixture(level), regions:onlineRegions, expedition:{id:'run-1',regionId,status:'active',state:newExpedition(regionId)}, character: { name:'Taichou', heroClass, level, xp:40, xpToNextLevel:100, gold:18, version:'1', stats:state.hero.stats },
+ return { tavern:tavernFixture({gold:18,stats:state.hero.stats}), specialization:profileFixture(heroClass,level,subclassId,ranks,loadout), guild:guildFixture(level), regions:onlineRegions, expedition:{id:'run-1',regionId,status:'active',state:newExpedition(regionId)}, character: { name:'Taichou', heroClass, level, xp:40, xpToNextLevel:100, gold:18, version:'1', stats:state.hero.stats },
  battle:{heroPresentation:heroPresentation(heroClass,subclassId),regionId,presentation:enemyPresentation(monsterId),id:state.id, revision:0,state:{...state,rewards:undefined},messages,skills:getHeroSkills(state.hero).filter(skill=>level>=skill.unlockLevel).map(skill=>({id:skill.id,name:skill.name,manaCost:skill.manaCost,furyCost:skill.furyCost||0,blocked:getSkillBlockReason(state.hero,skill)}))},inventory:[{instanceId:'ring',canEquip:true,equipped:false,definition:STARTER_LOOT_ITEMS['goblin-tooth-ring']}] };
 }
 snapshot = {...fixture(), battle:null, expedition:null};
@@ -42,6 +46,19 @@ await context.route('**/*',async route=>{
   if(path.endsWith('accept'))guildProgress.entries[q.id]={count:0,status:'active',claims:0};
   else {assert.equal(guildProgress.entries[q.id].count,q.target);guildProgress.entries[q.id].status='claimed';guildProgress.entries[q.id].claims++;receipt={questId:q.id,name:q.name,xp:q.xp,gold:q.gold,reputation:questReputation(q),equipment:null};}
   snapshot={...snapshot,character:{...snapshot.character,version:String(Number(snapshot.character.version)+1)},guild:guildFixture(snapshot.character.level,receipt)};
+  return route.fulfill({json:snapshot});
+ }
+ if(path==='/game/rest'||path.startsWith('/game/tavern/')){
+  const command=request.postDataJSON(),operation=path==='/game/rest'?'rest':path.split('/').at(-1);tavernRequests.push(command);
+  assert.deepEqual(Object.keys(command).sort(),['requestId','version',...(operation==='buy'?['potionId','quantity']:operation==='use'?['potionId']:[])].sort());
+  if(tavernReceipts.has(command.requestId))return route.fulfill({json:snapshot});
+  assert.equal(command.version,snapshot.character.version);tavernCommands++;
+  const c={...snapshot.character,stats:{...snapshot.character.stats},version:String(Number(snapshot.character.version)+1)},inventory=Object.fromEntries(snapshot.tavern.potions.map(p=>[p.id,p.quantity]));
+  if(operation==='buy'){c.gold-=POTIONS[command.potionId].price*command.quantity;inventory[command.potionId]+=command.quantity;}
+  if(operation==='use'){const hero={stats:c.stats,isAlive:c.stats.hp>0};assert.ok(applyPotionEffect(hero,command.potionId));inventory[command.potionId]--;}
+  if(operation==='rest'){c.gold-=20;c.stats.hp=c.stats.maxHp;c.stats.mana=c.stats.maxMana;}
+  snapshot={...snapshot,character:c,tavern:tavernFixture(c,inventory)};tavernReceipts.set(command.requestId,command);
+  if(interruptPurchase){interruptPurchase=false;return route.fulfill({status:503,json:{error:'Resposta interrompida.'}});}
   return route.fulfill({json:snapshot});
  }
  if(path.startsWith('/game/specialization/')) {
@@ -136,6 +153,25 @@ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWid
 await page.locator('#map-hotspots').evaluate(el=>el.closest('.map-scroll').scrollLeft=0);
 await page.locator('.map-panel').screenshot({path:`${output}/map-mobile.png`});
 await page.locator('#battle-panel').screenshot({path:`${output}/mobile.png`});
+// Tavern purchases, interrupted-response retry, consumption, paid rest and authoritative stock.
+snapshot={...fixture('mago','cemiterio-esquecido','skeleton-warrior-normal-lvl-1',20),battle:null,expedition:null};
+snapshot.character={...snapshot.character,gold:100,stats:{...snapshot.character.stats,hp:1,mana:1}};snapshot.tavern=tavernFixture(snapshot.character);
+await page.setViewportSize({width:1280,height:1050});await page.reload();await page.locator('#game').waitFor({state:'visible'});
+await page.locator('#tavern-shop summary').click();assert.equal(await page.locator('#tavern-potions article').count(),9);
+interruptPurchase=true;await page.getByRole('button',{name:'Comprar Poção de HP · 5 ouro',exact:true}).click();
+await page.waitForFunction(()=>document.getElementById('message').textContent==='Resposta interrompida.');
+assert.equal(tavernCommands,1);assert.equal(snapshot.character.gold,95);
+await page.getByRole('button',{name:'Comprar Poção de HP · 5 ouro',exact:true}).click();await page.waitForFunction(()=>document.getElementById('message').textContent==='Progresso sincronizado.');
+assert.equal(tavernCommands,1);assert.deepEqual(tavernRequests[0],tavernRequests[1]);
+await page.getByRole('button',{name:'Usar Poção de HP',exact:true}).click();await page.waitForFunction(()=>document.getElementById('message').textContent==='Progresso sincronizado.');
+assert.equal(tavernCommands,2);assert.equal(snapshot.character.stats.hp,41);assert.equal(snapshot.tavern.potions.find(p=>p.id==='healthPotion').quantity,0);
+await page.getByRole('button',{name:'Descansar · 20 ouro',exact:true}).click();await page.waitForFunction(()=>document.getElementById('message').textContent==='Progresso sincronizado.');
+assert.equal(tavernCommands,3);assert.equal(snapshot.character.gold,75);assert.ok(await page.locator('#rest').isDisabled());
+await page.locator('#tavern-potions img').first().evaluate(img=>img.decode());await page.locator('#tavern-panel').screenshot({path:`${output}/tavern-desktop.png`});
+await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.locator('#tavern-panel').screenshot({path:`${output}/tavern-mobile.png`});
+await page.reload();await page.locator('#game').waitFor({state:'visible'});assert.equal(tavernCommands,3);assert.match(await page.locator('#tavern-resources').textContent(),/75 ouro/);
+snapshot=fixture();await page.reload();await page.locator('#game').waitFor({state:'visible'});await page.locator('#tavern-shop summary').click();
+assert.ok(await page.getByRole('button',{name:'Comprar Poção de HP · 5 ouro',exact:true}).isDisabled());assert.ok(await page.locator('#rest').isDisabled());
 // Permanent choice confirmation, intent-only commands, server point balance and slot persistence.
 snapshot={...fixture('guerreiro','cemiterio-esquecido','skeleton-warrior-normal-lvl-1',20),battle:null,expedition:null};
 snapshot.specialization.books=[{instanceId:'00000000-0000-0000-0000-000000000001',subclassId:'berserker',name:SUBCLASS_DEFINITIONS.berserker.bookName,blocked:null}];
@@ -169,5 +205,5 @@ for(const id of SUBCLASS_IDS){
  await page.emulateMedia({reducedMotion:'no-preference'});await page.reload();await page.locator('#game').waitFor({state:'visible'});
  await page.locator('#hero-sprite').evaluate(img=>img.decode());assert.match(await page.locator('#hero-sprite').getAttribute('src'),/heroes\/.+\/idle.gif$/);
 }
-assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,checks:['CSP assets','desktop/mobile layout','server response updates HP','one action request','reload without animation replay','three hero classes','reduced motion','original map and five regions','region start command','five boss sprites and stages','Guild accept/claim commands and receipt','Guild rank gates and mobile layout','permanent book confirmation and consumption','talent allocation/reset and slot commands','nine subclass sprites under CSP','Berserk fury and active-battle edit locks'],actions}));
+assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,checks:['CSP assets','desktop/mobile layout','server response updates HP','one action request','reload without animation replay','three hero classes','reduced motion','original map and five regions','region start command','five boss sprites and stages','Guild accept/claim commands and receipt','Guild rank gates and mobile layout','permanent book confirmation and consumption','talent allocation/reset and slot commands','nine subclass sprites under CSP','Berserk fury and active-battle edit locks','nine recovery potions and original icons','purchase retry after interrupted response','potion consumption and paid rest','tavern persisted stock and mobile layout'],actions}));
 await browser.close();
