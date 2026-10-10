@@ -21,6 +21,14 @@ A [base PostgreSQL](docs/database.md) define contas, sessões, personagens,
 cópias identificadas de equipamentos e batalhas. O ambiente é de testes;
 comércio e pagamentos Pix ainda não estão disponíveis.
 
+### Livros e subclasses no online autenticado
+
+A tela `/play` salva as nove subclasses existentes, livros recebidos de chefes, ranks da árvore e os quatro espaços de habilidades do Berserk no PostgreSQL. O painel **Especialização** permite consumir um livro compatível, investir pontos e redistribuí-los gratuitamente entre batalhas. A escolha de subclasse é permanente; não exige um nível adicional para usar o livro. Os pontos são os mesmos da demo: um por nível após o primeiro, incluindo níveis anteriores ao desbloqueio.
+
+O servidor usa os catálogos compartilhados para chances de drop, pré-requisitos, atributos, efeitos, custos de mana/fúria e equipamentos. Berserk recebe um machado de duas mãos e devolve arma/escudo anteriores ao inventário; Assassino recebe adagas e mantém o arco anterior. Armas futuras de drops e da Guilda respeitam a subclasse. O combate mostra as animações originais e imagens estáticas com movimento reduzido.
+
+Cada cópia de livro tem dono, origem e registro de concessão/consumo. Os comandos validam sessão, origem, versão e identificador de tentativa; personagem, livro, talentos, equipamento e auditoria são gravados na mesma transação. Repetir uma tentativa não consome outro livro ou ponto. A migração `006` preserva personagens, inventário, batalhas, Guilda e expedições existentes. O progresso da demo permanece separado. Comércio, transferência de livros e Pix ainda não fazem parte desta etapa.
+
 ## 🎮 Jogar
 
 Acesse a versão publicada:

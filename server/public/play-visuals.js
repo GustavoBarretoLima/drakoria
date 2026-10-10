@@ -9,7 +9,7 @@ export function isNewTurn(previous, next) {
 export function createBattleVisuals() {
   const el = id => document.getElementById(id);
   const preference = matchMedia('(prefers-reduced-motion: reduce)');
-  let state, presentation, heroClass = 'guerreiro';
+  let state, presentation, heroArt, heroClass = 'guerreiro';
   const preloaded = new Set();
   const toggle = el('reduce-motion');
   toggle.checked = preference.matches;
@@ -18,7 +18,8 @@ export function createBattleVisuals() {
     if (!state) return;
     const dead = !state[side].isAlive;
     const prefix = heroClass;
-    const source = side === 'enemy' && presentation ? presentation[reduced() ? dead ? 'staticDeath' : 'static' : dead ? 'death' : pose] : reduced()
+    const art = side === 'enemy' ? presentation : heroArt;
+    const source = art ? art[reduced() ? dead ? 'staticDeath' : 'static' : dead ? 'death' : pose] : reduced()
       ? `/game-assets/${prefix}-${dead ? 'death' : 'static'}.png`
       : side === 'enemy' && dead ? '/game-assets/goblin-death.png'
       : `/game-assets/${prefix}-${dead ? 'death' : pose}.gif`;
@@ -36,19 +37,21 @@ export function createBattleVisuals() {
     if (!snapshot.battle) return;
     state = snapshot.battle.state; presentation = snapshot.battle.presentation;
     el('enemy-fighter').dataset.sprite = presentation?.idle?.match(/\/monsters\/([a-z_]+)\//)?.[1] || '';
-    heroClass = snapshot.character.heroClass;
+    heroClass = snapshot.character.heroClass; heroArt = snapshot.battle.heroPresentation;
+    el('hero-fighter').dataset.sprite = heroArt?.idle?.match(/\/heroes\/([a-z_]+)\//)?.[1] || '';
     el('battle-scene').dataset.region = snapshot.battle.regionId || '';
     const region = snapshot.regions?.find(region => region.id === snapshot.battle.regionId);
     el('arena-region').textContent = region?.label || 'Encontro online';
     el('battle-scene').setAttribute('aria-label', `Arena de combate: ${region?.label || 'encontro online'}`);
     el('battle-scene').classList.toggle('motion-reduced', reduced());
-    if (!reduced() && !preloaded.has(heroClass)) {
-      preloaded.add(heroClass);
-      for (const name of [`${heroClass}-attack`, `${heroClass}-damage`, `${heroClass}-death`]) { const img = new Image(); img.src = `/game-assets/${name}.gif`; }
+    const artKey = heroArt?.idle || heroClass;
+    if (!reduced() && !preloaded.has(artKey)) {
+      preloaded.add(artKey);
+      for (const pose of ['attack', 'damage', 'death']) { const img = new Image(); img.src = heroArt?.[pose] || `/game-assets/${heroClass}-${pose}.gif`; }
     }
     el('arena-hero-name').textContent = state.hero.name;
     el('arena-enemy-name').textContent = state.enemy.name;
-    el('arena-hero-health').textContent = `HP ${state.hero.stats.hp} / ${state.hero.stats.maxHp} · Mana ${state.hero.stats.mana}`;
+    el('arena-hero-health').textContent = `HP ${state.hero.stats.hp} / ${state.hero.stats.maxHp} · ${state.hero.subclassId === 'berserker' ? `Fúria ${state.hero.fury || 0}/100` : `Mana ${state.hero.stats.mana}`}`;
     for (const side of ['hero', 'enemy']) {
       const bar = el(`${side}-health-bar`); bar.max = state[side].stats.maxHp; bar.value = state[side].stats.hp;
       el(`${side}-fighter`).classList.toggle('is-dead', !state[side].isAlive);

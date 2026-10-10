@@ -3,10 +3,12 @@ import { QUESTS, normalizeQuests, questBlockReason, guildStanding, questReputati
 import type { BattleState, HeroClass } from '../../../shared/src/types/combat.js';
 import { applyProgressRewards } from '../../../shared/src/progression/playerProgress.js';
 import { createDungeonEquipment } from '../../../shared/src/loot/dungeonLoot.js';
+import { adaptSubclassWeaponDrops } from '../../../shared/src/equipment/assassinWeapons.js';
+import type { SubclassId } from '../../../shared/src/classes/subclasses.js';
 import { AuthError } from '../auth/security.js';
 import { itemDefinition } from './rules.js';
 
-interface GuildCharacter { id: string; hero_class: HeroClass; level: number; xp: string; gold: string; version: string; }
+interface GuildCharacter { id: string; hero_class: HeroClass; level: number; xp: string; gold: string; version: string; subclass_id?: SubclassId | null; }
 export function questDefinition(id: string) {
   const quest = QUESTS.find(quest => quest.id === id);
   if (!quest) throw new AuthError(400, 'Missão desconhecida.');
@@ -58,7 +60,7 @@ export async function questCommand(client: PoolClient, character: GuildCharacter
     entry.status = 'claimed'; entry.claims++;
     const awarded = applyProgressRewards({ nivel: character.level, xp: character.xp, ouro: character.gold }, quest.gold, quest.xp);
     character.level = awarded.nivel; character.xp = String(awarded.xp); character.gold = String(awarded.ouro);
-    const equipment = quest.gear ? itemDefinition(createDungeonEquipment(character.hero_class, 'weapon', quest.gear, 'epic').id) : null;
+    const equipment = quest.gear ? itemDefinition(adaptSubclassWeaponDrops([{ item: createDungeonEquipment(character.hero_class, 'weapon', quest.gear, 'epic'), quantity: 1 }], character.subclass_id ?? undefined)[0]!.item.id) : null;
     if (equipment) {
       const key = `quest:${requestId}:gear`;
       const item = await client.query(`INSERT INTO equipment_instances (owner_character_id, origin_character_id, definition_id, source_operation_key)
