@@ -39,8 +39,9 @@ desafios vencidos e contadores antigos são limpos a cada hora. Esse limite
 agregado é adequado ao staging; antes de escalar, evoluir por IP/conta, proteção
 contra abuso e controle operacional.
 
-Sockets de produção ficam fechados até carregar estado do personagem e
-persistir recompensas no servidor. Autenticação por si só não torna seguro
+O jogo online em `/play` usa HTTP autenticado com estado e recompensas no
+PostgreSQL (ver online-game.md). Os sockets antigos de produção ficam fechados
+porque ainda recebem setup local. Autenticação por si só não torna seguro
 aceitar nível ou posse de equipamentos enviados pelo jogador. A demo permanece
 local e não compartilha os bens com a conta online.
 

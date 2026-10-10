@@ -9,16 +9,16 @@
 
 **Drakoria** é um RPG online para navegador em desenvolvimento, com combate em tempo real baseado em ATB, classes distintas, progressão de personagem, loot, equipamentos, dungeons e monstros com níveis diferentes.
 
-> 🎮 A versão publicada no GitHub Pages roda em **modo demo local**, sem depender do backend para a batalha. Progressão, inventário e equipamentos da demo ficam salvos no `localStorage` do navegador. O modo online autoritativo continua dependendo do backend Socket.IO.
+> 🎮 O GitHub Pages é uma **demo local**, com progresso no navegador. O [portal de contas](https://drakoria-staging-api.onrender.com/login) oferece login por Google ou email/senha e acesso à primeira região online por turnos, com progresso salvo no PostgreSQL.
 
-O modo online ainda recebe dados de personagem do navegador e não possui
-autenticação ou save persistente por conta. A [revisão da fronteira de confiança
-do Socket.IO](docs/socket-trust-boundary.md) descreve as validações atuais e as
-etapas para persistir o progresso no servidor.
+O fluxo online usa o estado do personagem no servidor e persiste batalhas,
+XP, ouro e equipamentos. Consulte [o guia online](docs/online-game.md).
+Os handlers Socket.IO de desenvolvimento ainda recebem setup local e ficam
+bloqueados em produção; veja [a fronteira de confiança](docs/socket-trust-boundary.md).
 
-A [base PostgreSQL](docs/database.md) já define contas, sessões, personagens e
-cópias identificadas de equipamentos. Consulte o guia para subir o banco local
-e aplicar migrations; a integração com login e progresso online é a próxima etapa.
+A [base PostgreSQL](docs/database.md) define contas, sessões, personagens,
+cópias identificadas de equipamentos e batalhas. O ambiente é de testes;
+comércio e pagamentos Pix ainda não estão disponíveis.
 
 ## 🎮 Jogar
 

@@ -23,6 +23,7 @@ async function refresh() {
     el('account-email').textContent = account.email;
     el('character-summary').textContent = character ? `${character.name} · ${character.hero_class} · Nível ${character.level}` : 'Crie seu primeiro personagem.';
     el('create-character').hidden = !!character;
+    el('play-online').hidden = !character;
     message('Você está conectado.');
   } catch (error) {
     if (error.status !== 401) throw error;
