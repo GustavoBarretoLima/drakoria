@@ -1,19 +1,46 @@
 import assert from "node:assert/strict";
-import vm from "node:vm";
-import { readFileSync } from "node:fs";
 import { equipItem, unequipSlot, loadInventory, getEquippedItems } from "../client/src/inventory/inventoryClient.js";
 import { STARTER_LOOT_ITEMS } from "../shared/src/loot/lootTables.js";
 
 const saved = new Map<string, string>();
-Object.defineProperty(globalThis, "localStorage", { value: { getItem: (key: string) => saved.get(key) ?? null, setItem: (key: string, value: string) => saved.set(key, value) }, configurable: true });
+Object.defineProperty(globalThis, "localStorage", {
+  value: {
+    getItem: (key: string) => saved.get(key) ?? null,
+    setItem: (key: string, value: string) => saved.set(key, value),
+  },
+  configurable: true,
+});
 saved.set("classeHeroi", "guerreiro");
-saved.set("drakoriaProgresso", '{"nivel":25}');
+saved.set("drakoriaProgresso", '{"nivel":25,"xp":0,"xpParaProximoNivel":100,"ouro":0}');
 const axe = STARTER_LOOT_ITEMS["orc-iron-axe"]!;
 const sword = STARTER_LOOT_ITEMS["orc-warlord-sword"]!;
-saved.set("drakoriaInventario", JSON.stringify({ items: [{ item: axe, quantity: 2 }, { item: sword, quantity: 1 }], equipped: {} }));
-const windowStub: { getBackpackEntries?: (inventory: ReturnType<typeof loadInventory>) => ReturnType<typeof loadInventory>["items"] } = {};
-vm.runInNewContext(readFileSync("js/inventory-backpack.js", "utf8"), { window: windowStub });
-const backpack = () => windowStub.getBackpackEntries!(loadInventory());
+saved.set("drakoriaInventario", JSON.stringify({
+  items: [{ item: axe, quantity: 2 }, { item: sword, quantity: 1 }],
+  equipped: {},
+}));
+
+const panel = { innerHTML: "", scrollTop: 0, classList: { remove() {} } };
+const documentStub = {
+  addEventListener() {},
+  getElementById: (id: string) => id === "painelPraca" ? panel : null,
+  createElement() { return { id: "", className: "", style: {}, classList: { add() {}, remove() {} }, setAttribute() {}, getBoundingClientRect: () => ({ height: 0 }), scrollHeight: 0 }; },
+  body: { appendChild() {} },
+};
+Object.defineProperty(globalThis, "document", { value: documentStub, configurable: true });
+const windowStub: any = {
+  addEventListener() {},
+  innerWidth: 1280,
+  innerHeight: 720,
+  abrirStatus() {},
+  fecharPainelPraca() {},
+  criarFichaPersonagemJRPG: () => ({ profile: "", attributes: "" }),
+  criarPocoesInventario: () => "",
+};
+Object.defineProperty(globalThis, "window", { value: windowStub, configurable: true });
+
+const { getBackpackEntries, openInventory } = await import("../client/src/pages/statusInventoryUx.js");
+const backpack = () => getBackpackEntries(loadInventory());
+
 equipItem(axe.id);
 assert.equal(backpack().find(entry => entry.item.id === axe.id)?.quantity, 1);
 assert.equal(getEquippedItems()[0]?.id, axe.id);
@@ -24,22 +51,20 @@ unequipSlot("weapon");
 assert.equal(backpack().find(entry => entry.item.id === sword.id)?.quantity, 1);
 assert.equal(loadInventory().items.reduce((sum, entry) => sum + entry.quantity, 0), 3);
 assert.equal(getEquippedItems().length, 0);
-const panel = { innerHTML: "", classList: { remove() {} } };
-const uiWindow = { addEventListener() {}, progressoDrakoria: { carregarProgresso: () => ({ nivel: 25 }), adicionarRecompensa() {} } };
-const context = vm.createContext({ window: uiWindow, localStorage: globalThis.localStorage, document: { addEventListener() {}, getElementById: () => panel } });
-vm.runInContext(readFileSync("js/inventory-backpack.js", "utf8"), context);
-vm.runInContext(readFileSync("js/status-inventory-ux.js", "utf8"), context);
-vm.runInContext(`window.equiparItemInventario('${sword.id}')`, context);
-// Comparison tooltip mentions the equipped item without adding a backpack copy.
-const backpackHtml = panel.innerHTML.split('<div class="inventory-grid">')[1]!
-  .replace(/<div class="paper-tooltip inventory-comparison-source">[\s\S]*?<\/div>/g, "");
+
+windowStub.equiparItemInventario(sword.id);
+const [loadoutHtml = "", backpackHtml = ""] = panel.innerHTML.split('<div class="inventory-grid">');
 assert.ok(!backpackHtml.includes(sword.name));
-assert.ok(panel.innerHTML.split('<h3 class="section-title">Itens')[0]!.includes(sword.name));
-vm.runInContext('window.desequiparSlotInventario("weapon")', context);
+assert.ok(loadoutHtml.includes(sword.name));
+windowStub.desequiparSlotInventario("weapon");
 assert.ok(panel.innerHTML.split('<div class="inventory-grid">')[1]!.includes(sword.name));
-vm.runInContext(`window.equiparItemInventario('${axe.id}'); window.venderItemInventario('${axe.id}')`, context);
+
+windowStub.equiparItemInventario(axe.id);
+windowStub.venderItemInventario(axe.id);
 assert.equal(loadInventory().items.find(entry => entry.item.id === axe.id)?.quantity, 1);
-vm.runInContext(`window.venderItemInventario('${axe.id}')`, context);
+windowStub.venderItemInventario(axe.id);
 assert.equal(loadInventory().items.find(entry => entry.item.id === axe.id)?.quantity, 1);
 assert.equal(getEquippedItems()[0]?.id, axe.id);
-console.log("inventoryBackpack.test.ts: equipped copy, duplicate copies, swap, unequip and saved ownership passed");
+openInventory();
+assert.ok(panel.innerHTML.includes('data-inventory-action="unequip"') || panel.innerHTML.includes('data-inventory-action="equipped-details"'));
+console.log("inventoryBackpack.test.ts: TypeScript backpack ownership, swap, unequip and equipped-copy sale protection passed");
