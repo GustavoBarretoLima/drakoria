@@ -107,6 +107,13 @@
   overflow: visible;
 }
 
+/* Desktop command dock lives on the left; keep the hero clear of it. */
+@media (min-width: 901px) and (min-height: 501px) {
+  #batalha .heroi {
+    transform: translateX(clamp(110px, 10vw, 160px));
+  }
+}
+
 #batalha .inimigo {
   --enemy-visible-size: calc(var(--battle-hero-visible-size) * 1.15);
 }
