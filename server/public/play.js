@@ -1,5 +1,7 @@
+import { createBattleVisuals, equipmentIcon } from '/play-visuals.js';
 const el = id => document.getElementById(id);
 let snapshot, busy = false, pendingStart;
+const visuals = createBattleVisuals();
 async function api(path, body) {
   const response = await fetch(path, { credentials: 'same-origin', cache: 'no-store',
     ...(body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }) });
@@ -21,6 +23,7 @@ function render() {
   el('hero-info').textContent = `${c.heroClass} · Nível ${c.level}`;
   el('hp').textContent = `HP ${c.stats.hp} / ${c.stats.maxHp}`;
   el('mana').textContent = `Mana ${c.stats.mana} / ${c.stats.maxMana}`;
+  el('xp-bar').max = c.xpToNextLevel; el('xp-bar').value = c.xp;
   el('progress').textContent = `${c.xp} / ${c.xpToNextLevel} XP · ${c.gold} ouro`;
   el('start').disabled = busy || fighting || c.stats.hp <= 0;
   el('rest').disabled = busy || fighting;
@@ -28,12 +31,19 @@ function render() {
   el('battle-panel').hidden = !b;
   if (b) {
     const state = b.state;
+    visuals.render(snapshot);
     el('enemy-name').textContent = state.enemy.name;
     el('enemy-hp').textContent = `HP inimigo: ${state.enemy.stats.hp} / ${state.enemy.stats.maxHp}`;
     el('battle-status').textContent = fighting ? 'Sua vez. Escolha uma ação.' : state.winnerId === state.hero.id ? 'Vitória! Progresso salvo.' : 'Derrota. Descanse no acampamento para voltar.';
+    el('command-heading').hidden = !fighting;
     el('battle-actions').replaceChildren();
     if (fighting) {
-      const act = action => async () => { snapshot = await api('/game/action', { battleId: b.id, revision: b.revision, action }); };
+      const act = action => async () => {
+        const previous = snapshot;
+        snapshot = await api('/game/action', { battleId: b.id, revision: b.revision, action });
+        render(); el('message').textContent = 'Turno salvo. Mostrando o combate…';
+        await visuals.animate(previous, snapshot, action);
+      };
       el('battle-actions').append(button('Atacar', act({ type: 'ATTACK' }), busy), button('Defender', act({ type: 'DEFEND' }), busy),
         button('Magia · 10 mana', act({ type: 'CAST_MAGIC' }), busy || state.hero.stats.mana < 10));
       for (const skill of b.skills) {
@@ -52,7 +62,11 @@ function render() {
     const li = document.createElement('li'), text = document.createElement('div'), details = document.createElement('small');
     text.textContent = entry.definition.name;
     details.textContent = `Nível ${entry.definition.level} · ${entry.definition.rarity} · ${entry.equipped ? 'Equipado' : entry.canEquip ? 'Disponível' : 'Classe ou nível incompatível'}`;
-    text.append(details); li.append(text, button('Equipar', async () => { snapshot = await api('/game/equip', { version: c.version, instanceId: entry.instanceId }); }, busy || fighting || entry.equipped || !entry.canEquip));
+    text.append(details);
+    const info = document.createElement('div'); info.className = 'item-info';
+    const icon = equipmentIcon(entry.definition.icon);
+    if (icon) { const img = document.createElement('img'); img.src = icon; img.alt = ''; img.loading = 'lazy'; img.width = 52; img.height = 52; img.className = `rarity-${entry.definition.rarity}`; img.addEventListener('error', () => { img.hidden = true; }); info.append(img); }
+    info.append(text); li.append(info, button('Equipar', async () => { snapshot = await api('/game/equip', { version: c.version, instanceId: entry.instanceId }); }, busy || fighting || entry.equipped || !entry.canEquip));
     el('inventory').append(li);
   }
 }

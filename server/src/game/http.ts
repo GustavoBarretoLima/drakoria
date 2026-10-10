@@ -4,12 +4,14 @@ import type { AuthRepository } from '../auth/repository.js';
 import { AuthError, cookieName, readCookie } from '../auth/security.js';
 import { readJson } from '../auth/http.js';
 import type { GameRepository } from './repository.js';
+import { serveGameAsset } from './assets.js';
 import { onlyFields, parseAction, uuid } from './rules.js';
 
 interface Dependencies { auth: AuthRepository; game: GameRepository; origin: string; production: boolean; }
 const files = new Map([
   ['/play', ['play.html', 'text/html; charset=utf-8']],
   ['/play.js', ['play.js', 'text/javascript; charset=utf-8']],
+  ['/play-visuals.js', ['play-visuals.js', 'text/javascript; charset=utf-8']],
   ['/play.css', ['play.css', 'text/css; charset=utf-8']],
 ]);
 const routes = ['/game/state', '/game/start', '/game/action', '/game/rest', '/game/equip'];
@@ -19,12 +21,13 @@ function send(response: ServerResponse, status: number, data: unknown) {
 export function createGameHandler(deps: Dependencies) {
   let active = 0;
   return async (request: IncomingMessage, response: ServerResponse): Promise<boolean> => {
+    if (await serveGameAsset(request, response)) return true;
     const path = request.url ?? '';
     if (!files.has(path) && !path.startsWith('/game/')) return false;
     response.setHeader('Cache-Control', 'no-store');
     response.setHeader('X-Content-Type-Options', 'nosniff');
     response.setHeader('Referrer-Policy', 'no-referrer');
-    response.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
+    response.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'");
     let acquired = false;
     try {
       if (files.has(path)) {
