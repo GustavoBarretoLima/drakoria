@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import { applyEquipmentStats } from "../shared/src/equipment/equipmentStats.js";
 import { applySubclassStats } from "../shared/src/classes/subclasses.js";
 import { createStatsForLevel } from "../shared/src/combat/classStats.js";
-import { getTestCharacterEquipment } from "../shared/src/testing/testCharacter.js";
+import { generateEquipmentCatalog } from "../shared/src/types/equipmentGenerator.js";
 import { createBerserkAxe } from "../shared/src/equipment/berserkWeapons.js";
 
-const items = getTestCharacterEquipment("guerreiro")
+const items = generateEquipmentCatalog().filter(item => item.level === 20 && item.rarity === "mythic" && item.allowedClasses.length === 1 && item.allowedClasses[0] === "guerreiro")
   .filter(item => item.slot !== "shield")
   .map(item => item.slot === "weapon" ? createBerserkAxe(item) : item);
 const inventory = {

@@ -166,11 +166,12 @@ O desenvolvimento local usa o backend. O modo demo é ativado automaticamente no
 
 ## ✅ Validação
 
-### Personagem de testes
+### Regras de personagem
 
-Na criação de personagem, use o nome **Taichou** (maiúsculas/minúsculas e espaços nas extremidades são ignorados). Ele começa com nível mínimo 20, vida/mana completas e os nove equipamentos míticos de nível 20 da classe escolhida já equipados. A preparação preserva outros itens e não duplica o set ao ser executada novamente.
-
-Para esse nome, bosses elegíveis para livros de subclasse têm **100% de chance de conceder um livro**, na demo e no backend. A subclasse do livro continua aleatória; monstros comuns e mini-bosses mantêm as regras atuais. Outros personagens têm chance de **0,5% a 0,9%**, conforme o nível do boss: Cemitério (Nv.15) 0,5%, Pântano (Nv.25) 0,6%, Floresta (Nv.35) 0,7%, Acampamento (Nv.40) 0,75% e Fortaleza (Nv.55) 0,9%. Cada nível acima de 15 acrescenta 0,01 ponto percentual, com teto de 0,9%; bosses antigos abaixo de 15 mantêm 0,5%. A chance é de receber um livro, cuja subclasse é sorteada entre as nove com chances iguais, sem garantia por número de tentativas. Monstros comuns e mini-bosses não dropam livros. O nome é um atalho de testes, sem autenticação ou permissões administrativas de conta.
+Nomes não concedem privilégios. Todos os personagens seguem a mesma criação,
+progressão, regras de classe e chance de livros de subclasse (0,5% a 0,9% por
+boss conforme o nível). A especialização escolhida permanece ativa; redistribuir
+pontos mantém a subclasse. Saves existentes preservam seus itens e progresso.
 
 ### Comandos
 
@@ -405,14 +406,6 @@ Força corresponde a ataque físico; magia corresponde a `magicPower`. Bônus de
 
 Referências de identidade: [profissões](https://www.guildwars2.com/en/the-game/professions/) e [especializações](https://heartofthorns.guildwars2.com/game/specializations/) oficiais de Guild Wars 2. Os valores e nomes são próprios do Drakoria, adaptados ao combate com alvo único. `tests/attributeTalents.test.ts` cobre ranks, pré-requisitos, aplicação de bônus, orçamento, preservação de saves e paridade demo/backend.
 
-
-### Taichou — troca de especialização para testes
-
-O personagem de teste Taichou (nome sem distinção de maiúsculas e espaços nas extremidades) tem o botão **Resetar subclasse (ADM)** na tela de livros e na árvore. Resetar limpa a especialização, ranks e habilidades equipadas, devolvendo o orçamento de pontos, sem consumir ou devolver livros. Nível, XP, ouro, itens e livros restantes são preservados. Equipamentos exclusivos incompatíveis voltam à mochila e recursos são ajustados sem cura gratuita.
-
-Após resetar, Taichou pode usar qualquer livro que possua, independentemente da classe atual. A classe base é ajustada à especialização para manter atributos, habilidades, animações e regras de equipamento corretos no status, demo e backend. Equipamentos incompatíveis voltam à mochila; Berserk e Assassino mantêm suas regras de machado/adagas, com arma inicial quando necessário. A prévia de outra classe considera a nova base e equipamentos compatíveis. Os demais personagens continuam com escolha permanente e livros restritos à classe.
-
-`tests/taichouSubclassReset.test.ts` valida as nove escolhas, restrição aos demais personagens, consumo de livros, reset, itens míticos preservados, recursos e paridade demo/backend. A permissão continua sendo a identidade local de teste existente, sem autenticação administrativa adicional.
 
 ### Missões regionais e loja de poções
 

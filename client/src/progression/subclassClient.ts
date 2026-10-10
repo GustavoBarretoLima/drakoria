@@ -7,9 +7,7 @@ import type { HeroClass } from "../../../shared/src/types/combat.js";
 import { normalizeTreeRanks, normalizeBerserkLoadout, type TreeRanks } from "../../../shared/src/classes/skillTrees.js";
 import { loadProgress } from "./progressionClient.js";
 
-import { isTestCharacter } from "../../../shared/src/testing/testCharacter.js";
-import { syncCharacterVitals } from "./heroStats.js";
-import { ensureAssassinEquipment, ensureBerserkEquipment, reconcileEquippedItems } from "../inventory/inventoryClient.js";
+import { ensureAssassinEquipment, ensureBerserkEquipment } from "../inventory/inventoryClient.js";
 
 const SUBCLASS_STORAGE_KEY = "drakoriaSubclassProgress";
 
@@ -82,7 +80,7 @@ export function useSubclassBook(
   if (!definition || count <= 0) {
     return { used: false, message: "Você não possui esse livro.", state };
   }
-  if (definition.baseClass !== heroClass && !isTestCharacter(localStorage.getItem("nomeHeroi"))) {
+  if (definition.baseClass !== heroClass) {
     return { used: false, message: `Esse livro pertence à classe ${definition.baseClass}.`, state };
   }
   if (state.activeSubclass) {
@@ -94,22 +92,12 @@ export function useSubclassBook(
     };
   }
 
-  if (isTestCharacter(localStorage.getItem("nomeHeroi"))) {
-    const target = definition.baseClass;
-    const female = (localStorage.getItem("generoHeroi") ?? "").toLowerCase().includes("fem");
-    localStorage.setItem("classeHeroi", target);
-    localStorage.setItem("classeHeroiTexto", target === "guerreiro" ? female ? "Guerreira" : "Guerreiro" : target === "mago" ? female ? "Maga" : "Mago" : female ? "Arqueira" : "Arqueiro");
-    const folder = target === "guerreiro" ? female ? "guerreira_anime" : "heroi_anime" : target === "mago" ? female ? "maga_anime" : "mago_anime" : female ? "elfa_anime" : "elfo_anime";
-    localStorage.setItem("imagemHeroi", `../img/personagens/${folder}/idle.gif`);
-  }
   state.books[subclassId] = count - 1;
   state.activeSubclass = subclassId;
   if (subclassId === "berserker") { state.berserkTreeVersion = 2; state.treeRanks = {}; state.equippedSkills = []; }
   saveSubclassProgress(state);
-  if (isTestCharacter(localStorage.getItem("nomeHeroi"))) reconcileEquippedItems();
   if (subclassId === "assassin") ensureAssassinEquipment(true);
   if (subclassId === "berserker") ensureBerserkEquipment(true);
-  if (isTestCharacter(localStorage.getItem("nomeHeroi"))) syncCharacterVitals();
   return {
     used: true,
     message: `Especialização desbloqueada: ${definition.name}.`,
@@ -122,15 +110,4 @@ export function getActiveSubclass(heroClass?: HeroClass): SubclassId | undefined
   if (!activeSubclass) return undefined;
   if (heroClass && SUBCLASS_DEFINITIONS[activeSubclass].baseClass !== heroClass) return undefined;
   return activeSubclass;
-}
-
-/** Test character only: consume no books, return all tree points, keep item ownership. */
-export function resetTestCharacterSubclass(): string | null {
-  if (!isTestCharacter(localStorage.getItem("nomeHeroi"))) return "Somente Taichou pode resetar a subclasse.";
-  const state = loadSubclassProgress();
-  if (!state.activeSubclass) return "Nenhuma subclasse ativa.";
-  saveSubclassProgress({ books: { ...state.books }, treeRanks: {}, equippedSkills: [] });
-  reconcileEquippedItems();
-  syncCharacterVitals();
-  return null;
 }

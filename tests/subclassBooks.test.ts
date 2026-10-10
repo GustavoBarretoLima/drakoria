@@ -34,13 +34,12 @@ for (const [boss, chance] of bossRates) {
   assert.equal(rollSubclassBookDrops(boss, () => { calls++; return calls === 1 ? chance - Number.EPSILON : 0; }).length, 1);
   assert.deepEqual(rollSubclassBookDrops(boss, () => chance), []);
   assert.deepEqual(rollSubclassBookDrops(boss, () => chance + Number.EPSILON), []);
-  assert.equal(rollSubclassBookDrops(boss, () => 0.999999, "Taichou").length, 1);
 }
 assert.equal(getSubclassBookDropChance("orc-king-boss-lvl-100"), 0.009);
 assert.equal(getSubclassBookDropChance("orc-king-boss-lvl-1"), 0.005);
 for (const id of ["goblin-normal-lvl-1", "orc-warlord-mini-boss-lvl-40", "orc-king-boss-lvl-0", "orc-king-boss-lvl-9999999999999999999", "orc-king-boss-lvl-NaN"]) {
   assert.equal(getSubclassBookDropChance(id), 0);
-  assert.deepEqual(rollSubclassBookDrops(id, () => { throw new Error("Ineligible monsters must not roll"); }, "Taichou"), []);
+  assert.deepEqual(rollSubclassBookDrops(id, () => { throw new Error("Ineligible monsters must not roll"); }), []);
 }
 for (let level = 1; level <= 100; level++) {
   const chance = getSubclassBookDropChance(`orc-king-boss-lvl-${level}`);

@@ -124,7 +124,7 @@ export function createInitialBattleState(
       xp: monster.xpReward,
       gold: monster.goldReward,
       drops: adaptSubclassWeaponDrops(rollMonsterDrops(monster.id), subclassId),
-      classBooks: rollSubclassBookDrops(monster.id, Math.random, heroName),
+      classBooks: rollSubclassBookDrops(monster.id),
     },
     revealEnemyStats: hasMonsterInsight(equippedItems, heroLevel),
     turnOwnerId: null,
