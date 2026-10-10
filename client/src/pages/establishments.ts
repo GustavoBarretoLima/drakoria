@@ -11,8 +11,8 @@ const establishmentIds: EstablishmentId[] = ["taberna", "ferreiro", "guilda"];
 
 declare global {
   interface Window {
-    carregarFerreiro?: () => void;
-    carregarGuilda?: () => void;
+    carregarFerreiro: () => void;
+    carregarGuilda: () => void;
   }
 }
 
