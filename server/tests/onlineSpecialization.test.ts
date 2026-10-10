@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import { Readable } from 'node:stream';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { createDatabasePool, inTransaction } from '../src/database/pool.js';
+import { CharacterRepository } from '../src/database/characterRepository.js';
 import { migrateDatabase } from '../src/database/migrate.js';
 import { AuthRepository } from '../src/auth/repository.js';
 import { GameRepository } from '../src/game/repository.js';
@@ -121,7 +122,7 @@ test('online specialization persists owned books, permanent choices and validate
       assert.equal(s.specialization.books.length, 1);
       await assert.rejects(game.action(c.id, battle.id, battle.revision, { type: 'ATTACK' }));
       assert.equal((await game.load(c.id)).specialization.books.length, 1);
-      s = await game.start(c.id, randomUUID(), 'cemiterio-esquecido', s.character.version, s.expedition!.id);
+      s = await game.start(c.id, randomUUID(), 'cemiterio-esquecido', s.character.version);
       const lost = (await pool.query('SELECT state FROM online_battles WHERE id = $1', [s.battle!.id])).rows[0].state;
       lost.hero.stats.hp = 1; lost.hero.stats.defense = 0; lost.hero.stats.dodgeChance = 0; lost.enemy.stats.attack = 999999; lost.enemy.stats.magicPower = 999999;
       lost.enemy.stats.hp = 999999; lost.enemy.stats.maxHp = 999999; lost.hero.stats.attack = 0; lost.enemy.atb = 100;
@@ -136,6 +137,12 @@ test('online specialization persists owned books, permanent choices and validate
         const account = await auth.createPasswordAccount(`specialization-${id}@example.test`, 'd'.repeat(64));
         const heroClass = SUBCLASS_DEFINITIONS[id].baseClass; await auth.createCharacter(account.id, `Hero${SUBCLASS_IDS.indexOf(id)}`, heroClass);
         let s = await game.load(account.id); await pool.query('UPDATE characters SET level = 20 WHERE id = $1', [s.character.id]);
+        if (id === 'berserker' || id === 'assassin') {
+          const items = new CharacterRepository(pool);
+          const weapon = await items.grantEquipment(account.id, s.character.id, `dungeon-weapon-${heroClass}-rare-lvl-5`, `test:${id}:weapon`);
+          const shield = await items.grantEquipment(account.id, s.character.id, `dungeon-shield-${heroClass}-rare-lvl-5`, `test:${id}:shield`);
+          s = await game.load(account.id); s = await game.camp(account.id, s.character.version, weapon); s = await game.camp(account.id, s.character.version, shield);
+        }
         const ownedBook = await grant(s.character.id, id); s = await game.load(account.id);
         s = await game.specialize(account.id, randomUUID(), s.character.version, { operation: 'use-book', bookId: ownedBook });
         const node = SUBCLASS_TREES[id].find(n => !n.requires.length)!;
@@ -144,8 +151,24 @@ test('online specialization persists owned books, permanent choices and validate
         const expected = characterStats(heroClass, 20, s.inventory.filter(i => i.equipped).map(i => i.definition), id, { [node.id]: 1 });
         assert.equal(s.character.stats.attack, expected.attack); assert.equal(s.character.stats.maxHp, expected.maxHp);
         assert.deepEqual(await new GameRepository(pool).load(account.id), s);
-        if (id === 'assassin') assert.equal(s.inventory.find(i => i.equipped)!.definition.id, 'assassin-dungeon-weapon-arqueiro-common-lvl-1');
+        if (id === 'berserker' || id === 'assassin') {
+          const prefix = id === 'berserker' ? 'berserk' : 'assassin';
+          assert.equal(s.inventory.find(i => i.equipped && i.definition.slot === 'weapon')!.definition.id, `${prefix}-dungeon-weapon-${heroClass}-rare-lvl-5`);
+          assert.equal(s.inventory.length, 3);
+          assert.equal(s.inventory.find(i => i.definition.id === `dungeon-weapon-${heroClass}-rare-lvl-5`)!.equipped, false);
+          const shield = s.inventory.find(i => i.definition.slot === 'shield')!;
+          assert.equal(shield.equipped, id !== 'berserker'); assert.equal(shield.canEquip, id !== 'berserker');
+          await assert.rejects(game.camp(account.id, s.character.version, s.inventory.find(i => i.definition.id === `dungeon-weapon-${heroClass}-rare-lvl-5`)!.instanceId));
+        }
       }
+    });
+    await t.test('a compatible book works at level one but cannot create talent points', async () => {
+      const account = await auth.createPasswordAccount('specialization-new@example.test', 'e'.repeat(64)); await auth.createCharacter(account.id, 'NewHero', 'guerreiro');
+      let s = await game.load(account.id); const book = await grant(s.character.id, 'paladin');
+      s = await game.specialize(account.id, randomUUID(), s.character.version, { operation: 'use-book', bookId: book });
+      assert.equal(s.character.level, 1); assert.equal(s.specialization.active!.id, 'paladin'); assert.equal(s.specialization.points, 0);
+      await assert.rejects(game.specialize(account.id, randomUUID(), s.character.version, { operation: 'invest', nodeId: 'paladin-foundation' }));
+      assert.deepEqual(await game.load(account.id), s);
     });
     await t.test('HTTP validates identity, origin and exact intent-only payloads', async () => {
       const token = await auth.newSession(a.id), handler = createGameHandler({ auth, game, origin: 'https://game.example', production: false });
