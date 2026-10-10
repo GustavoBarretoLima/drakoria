@@ -1,6 +1,6 @@
 import { createBattleVisuals, equipmentIcon } from '/play-visuals.js';
 const el = id => document.getElementById(id);
-let snapshot, busy = false, pendingStart, pendingQuest, guildRegion = 'cemiterio-esquecido';
+let snapshot, busy = false, pendingStart, pendingQuest, pendingSpecialization, guildRegion = 'cemiterio-esquecido';
 const visuals = createBattleVisuals();
 async function api(path, body) {
   const response = await fetch(path, { credentials: 'same-origin', cache: 'no-store',
@@ -20,7 +20,7 @@ function render() {
   const fighting = !!b && !b.state.finished;
   el('game').hidden = false;
   el('hero-name').textContent = c.name;
-  el('hero-info').textContent = `${c.heroClass} · Nível ${c.level}`;
+  el('hero-info').textContent = `${snapshot.specialization?.active?.name || c.heroClass} · Nível ${c.level}`;
   el('hp').textContent = `HP ${c.stats.hp} / ${c.stats.maxHp}`;
   el('mana').textContent = `Mana ${c.stats.mana} / ${c.stats.maxMana}`;
   el('xp-bar').max = c.xpToNextLevel; el('xp-bar').value = c.xp;
@@ -32,6 +32,7 @@ function render() {
   el('retreat').disabled = busy || fighting;
   renderMap(fighting, exploring);
   renderGuild(fighting);
+  renderSpecialization(fighting);
   el('rest').disabled = busy || fighting;
   el('refresh').disabled = busy;
   el('battle-panel').hidden = !b;
@@ -50,15 +51,15 @@ function render() {
         render(); el('message').textContent = 'Turno salvo. Mostrando o combate…';
         await visuals.animate(previous, snapshot, action);
       };
-      el('battle-actions').append(button('Atacar', act({ type: 'ATTACK' }), busy), button('Defender', act({ type: 'DEFEND' }), busy),
-        button('Magia · 10 mana', act({ type: 'CAST_MAGIC' }), busy || state.hero.stats.mana < 10));
+      el('battle-actions').append(button('Atacar', act({ type: 'ATTACK' }), busy), button('Defender', act({ type: 'DEFEND' }), busy));
+      if (state.hero.subclassId !== 'berserker') el('battle-actions').append(button('Magia · 10 mana', act({ type: 'CAST_MAGIC' }), busy || state.hero.stats.mana < 10));
       for (const skill of b.skills) {
-        const node = button(`${skill.name} · ${skill.manaCost} mana`, act({ type: 'USE_SKILL', skillId: skill.id }), busy || !!skill.blocked);
+        const node = button(`${skill.name} · ${state.hero.subclassId === 'berserker' ? `${skill.furyCost || 0} fúria` : `${skill.manaCost} mana`}`, act({ type: 'USE_SKILL', skillId: skill.id }), busy || !!skill.blocked);
         node.title = skill.blocked || skill.name; el('battle-actions').append(node);
       }
     }
     const rewards = state.rewards;
-    el('rewards').textContent = rewards ? `Recebido: ${rewards.xp} XP e ${rewards.gold} ouro.${rewards.drops?.length ? ' Itens: ' + rewards.drops.map(drop => `${drop.quantity}× ${drop.item.name}`).join(', ') : ''}` : '';
+    el('rewards').textContent = rewards ? `Recebido: ${rewards.xp} XP e ${rewards.gold} ouro.${rewards.drops?.length ? ' Itens: ' + rewards.drops.map(drop => `${drop.quantity}× ${drop.item.name}`).join(', ') : ''}${rewards.classBooks?.length ? ' Livros: ' + rewards.classBooks.map(book => book.name).join(', ') : ''}` : '';
     el('battle-log').replaceChildren(...b.messages.map(text => { const li = document.createElement('li'); li.textContent = text; return li; }));
     el('battle-log').scrollTop = el('battle-log').scrollHeight;
   }
@@ -75,6 +76,54 @@ function render() {
     info.append(text); li.append(info, button('Equipar', async () => { snapshot = await api('/game/equip', { version: c.version, instanceId: entry.instanceId }); }, busy || fighting || entry.equipped || !entry.canEquip));
     el('inventory').append(li);
   }
+}
+function renderSpecialization(fighting) {
+  const profile = snapshot.specialization;
+  if (!profile) return;
+  const locked = busy || fighting;
+  el('specialization-active').textContent = profile.active ? `Subclasse permanente: ${profile.active.name}` : 'Sua subclasse ainda não foi escolhida.';
+  el('specialization-passive').textContent = profile.active?.passiveSummary || 'Consulte as opções da sua classe antes de usar um livro.';
+  el('specialization-books').replaceChildren();
+  if (!profile.books.length) { const li = document.createElement('li'); li.textContent = 'Nenhum livro disponível.'; el('specialization-books').append(li); }
+  for (const book of profile.books) {
+    const li = document.createElement('li'), text = document.createElement('span'); text.textContent = `${book.name}${book.blocked ? ` · ${book.blocked}` : ''}`;
+    li.append(text, button('Usar livro', async () => {
+      if (!confirm(`Usar ${book.name}? O livro será consumido e esta escolha de subclasse é permanente.`)) return;
+      await specializationCommand({ operation: 'use-book', bookId: book.instanceId });
+    }, locked || !!book.blocked)); el('specialization-books').append(li);
+  }
+  el('specialization-options').replaceChildren(...profile.subclasses.map(subclass => {
+    const card = document.createElement('article'), name = document.createElement('h3'), passive = document.createElement('p'), book = document.createElement('p');
+    name.textContent = subclass.name; passive.textContent = subclass.passiveSummary; book.textContent = `Livro: ${subclass.bookName}`;
+    card.append(name, passive, book); return card;
+  }));
+  el('specialization-tree').hidden = !profile.active;
+  el('talent-points').textContent = `${profile.points} pontos disponíveis · 1 ponto por nível após o primeiro`;
+  el('reset-talents').disabled = locked || !profile.nodes.some(node => node.rank > 0);
+  el('talent-nodes').replaceChildren(...profile.nodes.map(node => {
+    const card = document.createElement('article'), heading = document.createElement('h3'), description = document.createElement('p'), rank = document.createElement('p');
+    heading.textContent = node.name; description.textContent = node.description;
+    rank.textContent = `Nv.${node.level} · Rank ${node.rank}/${node.maxRank}${node.blocked ? ` · ${node.blocked}` : ''}`;
+    card.append(heading, description, rank, button(`Investir em ${node.name}`, () => specializationCommand({ operation: 'invest', nodeId: node.id }), locked || !!node.blocked)); return card;
+  }));
+  el('skill-slots').hidden = profile.active?.id !== 'berserker';
+  el('skill-slot-controls').replaceChildren();
+  if (profile.active?.id === 'berserker') for (let slot = 0; slot < 4; slot++) {
+    const label = document.createElement('label'), select = document.createElement('select'); label.textContent = `Espaço ${slot + 1}`;
+    select.id = `skill-slot-${slot}`; select.setAttribute('aria-label', `Habilidade do espaço ${slot + 1}`);
+    const empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Vazio'; select.append(empty);
+    for (const skill of profile.slotChoices) { const option = document.createElement('option'); option.value = skill.id; option.textContent = skill.name; option.disabled = profile.loadout.some((id, index) => id === skill.id && index !== slot); select.append(option); }
+    select.value = profile.loadout[slot] || ''; select.disabled = locked;
+    select.addEventListener('change', () => void run(() => specializationCommand({ operation: 'skill-slot', slot, skillId: select.value })));
+    label.append(select); el('skill-slot-controls').append(label);
+  }
+}
+async function specializationCommand(command) {
+  const fingerprint = JSON.stringify(command);
+  if (!pendingSpecialization || pendingSpecialization.fingerprint !== fingerprint) pendingSpecialization = { fingerprint, body: { ...command, requestId: crypto.randomUUID(), version: snapshot.character.version } };
+  const { operation, ...body } = pendingSpecialization.body;
+  try { snapshot = await api(`/game/specialization/${operation}`, body); pendingSpecialization = undefined; }
+  catch (error) { if (error.status === 400 || error.status === 409) pendingSpecialization = undefined; throw error; }
 }
 function renderGuild(fighting) {
   const guild = snapshot.guild;
@@ -162,6 +211,7 @@ el('start').addEventListener('click', () => {
 });
 el('retreat').addEventListener('click', () => void run(async () => { snapshot = await api('/game/retreat', { version: snapshot.character.version, expeditionId: snapshot.expedition.id }); }));
 el('guild-region').addEventListener('change', event => { guildRegion = event.target.value; renderGuild(!!snapshot.battle && !snapshot.battle.state.finished); });
+el('reset-talents').addEventListener('click', () => void run(() => specializationCommand({ operation: 'reset' })));
 el('rest').addEventListener('click', () => void run(async () => { snapshot = await api('/game/rest', { version: snapshot.character.version }); }));
 el('refresh').addEventListener('click', () => void run(async () => { snapshot = await api('/game/state'); }));
 void run(async () => { snapshot = await api('/game/state'); });

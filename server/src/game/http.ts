@@ -5,6 +5,7 @@ import { AuthError, cookieName, readCookie } from '../auth/security.js';
 import { readJson } from '../auth/http.js';
 import type { GameRepository } from './repository.js';
 import { serveGameAsset } from './assets.js';
+import { parseSpecializationCommand } from './specialization.js';
 import { questDefinition } from './guild.js';
 import { regionConfig } from './world.js';
 import { onlyFields, parseAction, uuid } from './rules.js';
@@ -16,7 +17,7 @@ const files = new Map([
   ['/play-visuals.js', ['play-visuals.js', 'text/javascript; charset=utf-8']],
   ['/play.css', ['play.css', 'text/css; charset=utf-8']],
 ]);
-const routes = ['/game/state', '/game/start', '/game/action', '/game/rest', '/game/equip', '/game/retreat', '/game/quests/accept', '/game/quests/claim'];
+const routes = ['/game/state', '/game/start', '/game/action', '/game/rest', '/game/equip', '/game/retreat', '/game/quests/accept', '/game/quests/claim', ...['use-book', 'invest', 'reset', 'skill-slot'].map(operation => `/game/specialization/${operation}`)];
 function send(response: ServerResponse, status: number, data: unknown) {
   response.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); response.end(JSON.stringify(data));
 }
@@ -59,6 +60,9 @@ export function createGameHandler(deps: Dependencies) {
         onlyFields(body, ['battleId', 'revision', 'action']);
         if (!uuid(body.battleId) || !Number.isSafeInteger(body.revision) || Number(body.revision) < 0 || Number(body.revision) > 2147483646) throw new AuthError(400, 'Turno inválido.');
         send(response, 200, await deps.game.action(account.id, body.battleId, Number(body.revision), parseAction(body.action)));
+      } else if (path.startsWith('/game/specialization/')) {
+        const command = parseSpecializationCommand(path.slice('/game/specialization/'.length), body);
+        send(response, 200, await deps.game.specialize(account.id, body.requestId as string, body.version as string, command));
       } else if (path === '/game/quests/accept' || path === '/game/quests/claim') {
         onlyFields(body, ['requestId', 'questId', 'version']);
         if (!uuid(body.requestId) || typeof body.questId !== 'string' || typeof body.version !== 'string' || !/^\d{1,19}$/.test(body.version)) throw new AuthError(400, 'Missão inválida.');

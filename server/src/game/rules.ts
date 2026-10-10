@@ -1,3 +1,5 @@
+import { applySubclassStats, type SubclassId } from '../../../shared/src/classes/subclasses.js';
+import { applyTreeStats } from '../../../shared/src/classes/skillTrees.js';
 import type { BattleState, HeroClass } from '../../../shared/src/types/combat.js';
 import { advanceBattleAtb } from '../../../shared/src/combat/atb.js';
 import { applyBattleAction, applyEnemyTurn } from '../../../shared/src/combat/combatEngine.js';
@@ -24,8 +26,8 @@ export function itemDefinition(id: string): EquipmentItem {
   if (!item) throw new Error('Equipamento salvo não consta no catálogo.');
   return item;
 }
-export function characterStats(heroClass: HeroClass, level: number, items: EquipmentItem[]) {
-  return applyEquipmentStats(createStatsForLevel(heroClass, level), items.filter(item => canEquipItem(item, heroClass, level)));
+export function characterStats(heroClass: HeroClass, level: number, items: EquipmentItem[], subclassId?: SubclassId, treeRanks?: unknown) {
+  return applyTreeStats(applySubclassStats(applyEquipmentStats(createStatsForLevel(heroClass, level), items.filter(item => canEquipItem(item, heroClass, level, subclassId))), subclassId), subclassId, level, treeRanks);
 }
 // Online v1 is turn-based: ATB runs on the server until the hero can act.
 // No client clock, elapsed time, stats or battle result participates in this loop.

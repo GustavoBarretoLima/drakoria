@@ -1,3 +1,6 @@
+import { SUBCLASS_SPRITE_FOLDERS } from '../../../shared/src/classes/subclassSprites.js';
+import { isSubclassForClass, type SubclassId } from '../../../shared/src/classes/subclasses.js';
+import type { HeroClass } from '../../../shared/src/types/combat.js';
 import { readFile } from 'node:fs/promises';
 import { getMonsterById } from '../modules/monsters/monsterService.js';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -17,6 +20,17 @@ for (const [heroClass, folder] of [['guerreiro', 'heroi_anime'], ['mago', 'mago_
   }
   gameAssets.set(`/game-assets/${heroClass}-static.png`, `img/personagens/${folder}/idle_00.png`);
   gameAssets.set(`/game-assets/${heroClass}-death.png`, `img/personagens/${folder}/death_03.png`);
+}
+for (const { masculino: folder } of Object.values(SUBCLASS_SPRITE_FOLDERS)) {
+  for (const pose of ['idle', 'attack', 'damage', 'death']) gameAssets.set(`/game-assets/heroes/${folder}/${pose}.gif`, `img/personagens/${folder}/${pose}.gif`);
+  gameAssets.set(`/game-assets/heroes/${folder}/static.png`, `img/personagens/${folder}/idle_00.png`);
+  gameAssets.set(`/game-assets/heroes/${folder}/death.png`, `img/personagens/${folder}/death_03.png`);
+}
+export function heroPresentation(heroClass: HeroClass, subclassId?: SubclassId) {
+  const folder = subclassId && isSubclassForClass(subclassId, heroClass) ? SUBCLASS_SPRITE_FOLDERS[subclassId].masculino : null;
+  const prefix = folder ? `/game-assets/heroes/${folder}/` : `/game-assets/${heroClass}-`;
+  return { idle: `${prefix}idle.gif`, attack: `${prefix}attack.gif`, damage: `${prefix}damage.gif`, death: `${prefix}death.gif`,
+    static: `${prefix}static.png`, staticDeath: `${prefix}death.png` };
 }
 gameAssets.set('/game-assets/guild.png', 'img/stages/guilda-anime.png');
 gameAssets.set('/game-assets/world-map.png', 'img/mapas/arredores_de_drakoria.png');
