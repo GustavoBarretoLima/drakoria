@@ -5,11 +5,11 @@ GitHub Pages continua local; esta revisão trata do backend Socket.IO.
 
 ## Fluxo observado
 
-1. `js/login.js` verifica apenas se usuário e senha foram preenchidos e
-   redireciona. Não autentica nem cria uma sessão no servidor.
-2. `client/src/network/socket.ts` abre a conexão sem credenciais de conta.
-   `server/src/index.ts` registra os handlers para qualquer conexão aceita;
-   não há middleware de autenticação. O CORS está configurado com `origin: "*"`.
+1. O portal `/login` no backend autentica email/senha ou Google e emite uma
+   sessão HttpOnly. A demo tem entrada explícita sem conta; não simula login.
+2. Sockets de produção estão bloqueados enquanto os handlers ainda recebem
+   setup do navegador. O fluxo abaixo descreve desenvolvimento local. CORS e
+   handshake restringem origens; isso não comprova identidade de jogador.
 3. Ao conectar, `client/src/main.ts` envia `player:setup` com dados derivados
    do `localStorage`. A batalha é associada a `socket.id` em `BattleManager`.
 4. O servidor calcula combate e recompensas com regras compartilhadas, mas
@@ -58,8 +58,8 @@ de campos; não substituem limites de transporte ou controle de frequência.
 
 ## Próximas etapas para progresso persistente por conta
 
-1. Definir o provedor de autenticação e o armazenamento persistente. Verificar
-   a sessão no handshake e associar a conexão a um ID de conta estável.
+1. Reusar a autenticação e o PostgreSQL já implementados. Verificar a sessão
+   no handshake e associar a conexão a um ID de conta estável.
 2. Carregar o personagem pelo ID da conta no servidor. No modo online, o
    cliente deve solicitar um encontro, sem definir nível, posse de itens,
    estoque, recursos ou desbloqueios. Validar elegibilidade do encontro.

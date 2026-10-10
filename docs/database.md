@@ -1,8 +1,9 @@
 # Base PostgreSQL
 
-Esta etapa adiciona infraestrutura de persistência. O jogo e a demo ainda não
-usam essas tabelas: login real, sessão Socket.IO, saves online e entrega das
-recompensas serão conectados em PRs seguintes. Não há importação de localStorage.
+A API de contas usa estas tabelas para cadastro, login, sessões e um personagem
+por conta (veja [Autenticação](authentication.md)). O combate da demo e suas
+recompensas ainda são locais. Sessão Socket.IO e saves autoritativos serão
+conectados na próxima etapa. Não há importação de localStorage.
 
 ## Desenvolvimento local
 
@@ -36,15 +37,17 @@ usuário runtime com permissões mínimas; mantenha a rede do banco restrita ao 
 | --- | --- |
 | `accounts` | UUID estável, email normalizado e único, hash de senha, status |
 | `account_sessions` | Hash binário de 32 bytes do token, expiração e revogação |
+| `auth_google_challenges` | Nonce Google e hash do desafio, uso único e expiração |
+| `auth_rate_limits` | Contadores de tentativas persistentes por chave hash |
 | `characters` | Um personagem por conta, classe, nível, XP, ouro do jogo e versão |
 | `equipment_instances` | Uma linha/UUID por cópia; dono atual, personagem de origem e chave da concessão |
 | `equipment_events` | Registro de concessão por cópia; UPDATE/DELETE bloqueados por trigger |
 | `schema_migrations` | Nome, checksum e data das migrations aplicadas |
 
-`password_hash` deve ser produzido por um serviço de autenticação. O tamanho
-exigido na tabela não valida o algoritmo nem transforma senhas em hashes.
-Da mesma forma, a tabela de sessões não implementa emissão ou verificação de
-tokens. Não há endpoint público de criação de conta ou concessão de itens.
+O serviço de autenticação produz `password_hash` com scrypt e verifica as
+sessões no banco. Contas somente Google usam `google_subject` e senha nula.
+A migration 002 mantém as contas existentes e exige pelo menos uma credencial.
+Não há endpoint público de concessão de itens.
 
 `CharacterRepository` contém APIs internas:
 

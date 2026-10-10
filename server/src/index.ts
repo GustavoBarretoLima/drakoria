@@ -7,6 +7,11 @@ import { registerBattleSocketHandlers } from "./socketHandlers.js";
 import { createDatabasePool } from "./database/pool.js";
 import { createHealthHandler } from "./health.js";
 import { getAllowedOrigins, getServerPort } from "./runtimeConfig.js";
+import { AuthRepository } from "./auth/repository.js";
+import { CharacterRepository } from "./database/characterRepository.js";
+import { createAuthHandler } from "./auth/http.js";
+import { authOrigin } from "./auth/security.js";
+import { googleVerifier } from "./auth/google.js";
 
 const port = getServerPort(process.env.PORT);
 const allowedOrigins = getAllowedOrigins();
@@ -16,7 +21,28 @@ if (databasePool) databasePool.options.query_timeout = 3000;
 const health = createHealthHandler(async () => {
   if (databasePool) await databasePool.query("SELECT 1");
 });
-const httpServer = createServer((request, response) => { void health(request, response); });
+const production = process.env.NODE_ENV === "production";
+const origin = authOrigin(process.env);
+const googleClientId = process.env.GOOGLE_CLIENT_ID?.trim();
+if (googleClientId && !/^[a-zA-Z0-9-]+\.apps\.googleusercontent\.com$/.test(googleClientId)) throw new Error("GOOGLE_CLIENT_ID inválido.");
+const authRepo = databasePool ? new AuthRepository(databasePool) : undefined;
+const auth = authRepo && databasePool ? createAuthHandler({
+  repo: authRepo, characters: new CharacterRepository(databasePool), origin, production,
+  ...(googleClientId ? { googleClientId, verifyGoogle: googleVerifier(googleClientId) } : {}),
+}) : undefined;
+const httpServer = createServer((request, response) => {
+  void (async () => {
+    if (auth && await auth(request, response)) return;
+    await health(request, response);
+  })().catch(() => { if (!response.headersSent) response.writeHead(503); response.end(); });
+});
+httpServer.requestTimeout = 15000;
+httpServer.headersTimeout = 10000;
+httpServer.maxHeadersCount = 50;
+const cleanupTimer = authRepo ? setInterval(() => {
+  void authRepo.cleanup().catch(() => console.error("Falha na limpeza de sessões expiradas."));
+}, 3600000) : undefined;
+cleanupTimer?.unref();
 
 const io = new Server(httpServer, {
   cors: {
@@ -26,6 +52,10 @@ const io = new Server(httpServer, {
   // restriction, not user authentication; non-browser clients may omit Origin.
   allowRequest: (request, callback) => callback(null, !request.headers.origin || allowedOrigins.includes(request.headers.origin)),
 });
+
+// The demo is local. Production combat stays closed until saved character state
+// replaces player-provided setup, equipment and rewards in the online handlers.
+if (production) io.use((_socket, next) => next(new Error("Combate online ainda não disponível.")));
 
 const battleManager = new BattleManager();
 const atbIntervals = new Map<string, NodeJS.Timeout>();
@@ -96,6 +126,7 @@ httpServer.listen(port, "0.0.0.0", () => {
 });
 
 process.on("SIGTERM", () => {
+  if (cleanupTimer) clearInterval(cleanupTimer);
   for (const id of atbIntervals.keys()) stopAtbLoop(id);
   io.close(() => { void databasePool?.end(); });
 });

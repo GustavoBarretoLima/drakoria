@@ -164,6 +164,14 @@ Abra o endereço informado pelo Vite, normalmente `http://localhost:5173`.
 
 O desenvolvimento local usa o backend. O modo demo é ativado automaticamente no build de produção publicado em `github.io/drakoria/`.
 
+## Contas e login com Google
+
+O [portal de contas](https://drakoria-staging-api.onrender.com/login) oferece
+cadastro por email/senha, login, saída e um personagem no PostgreSQL. A opção
+Google é ativada após configurar o Client ID no Render. O progresso da demo
+continua local; o combate online de produção aguarda a integração do save.
+Veja [configuração e testes](docs/authentication.md).
+
 ## ✅ Validação
 
 ### Regras de personagem

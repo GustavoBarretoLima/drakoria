@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sua conta — Drakoria</title>
+  <link rel="stylesheet" href="/account.css">
+  <script src="/account.js" defer></script>
+</head>
+<body>
+  <main class="portal">
+    <p class="eyebrow">REINO DE DRAKORIA</p>
+    <h1>Portal dos Heróis</h1>
+    <p class="intro">Sua conta e seu personagem, em um só lugar.</p>
+    <p id="message" role="status" aria-live="polite"></p>
+    <section id="auth" hidden>
+      <div class="tabs" aria-label="Acesso à conta">
+        <button type="button" id="login-mode" aria-pressed="true">Entrar</button>
+        <button type="button" id="register-mode" aria-pressed="false">Criar conta</button>
+      </div>
+      <form id="credentials">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" maxlength="254" required>
+        <label for="password">Senha</label>
+        <input id="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" required>
+        <p class="hint">Use de 12 a 128 caracteres. Não reutilize a senha de outro serviço.</p>
+        <button id="submit" type="submit" class="primary">Entrar</button>
+      </form>
+      <div class="divider">ou</div>
+      <div id="google-button"></div>
+      <p id="google-message" class="hint">Verificando disponibilidade do Google…</p>
+    </section>
+    <section id="account" hidden>
+      <h2>Sua conta</h2><p id="account-email"></p>
+      <p id="character-summary"></p>
+      <form id="create-character" hidden>
+        <label for="character-name">Nome do personagem</label>
+        <input id="character-name" maxlength="40" autocomplete="off" required>
+        <label for="hero-class">Classe</label>
+        <select id="hero-class"><option value="guerreiro">Guerreiro</option><option value="mago">Mago</option><option value="arqueiro">Arqueiro</option></select>
+        <p class="hint">Um personagem por conta. Todos começam no nível 1.</p>
+        <button type="submit" class="primary">Criar personagem</button>
+      </form>
+      <button type="button" id="logout">Sair da conta</button>
+    </section>
+    <aside class="staging"><strong>Ambiente de testes</strong><p>O personagem da conta já fica salvo no servidor. O combate e o progresso da demo ainda são locais e não se conectam a esta conta.</p></aside>
+    <a class="demo" href="https://gustavobarretolima.github.io/drakoria/pages/personagens.html">Jogar a demo local →</a>
+    <a class="back" href="https://gustavobarretolima.github.io/drakoria/">Voltar ao Reino</a>
+  </main>
+</body>
+</html>

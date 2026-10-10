@@ -18,6 +18,9 @@ services:
         value: production
       - key: ALLOWED_ORIGINS
         value: https://gustavobarretolima.github.io
+      - key: AUTH_PUBLIC_URL
+        value: https://drakoria-staging-api.onrender.com
+      # GOOGLE_CLIENT_ID is configured separately in the Render Dashboard.
       - key: DATABASE_URL
         fromDatabase:
           name: drakoria-staging-db
