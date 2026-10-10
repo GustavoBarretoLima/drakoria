@@ -9,12 +9,12 @@ window.addEventListener("DOMContentLoaded", () => {
     "Classe";
   const nomeHeroi = localStorage.getItem("nomeHeroi") || "Herói";
 
-  const introTexto = `
+  const introTexto = [{ texto: `
     Em um mundo devastado por guerras antigas, surge um novo herói.
-    <span class="nome-destaque">${nomeHeroi}</span>, o(a) ${classe}, caminha em direção à cidade de Drakoria,
+    ` }, { texto: nomeHeroi, destaque: true }, { texto: `, o(a) ${classe}, caminha em direção à cidade de Drakoria,
     buscando glória e redenção. Mas no caminho, uma sombra surge...
     Um Goblin faminto bloqueia sua passagem!
-  `;
+  ` }];
 
   const btnContinuar = document.getElementById("continuar");
   const btnPular = document.getElementById("pularDialogos");
@@ -25,18 +25,38 @@ window.addEventListener("DOMContentLoaded", () => {
   digitarTexto(introTexto, "introTexto", mostrarCenaGoblin);
 });
 
-function digitarTexto(texto, elementoId, callback) {
+function digitarTexto(trechos, elementoId, callback) {
   const elemento = document.getElementById(elementoId);
   if (!elemento) return;
 
+  // Player-controlled values stay in text nodes throughout the animation.
+  elemento.replaceChildren();
+  const partes = trechos.map(({ texto, destaque }) => {
+    const node = document.createTextNode("");
+    if (destaque) {
+      const span = document.createElement("span");
+      span.className = "nome-destaque";
+      span.appendChild(node);
+      elemento.appendChild(span);
+    } else {
+      elemento.appendChild(node);
+    }
+    return { texto, node };
+  });
+  let parteAtual = 0;
   let i = 0;
-  elemento.innerHTML = "";
 
   function escrever() {
     if (introFinalizada) return;
 
-    if (i < texto.length) {
-      elemento.innerHTML = texto.substring(0, i + 1);
+    while (parteAtual < partes.length && i >= partes[parteAtual].texto.length) {
+      parteAtual++;
+      i = 0;
+    }
+
+    if (parteAtual < partes.length) {
+      const { texto, node } = partes[parteAtual];
+      node.textContent = texto.substring(0, i + 1);
       i++;
       typingTimer = window.setTimeout(escrever, 40);
       return;
@@ -70,7 +90,7 @@ function mostrarCenaGoblin() {
     if (introFinalizada) return;
 
     if (falaGoblin) {
-      falaGoblin.innerHTML = "“Haaaaaaa! Carne fresca! Você não passará, herói!”";
+      falaGoblin.textContent = "“Haaaaaaa! Carne fresca! Você não passará, herói!”";
     }
 
     if (btnContinuar) {
