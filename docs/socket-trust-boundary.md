@@ -3,6 +3,13 @@
 Revisão do fluxo atual de conexão, setup, combate e recompensas. A demo do
 GitHub Pages continua local; esta revisão trata do backend Socket.IO.
 
+## Fluxo online disponível
+
+`/play` usa HTTP autenticado na mesma origem, personagem carregado por conta
+e batalhas/recompensas persistidas no PostgreSQL. Leia [online-game.md](online-game.md)
+para limites, concorrência e recuperação. Os handlers Socket.IO descritos
+abaixo são de desenvolvimento e continuam bloqueados em produção.
+
 ## Fluxo observado
 
 1. O portal `/login` no backend autentica email/senha ou Google e emite uma

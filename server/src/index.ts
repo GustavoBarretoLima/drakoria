@@ -11,6 +11,8 @@ import { AuthRepository } from "./auth/repository.js";
 import { CharacterRepository } from "./database/characterRepository.js";
 import { createAuthHandler } from "./auth/http.js";
 import { authOrigin } from "./auth/security.js";
+import { GameRepository } from "./game/repository.js";
+import { createGameHandler } from "./game/http.js";
 import { googleVerifier } from "./auth/google.js";
 
 const port = getServerPort(process.env.PORT);
@@ -30,9 +32,11 @@ const auth = authRepo && databasePool ? createAuthHandler({
   repo: authRepo, characters: new CharacterRepository(databasePool), origin, production,
   ...(googleClientId ? { googleClientId, verifyGoogle: googleVerifier(googleClientId) } : {}),
 }) : undefined;
+const game = authRepo && databasePool ? createGameHandler({ auth: authRepo, game: new GameRepository(databasePool), origin, production }) : undefined;
 const httpServer = createServer((request, response) => {
   void (async () => {
     if (auth && await auth(request, response)) return;
+    if (game && await game(request, response)) return;
     await health(request, response);
   })().catch(() => { if (!response.headersSent) response.writeHead(503); response.end(); });
 });
@@ -53,8 +57,8 @@ const io = new Server(httpServer, {
   allowRequest: (request, callback) => callback(null, !request.headers.origin || allowedOrigins.includes(request.headers.origin)),
 });
 
-// The demo is local. Production combat stays closed until saved character state
-// replaces player-provided setup, equipment and rewards in the online handlers.
+// The online /play flow uses authenticated HTTP and PostgreSQL state.
+// Legacy sockets still accept browser setup and stay closed in production.
 if (production) io.use((_socket, next) => next(new Error("Combate online ainda não disponível.")));
 
 const battleManager = new BattleManager();

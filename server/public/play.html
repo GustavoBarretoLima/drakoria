@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jogar online — Drakoria</title><link rel="stylesheet" href="/play.css"><script src="/play.js" defer></script></head>
+<body><main>
+<header><div><p class="eyebrow">DRAKORIA · ONLINE</p><h1>Estrada dos Goblins</h1><p>Seu personagem, suas conquistas.</p></div><a href="/login">Minha conta →</a></header>
+<p id="message" role="status" aria-live="polite">Carregando seu personagem…</p>
+<section id="game" hidden>
+<div class="overview"><section class="panel"><h2 id="hero-name"></h2><p id="hero-info"></p><div class="resources"><span id="hp"></span><span id="mana"></span></div><p id="progress"></p></section>
+<section class="panel camp"><h2>Acampamento</h2><p>Descanse entre encontros para recuperar HP e mana. O descanso é gratuito nesta etapa de testes.</p><div class="actions"><button id="start" class="primary">Encontrar um goblin</button><button id="rest">Descansar</button><button id="refresh">Atualizar progresso</button></div></section></div>
+<section class="panel" id="battle-panel" hidden><div class="battle-heading"><h2 id="enemy-name"></h2><p id="battle-status"></p></div><p id="enemy-hp"></p><div id="battle-actions" class="actions"></div><p id="rewards"></p><h3>Últimos acontecimentos</h3><ol id="battle-log" aria-live="polite"></ol></section>
+<section class="panel"><h2>Inventário</h2><p class="muted">Cada equipamento pertence ao seu personagem. Troque equipamentos no acampamento.</p><ul id="inventory"></ul></section>
+</section>
+<footer>Teste online por turnos · Personagem, batalha e recompensas ficam salvos no servidor. Esta primeira região tem goblins até nível 10. A demo local usa outro progresso. <a href="https://gustavobarretolima.github.io/drakoria/">Voltar ao Reino</a></footer>
+</main></body></html>

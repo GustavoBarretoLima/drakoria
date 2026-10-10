@@ -2,8 +2,9 @@
 
 O `render.yaml` configura somente o backend de testes; a demo publicada continua
 com seu comportamento atual. O portal `/login` oferece cadastro, login e
-criação de personagem no banco. Saves de combate online e pagamentos Pix ainda
-não estão conectados.
+criação de personagem no banco. `/play` oferece a primeira região online por
+turnos, com batalha e recompensas persistentes (ver online-game.md). Pagamentos
+Pix ainda não estão conectados.
 
 ## Recursos
 
