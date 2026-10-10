@@ -3,13 +3,18 @@ import { loadConsumables, loadHeroVitals, saveHeroVitals } from "../battle/heroV
 import { getCurrentHeroStats, syncCharacterVitals } from "../progression/heroStats.js";
 import { loadProgress, saveProgress } from "../progression/progressionClient.js";
 import { buyPotion } from "../progression/shopClient.js";
-import { openBlacksmith } from "./blacksmith.js";
-import { openGuild } from "./guild.js";
 
 const TAVERN_REST_COST = 20;
 type EstablishmentId = "taberna" | "ferreiro" | "guilda";
 
 const establishmentIds: EstablishmentId[] = ["taberna", "ferreiro", "guilda"];
+
+declare global {
+  interface Window {
+    carregarFerreiro?: () => void;
+    carregarGuilda?: () => void;
+  }
+}
 
 function getPanel(id: EstablishmentId): HTMLElement | null {
   return document.getElementById(id);
@@ -95,8 +100,8 @@ function openTavern(): void {
 function openEstablishment(id: EstablishmentId): void {
   hideInteriors();
   if (id === "taberna") openTavern();
-  else if (id === "ferreiro") openBlacksmith();
-  else openGuild();
+  else if (id === "ferreiro") window.carregarFerreiro?.();
+  else window.carregarGuilda?.();
 }
 
 function currentEstablishment(): EstablishmentId | null {
