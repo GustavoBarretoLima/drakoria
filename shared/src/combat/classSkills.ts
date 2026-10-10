@@ -76,7 +76,11 @@ export function getSkill(id: string): ClassSkill | undefined {
   return [...CLASS_SKILLS, ...SUBCLASS_SKILLS].find(skill => skill.id === id);
 }
 
-export function getHeroSkills(hero: CombatantState): readonly ClassSkill[] {
+// Listing learned/equipped skills only needs the build, so the status page can
+// use the same rules without inventing battle resources or casting a fake hero.
+export type HeroSkillBuild = Pick<CombatantState, "className" | "level" | "subclassId" | "treeRanks" | "equippedSkills">;
+
+export function getHeroSkills(hero: HeroSkillBuild): readonly ClassSkill[] {
   const ranks = normalizeTreeRanks(hero.subclassId, hero.level ?? 1, hero.treeRanks);
   if (hero.subclassId === "berserker" && hero.className === "guerreiro") {
     const equipped = normalizeBerserkLoadout(hero.level ?? 1, ranks, hero.equippedSkills);

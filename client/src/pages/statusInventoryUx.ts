@@ -49,8 +49,8 @@ declare global {
     equiparItemInventario: (itemId: string) => void;
     desequiparSlotInventario: (slot: EquipmentSlot) => void;
     venderItemInventario: (itemId: string) => void;
-    abrirStatus: () => void;
-    fecharPainelPraca: () => void;
+    abrirStatus?: () => void;
+    fecharPainelPraca?: () => void;
     criarFichaPersonagemJRPG: () => { profile: string; attributes: string };
     criarPocoesInventario?: () => string;
     inventoryUxClassesLabel?: (item: EquipmentItem) => string;
@@ -327,8 +327,8 @@ document.addEventListener("click", event => {
   else if (action === "equip") equipInventoryItem(actionElement.dataset.itemId ?? "");
   else if (action === "sell") sellInventoryItem(actionElement.dataset.itemId ?? "");
   else if (action === "unequip") unequipInventorySlot(actionElement.dataset.slot as EquipmentSlot);
-  else if (action === "status") window.abrirStatus();
-  else if (action === "close") window.fecharPainelPraca();
+  else if (action === "status") window.abrirStatus?.();
+  else if (action === "close") window.fecharPainelPraca?.();
   else if (action === "hide-details") {
     const detail = actionElement.closest<HTMLElement>(".equipped-item-details");
     if (detail) detail.hidden = true;

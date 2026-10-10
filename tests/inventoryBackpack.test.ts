@@ -54,10 +54,14 @@ assert.equal(getEquippedItems().length, 0);
 
 windowStub.equiparItemInventario(sword.id);
 const [loadoutHtml = "", backpackHtml = ""] = panel.innerHTML.split('<div class="inventory-grid">');
-assert.ok(!backpackHtml.includes(sword.name));
+// The equipped sword is named in another item's comparison tooltip. Check
+// actionable item IDs instead of treating any mention of its name as a copy.
+assert.ok(backpackHtml.includes(`Equipado: ${sword.name}`));
+assert.ok(!backpackHtml.includes(`data-item-id="${sword.id}"`));
+assert.ok(backpackHtml.includes(`data-item-id="${axe.id}"`));
 assert.ok(loadoutHtml.includes(sword.name));
 windowStub.desequiparSlotInventario("weapon");
-assert.ok(panel.innerHTML.split('<div class="inventory-grid">')[1]!.includes(sword.name));
+assert.ok(panel.innerHTML.split('<div class="inventory-grid">')[1]!.includes(`data-item-id="${sword.id}"`));
 
 windowStub.equiparItemInventario(axe.id);
 windowStub.venderItemInventario(axe.id);

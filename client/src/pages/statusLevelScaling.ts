@@ -53,9 +53,9 @@ const STATUS_STAT_LABELS: Record<keyof EquipmentStats, string> = {
 
 declare global {
   interface Window {
-    abrirStatus: () => void;
+    abrirStatus?: () => void;
     abrirInventario: () => void;
-    fecharPainelPraca: () => void;
+    fecharPainelPraca?: () => void;
     criarFichaPersonagemJRPG: () => CharacterSheetColumns;
     inventoryUxClassesLabel?: (item: EquipmentItem) => string;
     hidePaperTooltipPortal?: () => void;
@@ -205,7 +205,13 @@ export function openStatus(): void {
   const sheet = createCharacterSheet();
   const subclassProgress = loadSubclassProgress();
   const heroSkills = subclass?.id === "berserker"
-    ? getHeroSkills({ className: cls, level: progress.nivel, subclassId: "berserker", treeRanks: getTreeRanks(), equippedSkills: subclassProgress.equippedSkills })
+    ? getHeroSkills({
+      className: cls,
+      level: progress.nivel,
+      subclassId: "berserker",
+      treeRanks: getTreeRanks(),
+      ...(subclassProgress.equippedSkills !== undefined ? { equippedSkills: subclassProgress.equippedSkills } : {}),
+    })
     : getClassSkills(cls);
   const skills = heroSkills.map(skill => `<div class="jrpg-skill-row"><span>${escapeHtml(skill.name)}</span><small>${progress.nivel >= skill.unlockLevel ? "Liberada" : `Nível ${skill.unlockLevel}`}</small></div>`).join("");
 
@@ -226,7 +232,7 @@ document.addEventListener("click", event => {
   const button = (event.target as Element | null)?.closest<HTMLButtonElement>("[data-status-action]");
   if (!button) return;
   if (button.dataset.statusAction === "inventory") window.abrirInventario();
-  else if (button.dataset.statusAction === "close") window.fecharPainelPraca();
+  else if (button.dataset.statusAction === "close") window.fecharPainelPraca?.();
   else if (button.dataset.statusAction === "subclass") openSubclassTree();
 });
 
