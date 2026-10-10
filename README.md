@@ -169,7 +169,8 @@ O desenvolvimento local usa o backend. O modo demo é ativado automaticamente no
 O [portal de contas](https://drakoria-staging-api.onrender.com/login) oferece
 cadastro por email/senha, login, saída e um personagem no PostgreSQL. A opção
 Google é ativada após configurar o Client ID no Render. O progresso da demo
-continua local; o combate online de produção aguarda a integração do save.
+continua local; o modo online em `/play` salva personagem, batalhas e
+expedições no servidor. Veja [o guia online](docs/online-game.md).
 Veja [configuração e testes](docs/authentication.md).
 
 ## ✅ Validação

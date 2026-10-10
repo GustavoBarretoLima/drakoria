@@ -21,3 +21,5 @@
 .enemy[data-sprite='orc_rei']{ --sprite-width:1.953488; --sprite-height:1.674419; --sprite-center:0.926599; --sprite-top:0.578488; }
 .enemy[data-sprite='rato_mutante']{ --sprite-width:2.630137; --sprite-height:1.753425; --sprite-center:1.263699; --sprite-top:0.691781; }
 .enemy[data-sprite]:not([data-sprite='']) .sprite-window{--visible-size:170px}.enemy[data-sprite]:not([data-sprite='']) .sprite-window img{max-width:none;object-fit:fill;width:calc(var(--visible-size)*var(--sprite-width));height:calc(var(--visible-size)*var(--sprite-height));left:calc(50% - var(--visible-size)*var(--sprite-center));top:calc(220px - var(--visible-size) - var(--visible-size)*var(--sprite-top));bottom:auto}@media(max-width:650px){.enemy[data-sprite]:not([data-sprite='']) .sprite-window{--visible-size:130px}.enemy[data-sprite]:not([data-sprite='']) .sprite-window img{top:calc(185px - var(--visible-size) - var(--visible-size)*var(--sprite-top))}}
+
+.map-hotspot:disabled{opacity:1;color:#a9b5aa;background:#111d19f2;border-color:#687158}

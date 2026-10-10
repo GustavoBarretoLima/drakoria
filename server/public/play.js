@@ -26,9 +26,9 @@ function render() {
   el('xp-bar').max = c.xpToNextLevel; el('xp-bar').value = c.xp;
   el('progress').textContent = `${c.xp} / ${c.xpToNextLevel} XP · ${c.gold} ouro`;
   const expedition = snapshot.expedition, exploring = expedition?.status === 'active';
-  el('start').hidden = !exploring; el('retreat').hidden = !exploring;
-  el('start').textContent = expedition?.state.bossPending ? 'Enfrentar o chefe' : 'Próximo encontro';
-  el('start').disabled = busy || fighting || !exploring || c.stats.hp <= 0;
+  el('start').hidden = !exploring && !fighting; el('retreat').hidden = !exploring;
+  el('start').textContent = fighting ? 'Ir para batalha' : expedition?.state.bossPending ? 'Enfrentar o chefe' : 'Próximo encontro';
+  el('start').disabled = busy || (!fighting && (!exploring || c.stats.hp <= 0));
   el('retreat').disabled = busy || fighting;
   renderMap(fighting, exploring);
   el('rest').disabled = busy || fighting;
@@ -118,7 +118,10 @@ async function run(work) {
     el('message').textContent = error.message;
   } finally { busy = false; render(); }
 }
-el('start').addEventListener('click', () => void run(() => startExpedition(snapshot.expedition.regionId, snapshot.expedition.id)));
+el('start').addEventListener('click', () => {
+  if (snapshot.battle && !snapshot.battle.state.finished) { el('battle-panel').scrollIntoView({ block: 'start' }); return; }
+  void run(() => startExpedition(snapshot.expedition.regionId, snapshot.expedition.id));
+});
 el('retreat').addEventListener('click', () => void run(async () => { snapshot = await api('/game/retreat', { version: snapshot.character.version, expeditionId: snapshot.expedition.id }); }));
 el('rest').addEventListener('click', () => void run(async () => { snapshot = await api('/game/rest', { version: snapshot.character.version }); }));
 el('refresh').addEventListener('click', () => void run(async () => { snapshot = await api('/game/state'); }));

@@ -48,6 +48,7 @@ await page.locator('.world-map>img').evaluate(img=>img.decode());
 await page.screenshot({path:`${output}/map-desktop.png`,fullPage:true});
 await page.getByRole('button',{name:'Explorar Cemitério Esquecido',exact:true}).click();
 await page.locator('#battle-panel').waitFor({state:'visible'});assert.equal(starts,1);
+await page.getByRole('button',{name:'Ir para batalha',exact:true}).click(); assert.equal(starts,1); assert.equal(actions,0);
 assert.match(await page.locator('#enemy-sprite').getAttribute('src'),/esqueleto_guerreiro\/idle.gif$/);
 await page.locator('#hero-sprite').evaluate(img=>img.decode());await page.locator('#enemy-sprite').evaluate(img=>img.decode());
 assert.equal(await page.locator('#hero-health-bar').evaluate(bar=>bar.value),snapshot.battle.state.hero.stats.hp);
@@ -71,6 +72,8 @@ for (const region of onlineRegions) {
  assert.equal(await page.locator('#arena-region').textContent(),region.label);
  assert.equal(await page.locator('#battle-scene').getAttribute('data-region'),region.id);
  assert.match(await page.locator('#enemy-sprite').getAttribute('src'),/monsters\/.+\/static.png$/);
+ snapshot={...snapshot,battle:{...snapshot.battle,state:{...snapshot.battle.state,finished:true,winnerId:snapshot.battle.state.hero.id}}};
+ await page.reload();await page.locator('#game').waitFor({state:'visible'});
  assert.equal(await page.locator('#start').textContent(),'Enfrentar o chefe');
 }
 snapshot=fixture();await page.setViewportSize({width:390,height:844});await page.emulateMedia({reducedMotion:'no-preference'});await page.reload();await page.locator('#game').waitFor({state:'visible'});
