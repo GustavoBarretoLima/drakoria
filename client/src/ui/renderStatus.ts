@@ -7,16 +7,48 @@ export function renderStatus(state: BattleState) {
   };
   const bar = (id: string, value: number) => {
     const element = document.getElementById(id);
-    if (element) element.style.width = `${Math.max(0, Math.min(100, value))}%`;
+    if (!element) return;
+    element.style.width = `${Math.max(0, Math.min(100, value))}%`;
+    element.style.transition = "width 180ms ease";
+  };
+  const hpBar = (id: string, current: number, max: number) => {
+    const percent = max > 0 ? current / max * 100 : 0;
+    bar(id, percent);
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    if (percent <= 25) {
+      element.style.background = "linear-gradient(90deg, #9d111f, #ff3d4f)";
+      element.style.boxShadow = "0 0 8px rgba(255, 61, 79, .68)";
+      return;
+    }
+
+    if (percent <= 50) {
+      element.style.background = "linear-gradient(90deg, #bd3b1f, #ff7c3d)";
+      element.style.boxShadow = "none";
+      return;
+    }
+
+    element.style.background = "linear-gradient(90deg, #d63344, #ff6673)";
+    element.style.boxShadow = "none";
+  };
+  const atbBar = (id: string, value: number) => {
+    bar(id, value);
+    const element = document.getElementById(id);
+    if (!element) return;
+    const ready = value >= 99;
+    element.style.filter = ready ? "brightness(1.2)" : "none";
+    element.style.boxShadow = ready ? "0 0 8px rgba(255, 226, 122, .72)" : "none";
   };
   const ratio = (value: number, max: number) => max > 0 ? value / max * 100 : 0;
-  bar("hpHeroiBar", ratio(state.hero.stats.hp, state.hero.stats.maxHp));
+
+  hpBar("hpHeroiBar", state.hero.stats.hp, state.hero.stats.maxHp);
   const berserk = state.hero.subclassId === "berserker";
   bar("manaHeroiBar", berserk ? state.hero.fury ?? 0 : ratio(state.hero.stats.mana, state.hero.stats.maxMana));
   document.getElementById("manaHeroiBar")?.classList.toggle("berserk-fury", berserk);
-  bar("atbHeroiBar", state.hero.atb);
-  bar("hpInimigoBar", ratio(state.enemy.stats.hp, state.enemy.stats.maxHp));
-  bar("atbInimigoBar", state.enemy.atb);
+  atbBar("atbHeroiBar", state.hero.atb);
+  hpBar("hpInimigoBar", state.enemy.stats.hp, state.enemy.stats.maxHp);
+  atbBar("atbInimigoBar", state.enemy.atb);
   text("hpHeroiTexto", "Vida");
   text("manaHeroiTexto", berserk ? `Fúria ${state.hero.fury ?? 0}/100` : "Mana");
   text("atbHeroiTexto", "ATB");
