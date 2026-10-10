@@ -42,6 +42,20 @@ window.addEventListener("DOMContentLoaded", () => {
       if (!drawer.contains(event.target as Node)) setOpen(false);
     });
   }
+
+  document.querySelectorAll<HTMLElement>("[data-city-href]").forEach(hotspot => {
+    const navigate = (): void => {
+      const href = hotspot.dataset.cityHref;
+      if (href) window.location.href = href;
+    };
+    hotspot.addEventListener("click", navigate);
+    hotspot.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      navigate();
+    });
+  });
+
   // Panels replace their contents when switching tabs, buying or learning a skill.
   // Recreate one sticky close bar without depending on each panel's footer.
   for (const id of ["painelPraca", "taberna", "ferreiro", "guilda"]) {
