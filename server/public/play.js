@@ -1,7 +1,9 @@
+import { createNavigation } from '/play-navigation.js';
 import { createBattleVisuals, equipmentIcon } from '/play-visuals.js';
 const el = id => document.getElementById(id);
 let snapshot, busy = false, pendingStart, pendingQuest, pendingSpecialization, pendingTavern, guildRegion = 'cemiterio-esquecido';
 const visuals = createBattleVisuals();
+const navigation = createNavigation();
 async function api(path, body) {
   const response = await fetch(path, { credentials: 'same-origin', cache: 'no-store',
     ...(body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }) });
@@ -19,6 +21,7 @@ function render() {
   const { character: c, battle: b, inventory } = snapshot;
   const fighting = !!b && !b.state.finished;
   el('game').hidden = false;
+  renderCharacter();
   el('hero-name').textContent = c.name;
   el('hero-info').textContent = `${snapshot.specialization?.active?.name || c.heroClass} · Nível ${c.level}`;
   el('hp').textContent = `HP ${c.stats.hp} / ${c.stats.maxHp}`;
@@ -35,7 +38,6 @@ function render() {
   renderTavern(fighting);
   renderSpecialization(fighting);
   el('refresh').disabled = busy;
-  el('battle-panel').hidden = !b;
   if (b) {
     const state = b.state;
     visuals.render(snapshot);
@@ -76,6 +78,23 @@ function render() {
     info.append(text); li.append(info, button('Equipar', async () => { snapshot = await api('/game/equip', { version: c.version, instanceId: entry.instanceId }); }, busy || fighting || entry.equipped || !entry.canEquip));
     el('inventory').append(li);
   }
+  navigation.render(snapshot);
+}
+function renderCharacter() {
+  const c = snapshot.character;
+  el('square-hero-name').textContent = c.name;
+  el('square-hero-info').textContent = `${snapshot.specialization?.active?.name || c.heroClass} · Nível ${c.level} · ${c.gold} ouro`;
+  const portrait = el('profile-sprite'), art = c.presentation;
+  const source = art?.[el('reduce-motion').checked ? 'static' : 'idle'] || `/game-assets/${c.heroClass}-${el('reduce-motion').checked ? 'static.png' : 'idle.gif'}`;
+  if (portrait.getAttribute('src') !== source) portrait.src = source;
+  el('hero-attributes').replaceChildren(...[['attack','Ataque'],['magicPower','Poder mágico'],['defense','Defesa'],['magicDefense','Defesa mágica'],['speed','Velocidade'],['criticalChance','Chance crítica'],['criticalDamage','Dano crítico'],['dodgeChance','Esquiva']].map(([key,label]) => {
+    const row = document.createElement('div'), term = document.createElement('dt'), value = document.createElement('dd'); row.className='jrpg-attribute-row'; term.textContent=label; value.textContent=`${c.stats[key]}${['criticalChance','criticalDamage','dodgeChance'].includes(key)?'%':''}`; row.append(term,value); return row;
+  }));
+  el('hero-skills').replaceChildren(...(snapshot.specialization?.learnedSkills || []).map(skill => { const row=document.createElement('div');row.className='jrpg-skill-row';row.textContent=skill.name;return row; }));
+  const labels = {weapon:'Arma',armor:'Armadura',shield:'Mão secundária',legs:'Pernas',boots:'Botas',gloves:'Luvas',ring:'Anel',earring:'Brinco',necklace:'Colar'};
+  el('hero-equipment').replaceChildren(...Object.entries(labels).map(([slot,label]) => {
+    const item=snapshot.inventory.find(entry=>entry.equipped && entry.definition.slot===slot),row=document.createElement('div'),name=document.createElement('span'),value=document.createElement('strong');row.className=`equipment-slot ${item?'occupied':''} rarity-${item?.definition.rarity || 'common'}`;name.textContent=label;value.textContent=item?.definition.name || 'Vazio';row.append(name);const icon=item && equipmentIcon(item.definition.icon);if(icon){const art=document.createElement('span'),img=document.createElement('img');art.className='equipment-art';img.src=icon;img.alt='';img.width=64;img.height=64;art.append(img);row.append(art);}row.append(value);return row;
+  }));
 }
 function renderTavern(fighting) {
   const tavern = snapshot.tavern;
@@ -216,7 +235,7 @@ async function startExpedition(regionId, expeditionId) {
   if (!pendingStart || pendingStart.regionId !== regionId || pendingStart.expeditionId !== expeditionId) {
     pendingStart = { requestId: crypto.randomUUID(), regionId, version: snapshot.character.version, ...(expeditionId ? { expeditionId } : {}) };
   }
-  try { snapshot = await api('/game/start', pendingStart); pendingStart = undefined; render(); el('battle-panel').scrollIntoView({ block: 'start' }); }
+  try { snapshot = await api('/game/start', pendingStart); pendingStart = undefined; render(); navigation.show('batalha'); }
   catch (error) { if (error.status === 400 || error.status === 409) pendingStart = undefined; throw error; }
 }
 async function run(work) {
@@ -229,8 +248,9 @@ async function run(work) {
     el('message').textContent = error.message;
   } finally { busy = false; render(); }
 }
+el('reduce-motion').addEventListener('change', () => { if (snapshot) renderCharacter(); });
 el('start').addEventListener('click', () => {
-  if (snapshot.battle && !snapshot.battle.state.finished) { el('battle-panel').scrollIntoView({ block: 'start' }); return; }
+  if (snapshot.battle && !snapshot.battle.state.finished) { navigation.show('batalha'); return; }
   void run(() => startExpedition(snapshot.expedition.regionId, snapshot.expedition.id));
 });
 el('retreat').addEventListener('click', () => void run(async () => { snapshot = await api('/game/retreat', { version: snapshot.character.version, expeditionId: snapshot.expedition.id }); }));

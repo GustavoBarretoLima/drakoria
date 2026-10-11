@@ -17,6 +17,8 @@ const files = new Map([
   ['/play.js', ['play.js', 'text/javascript; charset=utf-8']],
   ['/play-visuals.js', ['play-visuals.js', 'text/javascript; charset=utf-8']],
   ['/play.css', ['play.css', 'text/css; charset=utf-8']],
+  ['/play-layout.css', ['play-layout.css', 'text/css; charset=utf-8']],
+  ['/play-navigation.js', ['play-navigation.js', 'text/javascript; charset=utf-8']],
 ]);
 const routes = ['/game/state', '/game/start', '/game/action', '/game/rest', '/game/equip', '/game/retreat', '/game/quests/accept', '/game/quests/claim', '/game/tavern/buy', '/game/tavern/use', ...['use-book', 'invest', 'reset', 'skill-slot'].map(operation => `/game/specialization/${operation}`)];
 function send(response: ServerResponse, status: number, data: unknown) {

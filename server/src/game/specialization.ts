@@ -25,7 +25,7 @@ export async function specializationSnapshot(client: PoolClient, character: Spec
     loadout: id === 'berserker' ? normalizeBerserkLoadout(character.level, ranks, character.skill_loadout) : [],
     learnedSkills: getHeroSkills({ className: character.hero_class, level: character.level, ...(id ? { subclassId: id } : {}), treeRanks: ranks,
       ...(id === 'berserker' ? { equippedSkills: SUBCLASS_TREES[id].filter(node => node.skill && ranks[node.id]).map(node => node.id).slice(0, 4) } : {}) })
-      .filter(skill => !skill.subclassId || !!ranks[skill.id]).map(skill => ({ id: skill.id, name: skill.name })),
+      .filter(skill => character.level >= skill.unlockLevel && (!skill.subclassId || !!ranks[skill.id])).map(skill => ({ id: skill.id, name: skill.name })),
     // Slot choices include all learned Berserk actives, not just the equipped four.
     slotChoices: id === 'berserker' ? SUBCLASS_TREES[id].filter(node => node.skill && ranks[node.id]).map(node => ({ id: node.id, name: node.name })) : [] };
 }
