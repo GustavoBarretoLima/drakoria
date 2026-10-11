@@ -107,6 +107,7 @@ assert.equal(await page.locator('body').getAttribute('data-view'),'status');
 assert.ok(await page.locator('#city-sidebar').evaluate(node=>node.inert));
 assert.match(await page.locator('#hero-name').textContent(),/Taichou/);
 assert.equal(await page.locator('#hero-attributes dd').count(),8);assert.equal(await page.locator('#hero-equipment .equipment-slot').count(),9);
+assert.equal(await page.locator('#hero-equipment .equipment-slot strong').first().isVisible(),true);
 await page.locator('#profile-sprite').evaluate(img=>img.decode());
 await page.screenshot({path:`${output}/status-desktop.png`,fullPage:true});
 await page.locator('.jrpg-sheet-header a[href="#inventario"]').click();assert.equal(await page.locator('body').getAttribute('data-view'),'inventario');

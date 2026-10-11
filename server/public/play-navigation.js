@@ -26,8 +26,6 @@ export function createNavigation() {
   function show(name) { if (!Object.hasOwn(titles,name)) return; if (location.hash === `#${name}`) { view=name; apply(true); } else location.hash=name; }
   window.addEventListener('hashchange', () => { const name=location.hash.slice(1); view=Object.hasOwn(titles,name)?name:'praca'; setOpen(false); apply(true); });
   handle.addEventListener('click', () => setOpen(!drawer.classList.contains('is-open')));
-  drawer.addEventListener('pointerenter', event => { if (event.pointerType === 'mouse') setOpen(true); });
-  drawer.addEventListener('pointerleave', event => { if (event.pointerType === 'mouse') setOpen(false); });
   drawer.addEventListener('keydown', event => { if (event.key === 'Escape') { setOpen(false); handle.focus(); } });
   drawer.addEventListener('focusout', event => { if (!drawer.contains(event.relatedTarget)) setOpen(false); });
   document.addEventListener('pointerdown', event => { if (!drawer.contains(event.target)) setOpen(false); });
