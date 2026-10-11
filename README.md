@@ -35,6 +35,12 @@ A Taberna de `/play` oferece as nove poções de recuperação existentes (HP, m
 
 A migração `007` adiciona estoque por personagem e recibos imutáveis de compra/consumo/descanso. Sessão, origem, catálogo, saldo, estoque, versão e identificador de tentativa são validados no servidor. Ouro, estoque, recursos e recibo são gravados na mesma transação; retries não repetem compras ou consumo. O antigo descanso gratuito de teste deixa de ser acessível pela API. Após derrota, o personagem retorna com 30% do HP máximo sem custo, preservando a mana restante; saves online antigos com zero HP recebem essa recuperação uma única vez ao carregar fora de combate, permitindo continuar sem ouro. A batalha concluída conserva seu resultado original.
 
+### Aparência da demo no online autenticado
+
+`/play` usa a praça original de Drakoria como entrada, com portas da Taberna/Guilda e o menu lateral recolhível. Status e Inventário reutilizam o visual JRPG da demo, com retrato da classe/subclasse, atributos, nove espaços de equipamentos e mochila. Livros/talentos, mapa, Taberna, Guilda e batalha abrem como telas próprias; o combate mantém as artes/animações e recebe os painéis azuis da identidade original.
+
+A navegação por fragmentos (`#praca`, `#status`, `#inventario`, `#livros`, `#mapa`, `#taberna`, `#guilda`, `#batalha`) permite voltar e atualizar sem reiniciar progresso. O menu funciona por teclado e toque, com foco e movimento reduzido. O online continua usando sessões e snapshots do servidor; os scripts e saves locais da demo não são carregados. Ferreiro e demais recursos ainda locais aguardam integração funcional; venda de equipamentos não foi adicionada nesta etapa visual.
+
 ## 🎮 Jogar
 
 Acesse a versão publicada:
