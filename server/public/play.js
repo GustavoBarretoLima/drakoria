@@ -1,6 +1,6 @@
 import { createBattleVisuals, equipmentIcon } from '/play-visuals.js';
 const el = id => document.getElementById(id);
-let snapshot, busy = false, pendingStart, pendingQuest, pendingSpecialization, guildRegion = 'cemiterio-esquecido';
+let snapshot, busy = false, pendingStart, pendingQuest, pendingSpecialization, pendingTavern, guildRegion = 'cemiterio-esquecido';
 const visuals = createBattleVisuals();
 async function api(path, body) {
   const response = await fetch(path, { credentials: 'same-origin', cache: 'no-store',
@@ -32,8 +32,8 @@ function render() {
   el('retreat').disabled = busy || fighting;
   renderMap(fighting, exploring);
   renderGuild(fighting);
+  renderTavern(fighting);
   renderSpecialization(fighting);
-  el('rest').disabled = busy || fighting;
   el('refresh').disabled = busy;
   el('battle-panel').hidden = !b;
   if (b) {
@@ -41,7 +41,7 @@ function render() {
     visuals.render(snapshot);
     el('enemy-name').textContent = state.enemy.name;
     el('enemy-hp').textContent = `HP inimigo: ${state.enemy.stats.hp} / ${state.enemy.stats.maxHp}`;
-    el('battle-status').textContent = fighting ? 'Sua vez. Escolha uma ação.' : state.winnerId === state.hero.id ? 'Vitória! Progresso salvo.' : 'Derrota. Descanse no acampamento para voltar.';
+    el('battle-status').textContent = fighting ? 'Sua vez. Escolha uma ação.' : state.winnerId === state.hero.id ? 'Vitória! Progresso salvo.' : 'Derrota. Você voltou com parte do HP. Prepare-se na Taberna para tentar novamente.';
     el('command-heading').hidden = !fighting;
     el('battle-actions').replaceChildren();
     if (fighting) {
@@ -76,6 +76,30 @@ function render() {
     info.append(text); li.append(info, button('Equipar', async () => { snapshot = await api('/game/equip', { version: c.version, instanceId: entry.instanceId }); }, busy || fighting || entry.equipped || !entry.canEquip));
     el('inventory').append(li);
   }
+}
+function renderTavern(fighting) {
+  const tavern = snapshot.tavern;
+  if (!tavern) return;
+  const c = snapshot.character, locked = busy || fighting;
+  el('tavern-resources').textContent = `HP ${c.stats.hp}/${c.stats.maxHp} · Mana ${c.stats.mana}/${c.stats.maxMana} · ${c.gold} ouro`;
+  el('tavern-rest-detail').textContent = `Descanso: ${tavern.restCost} ouro para recuperar todo o HP e a mana.${tavern.restBlocked ? ` ${tavern.restBlocked}` : ''}`;
+  el('rest').textContent = `Descansar · ${tavern.restCost} ouro`; el('rest').disabled = locked || !!tavern.restBlocked;
+  el('tavern-potions').replaceChildren(...tavern.potions.map(potion => {
+    const card = document.createElement('article'), icon = document.createElement('img'), title = document.createElement('h3'), effect = document.createElement('p'), stock = document.createElement('p'), actions = document.createElement('div');
+    icon.src = potion.icon; icon.alt = ''; icon.width = 64; icon.height = 64; icon.loading = 'lazy';
+    title.textContent = potion.name; effect.textContent = potion.detail; stock.textContent = `${potion.price} ouro · Na mochila: ${potion.quantity}`; actions.className = 'actions';
+    const buy = button(`Comprar ${potion.name} · ${potion.price} ouro`, () => tavernCommand({ operation: 'buy', potionId: potion.id, quantity: 1 }), locked || !!potion.buyBlocked);
+    const use = button(`Usar ${potion.name}`, () => tavernCommand({ operation: 'use', potionId: potion.id }), locked || !!potion.useBlocked);
+    buy.title = fighting ? 'Conclua a batalha antes de usar a Taberna.' : potion.buyBlocked || 'Comprar uma unidade'; use.title = fighting ? 'Conclua a batalha antes de usar a Taberna.' : potion.useBlocked || potion.detail;
+    actions.append(buy, use); card.append(icon, title, effect, stock, actions); return card;
+  }));
+}
+async function tavernCommand(command) {
+  const fingerprint = JSON.stringify(command);
+  if (!pendingTavern || pendingTavern.fingerprint !== fingerprint) pendingTavern = { fingerprint, body: { ...command, requestId: crypto.randomUUID(), version: snapshot.character.version } };
+  const { operation, ...body } = pendingTavern.body;
+  try { snapshot = await api(operation === 'rest' ? '/game/rest' : `/game/tavern/${operation}`, body); pendingTavern = undefined; }
+  catch (error) { if (error.status === 400 || error.status === 409) pendingTavern = undefined; throw error; }
 }
 function renderSpecialization(fighting) {
   const profile = snapshot.specialization;
@@ -212,6 +236,6 @@ el('start').addEventListener('click', () => {
 el('retreat').addEventListener('click', () => void run(async () => { snapshot = await api('/game/retreat', { version: snapshot.character.version, expeditionId: snapshot.expedition.id }); }));
 el('guild-region').addEventListener('change', event => { guildRegion = event.target.value; renderGuild(!!snapshot.battle && !snapshot.battle.state.finished); });
 el('reset-talents').addEventListener('click', () => void run(() => specializationCommand({ operation: 'reset' })));
-el('rest').addEventListener('click', () => void run(async () => { snapshot = await api('/game/rest', { version: snapshot.character.version }); }));
+el('rest').addEventListener('click', () => void run(() => tavernCommand({ operation: 'rest' })));
 el('refresh').addEventListener('click', () => void run(async () => { snapshot = await api('/game/state'); }));
 void run(async () => { snapshot = await api('/game/state'); });

@@ -32,6 +32,8 @@ export function heroPresentation(heroClass: HeroClass, subclassId?: SubclassId) 
   return { idle: `${prefix}idle.gif`, attack: `${prefix}attack.gif`, damage: `${prefix}damage.gif`, death: `${prefix}death.gif`,
     static: `${prefix}static.png`, staticDeath: `${prefix}death.png` };
 }
+gameAssets.set('/game-assets/tavern.png', 'img/stages/taberna-anime.png');
+for (const file of ['hp', 'hp_media', 'hp_grande', 'mana', 'mana_media', 'mana_grande', 'restauradora', 'restauradora_superior', 'elixir']) gameAssets.set(`/game-assets/potions/${file}.png`, `img/itens/pocoes/icones_128/${file}.png`);
 gameAssets.set('/game-assets/guild.png', 'img/stages/guilda-anime.png');
 gameAssets.set('/game-assets/world-map.png', 'img/mapas/arredores_de_drakoria.png');
 for (const stage of ['cemiterio_esquecido', 'pantano_corrompido', 'floresta_sombria', 'acampamento_orc', 'fortaleza_rei_orc']) {

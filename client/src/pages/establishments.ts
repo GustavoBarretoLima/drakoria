@@ -1,10 +1,11 @@
+import { TAVERN_REST_COST } from '../../../shared/src/items/tavern.js';
 import { POTIONS, isPotionId, type PotionId } from "../../../shared/src/items/potions.js";
 import { loadConsumables, loadHeroVitals, saveHeroVitals } from "../battle/heroVitals.js";
 import { getCurrentHeroStats, syncCharacterVitals } from "../progression/heroStats.js";
 import { loadProgress, saveProgress } from "../progression/progressionClient.js";
 import { buyPotion } from "../progression/shopClient.js";
 
-const TAVERN_REST_COST = 20;
+
 type EstablishmentId = "taberna" | "ferreiro" | "guilda";
 
 const establishmentIds: EstablishmentId[] = ["taberna", "ferreiro", "guilda"];

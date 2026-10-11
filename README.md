@@ -29,6 +29,12 @@ O servidor usa os catálogos compartilhados para chances de drop, pré-requisito
 
 Cada cópia de livro tem dono, origem e registro de concessão/consumo. Os comandos validam sessão, origem, versão e identificador de tentativa; personagem, livro, talentos, equipamento e auditoria são gravados na mesma transação. Repetir uma tentativa não consome outro livro ou ponto. A migração `006` preserva personagens, inventário, batalhas, Guilda e expedições existentes. O progresso da demo permanece separado. Comércio, transferência de livros e Pix ainda não fazem parte desta etapa.
 
+### Taberna no online autenticado
+
+A Taberna de `/play` oferece as nove poções de recuperação existentes (HP, mana, restauradoras e Elixir), com preços e efeitos do catálogo compartilhado. O descanso custa **20 ouro** e recupera HP/mana completos. A compra permite uma unidade por clique; a API aceita lotes de 1 a 99, com estoque máximo de 9.999 por tipo. Poções são usadas entre batalhas, respeitam os limites atuais de atributos e são preservadas quando não há recursos a recuperar. Mana não restaura Fúria. Curativos e poções de atributos em combate ficam para outra etapa.
+
+A migração `007` adiciona estoque por personagem e recibos imutáveis de compra/consumo/descanso. Sessão, origem, catálogo, saldo, estoque, versão e identificador de tentativa são validados no servidor. Ouro, estoque, recursos e recibo são gravados na mesma transação; retries não repetem compras ou consumo. O antigo descanso gratuito de teste deixa de ser acessível pela API. Após derrota, o personagem retorna com 30% do HP máximo sem custo, preservando a mana restante; saves online antigos com zero HP recebem essa recuperação uma única vez ao carregar fora de combate, permitindo continuar sem ouro. A batalha concluída conserva seu resultado original.
+
 ## 🎮 Jogar
 
 Acesse a versão publicada:

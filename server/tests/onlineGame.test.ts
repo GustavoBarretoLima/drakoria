@@ -177,8 +177,9 @@ test('online game persists battles and grants rewards atomically by account', as
       const gold = saved.character.gold, xp = saved.character.xp;
       saved = await game.action(c.id, saved.battle!.id, saved.battle!.revision, { type: 'DEFEND' });
       assert.equal(saved.expedition!.status, 'defeated'); assert.equal(saved.expedition!.state.victories, 0);
-      assert.equal(saved.character.gold, gold); assert.equal(saved.character.xp, xp); assert.equal(saved.character.stats.hp, 0);
-      await assert.rejects(game.start(c.id, randomUUID(), 'cemiterio-esquecido', saved.character.version));
+      assert.equal(saved.character.gold, gold); assert.equal(saved.character.xp, xp); assert.equal(saved.character.stats.hp, Math.max(1, Math.floor(saved.battle!.state.hero.stats.maxHp * .3)));
+      saved = await game.start(c.id, randomUUID(), 'cemiterio-esquecido', saved.character.version);
+      assert.equal(saved.battle!.state.finished, false);
       assert.deepEqual(await new GameRepository(pool).load(c.id), saved);
     });
     await t.test('HTTP rejects unauthenticated, cross-origin and forged account/progress requests', async () => {

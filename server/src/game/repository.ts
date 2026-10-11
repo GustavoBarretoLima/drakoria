@@ -1,3 +1,5 @@
+import { defeatRecoveryHp } from '../../../shared/src/items/tavern.js';
+import { tavernSnapshot, tavernCommand, type TavernCharacter, type TavernCommand } from './tavern.js';
 import { randomUUID } from 'node:crypto';
 import type { Pool, PoolClient } from 'pg';
 import { inTransaction } from '../database/pool.js';
@@ -15,7 +17,7 @@ import { guildSnapshot, advanceGuildVictory, questCommand } from './guild.js';
 import { enemyPresentation, heroPresentation } from './assets.js';
 import { characterStats, itemDefinition, playTurn, readyForHero } from './rules.js';
 
-interface Character extends SpecializationCharacter {
+interface Character extends SpecializationCharacter, TavernCharacter {
   id: string; name: string; hero_class: HeroClass; level: number; xp: string; gold: string; version: string;
   current_hp: number | null; current_mana: number | null;
 }
@@ -54,7 +56,7 @@ export class GameRepository {
     const expedition = await this.expedition(client, character.id);
     const battleRun = current?.expedition_id ? (await client.query<Expedition>('SELECT * FROM online_expeditions WHERE id = $1 AND character_id = $2', [current.expedition_id, character.id])).rows[0] : null;
     const progress = normalizeProgress({ nivel: character.level, xp: character.xp, ouro: character.gold });
-    return { specialization: await specializationSnapshot(client, character), guild: await guildSnapshot(client, character.id, character.level), regions: onlineRegions, expedition: expedition ? { id: expedition.id, regionId: expedition.region_id, state: expedition.state, status: expedition.status } : null, character: { id: character.id, name: character.name, heroClass: character.hero_class, subclassId: character.subclass_id, level: character.level,
+    return { tavern: tavernSnapshot(character, stats), specialization: await specializationSnapshot(client, character), guild: await guildSnapshot(client, character.id, character.level), regions: onlineRegions, expedition: expedition ? { id: expedition.id, regionId: expedition.region_id, state: expedition.state, status: expedition.status } : null, character: { id: character.id, name: character.name, heroClass: character.hero_class, subclassId: character.subclass_id, level: character.level,
       xp: Number(character.xp), gold: Number(character.gold), version: character.version, xpToNextLevel: progress.xpParaProximoNivel, stats },
       inventory: inventory.map(entry => ({ instanceId: entry.id, equipped: !!entry.equipped_slot, canEquip: entry.canEquip, definition: entry.item })),
       battle: current ? { heroPresentation: heroPresentation(current.state.hero.className ?? character.hero_class, current.state.hero.subclassId), regionId: battleRun?.region_id ?? null, presentation: enemyPresentation(current.state.enemy.id), id: current.id, revision: current.revision, messages: current.messages,
@@ -63,7 +65,16 @@ export class GameRepository {
           .map(skill => ({ id: skill.id, name: skill.name, manaCost: skill.manaCost, furyCost: skill.furyCost ?? 0, blocked: getSkillBlockReason(current.state.hero, skill) })) } : null };
   }
   async load(accountId: string) {
-    return inTransaction(this.pool, async client => this.snapshot(client, await this.character(client, accountId)));
+    return inTransaction(this.pool, async client => {
+      let character = await this.character(client, accountId);
+      const battle = await this.latest(client, character.id);
+      if (character.current_hp === 0 && (!battle || battle.finished)) {
+        const items = await this.items(client, character);
+        const stats = characterStats(character.hero_class, character.level, items.filter(item => item.equipped_slot).map(item => item.item), character.subclass_id ?? undefined, character.tree_ranks);
+        character = (await client.query<Character>('UPDATE characters SET current_hp = $2, version = version + 1 WHERE id = $1 RETURNING *', [character.id, defeatRecoveryHp(stats.maxHp)])).rows[0]!;
+      }
+      return this.snapshot(client, character, battle);
+    });
   }
   private async saveBattle(client: PoolClient, character: Character, battle: Battle) {
     const state = battle.state;
@@ -95,7 +106,7 @@ export class GameRepository {
       }
       battle.settled = true;
     }
-    character.current_hp = state.hero.stats.hp; character.current_mana = state.hero.stats.mana;
+    character.current_hp = state.finished && state.winnerId !== state.hero.id ? defeatRecoveryHp(state.hero.stats.maxHp) : state.hero.stats.hp; character.current_mana = state.hero.stats.mana;
     const saved = await client.query<Character>(`UPDATE characters SET level = $2, xp = $3, gold = $4, current_hp = $5, current_mana = $6,
       version = version + 1 WHERE id = $1 RETURNING *`, [character.id, character.level, character.xp, character.gold, character.current_hp, character.current_mana]);
     battle.finished = state.finished; battle.messages = battle.messages.slice(-30);
@@ -142,6 +153,18 @@ export class GameRepository {
       if (!battle || battle.finished || battle.revision !== revision) throw new AuthError(409, 'A batalha mudou. Atualize para continuar.');
       battle.state = playTurn(battle.state, action, battle.messages); battle.revision++;
       return this.saveBattle(client, character, battle);
+    });
+  }
+  async tavern(accountId: string, requestId: string, version: string, command: TavernCommand) {
+    return inTransaction(this.pool, async client => {
+      const character = await this.character(client, accountId), battle = await this.latest(client, character.id);
+      const items = await this.items(client, character);
+      const stats = characterStats(character.hero_class, character.level, items.filter(item => item.equipped_slot).map(item => item.item), character.subclass_id ?? undefined, character.tree_ranks);
+      stats.hp = Math.min(stats.maxHp, character.current_hp ?? stats.maxHp); stats.mana = Math.min(stats.maxMana, character.current_mana ?? stats.maxMana);
+      if (!await tavernCommand(client, character, stats, requestId, version, command, !!battle && !battle.finished)) return this.snapshot(client, character);
+      const saved = await client.query<Character>('UPDATE characters SET gold = $2, potion_inventory = $3, current_hp = $4, current_mana = $5, version = version + 1 WHERE id = $1 RETURNING *',
+        [character.id, character.gold, JSON.stringify(character.potion_inventory), character.current_hp, character.current_mana]);
+      return this.snapshot(client, saved.rows[0]!);
     });
   }
   async specialize(accountId: string, requestId: string, version: string, command: SpecializationCommand) {
