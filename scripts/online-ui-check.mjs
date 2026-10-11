@@ -227,7 +227,7 @@ for(const id of SUBCLASS_IDS){
  snapshot=fixture(heroClass,'cemiterio-esquecido','skeleton-warrior-normal-lvl-1',20,id,{[node.id]:1},node.skill?[node.id]:[]);
  await page.emulateMedia({reducedMotion:'reduce'});await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
  await page.locator('#hero-sprite').evaluate(img=>img.decode());assert.match(await page.locator('#hero-sprite').getAttribute('src'),/heroes\/.+\/static.png$/);
- assert.ok(await page.getByRole('button',{name:'Redistribuir todos os pontos',exact:true}).isDisabled());
+ assert.ok(await page.locator('#reset-talents').isDisabled());
  if(id==='berserker'){
   assert.equal(await page.getByRole('button',{name:'Magia · 10 mana',exact:true}).count(),0);assert.match(await page.locator('#arena-hero-health').textContent(),/Fúria/);
   assert.match(await page.getByRole('button',{name:'Golpe Brutal · 0 fúria',exact:true}).textContent(),/fúria/);
