@@ -96,7 +96,7 @@ await context.route('**/*',async route=>{
  return route.fulfill({body:await fs.readFile(file),contentType:type,headers:path==='/play'?{'Content-Security-Policy':"default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'"}:{}});
 });
 await page.goto('https://drakoria.test/play');
-await page.locator('#game').waitFor({state:'visible'});
+await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
 assert.equal(await page.locator('body').getAttribute('data-view'),'praca');
 assert.ok(await page.locator('#city-sidebar').evaluate(node=>node.inert));
 await page.screenshot({path:`${output}/square-desktop.png`,fullPage:true});
@@ -119,7 +119,7 @@ await page.locator('#city-menu-handle').focus();await page.keyboard.press('Enter
 assert.equal(await page.locator('#city-menu-handle').getAttribute('aria-expanded'),'false');
 assert.equal(await page.evaluate(()=>document.activeElement.id),'city-menu-handle');
 await page.setViewportSize({width:1280,height:1050});await reloadView();
-await page.locator('#game').waitFor({state:'visible'});
+await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
 assert.equal(await page.locator('#regions article').count(),5);
 await page.locator('#guild-contracts summary').click();assert.equal(await page.locator('#guild-quests article').count(),3);
 assert.match(await page.locator('#guild-standing').textContent(),/Rank F/);
@@ -129,18 +129,18 @@ await page.getByRole('button',{name:'Aceitar: Patrulha: Cemitério Esquecido',ex
 await page.waitForFunction(()=>document.getElementById('message').textContent==='Progresso sincronizado.');assert.equal(questCommands,1);
 assert.match(await page.locator('#quest-tracker').textContent(),/0\/5/);
 guildProgress.entries['cemiterio-esquecido-hunt'].count=5;snapshot={...snapshot,guild:guildFixture()};
-await reloadView();await page.locator('#game').waitFor({state:'visible'});await page.locator('#guild-contracts summary').click();
+await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);await page.locator('#guild-contracts summary').click();
 await page.getByRole('button',{name:'Entregar Patrulha: Cemitério Esquecido',exact:true}).click();
 await page.waitForFunction(()=>document.getElementById('message').textContent==='Progresso sincronizado.');assert.equal(questCommands,2);
 assert.match(await page.locator('#guild-standing').textContent(),/10 de reputação/);
 assert.match(await page.locator('#guild-receipt').textContent(),/60 XP, 20 ouro/);
 await page.locator('#guild-panel').screenshot({path:`${output}/guild-desktop.png`});
-await reloadView();await page.locator('#game').waitFor({state:'visible'});assert.equal(questCommands,2);
+await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);assert.equal(questCommands,2);
 await page.setViewportSize({width:390,height:844});await page.locator('#guild-contracts summary').click();
 assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
 await page.locator('#guild-panel').screenshot({path:`${output}/guild-mobile.png`});
 testView='mapa';guildProgress=normalizeQuests({});snapshot={...fixture(),battle:null,expedition:null};await page.setViewportSize({width:1280,height:1050});
-await reloadView();await page.locator('#game').waitFor({state:'visible'});
+await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
 await page.locator('.world-map>img').evaluate(img=>img.decode());
 await page.screenshot({path:`${output}/map-desktop.png`,fullPage:true});
 await page.getByRole('button',{name:'Explorar Cemitério Esquecido',exact:true}).click();
@@ -153,27 +153,27 @@ await page.screenshot({path:`${output}/desktop.png`,fullPage:true});
 await page.getByRole('button',{name:'Atacar',exact:true}).click();
 await page.waitForFunction(()=>document.getElementById('message').textContent==='Progresso sincronizado.');
 assert.equal(actions,1);assert.equal(await page.locator('#enemy-health-bar').evaluate(bar=>bar.value),snapshot.battle.state.enemy.stats.hp);
-await reloadView();await page.locator('#game').waitFor({state:'visible'});assert.equal(actions,1);
-await page.emulateMedia({reducedMotion:'reduce'});await reloadView();await page.locator('#game').waitFor({state:'visible'});
+await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);assert.equal(actions,1);
+await page.emulateMedia({reducedMotion:'reduce'});await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
 assert.equal(await page.locator('#reduce-motion').isChecked(),true);
 assert.match(await page.locator('#hero-sprite').getAttribute('src'),/static\.png$/);
 for(const heroClass of ['mago','arqueiro']) {
- snapshot=fixture(heroClass);await reloadView();await page.locator('#game').waitFor({state:'visible'});
+ snapshot=fixture(heroClass);await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
  assert.match(await page.locator('#hero-sprite').getAttribute('src'),new RegExp(heroClass+'-static'));
 }
 for (const region of onlineRegions) {
  const monsterId = { 'cemiterio-esquecido':'cursed-gravedigger-boss-lvl-15', 'pantano-corrompido':'corruption-hydra-boss-lvl-25', 'floresta-sombria':'mutant-wolf-boss-lvl-35', 'acampamento-orc':'orc-warlord-boss-lvl-40', 'fortaleza-rei-orc':'orc-king-boss-lvl-55' }[region.id];
  snapshot=fixture('guerreiro',region.id,monsterId,100);snapshot.expedition.state.bossPending=true;
- await reloadView();await page.locator('#game').waitFor({state:'visible'});
+ await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
  await page.locator('#enemy-sprite').evaluate(img=>img.decode());
  assert.equal(await page.locator('#arena-region').textContent(),region.label);
  assert.equal(await page.locator('#battle-scene').getAttribute('data-region'),region.id);
  assert.match(await page.locator('#enemy-sprite').getAttribute('src'),/monsters\/.+\/static.png$/);
  snapshot={...snapshot,battle:{...snapshot.battle,state:{...snapshot.battle.state,finished:true,winnerId:snapshot.battle.state.hero.id}}};
- await reloadView();await page.locator('#game').waitFor({state:'visible'});
+ await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
  assert.equal(await page.locator('#start').textContent(),'Enfrentar o chefe');
 }
-snapshot=fixture();await page.setViewportSize({width:390,height:844});await page.emulateMedia({reducedMotion:'no-preference'});await reloadView();await page.locator('#game').waitFor({state:'visible'});
+snapshot=fixture();await page.setViewportSize({width:390,height:844});await page.emulateMedia({reducedMotion:'no-preference'});await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
 assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
 await page.locator('#map-hotspots').evaluate(el=>el.closest('.map-scroll').scrollLeft=0);
 await page.evaluate(()=>{location.hash='mapa';});await page.locator('.map-panel').waitFor({state:'visible'});
@@ -184,7 +184,7 @@ testView='taberna';
 // Tavern purchases, interrupted-response retry, consumption, paid rest and authoritative stock.
 snapshot={...fixture('mago','cemiterio-esquecido','skeleton-warrior-normal-lvl-1',20),battle:null,expedition:null};
 snapshot.character={...snapshot.character,gold:100,stats:{...snapshot.character.stats,hp:1,mana:1}};snapshot.tavern=tavernFixture(snapshot.character);
-await page.setViewportSize({width:1280,height:1050});await reloadView();await page.locator('#game').waitFor({state:'visible'});
+await page.setViewportSize({width:1280,height:1050});await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
 await page.locator('#tavern-shop summary').click();assert.equal(await page.locator('#tavern-potions article').count(),9);
 interruptPurchase=true;await page.getByRole('button',{name:'Comprar Poção de HP · 5 ouro',exact:true}).click();
 await page.waitForFunction(()=>document.getElementById('message').textContent==='Resposta interrompida.');
@@ -197,14 +197,14 @@ await page.getByRole('button',{name:'Descansar · 20 ouro',exact:true}).click();
 assert.equal(tavernCommands,3);assert.equal(snapshot.character.gold,75);assert.ok(await page.locator('#rest').isDisabled());
 await page.locator('#tavern-potions img').first().evaluate(img=>img.decode());await page.locator('#tavern-panel').screenshot({path:`${output}/tavern-desktop.png`});
 await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.locator('#tavern-panel').screenshot({path:`${output}/tavern-mobile.png`});
-await reloadView();await page.locator('#game').waitFor({state:'visible'});assert.equal(tavernCommands,3);assert.match(await page.locator('#tavern-resources').textContent(),/75 ouro/);
-snapshot=fixture();await reloadView();await page.locator('#game').waitFor({state:'visible'});await page.locator('#tavern-shop summary').click();
+await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);assert.equal(tavernCommands,3);assert.match(await page.locator('#tavern-resources').textContent(),/75 ouro/);
+snapshot=fixture();await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);await page.locator('#tavern-shop summary').click();
 assert.ok(await page.getByRole('button',{name:'Comprar Poção de HP · 5 ouro',exact:true}).isDisabled());assert.ok(await page.locator('#rest').isDisabled());
 testView='livros';
 // Permanent choice confirmation, intent-only commands, server point balance and slot persistence.
 snapshot={...fixture('guerreiro','cemiterio-esquecido','skeleton-warrior-normal-lvl-1',20),battle:null,expedition:null};
 snapshot.specialization.books=[{instanceId:'00000000-0000-0000-0000-000000000001',subclassId:'berserker',name:SUBCLASS_DEFINITIONS.berserker.bookName,blocked:null}];
-await page.setViewportSize({width:1280,height:1050});await reloadView();await page.locator('#game').waitFor({state:'visible'});
+await page.setViewportSize({width:1280,height:1050});await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
 page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Usar livro',exact:true}).click();
 await page.waitForFunction(()=>document.getElementById('message').textContent==='Progresso sincronizado.');assert.equal(specializationCommands,1);
 assert.match(await page.locator('#specialization-active').textContent(),/Berserk/);
@@ -217,14 +217,14 @@ await page.locator('#skill-slot-0').selectOption('');await page.waitForFunction(
 await page.locator('#specialization-panel').screenshot({path:`${output}/specialization-desktop.png`});
 await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
 await page.locator('#specialization-panel').screenshot({path:`${output}/specialization-mobile.png`});
-await reloadView();await page.locator('#game').waitFor({state:'visible'});assert.equal(specializationCommands,3);assert.equal(await page.locator('#skill-slot-0').inputValue(),'');
+await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);assert.equal(specializationCommands,3);assert.equal(await page.locator('#skill-slot-0').inputValue(),'');
 await page.getByRole('button',{name:'Redistribuir todos os pontos',exact:true}).click();await page.waitForFunction(()=>document.getElementById('message').textContent==='Progresso sincronizado.');
 assert.equal(specializationCommands,4);assert.match(await page.locator('#talent-points').textContent(),/19 pontos/);
 testView='batalha';
 for(const id of SUBCLASS_IDS){
  const heroClass=SUBCLASS_DEFINITIONS[id].baseClass,node=SUBCLASS_TREES[id].find(n=>!n.requires.length);
  snapshot=fixture(heroClass,'cemiterio-esquecido','skeleton-warrior-normal-lvl-1',20,id,{[node.id]:1},node.skill?[node.id]:[]);
- await page.emulateMedia({reducedMotion:'reduce'});await reloadView();await page.locator('#game').waitFor({state:'visible'});
+ await page.emulateMedia({reducedMotion:'reduce'});await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
  await page.locator('#hero-sprite').evaluate(img=>img.decode());assert.match(await page.locator('#hero-sprite').getAttribute('src'),/heroes\/.+\/static.png$/);
  assert.ok(await page.getByRole('button',{name:'Redistribuir todos os pontos',exact:true}).isDisabled());
  if(id==='berserker'){
@@ -232,7 +232,7 @@ for(const id of SUBCLASS_IDS){
   assert.match(await page.getByRole('button',{name:'Golpe Brutal · 0 fúria',exact:true}).textContent(),/fúria/);
   await page.locator('#battle-panel').screenshot({path:`${output}/berserk-mobile.png`});
  }
- await page.emulateMedia({reducedMotion:'no-preference'});await reloadView();await page.locator('#game').waitFor({state:'visible'});
+ await page.emulateMedia({reducedMotion:'no-preference'});await reloadView();await page.waitForFunction(()=>!document.getElementById('game').hidden && !!document.body.dataset.view);
  await page.locator('#hero-sprite').evaluate(img=>img.decode());assert.match(await page.locator('#hero-sprite').getAttribute('src'),/heroes\/.+\/idle.gif$/);
 }
 assert.equal(await page.evaluate(()=>localStorage.length),0);
