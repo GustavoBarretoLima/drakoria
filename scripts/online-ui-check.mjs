@@ -35,8 +35,8 @@ function fixture(heroClass = 'guerreiro', regionId = 'cemiterio-esquecido', mons
 }
 snapshot = {...fixture(), battle:null, expedition:null};
 const context = await browser.newContext({ viewport:{width:1280,height:1050} });
-let testView = 'guilda';
-async function reloadView() { await page.goto(`https://drakoria.test/play#${testView}`); }
+let testView = 'guilda', reloadSequence = 0;
+async function reloadView() { await page.goto(`https://drakoria.test/play?check=${++reloadSequence}#${testView}`); }
 const errors=[]; const page=await context.newPage(); page.on('pageerror', error=>errors.push(error.message));
 await context.route('**/*',async route=>{
  const request=route.request();const path=new URL(request.url()).pathname;
