@@ -559,4 +559,4 @@ body.has-city-sidebar{background:#100c08;font-family:Georgia,serif;min-height:10
 @media(prefers-reduced-motion:reduce){.hotspot,.hotspot:before,.hotspot:after,.hotspot .icon{animation:none!important;transition:none!important}}
 
 /* Online equipment rows show the server-owned item name. */
-#painelPraca .jrpg-sheet #hero-equipment .equipment-slot > strong{position:static;width:auto;height:auto;margin:0;overflow:visible;clip-path:none;min-width:100px}
+#painelPraca .jrpg-sheet #hero-equipment .equipment-slot > strong{position:static;width:auto;height:auto;margin:0;overflow:visible;clip-path:none;min-width:0;overflow-wrap:anywhere;font-size:11px}

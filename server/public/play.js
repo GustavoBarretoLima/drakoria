@@ -93,7 +93,7 @@ function renderCharacter() {
   el('hero-skills').replaceChildren(...(snapshot.specialization?.learnedSkills || []).map(skill => { const row=document.createElement('div');row.className='jrpg-skill-row';row.textContent=skill.name;return row; }));
   const labels = {weapon:'Arma',armor:'Armadura',shield:'Mão secundária',legs:'Pernas',boots:'Botas',gloves:'Luvas',ring:'Anel',earring:'Brinco',necklace:'Colar'};
   el('hero-equipment').replaceChildren(...Object.entries(labels).map(([slot,label]) => {
-    const item=snapshot.inventory.find(entry=>entry.equipped && entry.definition.slot===slot),row=document.createElement('div'),name=document.createElement('span'),value=document.createElement('strong');row.className=`equipment-slot rarity-${item?.definition.rarity || 'common'}`;name.textContent=label;value.textContent=item?.definition.name || 'Vazio';row.append(name,value);return row;
+    const item=snapshot.inventory.find(entry=>entry.equipped && entry.definition.slot===slot),row=document.createElement('div'),name=document.createElement('span'),value=document.createElement('strong');row.className=`equipment-slot ${item?'occupied':''} rarity-${item?.definition.rarity || 'common'}`;name.textContent=label;value.textContent=item?.definition.name || 'Vazio';row.append(name);const icon=item && equipmentIcon(item.definition.icon);if(icon){const art=document.createElement('span'),img=document.createElement('img');art.className='equipment-art';img.src=icon;img.alt='';img.width=64;img.height=64;art.append(img);row.append(art);}row.append(value);return row;
   }));
 }
 function renderTavern(fighting) {

@@ -110,11 +110,11 @@ assert.equal(await page.locator('#hero-attributes dd').count(),8);assert.equal(a
 assert.equal(await page.locator('#hero-equipment .equipment-slot strong').first().isVisible(),true);
 await page.locator('#profile-sprite').evaluate(img=>img.decode());
 await page.screenshot({path:`${output}/status-desktop.png`,fullPage:true});
-await page.locator('.jrpg-sheet-header a[href="#inventario"]').click();assert.equal(await page.locator('body').getAttribute('data-view'),'inventario');
+await page.locator('.jrpg-sheet-header a[href="#inventario"]').click();await page.waitForFunction(()=>document.body.dataset.view==='inventario');assert.equal(await page.locator('body').getAttribute('data-view'),'inventario');
 assert.equal(actions+starts+questCommands+specializationCommands+tavernCommands,0);
 await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
 await page.screenshot({path:`${output}/inventory-mobile.png`,fullPage:true});
-await page.locator('.city-window-toolbar a[href="#praca"]').click();
+await page.locator('.city-window-toolbar a[href="#praca"]').click();await page.waitForFunction(()=>document.body.dataset.view==='praca');
 await page.screenshot({path:`${output}/square-mobile.png`,fullPage:true});
 await page.locator('#city-menu-handle').focus();await page.keyboard.press('Enter');await page.keyboard.press('Escape');
 assert.equal(await page.locator('#city-menu-handle').getAttribute('aria-expanded'),'false');
